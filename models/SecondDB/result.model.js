@@ -1,5 +1,5 @@
 import { Schema, Types } from "mongoose";
-import { connTwo } from "../../database/MongoDB";
+import { connTwo } from '../../database/MongoDB';
 
 // Logic to extract response from response field will depend on type of exams
 const wrongAnswersSchema = new Schema({
