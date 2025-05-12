@@ -20,6 +20,10 @@ export const CreateOrganization = async (req, res) => {
     //       location
     //     };
     //   }
+
+    if (req.file && req.file.path) {
+        data.logoUrl = req.file.path;
+      }
   
       const existing = await Organization.findOne({
         $or: [{ email: data.email }, { phone: data.phone }]
@@ -35,7 +39,7 @@ export const CreateOrganization = async (req, res) => {
       console.error('Error creating Organization:', err.message);
       return new APIError(500, ['something went wrong while creating organization' , err.message]).send(res);
     }
-  };
+};
 
 export const getAllOrganization = async (req , res) => {
 

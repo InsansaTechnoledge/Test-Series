@@ -1,5 +1,5 @@
 import { Schema, Types } from "mongoose";
-import { connOne } from "../../database/MongoDB";
+import { connOne } from "../../database/MongoDB.js";
 import bcrypt from 'bcrypt';
 import validator from 'validator';
 
@@ -104,7 +104,7 @@ const studentSchema = new Schema({
         type:String,
         enum:['Male', 'Female' , 'Others'],
         required: true
-    }
+    } 
 }, {
     timestamps: true
 });
