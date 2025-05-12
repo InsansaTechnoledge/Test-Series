@@ -1,5 +1,5 @@
 import { Schema, Types } from "mongoose";
-import { connOne } from "../../database/MongoDB";
+import { connOne } from "../../database/MongoDB.js";
 import bcrypt from 'bcrypt';
 import validator from 'validator';
 
