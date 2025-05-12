@@ -22,9 +22,13 @@ export const deleteSubscription = async (req, res) => {
     try {
         const { id } = req.params;
 
+        const data = await SubscriptionPlan.findById(id)
+
+        if(!data) return new APIError(404, 'subscription plan does not exist').send(res);
+
         const deletedPlan = await SubscriptionPlan.findByIdAndDelete(id);
 
-        return new APIResponse(200, deletedPlan, "Plan deleted successfully");
+        return new APIResponse(200, "Plan deleted successfully").send(res);
 
     }
     catch (err) {
