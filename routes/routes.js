@@ -11,7 +11,6 @@ const routes = (app) => {
     app.use('/api/v1/feature', featureRoutes)
     app.use('/api/v1/organization', organizationRoutes)
     app.use('/api/v1/users', userRoutes);
-
 }
 
 export default routes;
