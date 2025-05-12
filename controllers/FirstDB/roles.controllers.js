@@ -23,7 +23,7 @@ export const deleteRole = async (req, res) => {
 
         const role = await Role.findByIdAndDelete(id);
 
-        return new APIResponse(200, role, 'Role Deleted successfully');
+        return new APIResponse(200, role, 'Role Deleted successfully').send(res);
     }
     catch (err) {
         console.log(err);
@@ -35,10 +35,9 @@ export const updateRole = async (req, res) => {
     try {
         const { id } = req.params;
         const roleData = req.body;
+        const role = await Role.findByIdAndUpdate(id, roleData, {new: true});
 
-        const role = await Role.findByIdAndUpdate(id, roleData);
-
-        return new APIResponse(200, role, 'Role updated successfully');
+        return new APIResponse(200, role, 'Role updated successfully').send(res);
     }
     catch (err) {
         console.log(err);
@@ -51,7 +50,10 @@ export const fetchRolesForOrganization = async (req,res) => {
 
         const {id} = req.params;
         const OrgRoles = await Role.find({organizationId: id}).populate('features').lean();
-        return new APIResponse(200, OrgRoles, "Roles for organization fetched");
+        if(!OrgRoles || OrgRoles.length===0){
+            return new APIError(404, ["Roles for organization not found"]).send(res);
+        }
+        return new APIResponse(200, OrgRoles, "Roles for organization fetched").send(res);
     }
     catch(err){
         console.log(err);
@@ -63,7 +65,11 @@ export const fetchRoleDetails = async (req,res) => {
     try{
         const {id} = req.params;
         const role = await Role.findById(id).populate('features').lean();
-        return new APIResponse(200, role, "Role fetched successfully");
+        if(!role){
+            return new APIError(404, ["Role not found"]).send(res);
+        }
+        
+        return new APIResponse(200, role, "Role fetched successfully").send(res);
     }
     catch(err){
         console.log(err);
