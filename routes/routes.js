@@ -1,4 +1,3 @@
-import app from "../app.js".<<<<<<< HEAD
 import userRoutes from './mongoRoutes/FirstDB/user.routes.js';
 
 const routes=(app)=>{
