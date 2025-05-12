@@ -1,6 +1,7 @@
 import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
-import { APIResponse } from "../../utils/ResponseAndError/ApiRsponse.utils.js";
+import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
 import { Organization } from "../../models/FirstDB/organization.model.js";
+
 
 export const CreateOrganization = async (req, res) => {
     try {
@@ -37,6 +38,7 @@ export const CreateOrganization = async (req, res) => {
   };
 
 export const getAllOrganization = async (req , res) => {
+
     try{
         const allOrganization = await Organization.find().sort({createdAt: -1});
         return new APIResponse(200 , allOrganization , 'all fetched').send(res);
@@ -47,6 +49,7 @@ export const getAllOrganization = async (req , res) => {
 }
 
 export const getOrganizationById = async (req, res) => {
+
     try{
 
         const {id} = req.params
@@ -65,6 +68,7 @@ export const getOrganizationById = async (req, res) => {
 }
 
 export const updateOrganization = async (req, res) => {
+
     try {
       const { id } = req.params;
       const updateData = req.body;
@@ -85,3 +89,20 @@ export const updateOrganization = async (req, res) => {
     }
 };
 
+export const deleteOrganization = async (req, res) => {
+
+    try {
+      const { id } = req.params;
+  
+      const organization = await Organization.findByIdAndDelete(id);
+  
+      if (!organization) {
+        return new APIError(404, ['Organization not found']).send(res);
+      }
+  
+      return new APIResponse(200, organization, 'Organization deleted successfully').send(res);
+    } catch (err) {
+      console.error('Error deleting Organization:', err);
+      return new APIError(500, ['something went wrong in deleting orgnization' , err.message]).send(res);
+    }
+};

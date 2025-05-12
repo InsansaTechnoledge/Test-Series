@@ -1,8 +1,12 @@
 import cron from "node-cron";
-import { Organization } from "../models/FirstDB/organization.model.js";
-import mongoose from "mongoose";
+// import { getOrganizationModel } from "../models/FirstDB/organization.model.js";
+const { Organization } = import ("../models/FirstDB/organization.model.js")
 
-cron.schedule('0 0 * * *', async () => {
+const AutoInactive = async () => {
+
+// const Organization = getOrganizationModel();
+
+  cron.schedule('0 0 * * *', async () => {
     try {
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - 3); 
@@ -23,4 +27,9 @@ cron.schedule('0 0 * * *', async () => {
     } catch (e) {
       console.error('[Scheduler Error] Failed to auto-deactivate organizations:', e.message);
     }
-});
+  });
+
+  console.log('[Scheduler] Cron job scheduled for midnight daily');
+};
+
+export default AutoInactive;

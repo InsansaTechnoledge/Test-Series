@@ -1,4 +1,6 @@
-import app from '../app.js'
+import Dotenv from 'dotenv'
+Dotenv.config({path: '.env.development.local'})
+
 import connectDB from '../database/MongoDB.js'
 import { connectToSupabase } from '../database/SupabaseDB.js'
 import AutoInactive from '../scheduler/organization.scheduler.js'
@@ -11,7 +13,9 @@ const startServer = async () => {
 
     await connectToSupabase();
 
-    AutoInactive();
+    await AutoInactive();
+
+    const { default: app } = await import('../config/express.config.js');
 
     app.listen(PORT , () => {
         console.log(`server is live at PORT : ${PORT}`)

@@ -1,5 +1,5 @@
-const { Schema } = require("mongoose");
-const { connOne } = require("../../database/MongoDB");
+import  {Schema} from 'mongoose'
+import { connOne } from '../../database/MongoDB.js';
 
 const FeaturesSchema = new Schema(
   {

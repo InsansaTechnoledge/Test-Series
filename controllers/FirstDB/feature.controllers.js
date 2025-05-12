@@ -1,6 +1,7 @@
-import { Feature } from "../../models/FirstDB/features.model.js"
+const { Feature }= await import ("../../models/FirstDB/features.model.js")
 import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js"
 import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js"
+
 
 export const createFeature = async (req,res) => {
     try{

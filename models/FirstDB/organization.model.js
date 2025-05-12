@@ -1,7 +1,7 @@
-import {Schema } from 'mongoose'
+import {Schema , Types } from 'mongoose'
 import validator from 'validator';
 import bcrypt from 'bcrypt';
-import { connOne } from '../../database/MongoDB';
+import { connOne } from '../../database/MongoDB.js';
 
 
 const addressSchema = new Schema({
@@ -158,3 +158,4 @@ OrganizationSchema.methods.comparePassword = async function (candidatePassword) 
 };
 
 export const Organization = connOne.model('Organization' , OrganizationSchema)
+
