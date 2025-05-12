@@ -4,10 +4,6 @@ import bcrypt from 'bcrypt';
 import validator from 'validator';
 
 const studentSchema = new Schema({
-    profilePhoto: {
-        type: String,
-        default: null
-    },
     name: {
         type: String,
         trim: true,
@@ -19,6 +15,12 @@ const studentSchema = new Schema({
             },
             message: 'Name should contain only alphabets and spaces',
         }
+    },
+    profilePhoto: {
+        type: String,
+        default: function () {
+            return `https://ui-avatars.com/api/?name=${encodeURIComponent(this.name)}&background=random`;
+          }
     },
     email: {
         type: String,

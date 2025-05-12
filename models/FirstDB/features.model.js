@@ -1,5 +1,5 @@
-const { Schema } = require("mongoose");
-const { connOne } = require("../../database/MongoDB");
+import  {Schema} from 'mongoose'
+import { connOne } from '../../database/MongoDB.js';
 
 const FeaturesSchema = new Schema(
   {
@@ -61,33 +61,33 @@ FeaturesSchema.statics = {
     return this.findOne({ name }).exec();
   },
 
-  async activateById(id) {
-    return this.findByIdAndUpdate(
-      id,
-      { status: 'active' },
-      { new: true }
-    ).exec();
-  },
+  // async activateById(id) {
+  //   return this.findByIdAndUpdate(
+  //     id,
+  //     { status: 'active' },
+  //     { new: true }
+  //   ).exec();
+  // },
 
-  async deactivateById(id) {
-    return this.findByIdAndUpdate(
-      id,
-      { status: 'inactive' },
-      { new: true }
-    ).exec();
-  }
+  // async deactivateById(id) {
+  //   return this.findByIdAndUpdate(
+  //     id,
+  //     { status: 'inactive' },
+  //     { new: true }
+  //   ).exec();
+  // }
 };
 
 FeaturesSchema.methods = {
-  activate() {
-    this.status = 'active';
-    return this.save();
-  },
+  // activate() {
+  //   this.status = 'active';
+  //   return this.save();
+  // },
   
-  deactivate() {
-    this.status = 'inactive';
-    return this.save();
-  },
+  // deactivate() {
+  //   this.status = 'inactive';
+  //   return this.save();
+  // },
 
   toResponse() {
     const obj = this.toObject();

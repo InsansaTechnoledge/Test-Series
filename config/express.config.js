@@ -17,9 +17,7 @@ app.use(express.urlencoded({extended: true}))
 routes(app);
 
 app.get('/' , (req,res) => {
-    res.status(200).json({
-        message: 'Welcome to the API'
-    });
+    res.send('API is working fine ✅')
 })
 
 export default app;
