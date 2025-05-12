@@ -57,7 +57,7 @@ const subscriptionPlanSchema = new Schema(
       default: 1
     },
     metadata: {
-      displayOrder: { type: Number, default: 0 },
+      displayOrder: { type: Number, default: 0, unique: true },
       popular: { type: Boolean, default: false },
       recommended: { type: Boolean, default: false }
     }
@@ -113,24 +113,7 @@ subscriptionPlanSchema.index({ 'metadata.popular': 1, 'metadata.recommended': 1 
 
 // Static methods
 subscriptionPlanSchema.statics = {
-  async createWithFeatures(planData, featureIds) {
-    const plan = new this(planData);
-    plan.features = featureIds;
-    await plan.save();
-    return plan.populate('features');
-  },
-
-  async getPlansWithFeatures(filter = {}) {
-    return this.find(filter)
-      .populate('features', 'name description status')
-      .sort({ 'metadata.displayOrder': 1, price: 1 });
-  },
-
-  async findByIdWithFeatures(id) {
-    return this.findById(id)
-      .populate('features', 'name description status');
-  },
-
+  
   async addFeaturesToPlan(planId, featureIds) {
     return this.findByIdAndUpdate(
       planId,
@@ -150,9 +133,9 @@ subscriptionPlanSchema.statics = {
 
 // Instance methods
 subscriptionPlanSchema.methods = {
-  async getFeatureNames() {
+  async getFeatures() {
     await this.populate('features');
-    return this.features.map(f => f.name);
+    return this.features;
   },
 
   async hasFeature(featureId) {

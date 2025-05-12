@@ -25,6 +25,8 @@ const RoleSchema = new Schema({
     }
 },{
     timestamps: true
-})
+});
+
+
 
 export const Role = connOne.model('Role' , RoleSchema)
