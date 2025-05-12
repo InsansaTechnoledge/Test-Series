@@ -1,0 +1,179 @@
+import xlsx from 'xlsx';
+import fs from 'fs';
+import bcrypt from 'bcrypt';
+import Student from '../../models/FirstDB/student.model.js';
+import { APIError } from '../../utils/ResponseAndError/ApiError.utils.js';
+import { APIResponse } from '../../utils/ResponseAndError/ApiRsponse.utils.js';
+
+export const createOneStudent = async (req, res) => {
+    try{
+        const data = req.body 
+
+        if(!data.name || !data.email || !data.password || !data.gender) return new APIError(401 , 'required data is missing from student').send(res)
+
+        const upload = Student.create(data)
+
+        return new APIResponse(200 , upload , ['sudents created successfully']).send(res)
+    } catch(e) {
+        return new APIError(500, ['something went wrong while creating users', e.message]).send(res)
+    }
+}
+
+export const bulkCreateStudents = async (req, res) => {
+    try {
+      const students = req.body;
+  
+      if (!Array.isArray(students) || students.length === 0) {
+        return new APIError(400, 'No student data provided or invalid format').send(res);
+      }
+  
+      const preparedStudents = await Promise.all(
+        students.map(async (student) => {
+          if (!student.name || !student.email || !student.password || !student.gender) {
+            throw new Error(`Missing fields in student: ${student.email || 'unknown'}`);
+          }
+  
+          const hashedPassword = await bcrypt.hash(student.password, 12);
+          return {
+            ...student,
+            password: hashedPassword
+          };
+        })
+      );
+  
+      const inserted = await Student.insertMany(preparedStudents);
+      return new APIResponse(201, inserted, 'Students uploaded successfully').send(res);
+    } catch (err) {
+      console.error('Bulk Upload Error:', err);
+      return new APIError(500, ['Something went wrong during bulk upload', err.message]).send(res);
+    }
+};
+
+export const uploadStudentExcel = async (req, res) => {
+  try {
+    if (!req.file) {
+      return new APIError(400, 'No file uploaded').send(res);
+    }
+
+    const workbook = xlsx.readFile(req.file.path);
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+    const rawData = xlsx.utils.sheet_to_json(sheet);
+
+    const students = await Promise.all(
+      rawData.map(async (s, i) => {
+        if (!s.name || !s.email || !s.password || !s.gender) {
+          throw new Error(`Row ${i + 2} is missing required fields`);
+        }
+        return {
+          ...s,
+          password: await bcrypt.hash(s.password, 10)
+        };
+      })
+    );
+
+    const inserted = await Student.insertMany(students);
+
+    // Cleanup file
+    fs.unlinkSync(req.file.path);
+
+    return new APIResponse(201, inserted, 'Students uploaded via Excel').send(res);
+  } catch (err) {
+    console.error('Excel Upload Error:', err);
+    return new APIError(500, ['Something went wrong while uploading Excel', err.message]).send(res);
+  }
+};
+
+export const getAllStudents = async (req, res) => {
+    try{
+
+        const data = await Student.find();
+
+        if(data.length === 0) return new APIError(404, 'no students found').send(res)
+
+        return new APIResponse(200, data , 'Students fetched successfully').send(res);
+    } catch (e) {
+        return new APIError(500, ['something went wrong while fetching list of students' , e.message]).send(res);
+    }
+}
+
+export const uploadProfileImage = async (req , res) => {
+    try{
+
+        const { id } = req.params;
+
+        const profilePicUrl = req.file?.path || req.file?.secure_url;
+
+        if (!profilePicUrl) return new APIError(404, 'Profile picture upload failed').send(res);
+
+        const student = await Student.findByIdAndUpdate(id , {profilePhoto: profilePicUrl} , {new: true})
+
+        if (!student) return new APIError(401, 'Student not found').send(res);
+
+        return new APIResponse(200, student, 'Profile pic uploaded successfully').send(res);
+
+    } catch (e) {
+        return new APIError(500, ['something went wrong while uploading the profile Image' , e.message]).send(res);
+    }
+}
+
+export const updateStudent = async (req,res) => {
+    try{
+        const data = req.body
+
+        const {id} = req.params
+
+        const student = await  Student.findById(id)
+
+        if (!student) return new APIError(401, 'Student not found').send(res);
+
+        const updated = await Student.findByIdAndUpdate(id , {...data} , {new: true})
+
+        return new APIResponse(200, updated , 'student data updated').send(res);
+
+    } catch(e) {
+        return new APIError(500, ['something went wrong while updating the student' , e.message]).send(res);
+
+    }
+}
+
+export const deleteStudent = async (req, res) => {
+    try{
+        const {id} = req.params
+
+        const student = await  Student.findById(id)
+
+        if (!student) return new APIError(401, 'Student not found').send(res);
+
+        await Student.findByIdAndDelete(id)
+
+        return new APIResponse(200, null , 'student data deleted').send(res);
+
+
+    } catch(e) {
+        return new APIError(500, ['something went wrong while deleting the student' , e.message]).send(res);
+
+    }
+}
+
+export const changeStudentBatch = async (req, res) => {
+    try{
+
+        const {id} = req.params
+
+        const {BatchId} = req.body
+
+        const student = await  Student.findById(id)
+
+        if (!student) return new APIError(401, 'Student not found').send(res);
+
+
+        const update = await Student.findByIdAndUpdate(id, {batchId: BatchId} , {new: true});
+
+        return new APIResponse(200, update , 'student Batch updated').send(res);
+
+    } catch(e) {
+        return new APIError(500, ['something went wrong while changing the student batch' , e.message]).send(res);
+
+    }
+}

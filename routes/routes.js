@@ -3,6 +3,7 @@ import subscriptionPlanRouter from './mongoRoutes/FirstDB/subscriptionPlan.route
 import featureRoutes from './mongoRoutes/FirstDB/features.routes.js'
 import organizationRoutes from './mongoRoutes/FirstDB/organization.routes.js'
 import userRoutes from './mongoRoutes/FirstDB/user.routes.js';
+import studentRoutes from './mongoRoutes/FirstDB/student.routes.js'
 import resultRoutes from './mongoRoutes/SecondDB/result.routes.js';
 
 const routes = (app) => {
@@ -12,6 +13,7 @@ const routes = (app) => {
     app.use('/api/v1/organization', organizationRoutes)
     app.use('/api/v1/users', userRoutes);
     app.use('/api/v1/result', resultRoutes);
+    app.use('/api/v1/student', studentRoutes)
 }
 
 export default routes;

@@ -27,6 +27,7 @@ const studentSchema = new Schema({
         unique: [true, "Email already exists"],
         minLength: [10, 'Enter a valid email'],
         trim: true,
+        required: true,
         lowercase: true,
         maxLength: [60, 'email length exeeds '],
         validate: {
@@ -53,11 +54,12 @@ const studentSchema = new Schema({
             message:
                 'Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.',
         },
+        required: true
     },
     organizationId: {
         type: Types.ObjectId,
         ref: "Organization",
-        required: [true, 'Student should belong to any organization']
+        // required: [true, 'Student should belong to any organization']
     },
     phone: {
         type: Number,
@@ -93,13 +95,13 @@ const studentSchema = new Schema({
     },
     batchId: {
         type: String,
-        required: [true, 'batchId is required'],
+        // required: [true, 'batchId is required'],
     },
-    StudentId: {
-        type: String,
-        required: [true, "Student ID is required"],
-        unique: [true, "Student ID must be unique"]
-    },
+    // StudentId: {
+    //     type: String,
+    //     required: [true, "Student ID is required"],
+    //     unique: [true, "Student ID must be unique"]
+    // },
     gender:{
         type:String,
         enum:['Male', 'Female' , 'Others'],
