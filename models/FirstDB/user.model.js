@@ -65,6 +65,7 @@ const userSchema = new Schema({
         required: [true, 'Batch does not exists'],
         default: []
     },
+    //id which is given by the organization
     userId: {
         type: String,
         required: [true, 'UserId is required']
@@ -81,8 +82,8 @@ const userSchema = new Schema({
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next;
   try {
-    const salt = await bcrypt.genSalt(10);
-    this.password = bcrypt.hash(this.password, salt);
+    this.password = await this.hashPassword(this.password);
+    next();
   } catch (err) {
     next(err);
   }
@@ -91,6 +92,11 @@ userSchema.pre('save', async function (next) {
 userSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
+
+userSchema.methods.hashPassword = async function (password) {
+  const salt = await bcrypt.genSalt(10);
+  return bcrypt.hash(password, salt);
+}
 
 const User = connOne.model('User', userSchema);
 export default User;
