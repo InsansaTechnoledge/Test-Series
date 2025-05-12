@@ -6,8 +6,8 @@ import userRoutes from './mongoRoutes/FirstDB/user.routes.js';
 
 
 const routes = (app) => {
-    app.use('/api/v1/role/', roleRouter);
-    app.use('/api/v1/subscriptionPlan/', subscriptionPlanRouter);
+    app.use('/api/v1/role', roleRouter);
+    app.use('/api/v1/subscriptionPlan', subscriptionPlanRouter);
     app.use('/api/v1/feature', featureRoutes)
     app.use('/api/v1/organization', organizationRoutes)
     app.use('/api/v1/users', userRoutes);
