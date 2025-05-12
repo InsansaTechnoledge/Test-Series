@@ -1,5 +1,5 @@
 import { Schema, Types } from "mongoose";
-import { connOne } from "../../database/MongoDB";
+import { connOne } from "../../database/MongoDB.js";
 import bcrypt from 'bcrypt';
 import validator from 'validator';
 
@@ -60,7 +60,7 @@ const userSchema = new Schema({
         ref: 'Role'
     },
     organizationId: {
-        type: Object.Types.Schema,
+        type: Types.ObjectId,
         ref: 'Organization'
     },
     batch: {
