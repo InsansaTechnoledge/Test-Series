@@ -1,5 +1,5 @@
 import express from 'express'
-import { bulkCreateStudents, changeStudentBatch, createOneStudent, deleteStudent, getAllStudents, updateStudent, uploadProfileImage, uploadStudentExcel } from '../../../controllers/FirstDB/student.controller.js'
+import { bulkCreateStudents, changeStudentBatch, createOneStudent, deleteStudent, getAllStudents, updateStudent, uploadProfileImage, uploadStudentExcel } from '../../../controllers/FirstDB/student.controllers.js'
 import { uploadExcel } from '../../../middleware/uploadExcelForStudents.middleware.js'
 import { upload } from '../../../middleware/uploadLogoAndProfile.moddleware.js'
 

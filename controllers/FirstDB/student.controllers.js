@@ -3,7 +3,7 @@ import fs from 'fs';
 import bcrypt from 'bcrypt';
 import Student from '../../models/FirstDB/student.model.js';
 import { APIError } from '../../utils/ResponseAndError/ApiError.utils.js';
-import { APIResponse } from '../../utils/ResponseAndError/ApiRsponse.utils.js';
+import { APIResponse } from '../../utils/ResponseAndError/ApiResponse.utils.js';
 
 export const createOneStudent = async (req, res) => {
     try{
