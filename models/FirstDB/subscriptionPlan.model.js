@@ -11,24 +11,19 @@ const subscriptionPlanSchema = new Schema(
       unique: true,
       index: true
     },
-    features: [
-      {
-        type: Types.ObjectId,
-        ref: 'Feature',
-        required: true,
-        validate: {
-          validator: async function(featureIds) {
-            
-            const featureCount = await connOne.model('Feature').countDocuments({
-              _id: { $in: featureIds },
-              status: 'active' // Only allow active features
-            });
-            return featureCount === featureIds.length;
-          },
-          message: 'One or more features are invalid or inactive'
-        }
+    features: {
+      type: [Types.ObjectId],
+      validate: {
+        validator: async function (featureIds) {
+          const count = await connOne.model('Feature').countDocuments({
+            _id: { $in: featureIds },
+            status: 'active'
+          });
+          return count === featureIds.length;
+        },
+        message: 'One or more features are invalid or inactive'
       }
-    ],
+    },
     price: {
       type: Number,
       required: [true, 'Price is required'],
@@ -179,7 +174,7 @@ subscriptionPlanSchema.pre('save', async function(next) {
 
 subscriptionPlanSchema.post('save', async function(doc) {
   // Update feature references if needed
-  await doc.populate('features').execPopulate();
+  await doc.populate('features')
 });
 
 export const SubscriptionPlan = connOne.model('SubscriptionPlan', subscriptionPlanSchema);
