@@ -68,7 +68,12 @@ const userSchema = new Schema({
     userId: {
         type: String,
         required: [true, 'UserId is required']
-    }
+    },
+    gender:{
+      type:String,
+      enum:['Male', 'Female' , 'Others'],
+      required: true
+  }
 },{
     timestamps: true
 });

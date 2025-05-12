@@ -1,0 +1,115 @@
+create table public.Batch_syllabus (
+  id uuid primary key default gen_random_uuid(),
+  syllabus jsonb not null,
+  created_at timestamp with time zone default now()
+);
+
+create table public.Organization_Batch (
+  id uuid primary key default gen_random_uuid(),
+  organization_id text not null,
+  name text not null,
+  year int2 not null,
+  syllabus_id uuid references public.Batch_syllabus(id),
+  created_at timestamp with time zone default now()
+);
+
+create table public.Batch_exam (
+  id uuid primary key default gen_random_uuid(),
+
+  name text not null,
+  date date not null,
+
+  batch_id uuid references public.Organization_Batch(id) on delete cascade,
+  organization_id text not null, -- from MongoDB
+
+  total_marks int2,
+  duration int2, -- in minutes
+  live_until timestamp with time zone,
+
+  description text,
+  guidelines text,
+
+  status text check (
+    status in ('scheduled', 'live', 'ended')
+  ) default 'scheduled',
+
+  syllabus jsonb, -- subject: [chapters]
+
+  created_at timestamp with time zone default now()
+);
+
+create table public.questions (
+  id uuid primary key default gen_random_uuid(),
+  exam_id uuid references Batch_exam(id) on delete cascade,
+  organization_id text not null, -- from MongoDB
+
+  subject text,
+  chapter text,
+  question_type text check (
+    question_type in ('mcq', 'msq', 'fill', 'tf', 'match', 'comprehension', 'numerical', 'code')
+  ) not null,
+
+  difficulty text check (
+    difficulty in ('easy', 'medium', 'hard')
+  ),
+
+  explanation text,
+  marks int2 default 1,
+
+  created_at timestamp with time zone default now()
+);
+
+create table public.question_mcq (
+  id uuid primary key references questions(id) on delete cascade,
+  question_text text not null,
+  options text[] not null,
+  correct_option int2 not null
+);
+
+create table public.question_msq (
+  id uuid primary key references questions(id) on delete cascade,
+  question_text text not null,
+  options text[] not null,
+  correct_options int2[] not null
+);
+
+create table public.question_fill (
+  id uuid primary key references questions(id) on delete cascade,
+  question_text text not null,
+  correct_answer text not null
+);
+
+create table public.question_tf (
+  id uuid primary key references questions(id) on delete cascade,
+  statement text not null,
+  is_true boolean not null
+);
+
+create table public.question_match (
+  id uuid primary key references questions(id) on delete cascade,
+  left_items text[] not null,
+  right_items text[] not null,
+  correct_pairs jsonb not null -- e.g., {"1":"C", "2":"A"}
+);
+
+create table public.question_comprehension (
+  id uuid primary key references questions(id) on delete cascade,
+  passage text not null,
+  sub_question_ids uuid[] -- Optional for linking other questions
+);
+
+create table public.question_numerical (
+  id uuid primary key references questions(id) on delete cascade,
+  question_text text not null,
+  correct_answer numeric
+);
+
+create table public.question_code (
+  id uuid primary key references questions(id) on delete cascade,
+  prompt text not null,
+  input_format text,
+  output_format text,
+  sample_input text,
+  sample_output text,
+  test_cases jsonb -- e.g., [{input: "2 3", output: "5"}]
+);

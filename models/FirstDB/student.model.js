@@ -97,6 +97,11 @@ const studentSchema = new Schema({
         type: String,
         required: [true, "Student ID is required"],
         unique: [true, "Student ID must be unique"]
+    },
+    gender:{
+        type:String,
+        enum:['Male', 'Female' , 'Others'],
+        required: true
     }
 }, {
     timestamps: true

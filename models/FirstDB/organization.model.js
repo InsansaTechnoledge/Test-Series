@@ -62,7 +62,7 @@ const subscriptionSchema = new Schema({
     },
     status: { 
         type: String, 
-        enum: ['active', 'cancelled', 'trialing'], 
+        enum: ['active', 'cancelled', 'trialing', 'inactive'], 
         default: 'trialing' 
     }
 },
