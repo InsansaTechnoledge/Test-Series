@@ -11,7 +11,7 @@ export const createFeature = async (req,res) => {
 
         const data = await Feature.create(body)
 
-        return new APIResponse(200, data.toResponse() , 'feature created successfully').send(res)
+        return new APIResponse(200, data , 'feature created successfully').send(res)
     } catch(e) {
         return new APIError(500, ['something went wrong while creating features', e.message]).send(res);
     }
@@ -23,7 +23,7 @@ export const fetchAllFeatures = async(req,res) => {
 
         if(!data || data.length === 0) return new APIError(400, 'feature you are looking for , is either removed or does not exists').send(res);
 
-        return new APIResponse(200, data.toResponse() , 'all features fetched successfully').send(res);
+        return new APIResponse(200, data , 'all features fetched successfully').send(res);
     } catch(e) {
         return new APIError(500 , ['soomething went wrong while fetching all features' , e.message]).send(res)
     }
@@ -42,7 +42,7 @@ export const ToggleActiveOrInactive = async (req,res) => {
 
         await data.save();
 
-        return new APIResponse(200 , data.toResponse() , `Feature has been set to ${data.status}`).send(res);
+        return new APIResponse(200 , data , `Feature has been set to ${data.status}`).send(res);
 
     } catch(e) {
         return new APIError(500, ['something went wrong while activating/in-activating the feature' , e.message]).send(res)
@@ -62,7 +62,7 @@ export const updateFeature = async(req,res) => {
 
         const updated = await Feature.findByIdAndUpdate(id , update , {new: true})
 
-        return new APIResponse(200, updated.toResponse() , 'feature updated successfully').send(res)
+        return new APIResponse(200, updated , 'feature updated successfully').send(res)
 
 
     } catch(e) {
