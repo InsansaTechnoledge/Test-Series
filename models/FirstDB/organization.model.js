@@ -123,8 +123,11 @@ const OrganizationSchema = new Schema({
         maxlength: 15,
         minlength: 10
       },
-      logoUrl:{
-        type: String
+      logoUrl: {
+        type: String,
+        default: function () {
+          return `https://ui-avatars.com/api/?name=${encodeURIComponent(this.name)}&background=random`;
+        }
       },
       address : addressSchema,
       website:{

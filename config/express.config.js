@@ -17,7 +17,7 @@ app.use(express.urlencoded({extended: true}))
 // routes(app);
 
 app.get('/' , (req,res) => {
-    app.send('API is working fine ✅')
+    res.send('API is working fine ✅')
 })
 
 export default app;

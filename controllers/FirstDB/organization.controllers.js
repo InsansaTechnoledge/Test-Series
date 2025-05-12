@@ -1,0 +1,87 @@
+import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
+import { APIResponse } from "../../utils/ResponseAndError/ApiRsponse.utils.js";
+import { Organization } from "../../models/FirstDB/organization.model.js";
+
+export const CreateOrganization = async (req, res) => {
+    try {
+      const data = req.body;
+  
+    //   // Get client's IP
+    //   const ip = req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress;
+  
+    //   // Fetch coordinates
+    //   const location = await getGeoLocationFromIp(ip);
+      
+  
+    //   if (location) {
+    //     data.address = {
+    //       ...data.address,
+    //       location
+    //     };
+    //   }
+  
+      const existing = await Organization.findOne({
+        $or: [{ email: data.email }, { phone: data.phone }]
+      });
+  
+      if (existing) {
+        return new APIError(409, ['Institute already exists']).send(res);
+      }
+  
+      const newOrganization = await Organization.create(data);
+      return new APIResponse(201, newOrganization, 'Organization created successfully').send(res);
+    } catch (err) {
+      console.error('Error creating Organization:', err.message);
+      return new APIError(500, ['something went wrong while creating organization' , err.message]).send(res);
+    }
+  };
+
+export const getAllOrganization = async (req , res) => {
+    try{
+        const allOrganization = await Organization.find().sort({createdAt: -1});
+        return new APIResponse(200 , allOrganization , 'all fetched').send(res);
+
+    } catch(e) {
+        return new APIError(500 , ['something went wrong while fetching all Organizations', e.message]).send(res)
+    }
+}
+
+export const getOrganizationById = async (req, res) => {
+    try{
+
+        const {id} = req.params
+        
+        const org = await Organization.findById(id)
+        if (!org) {
+            return new APIError(404, ['org not found']).send(res);
+        }
+
+        return new APIResponse(200, org, 'org fetched').send(res);
+
+    } catch(e) {
+        return new APIError(500 , ['something went wrong while fetching organization data' , e.message]).send(res)
+
+    }
+}
+
+export const updateOrganization = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updateData = req.body;
+  
+      const newOrganization = await Organization.findByIdAndUpdate(id, updateData, {
+        new: true,
+        runValidators: true,
+      });
+  
+      if (!newOrganization) {
+        return new APIError(404, ['Institute not found']).send(res);
+      }
+  
+      return new APIResponse(200, newOrganization, 'Organization updated successfully').send(res);
+    } catch (err) {
+      console.error('Error updating Organization:', err);
+      return new APIError(500, ['something went wrong while updating organization' , err.message]).send(res);
+    }
+};
+
