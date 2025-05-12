@@ -11,7 +11,7 @@ export const createFeature = async (req,res) => {
 
         const data = await Feature.create(body)
 
-        return new APIResponse(200, data.toResponse() , 'feature created successfully').send(res)
+        return new APIResponse(200, data , 'feature created successfully').send(res)
     } catch(e) {
         return new APIError(500, ['something went wrong while creating features', e.message]).send(res);
     }
