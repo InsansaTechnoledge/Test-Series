@@ -1,6 +1,6 @@
 import { Role } from "../../models/FirstDB/roles.model.js";
-import { APIError } from "../../utils/ResponseAndError/ApiError.utils";
-import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils";
+import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
+import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
 
 export const addRole = async (req, res) => {
     try {

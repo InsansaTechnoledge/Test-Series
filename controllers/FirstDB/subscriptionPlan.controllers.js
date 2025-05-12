@@ -1,6 +1,6 @@
 import { SubscriptionPlan } from "../../models/FirstDB/subscriptionPlan.model.js";
-import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils";
-import { APIError } from '../../utils/ResponseAndError/ApiError.utils';
+import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
+import { APIError } from '../../utils/ResponseAndError/ApiError.utils.js';
 
 export const addSubscription = async (req, res) => {
 
