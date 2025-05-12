@@ -1,5 +1,5 @@
 import { Schema, Types } from "mongoose";
-import { connTwo } from '../../database/MongoDB';
+import { connTwo } from '../../database/MongoDB.js';
 
 // Logic to extract response from response field will depend on type of exams
 const wrongAnswersSchema = new Schema({
@@ -19,7 +19,8 @@ const resultSchema = new Schema({
     studentId: {
         type: Types.ObjectId,
         ref: "Student",
-        required: [true, "StudentId is required"]
+        required: [true, "StudentId is required"],
+        index: true
     },
     examId: {
         type: String,
