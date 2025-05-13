@@ -15,7 +15,7 @@ export const registerUser = async (req, res) => {
 
     } catch (err) {
         console.log(err);
-      new APIError(err?.response?.status || err?.status || 500, ["Something went wrong", err.message || ""]).send(res);
+        new APIError(err?.response?.status || err?.status || 500, ["Something went wrong", err.message || ""]).send(res);
     }
 
 };
@@ -98,7 +98,7 @@ export const getUser = async (req, res) => {
         if (!user) {
             return new APIError(404, ["User not found!!"]).send(res);
         };
-        
+
         delete user.password;
         return new APIResponse(200, ["User fetched successfully!!"], userObject).send(res);
     }
@@ -106,5 +106,32 @@ export const getUser = async (req, res) => {
         console.log(err);
         return new APIError(err.response.status || 500, ["Something went wrong while fetching the user!!", err.response.message]).send(res);
     }
- };
+};
 
+export const getUsersFromBatch = async (req, res) => {
+    try {
+
+        const { id } = req.params;
+        if (!id) {
+            return new APIError(400, ["Invalid batch id"]).send(res);
+        }
+
+        const users = await User.find({
+            batch: {
+                $in: id
+            }
+        })
+        .select('-batch');
+
+        if (users.length === 0) {
+            return new APIError(404, ["Users not found"]).send(res);
+        }
+
+        return new APIResponse(200, users, "Users for batch fetched").send(res);
+    }
+    catch (err) {
+        console.log(err);
+        return new APIError(err.response.status || 500, ["Something went wrong while fetching users!!", err.response.message]).send(res);
+
+    }
+}
