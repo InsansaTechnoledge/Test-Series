@@ -2,7 +2,7 @@ import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
 import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
 import { createSyllabus ,updateSyllabus,deleteSyllabus} from "../../SqlQueries/syllabus.queries.js";
 
-export const createSyllabus = async (req, res) => {
+export const AddSyllabus = async (req, res) => {
     const syllabusData = req.body;
     try{
         const data={
@@ -19,7 +19,7 @@ export const createSyllabus = async (req, res) => {
 
 };
 
-export const getSyllabus = async (req, res) => {
+export const getSyllabusData = async (req, res) => {
     try{
         const syllabusData = await getSyllabus();
         return new APIResponse(200, ["Syllabus fetched successfully!!"], syllabusData).send(res);
@@ -31,7 +31,7 @@ export const getSyllabus = async (req, res) => {
 
 };
 
-export const updateSyllabus = async (req, res) => {
+export const updateSyllabusData = async (req, res) => {
     const syllabusData= req.body;
     try{
         const syllabusId = req.params.id;
@@ -53,7 +53,7 @@ export const updateSyllabus = async (req, res) => {
 
 };
 
-export const deleteSyllabus = async (req, res) => {
+export const deleteSyllabusData = async (req, res) => {
     const syllabusId = req.params.id;
     try{
         if(!syllabusId){

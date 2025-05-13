@@ -1,12 +1,12 @@
 import express from 'express';
-import { createSyllabus, getSyllabus ,updateSyllabus,deleteSyllabus} from '../../controllers/SupabaseDB/syllabus.controllers.js';
+import { AddSyllabus, getSyllabusData ,updateSyllabusData,deleteSyllabusData} from '../../controllers/SupabaseDB/syllabus.controllers.js';
 
-router= express.Router();
+const router= express.Router();
 
-router.post('/',createSyllabus);
-router.get('/',getSyllabus);
-router.post('/:id',updateSyllabus);
-router.delete('/:id',deleteSyllabus);
+router.post('/',AddSyllabus);
+router.get('/',getSyllabusData);
+router.post('/:id',updateSyllabusData);
+router.delete('/:id',deleteSyllabusData);
 
 
 export default router;
