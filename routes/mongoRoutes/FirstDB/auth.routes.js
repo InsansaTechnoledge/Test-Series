@@ -4,7 +4,7 @@ import { authenticateUserMiddleware ,authenticateOrganizationMiddleware, authent
 import { isLoggedInMiddleware } from '../../../middleware/isLoggedIn.middleware.js';
 const router = express.Router();
 
-router.post('/user-login',authenticateUserMiddleware.UserLogin);
+router.post('/user-login',authenticateUserMiddleware, UserLogin);
 router.post('/user-logout',UserLogout);
 router.post('/org-login',authenticateOrganizationMiddleware,organizationLogin);
 router.post('/org-logout',organizationLogout);
