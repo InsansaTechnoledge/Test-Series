@@ -12,4 +12,13 @@ export const fetchQuestionsByExam = async (examId) => {
     return data;
   };
 
-  
+export const updateQuestion = async (question, id) => {
+  const { data, error } = await supabase
+  .from("questions")
+  .select("*")
+  .update(question)
+  .eq('id', id)
+
+  if(error) throw error;
+  return data;
+}
