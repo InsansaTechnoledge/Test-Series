@@ -177,3 +177,18 @@ export const changeStudentBatch = async (req, res) => {
 
     }
 }
+
+export const getAllStudentOfBatch = async (req, res) => {
+  try{
+
+    const {BatchId} = req.params
+    const students = await Student.find({batchId : BatchId}).select('-batchId')
+
+    if(students.length === 0) return APIError(403 , 'Students not found').send(res);
+
+    return new APIResponse(200, students , 'fetched all student of this batch').send(res);
+
+  } catch (e) {
+    return new APIError(500, ['something went wrong while fetching students of this batch ' , e.message]).send(res);
+  }
+}
