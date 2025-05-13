@@ -5,6 +5,7 @@ import organizationRoutes from './mongoRoutes/FirstDB/organization.routes.js'
 import userRoutes from './mongoRoutes/FirstDB/user.routes.js';
 import studentRoutes from './mongoRoutes/FirstDB/student.routes.js'
 import resultRoutes from './mongoRoutes/SecondDB/result.routes.js';
+import authRoutes from './mongoRoutes/FirstDB/auth.routes.js';
 
 const routes = (app) => {
     app.use('/api/v1/role', roleRouter);
@@ -13,7 +14,8 @@ const routes = (app) => {
     app.use('/api/v1/organization', organizationRoutes)
     app.use('/api/v1/users', userRoutes);
     app.use('/api/v1/result', resultRoutes);
-    app.use('/api/v1/student', studentRoutes)
+    app.use('/api/v1/student', studentRoutes);
+    app.use('/api/v1/auth',authRoutes);
 }
 
 export default routes;

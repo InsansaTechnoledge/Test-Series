@@ -15,7 +15,7 @@ export const registerUser = async (req, res) => {
 
     } catch (err) {
         console.log(err);
-        return new APIError(err.response.status || 500, ["Something went wrong while registering the user!!", err.response.message]).send(res);
+      new APIError(err?.response?.status || err?.status || 500, ["Something went wrong", err.message || ""]).send(res);
     }
 
 };
