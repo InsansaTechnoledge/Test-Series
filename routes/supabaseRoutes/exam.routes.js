@@ -1,5 +1,5 @@
 import express from "express";
-import { addExam, deleteExamById, fetchExamBasedOnCondition, updateExamById } from "../../controllers/SupabaseDB/exam.controllers";
+import { addExam, deleteExamById, fetchExamBasedOnCondition, updateExamById } from "../../controllers/SupabaseDB/exam.controllers.js";
 
 const router = express.Router();
 
