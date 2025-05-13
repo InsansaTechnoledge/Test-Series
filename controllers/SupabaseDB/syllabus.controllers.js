@@ -1,0 +1,71 @@
+import { APIError } from "../../utils/ResponseAndError/ApiError.utils";
+import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils";
+import { createSyllabus ,updateSyllabus,deleteSyllabus} from "../../SqlQueries/syllabus.queries";
+
+export const createSyllabus = async (req, res) => {
+    const syllabusData = req.body;
+    try{
+        const data={
+            syllabus:syllabusData,
+            created_at: new Date()
+        }
+        const createdSyllabus = await createSyllabus(data);
+        return new APIResponse(200, ["Syllabus created successfully!!"], createdSyllabus).send(res);
+
+    }catch(err){
+        console.log(err);
+        new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while creating syllabus", err.message || ""]).send(res);
+    }
+
+};
+
+export const getSyllabus = async (req, res) => {
+    try{
+        const syllabusData = await getSyllabus();
+        return new APIResponse(200, ["Syllabus fetched successfully!!"], syllabusData).send(res);
+
+    }catch(err){
+        console.log(err);
+        new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while fetching syllabus", err.message || ""]).send(res);
+    }
+
+};
+
+export const updateSyllabus = async (req, res) => {
+    const syllabusData= req.body;
+    try{
+        const syllabusId = req.params.id;
+        if(!syllabusId){
+            return new APIError(400, ["Syllabus ID is required"]).send(res);
+        };
+        const data={
+            syllabus:syllabusData,
+            updated_at: new Date(),
+            updated_by: req.user._id
+        }
+        const updatedSyllabus = await updateSyllabus(data,syllabusId);
+        return new APIResponse(200, ["Syllabus updated successfully!!"], updatedSyllabus).send(res);
+
+    }catch(err){
+        console.log(err);
+        new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while updating syllabus", err.message || ""]).send(res);
+    }
+
+};
+
+export const deleteSyllabus = async (req, res) => {
+    const syllabusId = req.params.id;
+    try{
+        if(!syllabusId){
+            return new APIError(400, ["Syllabus ID is required"]).send(res);
+        };
+        const deletedSyllabus = await deleteSyllabus(syllabusId);
+        return new APIResponse(200, ["Syllabus deleted successfully!!"], deletedSyllabus).send(res);
+
+    }catch(err){
+        console.log(err);
+        new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while deleting syllabus", err.message || ""]).send(res);
+    }
+
+};
+
