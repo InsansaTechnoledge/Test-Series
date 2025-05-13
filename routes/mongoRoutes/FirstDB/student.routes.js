@@ -1,5 +1,5 @@
 import express from 'express'
-import { bulkCreateStudents, changeStudentBatch, createOneStudent, deleteStudent, getAllStudents, updateStudent, uploadProfileImage, uploadStudentExcel } from '../../../controllers/FirstDB/student.controllers.js'
+import { bulkCreateStudents, changeStudentBatch, createOneStudent, deleteStudent, getAllStudentOfBatch, getAllStudents, updateStudent, uploadProfileImage, uploadStudentExcel } from '../../../controllers/FirstDB/student.controllers.js'
 import { uploadExcel } from '../../../middleware/uploadExcelForStudents.middleware.js'
 import { upload } from '../../../middleware/uploadLogoAndProfile.moddleware.js'
 
@@ -13,6 +13,7 @@ router.post('/:id/upload-profile-photo' , upload.single('profilePic'), uploadPro
 router.patch('/update/:id', updateStudent)
 router.delete('/delete:id', deleteStudent)
 router.patch('/change-batch/:id', changeStudentBatch)
+router.get('/get-all-student-batch/:id' , getAllStudentOfBatch)
 
 export default router
 
