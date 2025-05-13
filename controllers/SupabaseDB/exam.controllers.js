@@ -1,0 +1,70 @@
+import { createExam, deleteExam, fetchSelective, updateExam } from '../../SqlQueries/exam.queries.js';
+import {APIError} from '../../utils/ResponseAndError/ApiError.utils.js'
+import {APIResponse} from '../../utils/ResponseAndError/ApiResponse.utils.js'
+
+export const addExam = async (req, res) => {
+    try{
+        const examData = req.body;
+        
+        const examDataWithUpdateMetaData = {
+            ...examData,
+            updated_at: Date.now(),
+            updated_by: req.user._id
+        }
+
+        const exam = await createExam(examDataWithUpdateMetaData);
+
+        return new APIResponse(200, exam, "Exam created successfully").send(res);
+    }
+    catch(err){
+        console.log(err);
+        return new APIError(500, ["Something went wrong while creating exam", err.message]).send(res);
+    }
+}
+
+export const updateExamById = async (req,res) => {
+    try{
+        const {id} = req.params;
+        const examData = req.body;
+
+        const examDataWithUpdateMetaData = {
+            ...examData,
+            updated_at: Date.now(),
+            updated_by: req.user._id
+        }
+        const exam = await updateExam(examDataWithUpdateMetaData, id);
+
+        return new APIResponse(200, exam, 'Exam Updated successfully').send(res);
+    }
+    catch(err){
+        console.log(err);
+        return new APIError(500, ["Something went wrong while updating exam", err.message]).send(res);   
+    }
+}
+
+export const fetchExamBasedOnCondition = async (req,res) => {
+    try{
+        const query = req.query;
+        const exams = await fetchSelective(query);
+
+        return new APIResponse(200, exams, "Exams fetched successfully!").send(res);
+    }
+    catch(err){
+        console.log(err);
+        return new APIError(500, ["Something went wrong while fetching exam", err.message]).send(res);   
+    }
+}
+
+export const deleteExamById = async (req,res) => {
+    try{
+        const {id} = req.params;
+        const exam = await deleteExam(id);
+
+        return new APIResponse(200, exam, "Deleted successfully").send(res);
+    }
+    catch(err){
+        console.log(err);
+        return new APIError(500, ["Something went wrong while fetching exam", err.message]).send(res);  
+    }
+}
+
