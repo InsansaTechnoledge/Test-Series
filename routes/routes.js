@@ -9,6 +9,7 @@ import authRoutes from './mongoRoutes/FirstDB/auth.routes.js';
 import examRoutes from './supabaseRoutes/exam.routes.js';
 import syllabusRoutes from './supabaseRoutes/syllabus.routes.js';
 import batchRoutes from './supabaseRoutes/batch.routes.js'
+import questionUploadRoutes from './supabaseRoutes/questionUpload.routes.js'
 
 const routes = (app) => {
     app.use('/api/v1/role', roleRouter);
@@ -21,7 +22,9 @@ const routes = (app) => {
     app.use('/api/v1/auth',authRoutes);
     app.use('/api/v1/exam', examRoutes);
     app.use('/api/v1/syllabus',syllabusRoutes);
-    app.use('/api/v1/batch' , batchRoutes);
+    app.use('/api/v1/batch' , batchRoutes); 
+    app.use('/api/v1/questionUpload', questionUploadRoutes);
+
 }
 
 export default routes;
