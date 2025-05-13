@@ -1,6 +1,7 @@
 import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
 import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
-import { CreateOrganizationBatch , getOrganizationBatches ,updateOrganizationBatch , deleteOrganizationBatch} from "../../SqlQueries/batch.query.js";
+import { CreateOrganizationBatch , getOrganizationBacthes ,updateOrganizationBatch , deleteOrganizationBatch} from "../../SqlQueries/batch.query.js";
+
 export const createOrgBatch = async (req, res) => {
     try {
       const data = req.body;
@@ -20,7 +21,7 @@ export const createOrgBatch = async (req, res) => {
     try {
       const { id, organization_id, year } = req.query;
   
-      const batches = await getOrganizationBatches({ id, organization_id, year });
+      const batches = await getOrganizationBacthes({ id, organization_id, year });
       return new APIResponse(200, batches, 'Batch(s) fetched successfully').send(res);
     } catch (e) {
       return new APIError(500, ['Failed to fetch batch(s)', e.message]).send(res);
