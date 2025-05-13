@@ -1,5 +1,5 @@
 import express from 'express';
-import { createSyllabus, getSyllabus ,updateSyllabus,deleteSyllabus} from '../../controllers/SupabaseDB/syllabus.controllers';
+import { createSyllabus, getSyllabus ,updateSyllabus,deleteSyllabus} from '../../controllers/SupabaseDB/syllabus.controllers.js';
 
 router= express.Router();
 

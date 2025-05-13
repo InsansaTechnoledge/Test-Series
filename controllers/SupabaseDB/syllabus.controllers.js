@@ -1,6 +1,6 @@
-import { APIError } from "../../utils/ResponseAndError/ApiError.utils";
-import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils";
-import { createSyllabus ,updateSyllabus,deleteSyllabus} from "../../SqlQueries/syllabus.queries";
+import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
+import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
+import { createSyllabus ,updateSyllabus,deleteSyllabus} from "../../SqlQueries/syllabus.queries.js";
 
 export const createSyllabus = async (req, res) => {
     const syllabusData = req.body;
