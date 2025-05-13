@@ -1,5 +1,5 @@
 import passport from 'passport';
-import { APIError} from '../utils/ResponseAndError/ApiError.utils.js';
+import { APIError } from "../utils/ResponseAndError/ApiError.utils.js";
 
 export const authenticateUserMiddleware = async (req, res, next) => {
     passport.authenticate('user-local', (err, user, info) => {
@@ -17,7 +17,7 @@ export const authenticateUserMiddleware = async (req, res, next) => {
     })(req, res, next);
   };
 
-  export const authenticateInstituteMiddleware = async (req, res, next) => {
+  export const authenticateOrganizationMiddleware = async (req, res, next) => {
     passport.authenticate('org-local', (err, user, info) => {
       // console.log(info);
       if (err) return new APIError(400, [err.message]).send(res);

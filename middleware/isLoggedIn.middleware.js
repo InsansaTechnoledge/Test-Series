@@ -1,4 +1,4 @@
-import APIError from '../utils/ResponseAndError/ApiError.utils.js';
+import {APIError} from '../utils/ResponseAndError/ApiError.utils.js';
 
 export const isLoggedInMiddleware = async (req, res, next) => {
     if (req.user) {
