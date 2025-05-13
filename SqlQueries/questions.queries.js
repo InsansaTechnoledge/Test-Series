@@ -12,4 +12,25 @@ export const fetchQuestionsByExam = async (examId) => {
     return data;
   };
 
+
+export const deleteQuestion = async (id) => {
+    const { data, error } = await supabase
+      .from("questions")
+      .delete()
+      .eq("id", id)
+      .select();
   
+    if (error) throw error;
+    return data;
+};
+
+export const deleteQuestionsBulk = async (ids) => {
+    const { data, error } = await supabase
+      .from("questions")
+      .delete()
+      .in("id", ids)
+      .select();
+  
+    if (error) throw error;
+    return data;
+};
