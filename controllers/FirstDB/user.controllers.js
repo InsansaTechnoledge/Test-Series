@@ -8,10 +8,7 @@ export const registerUser = async (req, res) => {
         const userData = req.body;
         const user = await User.create(userData);
 
-        const userObject = user.toObject();
-        delete userObject.password;
-
-        return new APIResponse(200, ["User registered successfully!!"], userObject).send(res);
+        return new APIResponse(200, ["User registered successfully!!"], user).send(res);
 
     } catch (err) {
         console.log(err);
@@ -28,13 +25,12 @@ export const updateUser = async (req, res) => {
             { $set: Data },
             { new: true }
         );
-        const userObject = user.toObject();
-        delete userObject.password;
-        return new APIResponse(200, ["User updated successfully!!"], userObject).send(res);
+
+        return new APIResponse(200, ["User updated successfully!!"], user).send(res);
 
     } catch (err) {
         console.log(err);
-        return new APIError(err.response.status || 500, ["Something went wrong while updating the user!!", err.response.message]).send(res);
+        new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while updating user", err.message || ""]).send(res);
     }
 
 };
@@ -43,7 +39,7 @@ export const changePassword = async (req, res) => {
     const { userId, oldPassword, newPassword } = req.body;
 
     try {
-        const user = await User.findOne({ userId });
+        const user = await User.findOne({ userId }).select('+password');
         if (!user) {
             return new APIError(404, ["User not found!!"]).send(res);
         };
@@ -56,7 +52,7 @@ export const changePassword = async (req, res) => {
         return new APIResponse(200, ["Password updated successfully!!"]).send(res);
     } catch (err) {
         console.log(err);
-        return new APIError(err.response.status || 500, ["Something went wrong while updating the password!!", err.response.message]).send(res);
+        new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while updating password", err.message || ""]).send(res);
 
     }
 
@@ -74,7 +70,7 @@ export const forgotPassword = async (req, res) => {
 
     } catch (err) {
         console.log(err);
-        return new APIError(err.response.status || 500, ["Something went wrong while updating the password!!", err.response.message]).send(res);
+       new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while updating the password", err.message || ""]).send(res);
     }
 
 };
@@ -86,7 +82,7 @@ export const deleteUser = async (req, res) => {
         new APIResponse(200, ["User deleted successfully!!"]).send(res);
     } catch (err) {
         console.log(err);
-        return new APIError(err.response.status || 500, ["Something went wrong while deleting the user!!", err.response.message]).send(res);
+        new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while deleting the user", err.message || ""]).send(res);
     }
 };
 
@@ -98,13 +94,12 @@ export const getUser = async (req, res) => {
         if (!user) {
             return new APIError(404, ["User not found!!"]).send(res);
         };
-
-        delete user.password;
-        return new APIResponse(200, ["User fetched successfully!!"], userObject).send(res);
+        
+        return new APIResponse(200, ["User fetched successfully!!"], user).send(res);
     }
     catch (err) {
         console.log(err);
-        return new APIError(err.response.status || 500, ["Something went wrong while fetching the user!!", err.response.message]).send(res);
+new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while fetching the user", err.message || ""]).send(res);
     }
 };
 

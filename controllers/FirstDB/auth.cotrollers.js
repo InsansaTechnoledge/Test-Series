@@ -23,14 +23,11 @@ export const UserLogin = async (req, res) => {
             { new: true }
         );
 
-        userObject = user.toObject();
-        delete userObject.password;
-
-        return new APIResponse(200, ["User logged in successfully!!"], userObject).send(res);
+        return new APIResponse(200, ["User logged in successfully!!"], user).send(res);
 
     } catch (err) {
         console.log(err);
-new APIError(err?.response?.status || err?.status || 500, ["Something went wrong", err.message || ""]).send(res);
+new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while user login", err.message || ""]).send(res);
 
     }
 };
@@ -54,7 +51,7 @@ export const UserLogout = async (req, res) => {
         });
     } catch (err) {
         console.log(err);
-        new APIError(err.response.status || 500, ["Something went wrong while loging out user", err.message]).send(res);
+        new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while user logout", err.message || ""]).send(res);
     }
 };
 
@@ -94,7 +91,7 @@ export const organizationLogin = async (req, res) => {
 
     } catch (err) {
         console.log(err);
-        new APIError(err.response.status || 500, ["Something went wrong while loging in organization", err.message]).send(res);
+        new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while organization login", err.message || ""]).send(res);
     }
 };
 
@@ -117,7 +114,7 @@ export const organizationLogout = async (req, res) => {
         });
     } catch (err) {
         console.log(err);
-        new APIError(err.response.status || 500, ["Something went wrong while loging out organization", err.message]).send(res);
+        new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while organization logout", err.message || ""]).send(res);
     }
 }; 
 
@@ -147,7 +144,7 @@ export const studentLogin = async (req, res) => {
 
     } catch (err) {
         console.log(err);
-        new APIError(err.response.status || 500, ["Something went wrong while loging in student", err.message]).send(res);
+        new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while student login", err.message || ""]).send(res);
     }
 };
 
@@ -170,7 +167,7 @@ export const studentLogout = async (req, res) => {
         });
     } catch (err) {
         console.log(err);
-        new APIError(err.response.status || 500, ["Something went wrong while loging out student", err.message]).send(res);
+        new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while student logout", err.message || ""]).send(res);
     }
 };
 
