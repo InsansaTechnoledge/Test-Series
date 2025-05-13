@@ -1,0 +1,60 @@
+import { getSupabaseClient } from "../database/SupabaseDB";
+
+const supabase = getSupabaseClient();
+
+export const CreateOrganizationBatch = async ({organization_id, name, year, syllabus_id}) => {
+    const {data , error} = await supabase
+    .from('Organization_Batch')
+    .insert([{organization_id, name, year, syllabus_id}])
+    .select()
+    .single()
+
+    if (error) throw error;
+    return data;
+}
+
+export const getOrganizationBacthes = async({id ,organization_id, year }) => {
+    let query = supabase.from('Organization_Batch').select('*')
+
+    if(id) {
+        query =query.eq('id', id).single()
+
+    } else {
+        if( organization_id ) query = query.eq('organization_id', organization_id)
+        if(year) query = query.eq('year' , year)
+
+        query = query.order('created_at', { ascending: false });
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return data;
+}
+
+export const updateOrganizationBatch = async (id, updates, updated_by) => {
+    const { data, error } = await supabase
+      .from('organization_batch')
+      .update({ 
+        ...updates, 
+        updated_at: new Date(), 
+        updated_by 
+      })
+      .eq('id', id)
+      .select()
+      .single();
+  
+    if (error) throw error;
+    return data;
+};
+
+export const deleteOrganizationBatch = async (id) => {
+    const { data, error } = await supabase
+      .from('Organization_Batch')
+      .delete()
+      .eq('id', id)
+      .select()
+      .single();
+  
+    if (error) throw error;
+    return data;
+};
