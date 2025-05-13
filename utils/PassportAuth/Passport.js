@@ -14,13 +14,15 @@ passport.use('user-local',
     async (email, password, done) => {
         try {
             const user = await User.findOne({ email: email}).select('+password');
+            console.log("😏",user);
             if (!user) {
                 return done(null, false, { message: 'User not found.' });
             }
             const isMatch = await user.comparePassword(password);
             if (!isMatch) {
                 return done(null, false, { message: 'Incorrect password.' });
-            }       
+            }   
+            console.log("😏",user.toObject());
             return done(null, {...user.toObject(), role: user.roleId });
 
         } catch (error) {
@@ -75,7 +77,9 @@ passport.use('org-local',
 
 
 passport.serializeUser((user, done) => {
-    done(null,{id:user_id,role:user.role} );
+      console.log("🚀 ~ file: passport.js:70 ~ passport.serializeUser ~ user:", user)
+    done(null,{id:user._id,role:user.roleId} );
+  
 });
 passport.deserializeUser(async (object, done) => {
     try {
