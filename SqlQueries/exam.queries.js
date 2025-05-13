@@ -6,6 +6,7 @@ export const createExam = async (examData) => {
     const { data, error } = await supabase
         .from("exam")
         .insert(examData)
+        .select()
 
     if (error) throw error;
     return data;
@@ -16,6 +17,7 @@ export const updateExam = async (examData, examId) => {
         .from("exam")
         .update(examData)
         .eq('id', examId)
+        .select()
 
     if (error) throw error;
     return data;
@@ -41,7 +43,8 @@ export const deleteExam = async (id) => {
     const {data, error} = await supabase
     .from("exam")
     .delete()
-    .eq('id', id);
+    .eq('id', id)
+    .select();
 
     if(error) throw error;
     return data;
