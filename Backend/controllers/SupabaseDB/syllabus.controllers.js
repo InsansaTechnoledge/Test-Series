@@ -1,6 +1,6 @@
 import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
 import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
-import { createSyllabus ,updateSyllabus,deleteSyllabus} from "../../SqlQueries/syllabus.queries.js";
+import { createSyllabus ,updateSyllabus,deleteSyllabus} from "../../utils/SqlQueries/syllabus.queries.js";
 
 export const AddSyllabus = async (req, res) => {
     const syllabusData = req.body;

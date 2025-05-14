@@ -1,6 +1,6 @@
 import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
 import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
-import { CreateOrganizationBatch , getOrganizationBacthes ,updateOrganizationBatch , deleteOrganizationBatch} from "../../SqlQueries/batch.queries.js";
+import { CreateOrganizationBatch , getOrganizationBacthes ,updateOrganizationBatch , deleteOrganizationBatch} from "../../utils/SqlQueries/batch.queries.js";
 
 export const createOrgBatch = async (req, res) => {
     try {

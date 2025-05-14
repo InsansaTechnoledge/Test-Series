@@ -1,12 +1,12 @@
 import fs from "fs";
-import { insertBaseQuestion, insertCode, insertComprehension, insertFILL, insertMatch, insertMCQ, insertMSQ, insertNumerical, insertTF } from "../../SqlQueries/questionUpload.queries.js";
+import { insertBaseQuestion, insertCode, insertComprehension, insertFILL, insertMatch, insertMCQ, insertMSQ, insertNumerical, insertTF } from "../../utils/SqlQueries/questionUpload.queries.js";
 import { mapQuestionData } from "../../utils/questionMapping.js";
 import parseExcel from "../../utils/readExcelFile.js";
 import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
 import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
 
 //uploading the questions foe all types
-const uploadedQuestions = async ( questionTypeData) => {
+const uploadedQuestions = async (questionTypeData) => {
 
   const insertPromises = [];
 
@@ -28,17 +28,17 @@ const uploadedQuestions = async ( questionTypeData) => {
   }
 
   const questions = await Promise.all(insertPromises);
-  return  questions;
+  return questions;
 }
 
 export const uploadMixedExcel = async (req, res) => {
-    const filePath = req.file.path;
-    const { exam_id, organization_id } = req.body;
+  const filePath = req.file.path;
+  const { exam_id, organization_id } = req.body;
 
   try {
     const rows = parseExcel(filePath);
     const baseQuestions = [];
-      let questionTypeData = {
+    let questionTypeData = {
       mcq: [],
       msq: [],
       fill: [],
@@ -63,19 +63,19 @@ export const uploadMixedExcel = async (req, res) => {
       });
 
     });
-        const insertedBases = await insertBaseQuestion(baseQuestions);
+    const insertedBases = await insertBaseQuestion(baseQuestions);
 
-  insertedBases.forEach((base, index) => {
-    const baseId = base.id;
-    questionTypeData[base.question_type] = mapQuestionData(rows[index],rows[index].type,baseId);
-    
-  });
+    insertedBases.forEach((base, index) => {
+      const baseId = base.id;
+      questionTypeData[base.question_type] = mapQuestionData(rows[index], rows[index].type, baseId);
+
+    });
 
     const questions = await uploadedQuestions(questionTypeData);
 
     fs.unlinkSync(filePath); // Delete the file after processing
 
-    new APIResponse(200, {insertedBases,questions},"Questions uploaded successfully").send(res);
+    new APIResponse(200, { insertedBases, questions }, "Questions uploaded successfully").send(res);
 
 
 
@@ -121,7 +121,7 @@ export const uploadByType = async (req, res) => {
       });
 
       // Map to type-specific array
-      questionTypeData = mapQuestionData(row,type,questionTypeData);
+      questionTypeData = mapQuestionData(row, type, questionTypeData);
     });
 
     const insertedBases = await insertBaseQuestion(baseQuestions);
@@ -131,10 +131,10 @@ export const uploadByType = async (req, res) => {
     }
     );
 
-      const questions = await uploadedQuestions( questionTypeData);
+    const questions = await uploadedQuestions(questionTypeData);
 
     fs.unlinkSync(filePath); // Delete the file after use
-    new APIResponse(200, {insertedBases,questions},"Questions uploaded successfully").send(res);
+    new APIResponse(200, { insertedBases, questions }, "Questions uploaded successfully").send(res);
   } catch (err) {
     console.error("Something went wrong:", err);
     new APIError(

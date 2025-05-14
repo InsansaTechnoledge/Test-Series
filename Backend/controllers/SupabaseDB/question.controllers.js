@@ -1,7 +1,6 @@
-import { fetchQuestionsSelectively, updateQuestion } from "../../SqlQueries/questions.queries.js";
+import { fetchQuestionsSelectively, updateQuestion ,deleteQuestion, deleteQuestionsBulk} from "../../utils/SqlQueries/questions.queries.js";
 import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
 import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
-import { deleteQuestion, deleteQuestionsBulk } from '../../SqlQueries/questions.queries.js'
 
 export const updateQuestionById = async (req, res) => {
     try {
