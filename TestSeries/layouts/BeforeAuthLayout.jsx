@@ -7,7 +7,7 @@ const BeforeAuthLayout = ({ children }) => {
   return (
     <div className="relative">
       <Navbar />
-      <main className="w-full overflow-x-hidden">
+      <main className="">
         {children || <Outlet />} {/* supports both routing and direct nesting */}
       </main>
      
