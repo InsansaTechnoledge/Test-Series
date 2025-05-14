@@ -4,22 +4,20 @@ import thinking from '../../../assests/Landing/Demo/thinking.svg';
 
 const WhyYourInstitute = () => {
   return (
-    <>
+    <div className="relative w-full py-20">
+      {/* Overlapping line image */}
+      <img src={line} alt="line img" className="absolute -top-22 left-0 w-full" />
 
-      {/* Full-screen Line Image */}
-      <img src={line} alt="line img" className='absolute z-10 h-full' />
-    
-    <div className="relative w-full h-screen overflow-hidden">
-
-      <div className="relative z-10  flex flex-row items-center justify-between w-full h-full px-12">
-
-        {/* Left side */}
+      {/* Main Content */}
+      <div className="relative z-10 flex flex-row items-center justify-center gap-8 px-12">
+        
+        {/* Left Image */}
         <div className="w-1/2 flex justify-center">
-          <img src={thinking} alt="thinking man image" className="max-h-screen" />
+          <img src={thinking} alt="thinking man image" className="max-h-[500px]" />
         </div>
 
-        {/* Right side */}
-        <div className="w-1/2 px-8">
+        {/* Right Text */}
+        <div className="w-1/2">
           <h1 className="text-violet-950 font-bold text-4xl leading-snug">
             Why your institute should register?
           </h1>
@@ -27,13 +25,13 @@ const WhyYourInstitute = () => {
             Partnering with us provides your institution with cutting-edge tools designed to enhance
             educational outcomes and streamline administrative processes.
           </p>
-          <button className="bg-violet-800/10 text-xl text-violet-950 border-violet-950 border-2 rounded-lg py-2 px-8 mt-6">
+          <button className="hover:cursor-pointer bg-violet-800/10 text-xl text-violet-950 border-violet-950 border-2 rounded-lg py-2 px-8 mt-6">
             Schedule demo
           </button>
         </div>
+
       </div>
     </div>
-    </>
   );
 };
 
