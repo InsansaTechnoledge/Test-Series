@@ -10,6 +10,7 @@ import examRoutes from './supabaseRoutes/exam.routes.js';
 import syllabusRoutes from './supabaseRoutes/syllabus.routes.js';
 import batchRoutes from './supabaseRoutes/batch.routes.js'
 import questionUploadRoutes from './supabaseRoutes/questionUpload.routes.js'
+import questionRoutes from './supabaseRoutes/question.routes.js';
 
 const routes = (app) => {
     app.use('/api/v1/role', roleRouter);
@@ -24,6 +25,7 @@ const routes = (app) => {
     app.use('/api/v1/syllabus',syllabusRoutes);
     app.use('/api/v1/batch' , batchRoutes); 
     app.use('/api/v1/questionUpload', questionUploadRoutes);
+    app.use('/api/v1/question', questionRoutes);
 
 }
 

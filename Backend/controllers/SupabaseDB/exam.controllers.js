@@ -18,7 +18,7 @@ export const addExam = async (req, res) => {
     }
     catch(err){
         console.log(err);
-        return new APIError(500, ["Something went wrong while creating exam", err.message]).send(res);
+        return new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while creating exam", err.message]).send(res);
     }
 }
 
@@ -38,7 +38,7 @@ export const updateExamById = async (req,res) => {
     }
     catch(err){
         console.log(err);
-        return new APIError(500, ["Something went wrong while updating exam", err.message]).send(res);   
+        return new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while updating exam", err.message]).send(res);   
     }
 }
 
@@ -51,7 +51,7 @@ export const fetchExamBasedOnCondition = async (req,res) => {
     }
     catch(err){
         console.log(err);
-        return new APIError(500, ["Something went wrong while fetching exam", err.message]).send(res);   
+        return new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while fetching exam", err.message]).send(res);   
     }
 }
 
@@ -64,7 +64,7 @@ export const deleteExamById = async (req,res) => {
     }
     catch(err){
         console.log(err);
-        return new APIError(500, ["Something went wrong while fetching exam", err.message]).send(res);  
+        return new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while fetching exam", err.message]).send(res);  
     }
 }
 
