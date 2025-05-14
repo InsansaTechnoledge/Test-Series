@@ -3,7 +3,7 @@ Dotenv.config({path: '.env.development.local'})
 
 import connectDB from '../database/MongoDB.js'
 import { connectToSupabase } from '../database/SupabaseDB.js'
-import AutoInactive from '../scheduler/organization.scheduler.js'
+import AutoInactive from '../utils/scheduler/organization.scheduler.js'
 
 const PORT = process.env.PORT || 8383
 

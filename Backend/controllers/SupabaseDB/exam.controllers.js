@@ -1,4 +1,4 @@
-import { createExam, deleteExam, fetchSelective, updateExam } from '../../SqlQueries/exam.queries.js';
+import { createExam, deleteExam, fetchSelective, updateExam } from '../../utils/SqlQueries/exam.queries.js';
 import {APIError} from '../../utils/ResponseAndError/ApiError.utils.js'
 import {APIResponse} from '../../utils/ResponseAndError/ApiResponse.utils.js'
 

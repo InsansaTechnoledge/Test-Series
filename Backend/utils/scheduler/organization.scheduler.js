@@ -1,6 +1,6 @@
 import cron from "node-cron";
 // import { getOrganizationModel } from "../models/FirstDB/organization.model.js";
-const { Organization } = import ("../models/FirstDB/organization.model.js")
+const { Organization } = import ("../../models/FirstDB/organization.model.js")
 
 const AutoInactive = async () => {
 
