@@ -36,12 +36,14 @@ export const Logout = async (req, res) => {
     try {
         req.logout(function (err) {
             if (err) {
-                return new APIError(500, ["Something went wrong while loging out user", err.message]).send(res);
+                new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while loging out", err.message || ""]).send(res);
+;
             }
 
             req.session.destroy((err) => {
                 if (err) {
-                    return new APIError(500, ["Something went wrong while loging out user", err.message]).send(res);
+                    new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while loging out", err.message || ""]).send(res);
+
                 }
 
                 res.clearCookie('connect.sid');

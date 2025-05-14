@@ -14,7 +14,8 @@ export const updateQuestionById = async (req, res) => {
     }
     catch (err) {
         console.log(err);
-        return new APIError(500, ["Something went wrong while updating question", err.message]).send(res);
+        new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while updating the questions", err.message || ""]).send(res);
+
     }
 }
 
@@ -26,7 +27,8 @@ export const getAllQuestionsSelectively = async (req, res) => {
         const data = await fetchQuestionsSelectively(condition);
         return new APIResponse(200, data, "Questions fetched successfully!").send(res);
     } catch (e) {
-        return new APIError(500, ["Something went wrong while updating question", e.message]).send(res);
+        new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while updating the questions", err.message || ""]).send(res);
+
     }
 };
 
@@ -46,6 +48,7 @@ export const deleteQuestions = async (req, res) => {
 
     } catch (e) {
         res.status(500).json({ message: e.message });
-        return new APIError(500, ["Sometihng went wrong while deleting questions", e.message]).send(res);
+        new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while deleting the questions", err.message || ""]).send(res);
+
     }
 };

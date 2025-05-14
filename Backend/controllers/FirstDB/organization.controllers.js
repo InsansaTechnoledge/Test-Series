@@ -37,7 +37,8 @@ export const CreateOrganization = async (req, res) => {
       return new APIResponse(201, newOrganization, 'Organization created successfully').send(res);
     } catch (err) {
       console.error('Error creating Organization:', err.message);
-      return new APIError(500, ['something went wrong while creating organization' , err.message]).send(res);
+      new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while creating organization", err.message || ""]).send(res);
+
     }
 };
 
@@ -48,7 +49,8 @@ export const getAllOrganization = async (req , res) => {
         return new APIResponse(200 , allOrganization , 'all fetched').send(res);
 
     } catch(e) {
-        return new APIError(500 , ['something went wrong while fetching all Organizations', e.message]).send(res)
+        new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while fetching all organization", err.message || ""]).send(res);
+        
     }
 }
 
@@ -66,7 +68,8 @@ export const getOrganizationById = async (req, res) => {
         return new APIResponse(200, org, 'org fetched').send(res);
 
     } catch(e) {
-        return new APIError(500 , ['something went wrong while fetching organization data' , e.message]).send(res)
+       new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while fetching organization Data", err.message || ""]).send(res);
+       
 
     }
 }
@@ -89,7 +92,8 @@ export const updateOrganization = async (req, res) => {
       return new APIResponse(200, newOrganization, 'Organization updated successfully').send(res);
     } catch (err) {
       console.error('Error updating Organization:', err);
-      return new APIError(500, ['something went wrong while updating organization' , err.message]).send(res);
+      new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while updating the organization", err.message || ""]).send(res);
+
     }
 };
 
@@ -107,6 +111,7 @@ export const deleteOrganization = async (req, res) => {
       return new APIResponse(200, organization, 'Organization deleted successfully').send(res);
     } catch (err) {
       console.error('Error deleting Organization:', err);
-      return new APIError(500, ['something went wrong in deleting orgnization' , err.message]).send(res);
+     new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while deleting the organization", err.message || ""]).send(res);
+
     }
 };

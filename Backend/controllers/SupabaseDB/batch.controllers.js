@@ -13,7 +13,8 @@ export const createOrgBatch = async (req, res) => {
       const batch = await CreateOrganizationBatch(data);
       return new APIResponse(201, batch, 'Batch created successfully').send(res);
     } catch (e) {
-      return new APIError(500, ['Failed to create batch', e.message]).send(res);
+      new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while creating the batch", err.message || ""]).send(res);
+
     }
   };
   
@@ -24,7 +25,8 @@ export const createOrgBatch = async (req, res) => {
       const batches = await getOrganizationBacthes({ id, organization_id, year });
       return new APIResponse(200, batches, 'Batch(s) fetched successfully').send(res);
     } catch (e) {
-      return new APIError(500, ['Failed to fetch batch(s)', e.message]).send(res);
+      new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while fetching the batch(s)", err.message || ""]).send(res);
+
     }
   };
   
@@ -38,7 +40,8 @@ export const createOrgBatch = async (req, res) => {
       const updated = await updateOrganizationBatch(id, updates);
       return new APIResponse(200, updated, 'Batch updated successfully').send(res);
     } catch (e) {
-      return new APIError(500, ['Failed to update batch', e.message]).send(res);
+      new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while updating the batch", err.message || ""]).send(res);
+      
     }
   };
   
@@ -51,6 +54,7 @@ export const createOrgBatch = async (req, res) => {
       const deleted = await deleteOrganizationBatch(id);
       return new APIResponse(200, deleted, 'Batch deleted successfully').send(res);
     } catch (e) {
-      return new APIError(500, ['Failed to delete batch', e.message]).send(res);
+      new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while deleting the batch", err.message || ""]).send(res);
+
     }
   };
