@@ -32,8 +32,8 @@ const uploadedQuestions = async ( questionTypeData) => {
 }
 
 export const uploadMixedExcel = async (req, res) => {
-  const filePath = req.file.path;
-  const { exam_id, organization_id } = req.body;
+    const filePath = req.file.path;
+    const { exam_id, organization_id } = req.body;
 
   try {
     const rows = parseExcel(filePath);
