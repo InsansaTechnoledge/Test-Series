@@ -1,5 +1,5 @@
 import express from 'express';
-import { fileUpload } from '../../middleware/uploadQuestionExcel.js';
+import { fileUpload } from '../../middleware/uploadExcel.middleware.js';
 import { uploadByType, uploadMixedExcel } from '../../controllers/SupabaseDB/questionUploader.controllers.js';
 
 const router = express.Router();
