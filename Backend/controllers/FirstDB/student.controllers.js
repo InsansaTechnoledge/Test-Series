@@ -15,7 +15,8 @@ export const createOneStudent = async (req, res) => {
 
         return new APIResponse(200 , upload , ['sudents created successfully']).send(res)
     } catch(e) {
-        return new APIError(500, ['something went wrong while creating users', e.message]).send(res)
+       new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while creating the user", err.message || ""]).send(res);
+
     }
 }
 
@@ -45,7 +46,8 @@ export const bulkCreateStudents = async (req, res) => {
       return new APIResponse(201, inserted, 'Students uploaded successfully').send(res);
     } catch (err) {
       console.error('Bulk Upload Error:', err);
-      return new APIError(500, ['Something went wrong during bulk upload', err.message]).send(res);
+      new APIError(err?.response?.status || err?.status || 500, ["Something went wrong during bulk upload", err.message || ""]).send(res);
+      
     }
 };
 
@@ -80,7 +82,8 @@ export const uploadStudentExcel = async (req, res) => {
     return new APIResponse(201, inserted, 'Students uploaded via Excel').send(res);
   } catch (err) {
     console.error('Excel Upload Error:', err);
-    return new APIError(500, ['Something went wrong while uploading Excel', err.message]).send(res);
+   new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while uploading the excel", err.message || ""]).send(res);
+
   }
 };
 
@@ -93,7 +96,8 @@ export const getAllStudents = async (req, res) => {
 
         return new APIResponse(200, data , 'Students fetched successfully').send(res);
     } catch (e) {
-        return new APIError(500, ['something went wrong while fetching list of students' , e.message]).send(res);
+        new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while fetching list of students", err.message || ""]).send(res);
+
     }
 }
 
@@ -113,7 +117,8 @@ export const uploadProfileImage = async (req , res) => {
         return new APIResponse(200, student, 'Profile pic uploaded successfully').send(res);
 
     } catch (e) {
-        return new APIError(500, ['something went wrong while uploading the profile Image' , e.message]).send(res);
+       new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while uploading the profile image", err.message || ""]).send(res);
+
     }
 }
 
@@ -132,7 +137,8 @@ export const updateStudent = async (req,res) => {
         return new APIResponse(200, updated , 'student data updated').send(res);
 
     } catch(e) {
-        return new APIError(500, ['something went wrong while updating the student' , e.message]).send(res);
+        new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while updating the students", err.message || ""]).send(res);
+
 
     }
 }
@@ -151,7 +157,8 @@ export const deleteStudent = async (req, res) => {
 
 
     } catch(e) {
-        return new APIError(500, ['something went wrong while deleting the student' , e.message]).send(res);
+       new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while deleting the students", err.message || ""]).send(res);
+       
 
     }
 }
@@ -173,7 +180,8 @@ export const changeStudentBatch = async (req, res) => {
         return new APIResponse(200, update , 'student Batch updated').send(res);
 
     } catch(e) {
-        return new APIError(500, ['something went wrong while changing the student batch' , e.message]).send(res);
+       new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while changing the batch of students", err.message || ""]).send(res);
+
 
     }
 }
@@ -189,6 +197,7 @@ export const getAllStudentOfBatch = async (req, res) => {
     return new APIResponse(200, students , 'fetched all student of this batch').send(res);
 
   } catch (e) {
-    return new APIError(500, ['something went wrong while fetching students of this batch ' , e.message]).send(res);
+    new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while fetching the students of this batch", err.message || ""]).send(res);
+
   }
 }

@@ -13,7 +13,8 @@ export const createFeature = async (req,res) => {
 
         return new APIResponse(200, data , 'feature created successfully').send(res)
     } catch(e) {
-        return new APIError(500, ['something went wrong while creating features', e.message]).send(res);
+        new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while creating the feature", err.message || ""]).send(res);
+
     }
 }
 
@@ -25,7 +26,8 @@ export const fetchAllFeatures = async(req,res) => {
 
         return new APIResponse(200, data , 'all features fetched successfully').send(res);
     } catch(e) {
-        return new APIError(500 , ['soomething went wrong while fetching all features' , e.message]).send(res)
+        new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while fetching all features", err.message || ""]).send(res);
+
     }
 }
 
@@ -45,7 +47,8 @@ export const ToggleActiveOrInactive = async (req,res) => {
         return new APIResponse(200 , data , `Feature has been set to ${data.status}`).send(res);
 
     } catch(e) {
-        return new APIError(500, ['something went wrong while activating/in-activating the feature' , e.message]).send(res)
+        new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while activating/in-activating the feature", err.message || ""]).send(res);
+        
     }
 }
 
@@ -66,7 +69,8 @@ export const updateFeature = async(req,res) => {
 
 
     } catch(e) {
-        return new APIError(500, ['something went wrong while updating the feature' , e.message]).send(res);
+        new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while updating the feature", err.message || ""]).send(res);
+        
     }
 }
 
@@ -84,7 +88,8 @@ export const deleteFeature = async(req , res) => {
         return new APIResponse(200, null, 'feature deleted successfully').send(res)
 
     } catch (e) {
-        return new APIError(500 , ['something went wrong while deleting' , e.message]).send(res)
+        new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while deleting the feature", err.message || ""]).send(res);
+
     }
 }
 
