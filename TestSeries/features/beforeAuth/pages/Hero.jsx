@@ -61,7 +61,9 @@ const Hero = () => {
       </div>
       <div className='w-full flex'>
         <button
-        className='bg-indigo-800 rounded-full text-white py-4 px-10 mt-12 mx-auto'
+        className='
+        hover:cursor-pointer
+        bg-indigo-800 rounded-full text-white py-4 px-10 mt-20 mx-auto'
         >
           <div className='flex'>
             <span className='pr-5 font-semibold text-xl '>
