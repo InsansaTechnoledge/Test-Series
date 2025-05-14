@@ -7,7 +7,8 @@ const types = [
     "Mcq's",
     "MsQ",
     "Fill In The Blanks",
-    "Matching",
+    "Matching Type",
+    "True/False",
     "Compehension",
     "Number Type",
     "Code Compiler"
