@@ -1,18 +1,19 @@
-import React from 'react'
-import Hero from './pages/Hero'
-import WhyYourInstitute from './pages/WhyYourInstitute'
-import TestTypes from './pages/TestTypes'
-import WhyTakeExam from './pages/WhyTakeExam'
+// BeforeAuthLanding.jsx
+import React from 'react';
+import Hero from './pages/Hero';
+import WhyYourInstitute from './pages/WhyYourInstitute';
+import TestTypes from './pages/TestTypes';
+import WhyTakeExam from './pages/WhyTakeExam';
 
 const BeforeAuthLanding = () => {
-    return (
-        <>
-        <Hero />
-        <WhyYourInstitute/>
-        <WhyTakeExam/>
-        <TestTypes />
-        </>
-    )
-}
+  return (
+    <>
+      <Hero />
+      <WhyYourInstitute />
+      <WhyTakeExam />
+      <TestTypes />
+    </>
+  );
+};
 
-export default BeforeAuthLanding
+export default BeforeAuthLanding;

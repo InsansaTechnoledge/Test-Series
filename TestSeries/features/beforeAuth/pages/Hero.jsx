@@ -28,7 +28,8 @@ const chips = [
 
 const Hero = () => {
   return (
-    <div className='mt-34 relative mx-50'>
+    
+    <div className='mt-34  relative mx-50'>
       <img 
       className='absolute left-0 top-0'
       src={planeLeft} alt='plane_left' />
