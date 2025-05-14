@@ -1,11 +1,12 @@
 import React from 'react'
 import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
+import Landing from '../../features/beforeAuth/pages/Landing';
 
 const PageLinks = () => {
   return (
     <Router>
         <Routes>
-            
+            <Route path={'/'} element={<Landing />}/>
         </Routes>
     </Router>
   )
