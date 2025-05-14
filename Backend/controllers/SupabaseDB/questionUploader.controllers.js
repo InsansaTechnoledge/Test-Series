@@ -1,7 +1,7 @@
 import fs from "fs";
 import { insertBaseQuestion, insertCode, insertComprehension, insertFILL, insertMatch, insertMCQ, insertMSQ, insertNumerical, insertTF } from "../../SqlQueries/questionUpload.queries.js";
-import { mapQuestionData } from "../../utils/questionUploadUtils/questionMapping.js";
-import parseExcel from "../../utils/questionUploadUtils/readExcelFile.js";
+import { mapQuestionData } from "../../utils/questionMapping.js";
+import parseExcel from "../../utils/readExcelFile.js";
 import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
 import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
 
