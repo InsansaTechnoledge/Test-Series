@@ -3,7 +3,7 @@ import { ArrowRight } from 'lucide-react';
 
 const Navbar = () => {
   return (
-    <div className="fixed w-full z-50 bg-blue-950 text-white px-6 py-6 ">
+    <div className="top-0 fixed w-full z-50 bg-blue-950 text-white px-6 py-6 ">
       <div className="max-w-screen-xl mx-auto flex justify-between items-center">
         {/* Logo */}
         <div className="text-2xl font-bold">
