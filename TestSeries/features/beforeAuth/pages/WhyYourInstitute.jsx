@@ -20,7 +20,7 @@ const WhyYourInstitute = () => {
         </div>
 
         {/* Right side */}
-        <div className="w-1/2 px-8">
+        <div className="w-1/2">
           <h1 className="text-violet-950 font-bold text-4xl leading-snug">
             Why your institute should register?
           </h1>
