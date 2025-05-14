@@ -29,4 +29,12 @@ const storage = multer.diskStorage({
 
 });
 
-export const fileUpload = multer({ storage });
+const fileFilter = (req, file, cb) => {
+  const ext = path.extname(file.originalname);
+  if (ext !== '.xlsx') {
+    return cb(new Error('Only .xlsx files are allowed'), false);
+  }
+  cb(null, true);
+};
+
+export const fileUpload = multer({ storage, fileFilter });
