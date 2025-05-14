@@ -28,7 +28,7 @@ const chips = [
 
 const Hero = () => {
   return (
-    <div className='mt-34 relative mx-64'>
+    <div className='mt-34 relative mx-50'>
       <img 
       className='absolute left-0 top-0'
       src={planeLeft} alt='plane_left' />
@@ -40,7 +40,7 @@ const Hero = () => {
       text-5xl font-bold
       text-center
       pb-5
-      mx-32
+      mx-40
       text-clip bg-clip-text text-transparent bg-gradient-to-r from-blue-900 via-purple-600 to-blue-800'>
         One Destination for Complete Exam Preparation
       </h1>
@@ -49,10 +49,10 @@ const Hero = () => {
       font-semibold mt-14'>
         Get exam-ready with concepts, questions and study notes as per the latest pattern
       </h2>
-      <div className='grid grid-cols-4 gap-8 mt-14 mx-20'>
+      <div className='grid grid-cols-4 gap-8 mt-14 mx-32'>
         {
           chips.map((chip, idx) => (
-            <div className='border-blue-900 border-2 rounded-lg py-4 px-2 flex justify-center' key={idx}>
+            <div className='border-blue-900 border-2 rounded-xl py-4 px-4 flex justify-center' key={idx}>
               <img src={chip.icon} alt={chip.text}/>
               <span className='my-auto pl-5 text-blue-900 font-semibold'>{chip.text}</span>
             </div>

@@ -61,7 +61,7 @@ const WhyTakeExam = () => {
         <img
         src={line}
         alt="line image"
-        className="absolute bottom-0 right-0"
+        className="hidden absolute bottom-0 right-0"
     />
 
 
