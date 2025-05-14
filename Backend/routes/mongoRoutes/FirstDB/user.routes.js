@@ -1,12 +1,12 @@
 import express from 'express';
-import { registerUser, updateUser,changePassword,forgotPassword,getUser, getUsersFromBatch } from '../../../controllers/FirstDB/user.controllers.js';
+import { registerUser, updateUser,changePassword,forgotPassword,getUser, getUsersFromBatch ,deleteUser} from '../../../controllers/FirstDB/user.controllers.js';
 const router = express.Router();
 
 router.post('/create', registerUser);
 router.patch('/update',updateUser);
 router.patch('/changePassword', changePassword);
-router.patch('/forgotPassword', forgotPassword);
-router.get('/getUser', getUser);
+router.patch('/forgotPassword', forgotPassword);router.delete('/delete/:id', deleteUser);
+router.get('/getUser/:id', getUser);
 router.get('/batch/:id', getUsersFromBatch);
 
 
