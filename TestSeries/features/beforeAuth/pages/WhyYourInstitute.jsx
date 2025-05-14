@@ -4,10 +4,13 @@ import thinking from '../../../assests/Landing/Demo/thinking.svg';
 
 const WhyYourInstitute = () => {
   return (
+    <>
+    
+      {/* Full-screen Line Image */}
+      <img src={line} alt="line img" className='absolute z-10 h-full' />
+    
     <div className="relative w-full h-screen overflow-hidden">
 
-      {/* Full-screen Line Image */}
-      <img src={line} alt="line img" className='absolute left-1/2 top-0 -translate-x-1/2 z-10 h-full' />
 
       <div className="relative z-10  flex flex-row items-center justify-between w-full h-full px-12">
 
@@ -31,6 +34,7 @@ const WhyYourInstitute = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
