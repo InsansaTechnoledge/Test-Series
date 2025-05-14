@@ -1,151 +1,146 @@
-import fs from 'fs';
-import xlsx from 'xlsx';
-import {
-    insertBaseQuestion,
-    insertMCQ,
-    insertMSQ,
-    insertFILL,
-    insertTF,
-    insertComprehension,
-    insertMatch,
-    insertCode,
-    insertNumerical,
-} from '../../SqlQueries/questionUpload.queries.js';
+import fs from "fs";
+import { insertBaseQuestion, insertCode, insertComprehension, insertFILL, insertMatch, insertMCQ, insertMSQ, insertNumerical, insertTF } from "../../SqlQueries/questionUpload.queries.js";
+import { mapQuestionData } from "../../utils/questionUploadUtils/questionMapping.js";
+import parseExcel from "../../utils/questionUploadUtils/readExcelFile.js";
+import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
+import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
 
-export const uploadByType = async (req, res) => {
-    const { exam_id, organization_id, question_type, subject, chapter } = req.body;
-    const filePath = req.file.path;
+//uploading the questions foe all types
+const uploadedQuestions = async ( questionTypeData) => {
 
-    try {
-        const workbook = xlsx.readFile(filePath);
-        const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        const rows = xlsx.utils.sheet_to_json(sheet);
+  const insertPromises = [];
 
-        for (const row of rows) {
-            if (row.type !== question_type) {
-                throw new Error(`Row type mismatch: Expected ${question_type} but got ${row.type}`);
-            }
+  const insertFunctions = {
+    mcq: insertMCQ,
+    msq: insertMSQ,
+    fill: insertFILL,
+    tf: insertTF,
+    match: insertMatch,
+    comprehension: insertComprehension,
+    numerical: insertNumerical,
+    code: insertCode
+  };
 
-            const { data: base, error: baseErr } = await insertBaseQuestion({
-                exam_id,
-                organization_id,
-                subject,
-                chapter,
-                question_type,
-                difficulty: row.difficulty,
-                explanation: row.explanation || null,
-                marks: row.marks || 1
-            });
-            if (baseErr) throw baseErr;
-
-            const id = base.id;
-
-            switch (question_type) {
-                case 'mcq':
-                    await insertMCQ(id, row);
-                    break;
-                case 'msq':
-                    await insertMSQ(id, row);
-                    break;
-                case 'fill':
-                    await insertFILL(id, row);
-                    break;
-                case 'tf':
-                    await insertTF(id, row);
-                    break;
-                default:
-                    throw new Error(`Unsupported question type: ${question_type}`);
-            }
-        }
-
-        fs.unlinkSync(filePath);
-        res.status(200).json({ message: "Upload successful" });
-
-    } catch (e) {
-        fs.unlinkSync(filePath);
-        res.status(500).json({ message: e.message });
+  for (const [type, questions] of Object.entries(questionTypeData)) {
+    if (questions.length && insertFunctions[type]) {
+      insertPromises.push(insertFunctions[type](questions));
     }
-};
+  }
+
+  const questions = await Promise.all(insertPromises);
+  return  questions;
+}
 
 export const uploadMixedExcel = async (req, res) => {
     const filePath = req.file.path;
     const { exam_id, organization_id } = req.body;
 
-    const uploadedQuestions = [];
+  try {
+    const rows = parseExcel(filePath);
+    const baseQuestions = [];
+      let questionTypeData = {
+      mcq: [],
+      msq: [],
+      fill: [],
+      tf: [],
+      match: [],
+      comprehension: [],
+      numerical: [],
+      code: []
+    };
 
-    try {
-        const workbook = xlsx.readFile(filePath);
-        const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        const rows = xlsx.utils.sheet_to_json(sheet);
+    rows.forEach((row) => {
+      const { type, subject, chapter, difficulty, explanation, marks } = row;
+      baseQuestions.push({
+        exam_id,
+        organization_id,
+        subject,
+        chapter,
+        question_type: type,
+        difficulty,
+        explanation,
+        marks
+      });
 
-        for (const row of rows) {
-            const { type, subject, chapter, difficulty, explanation, marks = 1 } = row;
+    });
+        const insertedBases = await insertBaseQuestion(baseQuestions);
 
-            const { data: base, error: baseErr } = await insertBaseQuestion({
-                exam_id,
-                organization_id,
-                subject,
-                chapter,
-                question_type: type,
-                difficulty,
-                explanation,
-                marks
-            });
-            if (baseErr) throw baseErr;
+  insertedBases.forEach((base, index) => {
+    const baseId = base.id;
+    questionTypeData[base.question_type] = mapQuestionData(rows[index],rows[index].type,baseId);
+    
+  });
 
-            const id = base.id;
+    const questions = await uploadedQuestions(questionTypeData);
 
-            switch (type) {
-                case 'mcq':
-                    await insertMCQ(id, row);
-                    break;
-                case 'msq':
-                    await insertMSQ(id, row);
-                    break;
-                case 'fill':
-                    await insertFILL(id, row);
-                    break;
-                case 'tf':
-                    await insertTF(id, row);
-                    break;
-                case 'match':
-                    await insertMatch(id, row);
-                    break;
-                case 'comprehension':
-                    await insertComprehension(id, row);
-                    break;
-                case 'numerical':
-                    await insertNumerical(id, row);
-                    break;
-                case 'code':
-                    await insertCode(id, row);
-                    break;
-                default:
-                    throw new Error(`Unknown question type: ${type}`);
-            }
+    fs.unlinkSync(filePath); // Delete the file after processing
 
-            // Collect question data (you can customize what to include)
-            uploadedQuestions.push({
-                id,
-                type,
-                subject,
-                chapter,
-                difficulty,
-                explanation,
-                marks
-            });
-        }
+    new APIResponse(200, {insertedBases,questions},"Questions uploaded successfully").send(res);
 
-        fs.unlinkSync(filePath);
-        res.status(200).json({
-            message: "Upload successful",
-            uploadedQuestions
-        });
 
-    } catch (e) {
-        fs.unlinkSync(filePath);
-        res.status(500).json({ message: e.message });
-    }
+
+  } catch (err) {
+    console.log("something went wrong", err);
+    new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while uploading the excel by question types", err.message || ""]).send(res);
+  }
 };
 
+
+export const uploadByType = async (req, res) => {
+  const filePath = req.file.path;
+  const { exam_id, organization_id, type } = req.body;
+
+  try {
+    const rows = parseExcel(filePath);
+
+    const baseQuestions = [];
+    let questionTypeData = {
+      mcq: [],
+      msq: [],
+      fill: [],
+      tf: [],
+      match: [],
+      comprehension: [],
+      numerical: [],
+      code: []
+    };
+
+    rows.forEach((row) => {
+      const { subject, chapter, difficulty, explanation, marks } = row;
+
+      // Add base question row
+      baseQuestions.push({
+        exam_id,
+        organization_id,
+        subject,
+        chapter,
+        question_type: type,
+        difficulty,
+        explanation,
+        marks
+      });
+
+      // Map to type-specific array
+      questionTypeData = mapQuestionData(row,type,questionTypeData);
+    });
+
+    const insertedBases = await insertBaseQuestion(baseQuestions);
+    insertedBases.forEach((base, index) => {
+      const baseId = base.id;
+      questionTypeData[type][index].id = baseId;
+    }
+    );
+
+      const questions = await uploadedQuestions( questionTypeData);
+
+    fs.unlinkSync(filePath); // Delete the file after use
+    new APIResponse(200, {insertedBases,questions},"Questions uploaded successfully").send(res);
+  } catch (err) {
+    console.error("Something went wrong:", err);
+    new APIError(
+      err?.response?.status || err?.status || 500,
+      ["Something went wrong while uploading the Excel file by type", err.message || ""]
+    ).send(res);
+  }
+};
 
