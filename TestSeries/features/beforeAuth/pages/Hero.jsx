@@ -74,7 +74,7 @@ const HeroSection = () => {
       {/* Wavy divider */}
       <div className="relative h-16 mt-8">
         <svg className="absolute bottom-0 w-full h-full" preserveAspectRatio="none" viewBox="0 0 1440 74" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M0,37 C240,74 480,0 720,37 C960,74 1200,0 1440,37 L1440 74 L0 74 Z" fill="#E4E5FF"/>
+          <path d="M0,37 C240,74 480,0 720,37 C960,74 1200,0 1440,37 L1440 74 L0 74 Z" fill="#dbeafe"/>
         </svg>
       </div>
     </div>
