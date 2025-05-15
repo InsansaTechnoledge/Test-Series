@@ -7,7 +7,7 @@ const StudentLoginPage = (props) => {
     const navigate = useNavigate();
   return (
     <div>
-        <div className='grid grid-cols-12 gap-20 mx-20 pt-20 min-h-screen'>
+        <div className='bg-gradient-to-b from-blue-50 to-white grid grid-cols-12 gap-20 px-20 pt-20 min-h-screen'>
             <div className='col-span-5'>
                 <div className='bg-blue-600 p-3 w-fit h-fit rounded-full'>
                     <UserRound className='w-7 h-7 text-white'/>
