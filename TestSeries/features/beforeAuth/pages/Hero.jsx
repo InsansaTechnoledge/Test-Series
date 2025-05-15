@@ -1,79 +1,101 @@
-import React from 'react'
-import shield from '../../../assests/Landing/Hero/Group23.svg';
-import pen from '../../../assests/Landing/Hero/Pen.svg';
-import trophy from '../../../assests/Landing/Hero/trophy.svg';
-import man from '../../../assests/Landing/Hero/man.svg';
-import planeButton from '../../../assests/Landing/Hero/planeButton.svg';
-import planeLeft from '../../../assests/Landing/Hero/planeLeft.svg';
-import planeRight from '../../../assests/Landing/Hero/planeRight.svg';
+import React from 'react';
+import { ArrowRight, Check, Shield, Clock, BookOpen } from 'lucide-react';
+import plane from '../../../assests/Landing/Hero/planeButton.svg';
+import rings from '../../../assests/Landing/Hero/rings.svg';
+import mirrorBg from '../../../assests/Landing/Hero/mirrorBg.svg';
 
-const chips = [
-  {
-    icon: shield,
-    text: "Registered students 1000+"
-  },
-  {
-    icon: pen,
-    text: "Registered students 1000+"
-  },
-  {
-    icon: trophy,
-    text: "Registered students 1000+"
-  },
-  {
-    icon: man,
-    text: "Registered students 1000+"
-  },
-]
+const HeroSection = () => {
+  const features = [
+    { text: "Secure exam environment", icon: Shield },
+    { text: "Real-time monitoring", icon: Clock },
+    { text: "Comprehensive assessment tools", icon: BookOpen }
+  ];
 
-const Hero = () => {
   return (
-    
-    <div className='mt-38  relative mx-50'>
-      <img 
-      className='absolute left-0 top-0 w-2/12'
-      src={planeLeft} alt='plane_left' />
-      <img 
-      className='absolute right-0 top-5/12 w-1/12'
-      src={planeRight} alt='plane_right' />
-      <h1 className='
-      pt-10
-      text-5xl font-bold
-      text-center
-      pb-5
-      mx-40
-      text-clip bg-clip-text text-transparent bg-gradient-to-r from-blue-900 via-purple-600 to-blue-800'>
-        One Destination for Complete Exam Preparation
-      </h1>
-      <h2 className='
-      text-blue-900 text-xl text-center
-      font-semibold mt-14'>
-        Get exam-ready with concepts, questions and study notes as per the latest pattern
-      </h2>
-      <div className='grid grid-cols-4 gap-8 mt-14 mx-32'>
-        {
-          chips.map((chip, idx) => (
-            <div className='border-blue-900 border-2 rounded-xl py-4 px-4 flex justify-center' key={idx}>
-              <img src={chip.icon} alt={chip.text}/>
-              <span className='my-auto pl-5 text-blue-900 font-semibold'>{chip.text}</span>
+    <div className="relative 
+    bg-[linear-gradient(to_right,_#0c0077,_#2C2AB7,_#1F26F9,_#4B64F1,_#6C87DE,_#CCDDFF)] 
+    overflow-hidden">
+      <img
+        src={rings}
+        alt='rings'
+        className='h-full absolute top-14 left-0' />
+      <div className="container mx-30 py-18 md:py-24 px-4 md:px-8 lg:px-12 relative">
+
+        <div className="grid lg:grid-cols-2 items-center">
+          {/* Left content - Text area */}
+          <div className="z-10 ">
+
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
+              Transform your <span className="text-indigo-300 relative">
+                examination
+                <svg className="absolute bottom-1 left-0 w-full" height="6" viewBox="0 0 200 6" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M0,3 C50,0 150,6 200,3" stroke="white" strokeWidth="4" fill="none" />
+                </svg>
+              </span> process
+            </h1>
+
+            <p className="text-lg text-indigo-100 mb-8 max-w-lg">
+              Our comprehensive platform helps educational institutions create, administer, and analyze assessments with powerful tools and actionable insights.
+            </p>
+
+            {/* Feature points */}
+            {/* <div className="mb-8 space-y-3">
+              {features.map((feature, index) => (
+                <div key={index} className="flex items-center">
+                  
+                  <span className="text-indigo-100">{feature.text}</span>
+                </div>
+              ))}
+            </div> */}
+
+            {/* CTA buttons */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <button className="bg-indigo-500 hover:bg-indigo-600 text-white px-8 py-3 rounded-4xl font-medium text-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center">
+                Get Registered
+                {/* <ArrowRight className="ml-2 w-5 h-5" /> */}
+                <img src={plane} alt="" className='ml-2 w-5 h-5' />
+              </button>
+
             </div>
-          ))
-        }
-      </div>
-      <div className='w-full flex'>
-        <button
-        className='relative z-20 hover:cursor-pointer bg-indigo-800 rounded-full text-white py-4 px-10 mt-20 mx-auto'>
-          <div className='flex'>
-            <span className='pr-5 font-semibold text-xl '>
-            Get Started For Free
-            </span>
-            <img src={planeButton} alt="send_btn"
-            />
+
+
           </div>
-        </button>
+
+          {/* Right content - Image area */}
+          <div className="relative">
+            <div>
+              <img
+                src={mirrorBg}
+                alt='mirror bg'
+                className='' />
+            </div>
+            <div className="mt-5 ml-14">
+              <p className="text-md text-gray-200 mb-4">Trusted by leading institutions</p>
+              <div className="flex flex-wrap gap-8 items-center">
+                <UniversityLogo name="Stanford" />
+                <UniversityLogo name="Harvard" />
+                <UniversityLogo name="MIT" />
+                <UniversityLogo name="Oxford" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Wavy divider */}
+      <div className="relative h-16 mt-8">
+        <svg className="absolute bottom-0 w-full h-full" preserveAspectRatio="none" viewBox="0 0 1440 74" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0,37 C240,74 480,0 720,37 C960,74 1200,0 1440,37 L1440 74 L0 74 Z" fill="#E4E5FF" />
+        </svg>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Hero
+
+const UniversityLogo = ({ name }) => (
+  <div className="font-bold text-white text-lg">{name}</div>
+);
+
+export default HeroSection;
+

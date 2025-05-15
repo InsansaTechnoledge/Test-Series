@@ -79,13 +79,13 @@ const FAQSection = () => {
         </div>
 
         {/* FAQ Content */}
-        <div className='mt-6 w-full max-w-3xl mx-auto text-blue-900'>
+        <div className='mt-6 w-full max-w-3xl mx-auto text-blue-900 '>
           <p className='mb-6 text-xl font-semibold text-center'>
             Showing FAQs for {selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}
           </p>
 
           {faqs.map((faq, index) => (
-            <div key={index} className='mb-4 bg-[#E4E5FF] rounded-lg shadow-md'>
+            <div key={index} className='mb-4 bg-[#E4E5FF] rounded-lg shadow-md hover:cursor-pointer'>
               <button
                 className='w-full flex justify-between items-center px-6 py-4 text-left text-xl font-medium focus:outline-none'
                 onClick={() => toggleFAQ(index)}
