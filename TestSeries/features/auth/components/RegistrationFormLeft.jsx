@@ -31,6 +31,8 @@ const RegistrationFormLeft = () => {
               <span>Student data management tools</span>
             </li>
           </ul>
+
+         
         </div>
       </div>
     </div>
