@@ -4,6 +4,7 @@ import Hero from './pages/Hero';
 import WhyYourInstitute from './pages/WhyYourInstitute';
 import TestTypes from './pages/TestTypes';
 import WhyTakeExam from './pages/WhyTakeExam';
+import SoftwareCapabilities from './pages/SoftwareCapabilities';
 
 const BeforeAuthLanding = () => {
   return (
@@ -12,6 +13,7 @@ const BeforeAuthLanding = () => {
       <WhyYourInstitute />
       <WhyTakeExam />
       <TestTypes />
+      <SoftwareCapabilities />
     </>
   );
 };
