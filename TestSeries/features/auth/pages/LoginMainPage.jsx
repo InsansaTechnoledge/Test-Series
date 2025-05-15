@@ -4,12 +4,12 @@ import InstituteLoginPage from './InstituteLogin/InstituteLoginPage';
 import StudentLoginPage from './StudentLogin/StudentLoginPage';
 
 const LoginMainPage = () => {
-    const [loginFor, setLoginFor] = useState('institute');
+    const [loginFor, setLoginFor] = useState('Institute');
     return (
     <div>
-        <LoginHeader />
+        <LoginHeader loginFor={loginFor}/>
         {
-            loginFor==="institute"
+            loginFor==="Institute"
             ?
             <InstituteLoginPage setLoginFor={setLoginFor} />
             :
