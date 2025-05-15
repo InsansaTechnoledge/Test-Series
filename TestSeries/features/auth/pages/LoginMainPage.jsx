@@ -1,23 +1,38 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import LoginHeader from './LoginHeader'
 import InstituteLoginPage from './InstituteLogin/InstituteLoginPage';
 import StudentLoginPage from './StudentLogin/StudentLoginPage';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const LoginMainPage = () => {
     const [loginFor, setLoginFor] = useState('Institute');
-    return (
-    <div>
-        <LoginHeader loginFor={loginFor}/>
-        {
-            loginFor==="Institute"
-            ?
-            <InstituteLoginPage setLoginFor={setLoginFor} />
-            :
-            <StudentLoginPage setLoginFor={setLoginFor}/>
+    const [searchParams] = useSearchParams();
+    const role = searchParams.get('role');
+    const navigate = useNavigate('Institute');
+
+    useEffect(() => {
+        if(role==='Student' || role==='Institute'){
+            setLoginFor(role);
         }
-        
-    </div>
-  )
+        else{
+            navigate('/login?role=Institute');
+        }
+    },[role])
+
+    console.log(role);
+    return (
+        <div>
+            <LoginHeader loginFor={loginFor} />
+            {
+                loginFor === "Institute"
+                    ?
+                    <InstituteLoginPage setLoginFor={setLoginFor} />
+                    :
+                    <StudentLoginPage setLoginFor={setLoginFor} />
+            }
+
+        </div>
+    )
 }
 
 export default LoginMainPage

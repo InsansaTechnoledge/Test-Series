@@ -38,21 +38,21 @@ const Navbar = () => {
             {/* Dropdown Menu */}
             {dropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg overflow-hidden z-50">
-                <a 
-                  href="/educator-login" 
+                <button 
                   className="flex items-center space-x-2 px-4 py-3 text-gray-800 hover:bg-blue-50 transition-colors duration-200"
+                  onClick={()=>navigate('/login?role=Institute')}
                 >
                   <User className="h-5 w-5 text-blue-700" />
                   <span>Educator Login</span>
-                </a>
+                </button>
                 <div className="border-b border-gray-200"></div>
-                <a 
-                  href="/student-login" 
+                <button 
+                  onClick={()=>navigate('/login?role=Student')}
                   className="flex items-center space-x-2 px-4 py-3 text-gray-800 hover:bg-blue-50 transition-colors duration-200"
                 >
                   <GraduationCap className="h-5 w-5 text-violet-700" />
                   <span>Student Login</span>
-                </a>
+                </button>
               </div>
             )}
           </div>

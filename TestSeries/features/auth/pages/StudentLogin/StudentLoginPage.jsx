@@ -1,8 +1,10 @@
 import { ArrowRight, CheckCircle, UserRound } from 'lucide-react'
 import React from 'react'
 import StudentLoginForm from './StudentLoginForm'
+import { useNavigate } from 'react-router-dom'
 
 const StudentLoginPage = (props) => {
+    const navigate = useNavigate();
   return (
     <div>
         <div className='grid grid-cols-12 gap-20 mx-20 pt-20 min-h-screen'>
@@ -42,8 +44,8 @@ const StudentLoginPage = (props) => {
                 <div className='flex space-x-2 mt-10 w-fit'>
                     <h2 className='my-auto text-indigo-950 font-semibold text-lg'>Are you an Institute?</h2>
                     <button 
-                    onClick={()=>{props.setLoginFor('Institute')}}
-                    className='my-auto group py-2 px-6 bg-indigo-950 text-white rounded-lg'>
+                    onClick={()=>{navigate('/login?role=Institute')}}
+                    className='hover:cursor-pointer my-auto group py-2 px-6 bg-indigo-950 text-white rounded-lg'>
                         <div className='flex space-x-2'>
                             <span>
                                 Institute Login
