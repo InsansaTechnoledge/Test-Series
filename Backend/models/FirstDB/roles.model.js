@@ -11,7 +11,8 @@ const RoleSchema = new Schema({
                 return /^[a-zA-Z ]+$/.test(v);
             },
             message: 'Name should contain only alphabets and spaces',
-        }
+        },
+        trim: true,
     },
     features: {
         type: [{type: Types.ObjectId, ref: 'Feature'}],

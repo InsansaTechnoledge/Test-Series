@@ -1,13 +1,9 @@
 import express from 'express'
 import cors from 'cors'
 import routes from '../routes/routes.js'
-import cookkieParser from 'cookie-parser';
+import cookieParser from 'cookie-parser';
 import passport from '../utils/PassportAuth/Passport.js';
 import passportsessionMiddleware from '../utils/PassportAuth/Passport-Session.js';
-
-
-
-
 const app = express()
 
 
@@ -19,7 +15,7 @@ app.use(cors({
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 
-app.use(cookkieParser())
+app.use(cookieParser())
 app.use(passportsessionMiddleware)
 app.use(passport.initialize())
 app.use(passport.session())

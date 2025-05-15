@@ -12,7 +12,9 @@ const HeroSection = () => {
   ];
 
   return (
-    <div className="relative bg-[linear-gradient(to_right,_#0c0077,_#2C2AB7,_#1F26F9,_#4B64F1,_#6C87DE,_#CCDDFF)] overflow-hidden">
+    <div className="relative 
+    bg-[linear-gradient(to_right,_#0c0077,_#2C2AB7,_#1F26F9,_#4B64F1,_#6C87DE,_#CCDDFF)] 
+    overflow-hidden">
       <img
         src={rings}
         alt='rings'
