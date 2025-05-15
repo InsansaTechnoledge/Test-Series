@@ -5,6 +5,7 @@ import BeforeAuthLayout from '../../layouts/BeforeAuthLayout';
 import AuthLayout from '../../layouts/authLayout';
 import LoginMainPage from '../../features/auth/pages/LoginMainPage';
 import InstituteRegistrationPage from '../../features/auth/pages/InstituteRegistrationPage';
+import StudentHero from '../../features/afterAuth/components/StudentSide/StudentHero';
 
 const PageLinks = () => {
   return (
