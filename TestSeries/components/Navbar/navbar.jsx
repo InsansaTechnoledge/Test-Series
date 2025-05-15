@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { ArrowRight, User, GraduationCap, ChevronDown } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <div className="top-0 fixed w-full z-50 bg-blue-950 text-white px-6 py-4 shadow-lg">
@@ -55,10 +57,13 @@ const Navbar = () => {
             )}
           </div>
 
-          <button className="group bg-blue-600 flex items-center space-x-2 text-white font-semibold px-6 py-2 rounded-lg border border-blue-400 shadow-md transition-all duration-300">
+          <button
+            onClick={() => navigate('/institute-registration')} 
+            className="group bg-blue-600 flex items-center space-x-2 text-white font-semibold px-6 py-2 rounded-lg border border-blue-400 shadow-md transition-all duration-300"
+          >
             <span>Sign Up</span>
             <ArrowRight className="group-hover:translate-x-1 transition-transform duration-200 h-5 w-5" />
-          </button>
+        </button>
         </div>
       </div>
     </div>
