@@ -16,13 +16,13 @@ const LoginHeader = (props) => {
             </button>
             <div className="pt-6 pb-12 md:pb-20 container mx-auto">
 
-                <div className="max-w-4xl mx-auto">
+                <div className="max-w-5xl mx-auto">
 
                     <div className="flex items-center justify-center mb-6">
                     </div>
 
                     <h1 className="text-4xl md:text-6xl font-bold text-white text-center mb-6">
-                        Login Your {props.loginFor} <span className="text-green-400">Now</span>
+                        Login Your <span className="text-green-400">{props.loginFor}</span> Profile Now
                     </h1>
 
                     {/* <p className="text-xl md:text-2xl text-indigo-100 text-center mb-8">
