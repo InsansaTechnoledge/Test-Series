@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowRight, Check, Shield, Clock, BookOpen } from 'lucide-react';
+import plane from '../../../assests/Landing/Hero/planeButton.svg'
 
 const HeroSection = () => {
   const features = [
@@ -9,7 +10,7 @@ const HeroSection = () => {
   ];
 
   return (
-    <div className="bg-gradient-to-br from-indigo-50 via-white to-indigo-50 overflow-hidden">
+    <div className="bg-gradient-to-br from-blue-800 via-white to-indigo-50 overflow-hidden">
       <div className="container mx-auto py-16 md:py-24 px-4 md:px-8 lg:px-12 relative">
 
         <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -33,9 +34,9 @@ const HeroSection = () => {
             <div className="mb-8 space-y-3">
               {features.map((feature, index) => (
                 <div key={index} className="flex items-center">
-                  <div className="bg-indigo-100 p-1 rounded-full mr-3">
+                  {/* <div className="bg-indigo-100 p-1 rounded-full mr-3">
                     <feature.icon className="w-4 h-4 text-indigo-600" />
-                  </div>
+                  </div> */}
                   <span className="text-indigo-800">{feature.text}</span>
                 </div>
               ))}
@@ -43,9 +44,10 @@ const HeroSection = () => {
             
             {/* CTA buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
-              <button className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg px-6 py-3 font-medium text-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center">
+              <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-4xl font-medium text-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center">
                 Get Registered
-                <ArrowRight className="ml-2 w-5 h-5" />
+                {/* <ArrowRight className="ml-2 w-5 h-5" /> */}
+                <img src={plane} alt="" className='ml-2 w-5 h-5' />
               </button>
              
             </div>
