@@ -8,6 +8,7 @@ import SoftwareCapabilities from './pages/SoftwareCapabilities';
 import AiBranding from './pages/AiBranding';
 import ProctoringWorking from './pages/ProctoringWorking';
 import RegisterCTA from './pages/RegisterCTA';
+import Testimonials from './pages/Testimonials';
 
 const BeforeAuthLanding = () => {
   return (
@@ -20,6 +21,7 @@ const BeforeAuthLanding = () => {
       <ProctoringWorking/>
       <SoftwareCapabilities />
       <RegisterCTA/>
+      <Testimonials />
     </>
   );
 };
