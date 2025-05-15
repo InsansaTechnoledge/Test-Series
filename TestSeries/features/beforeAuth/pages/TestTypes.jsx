@@ -17,9 +17,9 @@ const types = [
 const TestTypes = () => {
     return (
         <div className='relative py-20'>
-            <img src={line} alt='line_here'
+            {/* <img src={line} alt='line_here'
             className='w-full absolute z-0 py-24'
-            />
+            /> */}
             <div className='relative grid grid-cols-2 px-50 z-10'>
                 <div className=''>
                     <h1 className='text-indigo-900 text-[42px] font-bold leading-snug'>

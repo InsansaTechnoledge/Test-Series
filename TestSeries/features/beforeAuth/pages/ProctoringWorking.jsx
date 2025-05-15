@@ -6,11 +6,11 @@ const ProctoringWorking = () => {
   return (
     <div className="relative flex justify-center  py-20 px-6">
 
-        <img
+        {/* <img
           src={line}
           alt="decorative line"
           className="absolute top-0 right-0 w-200 "
-          />
+          /> */}
 
       {/* Main content box */}
       <div className="relative grid grid-cols-1 md:grid-cols-2 items-center w-10/12 rounded-xl p-8 ">
