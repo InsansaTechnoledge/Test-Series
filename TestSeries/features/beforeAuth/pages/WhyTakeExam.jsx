@@ -58,11 +58,11 @@ const WhyTakeExam = () => {
      </div>
 
     {/* img part*/}
-        <img
+        {/* <img
         src={line}
         alt="line image"
         className="hidden absolute bottom-0 right-0"
-    />
+    /> */}
 
 
     </div>
