@@ -3,7 +3,7 @@ import React from 'react'
 
 const RegisterCTA = () => {
   return (
-    <div className='flex justify-center items-center mt-10 px-4'>
+    <div className='flex justify-center items-center px-4'>
       <div className='w-8/12  bg-[#E4E5FF] py-16 px-6 md:px-12  rounded-3xl shadow-md text-center'>
 
         <h1 className='text-3xl md:text-4xl font-bold text-blue-950 mb-12'>
