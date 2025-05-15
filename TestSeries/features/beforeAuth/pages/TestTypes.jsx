@@ -36,7 +36,7 @@ const TestTypes = () => {
                             {types.map((type, idx) => (
                                 <li key={idx}
                                 className='flex space-x-4'>
-                                    <CheckCircle className='my-auto'/>
+                                    <CheckCircle className='my-auto text-green-600'/>
                                     <span className='my-auto text-xl'>
                                         {type}
                                     </span>
