@@ -25,11 +25,13 @@ export const createOrgBatch = async (req, res) => {
   
   export const getOrgBatches = async (req, res) => {
     try {
+      //here id would be array of ids , so always pass the is
       const { id, organization_id, year } = req.query;
-  
-      const batches = await getOrganizationBacthes({ id, organization_id, year });
+      const batches= await getOrganizationBacthes({ id, organization_id, year });
       return new APIResponse(200, batches, 'Batch(s) fetched successfully').send(res);
-    } catch (e) {
+      
+    } catch (err) {
+      console.log(err);
       new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while fetching the batch(s)", err.message || ""]).send(res);
 
     }
