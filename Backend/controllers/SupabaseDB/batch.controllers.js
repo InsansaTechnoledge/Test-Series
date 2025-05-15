@@ -2,17 +2,22 @@ import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
 import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
 import { CreateOrganizationBatch , getOrganizationBacthes ,updateOrganizationBatch , deleteOrganizationBatch} from "../../utils/SqlQueries/batch.queries.js";
 
+///have to crete the function rpc call when i add the syllabus for the partoicular batch 
+
 export const createOrgBatch = async (req, res) => {
     try {
-      const data = req.body;
-  
-      if (!data.organization_id || !data.name || !data.year) {
-        return new APIError(400, 'Required fields missing').send(res);
-      }
+      //body should be array of objects
+      let data = req.body;
+      data.upadted_at = new Date();
+      data.updated_by = req.user.id;
+      // if (!data.organization_id || !data.name || !data.year) {
+      //   return new APIError(400, 'Required fields missing').send(res);
+      // }
   
       const batch = await CreateOrganizationBatch(data);
       return new APIResponse(201, batch, 'Batch created successfully').send(res);
-    } catch (e) {
+    } catch (err) {
+      console.log(err);
       new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while creating the batch", err.message || ""]).send(res);
 
     }

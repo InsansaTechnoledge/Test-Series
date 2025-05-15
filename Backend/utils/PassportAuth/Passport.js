@@ -22,8 +22,9 @@ passport.use('user-local',
             if (!isMatch) {
                 return done(null, false, { message: 'Incorrect password.' });
             }   
-            console.log("😏",user.toObject());
-            return done(null, {...user.toObject(), role: user.roleId });
+            // return done(null, {...user.toObject(), role: user.roleId });
+            return done(null, { ...user.toObject(), role: 'user' });
+
 
         } catch (error) {
             return done(error);
@@ -78,7 +79,8 @@ passport.use('org-local',
 
 passport.serializeUser((user, done) => {
       console.log("🚀 ~ file: passport.js:70 ~ passport.serializeUser ~ user:", user)
-    done(null,{id:user._id,role:user.roleId} );
+    // done(null,{id:user._id,role:user.roleId} );
+    done(null, { id: user._id, role: user.role });
   
 });
 passport.deserializeUser(async (object, done) => {
@@ -88,12 +90,12 @@ passport.deserializeUser(async (object, done) => {
             done(null, student?{...student.toObject(), role: 'student'} : false);
         }
         else if(object.role === 'organization') {
-            const org = await organization.findById(object.id);
+            const org = await Organization.findById(object.id);
             done(null, org?{...org.toObject(), role: 'organization'} : false);
         }
         else {
             const user = await User.findById(object.id);
-            done(null, user?{...user.toObject(), role: user.roleId} : false);
+            done(null, user?{...user.toObject(), role: 'user'} : false);
         }
 
     } catch (error) {
