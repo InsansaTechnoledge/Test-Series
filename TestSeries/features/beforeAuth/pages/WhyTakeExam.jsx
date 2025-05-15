@@ -48,7 +48,7 @@ const WhyTakeExam = () => {
         <div className="flex flex-col items-center z-10 text-center px-4 ">
             <img src={Audit} alt="Different Exam Patterns" className="h-fit w-fit mb-4"/>
             <span className="text-2xl font-semibold text-violet-900 mb-2">
-                n-depth Performanc e A nalysis            
+                In-depth Performance Analysis            
             </span>
             <p className="text-gray-700 text-xl max-w-sm">
                 Prepare for the level expected
