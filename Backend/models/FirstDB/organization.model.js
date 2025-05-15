@@ -76,7 +76,8 @@ const OrganizationSchema = new Schema({
         required: true,
         minlength: [3 , 'name shall be length 3 (minimum) '],
         maxlength: [32, 'maximum lenght exeeds (32)'],
-        unique: [true, 'institute by this name already exists']
+        unique: [true, 'institute by this name already exists'],
+        trim: true,
     },
     email: {
         type: String,

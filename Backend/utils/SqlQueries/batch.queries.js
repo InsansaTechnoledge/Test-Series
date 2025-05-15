@@ -2,19 +2,18 @@ import { getSupabaseClient } from "../../database/SupabaseDB.js";
 
 const supabase = getSupabaseClient();
 
-export const CreateOrganizationBatch = async ({organization_id, name, year, syllabus_id}) => {
+export const CreateOrganizationBatch = async (batchData) => {
     const {data , error} = await supabase
-    .from('Organization_Batch')
-    .insert([{organization_id, name, year, syllabus_id}])
+    .from('organization_batch')
+    .insert(batchData)
     .select()
-    .single()
 
     if (error) throw error;
     return data;
 }
 
 export const getOrganizationBacthes = async({id ,organization_id, year }) => {
-    let query = supabase.from('Organization_Batch').select('*')
+    let query = supabase.from('organization_batch').select('*')
 
     if(id) {
         query =query.eq('id', id).single()
@@ -49,7 +48,7 @@ export const updateOrganizationBatch = async (id, updates, updated_by) => {
 
 export const deleteOrganizationBatch = async (id) => {
     const { data, error } = await supabase
-      .from('Organization_Batch')
+      .from('organization_batch')
       .delete()
       .eq('id', id)
       .select()

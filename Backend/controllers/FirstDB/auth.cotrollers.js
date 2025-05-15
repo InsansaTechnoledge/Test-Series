@@ -37,7 +37,6 @@ export const Logout = async (req, res) => {
         req.logout(function (err) {
             if (err) {
                 new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while loging out", err.message || ""]).send(res);
-;
             }
 
             req.session.destroy((err) => {
