@@ -7,6 +7,27 @@ const StudentLoginForm = () => {
         email: '',
         password: '',
     });
+    const [errors, setErrors] = useState({});
+    const validateField = (name, value) => {
+        switch (name) {
+            case 'email':
+                return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value) &&
+                    value.length >= 10 && value.length <= 60 ? '' : 'Please enter a valid email address';
+            case 'password':
+                const hasUpperCase = /[A-Z]/.test(value);
+                const hasLowerCase = /[a-z]/.test(value);
+                const hasNumbers = /\d/.test(value);
+                const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value);
+                const isLongEnough = value.length >= 8;
+
+                if (!isLongEnough || !hasUpperCase || !hasLowerCase || !hasNumbers || !hasSpecialChar) {
+                    return 'Password must be at least 8 characters with uppercase, lowercase, number, and special character';
+                }
+                return '';
+            default:
+                return '';
+        }
+    };
 
     const handleSubmit = () => {
 
@@ -74,7 +95,7 @@ const StudentLoginForm = () => {
                     type="submit"
                     className="mt-6 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium transition-all disabled:opacity-70 shadow-lg flex items-center justify-center"
                 >
-                    Login 
+                    Login
                 </button>
             </form>
         </div>
