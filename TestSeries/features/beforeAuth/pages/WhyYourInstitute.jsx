@@ -4,9 +4,9 @@ import thinking from '../../../assests/Landing/Demo/thinking.svg';
 
 const WhyYourInstitute = () => {
   return (
-    <div className="relative w-full py-20">
+    <div className="relative w-full py-20 bg-[#E4E5FF]">
       {/* Overlapping line image */}
-      <img src={line} alt="line img" className="absolute -top-22 left-0 w-full" />
+      {/* <img src={line} alt="line img" className="absolute -top-22 left-0 w-full" /> */}
 
       {/* Main Content */}
       <div className="relative z-10 flex flex-row items-center justify-center gap-8 px-12">

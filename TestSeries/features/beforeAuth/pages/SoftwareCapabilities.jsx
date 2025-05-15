@@ -75,8 +75,8 @@ const SoftwareCapabilities = () => {
     return (
         <div className='relative overflow-hidden'>
             {/* Line */}
-            <img src={line} alt='line here'
-            className='absolute bottom-0 left-0 -z-10 top-3/10 w-4xl '/>
+            {/* <img src={line} alt='line here'
+            className='absolute bottom-0 left-0 -z-10 top-3/10 w-4xl '/> */}
 
             {/* Part: 1 */}
             <div className='rounded-lg bg-[#E4E5FF] py-26 px-16 mx-50 mb-20'>
