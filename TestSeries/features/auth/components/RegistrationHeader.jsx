@@ -48,7 +48,7 @@ const RegistrationHeader = () => {
           </div>
 
           <button 
-            className='group flex justify-center items-center bg-amber-50 text-blue-950 border-2 border-white px-8 rounded-4xl' 
+            className='group flex justify-center items-center bg-amber-50 text-blue-950 border-2 border-white px-8 rounded-4xl hover:cursor-pointer' 
             onClick={() => navigate('/')}
             >
              <ArrowLeft className=' my-4 mr-3 h-5 w-6 group-hover:-translate-x-3  text-blue-400 duration-400'/>
