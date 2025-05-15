@@ -13,7 +13,7 @@ const WhyYourInstitute = () => {
     <div className="grid grid-cols-1 lg:grid-cols-3 items-center">
       
       {/* Image that rotates on button hover */}
-      <div className="flex justify-center transition-transform duration-500 group-hover:rotate-12">
+      <div className="flex justify-center transition-transform duration-500 group-hover:rotate-6">
         <img
           src={thinking}
           alt="thinking man image"
