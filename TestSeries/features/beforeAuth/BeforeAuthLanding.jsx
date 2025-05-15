@@ -7,6 +7,7 @@ import WhyTakeExam from './pages/WhyTakeExam';
 import AiBranding from './pages/AiBranding';
 import ProctoringWorking from './pages/ProctoringWorking';
 import RegisterCTA from './pages/RegisterCTA';
+import FAQSection from './pages/FAQSection';
 
 const BeforeAuthLanding = () => {
   return (
@@ -18,6 +19,7 @@ const BeforeAuthLanding = () => {
       <AiBranding/>
       <ProctoringWorking/>
       <RegisterCTA/>
+      <FAQSection/>
     </>
   );
 };
