@@ -6,7 +6,7 @@ import { Outlet } from 'react-router-dom';
 const AuthLayout = ({ children }) => {
   return (
     <div className="relative">
-      <Navbar />
+      {/* <Navbar /> */}
       <main className="">
         {children || <Outlet />}
       </main>
