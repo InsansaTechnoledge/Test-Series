@@ -2,7 +2,7 @@ import React from 'react'
 import RegistrationHeader from '../components/RegistrationHeader'
 import RegistrationForm from '../components/RegistrationForm'
 
-const InstituteLoginPage = () => {
+const InstituteRegistrationPage = () => {
   return (
     <div>
       <RegistrationHeader/>
@@ -11,4 +11,4 @@ const InstituteLoginPage = () => {
   )
 }
 
-export default InstituteLoginPage
+export default InstituteRegistrationPage

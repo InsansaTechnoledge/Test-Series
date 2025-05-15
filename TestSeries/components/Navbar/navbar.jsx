@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { ArrowRight, User, GraduationCap, ChevronDown } from 'lucide-react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const navigate = useNavigate();
 
   const click = async () => {
     console.log("clicked");
@@ -127,29 +129,32 @@ const Navbar = () => {
             {/* Dropdown Menu */}
             {dropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg overflow-hidden z-50">
-                <a
-                  href="/educator-login"
+                <button 
                   className="flex items-center space-x-2 px-4 py-3 text-gray-800 hover:bg-blue-50 transition-colors duration-200"
+                  onClick={()=>navigate('/login?role=Institute')}
                 >
                   <User className="h-5 w-5 text-blue-700" />
                   <span>Educator Login</span>
-                </a>
+                </button>
                 <div className="border-b border-gray-200"></div>
-                <a
-                  href="/student-login"
+                <button 
+                  onClick={()=>navigate('/login?role=Student')}
                   className="flex items-center space-x-2 px-4 py-3 text-gray-800 hover:bg-blue-50 transition-colors duration-200"
                 >
                   <GraduationCap className="h-5 w-5 text-violet-700" />
                   <span>Student Login</span>
-                </a>
+                </button>
               </div>
             )}
           </div>
 
-          <button className="group bg-blue-600 flex items-center space-x-2 text-white font-semibold px-6 py-2 rounded-lg border border-blue-400 shadow-md transition-all duration-300">
+          <button
+            onClick={() => navigate('/institute-registration')} 
+            className="group bg-blue-600 flex items-center space-x-2 text-white font-semibold px-6 py-2 rounded-lg border border-blue-400 shadow-md transition-all duration-300"
+          >
             <span>Sign Up</span>
             <ArrowRight className="group-hover:translate-x-1 transition-transform duration-200 h-5 w-5" />
-          </button>
+        </button>
         </div>
       </div>
     </div>

@@ -1,7 +1,10 @@
 import React from 'react';
-import { Check } from 'lucide-react';
+import { Check, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const RegistrationHeader = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="bg-gradient-to-r from-blue-800 to-blue-600 py-12 md:py-20 px-4">
       <div className="container mx-auto">
@@ -43,7 +46,15 @@ const RegistrationHeader = () => {
               <p className="text-gray-500 text-sm">Access core tools immediately</p>
             </div>
           </div>
-        </div>
+
+          <button 
+            className='group flex justify-center items-center bg-amber-50 text-blue-950 border-2 border-white px-8 rounded-4xl hover:cursor-pointer' 
+            onClick={() => navigate('/')}
+            >
+             <ArrowLeft className=' my-4 mr-3 h-5 w-6 group-hover:-translate-x-3  text-blue-400 duration-400'/>
+            Back
+          </button>
+        </div>  
       </div>
     </div>
   );
