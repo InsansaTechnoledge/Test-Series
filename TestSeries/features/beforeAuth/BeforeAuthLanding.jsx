@@ -9,6 +9,7 @@ import AiBranding from './pages/AiBranding';
 import ProctoringWorking from './pages/ProctoringWorking';
 import RegisterCTA from './pages/RegisterCTA';
 import Testimonials from './pages/Testimonials';
+import FAQSection from './pages/FAQSection';
 
 const BeforeAuthLanding = () => {
   return (
@@ -21,8 +22,10 @@ const BeforeAuthLanding = () => {
       <ProctoringWorking/>
       <SoftwareCapabilities />
       <RegisterCTA/>
+      <FAQSection/>
       <Testimonials />
     </>
+    
   );
 };
 
