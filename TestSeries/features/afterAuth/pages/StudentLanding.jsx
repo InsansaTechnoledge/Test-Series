@@ -9,7 +9,7 @@ import ExamLinksComponent from '../components/StudentSide/ExamLinksComponent'
 const StudentLanding = () => {
     return (
         <>
-        <div className='m-10 rounded-4xl overflow-hidden shadow-md'>
+        <div className='m-2 md:m-10 rounded-4xl overflow-hidden shadow-md'>
             <StudentHero />
             <div className='px-30 py-8'>
                 <StudentDetails />
