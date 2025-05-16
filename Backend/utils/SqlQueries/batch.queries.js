@@ -31,14 +31,10 @@ export const getOrganizationBacthes = async ({ id, organization_id, year }) => {
 };
 
 
-export const updateOrganizationBatch = async (id, updates, updated_by) => {
+export const updateOrganizationBatch = async (id, updates) => {
   const { data, error } = await supabase
     .from('organization_batch')
-    .update({
-      ...updates,
-      updated_at: new Date(),
-      updated_by
-    })
+    .update(updates)
     .eq('id', id)
     .select()
     .single();

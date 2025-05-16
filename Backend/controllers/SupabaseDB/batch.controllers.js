@@ -41,7 +41,9 @@ export const createOrgBatch = async (req, res) => {
   export const updateOrgBatch = async (req, res) => {
     try {
       const { id } = req.params;
-      const updates = req.body;
+      let updates = req.body;
+      updates.updated_at = new Date();
+      updates.updated_by = req.user.id;
   
       if (!id) return new APIError(400, 'Batch ID is required').send(res);
   
@@ -61,7 +63,8 @@ export const createOrgBatch = async (req, res) => {
   
       const deleted = await deleteOrganizationBatch(id);
       return new APIResponse(200, deleted, 'Batch deleted successfully').send(res);
-    } catch (e) {
+    } catch (err) {
+      console.log(err);
       new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while deleting the batch", err.message || ""]).send(res);
 
     }

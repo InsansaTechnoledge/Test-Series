@@ -7,6 +7,6 @@ const router = express.Router()
 router.post('/create-batch' , isOrganizationAuthenticated,createOrgBatch)
 router.get('/get-batch',isOrgAndUserAuthenticated ,getOrgBatches);
 router.patch('/update-batch/:id' , updateOrgBatch)
-router.delete('delete-batch/:id' , deleteOrgBatch)
+router.delete('/delete-batch/:id' , isOrganizationAuthenticated,deleteOrgBatch)
 
 export default router 

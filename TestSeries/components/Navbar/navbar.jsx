@@ -79,13 +79,34 @@ const Navbar = () => {
     // }
 
     //api for get batch by year
-    const year = 2023; 
-    const response = await axios.get(
-      `http://localhost:8000/api/v1/batch/get-batch?year=${year}`,
+    // const year = 2023; 
+    // const response = await axios.get(
+    //   `http://localhost:8000/api/v1/batch/get-batch?year=${year}`,
+    //   { withCredentials: true }
+    // );
+    // console.log(response);
+    // }
+    //api for the delete batch
+    // const response = await axios.delete(
+    //   `http://localhost:8000/api/v1/batch/delete-batch/d35a5b71-7623-422d-a0a1-40448d7d74fb`,
+    //   { withCredentials: true }
+    // );
+    // console.log(response);
+    // }
+
+    //api for the update batch
+    const response = await axios.patch(
+      `http://localhost:8000/api/v1/batch/update-batch/54b49cae-e6ea-4e38-9f88-1694a9569859`,  
+      {
+        name: "Updated Batch Name",  
+        year: 2024
+      },
       { withCredentials: true }
     );
-    console.log(response);
+        console.log(response);
     }
+
+
     catch (err) {
       console.log(err);
     }
