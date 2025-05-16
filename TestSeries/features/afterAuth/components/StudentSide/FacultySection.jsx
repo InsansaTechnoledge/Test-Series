@@ -28,7 +28,7 @@ const facultyData = [
 
 const FacultySection = () => {
   return (
-    <section className="bg-white py-16 px-6 md:px-20">
+    <section className="bg-blue-50 mx-30 rounded-3xl py-16 px-6 md:px-20">
       <div className="text-center">
         <span className="text-sm font-semibold text-blue-700 bg-blue-300 px-2 py-3 rounded-4xl">Driven by excellence</span>
         <h2 className="text-4xl font-bold text-blue-900 mt-6">Batch's Faculty</h2>
