@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import LoginHeader from './LoginHeader'
-import InstituteLoginPage from './InstituteLogin/InstituteLoginPage';
-import StudentLoginPage from './StudentLogin/StudentLoginPage';
+import InstituteLoginPage from './login/InstituteLoginPage';
+import StudentLoginPage from './login/StudentLoginPage';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const LoginMainPage = () => {
@@ -11,13 +11,13 @@ const LoginMainPage = () => {
     const navigate = useNavigate('Institute');
 
     useEffect(() => {
-        if(role==='Student' || role==='Institute'){
+        if (role === 'Student' || role === 'Institute') {
             setLoginFor(role);
         }
-        else{
+        else {
             navigate('/login?role=Institute');
         }
-    },[role])
+    }, [role])
 
     console.log(role);
     return (
