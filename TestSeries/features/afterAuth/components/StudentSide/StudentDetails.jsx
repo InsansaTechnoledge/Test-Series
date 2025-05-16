@@ -1,137 +1,127 @@
-import { Award, BookOpen, BookOpenCheck, Hexagon, Mail, Medal, NotepadText, Phone, UsersRound } from 'lucide-react'
-import React from 'react'
-import dashedLine from '../../../../assests/StudentLanding/dashedLine.svg';
+import React from 'react';
+import { 
+  Award, 
+  BookOpen, 
+  BookOpenCheck, 
+  Hexagon, 
+  Mail, 
+  Medal, 
+  NotepadText, 
+  Phone, 
+  UsersRound 
+} from 'lucide-react';
 
 const student = {
-    name: "Jay Fanse",
-    email: "jayf29112003@gmail.com",
-    phone: "+91 9726535193",
-    profilePhoto: `https://ui-avatars.com/api/?name=Jay%20Fanse&background=random`,
-    certifications: ['Table-Topper', 'Early-Bird', 'All-Nighter', 'Finisher', 'Early-Bird', 'All-Nighter', 'Finisher']
-}
+  name: "Jay Fanse",
+  email: "jayf29112003@gmail.com",
+  phone: "+91 9726535193",
+  profilePhoto: `https://ui-avatars.com/api/?name=Jay%20Fanse&background=random`,
+  certifications: ['Table-Topper', 'Early-Bird', 'All-Nighter', 'Finisher', 'Early-Bird', 'All-Nighter', 'Finisher']
+};
 
 const subjects = ["Physics", "Chemistry", "Maths", "English", "Computer science"];
 
-const StudentDetails = () => {
-    return (
-        <div className='
-    grid grid-cols-2 relative gap-10
-    rounded-xl shadow-sm shadow-gray-700/50 py-6 px-8 border-blue-600'>
-            {/* Student Side */}
-            <div className='flex space-x-4'>
-                <div>
-                    <img src={student.profilePhoto}
-                        alt='profilePhoto'
-                        className='rounded-full'
-                    />
-                </div>
-                <div className='w-full'>
-                    <h1 className='text-4xl mt-1 font-bold text-indigo-900'>{student.name}</h1>
-                    <div className='text-indigo-900 mt-10 space-y-3'>
-                        <div className='flex space-x-4'>
-                            <div>
-                                <Mail />
-                            </div>
-                            <span>
-                                {student.email}
-                            </span>
-                        </div>
-                        <div className='flex space-x-4 '>
-                            <div>
-                                <Phone />
-                            </div>
-                            <span>
-                                {student.phone}
-                            </span>
-                        </div>
-                        <div className='flex space-x-4 '>
-                            <div>
-                                <Medal />
-                            </div>
-                            <div className='flex flex-wrap gap-1'>
-                                {
-                                    student.certifications.map((certificate, idx) => (
-                                        <div
-                                            key={idx}
-                                            className='text-nowrap text-sm bg-blue-600/30 rounded-md py-2 px-4'>
-                                            {certificate}
-                                        </div>
-                                    ))
-                                }
-                            </div>
+export default function StudentDetails() {
+  return (
+    <div className="w-full max-w-7xl mx-auto bg-white rounded-xl  overflow-hidden">
 
-                        </div>
-                        <div className='flex space-x-4'>
-                            <div>
-                                <Award />
-                            </div>
-                            <div className='flex flex-wrap gap-1'>
-
-                                <Hexagon className='text-red-500' />
-                                <Hexagon className='text-red-500' />
-                                <Hexagon className='text-red-500' />
-                                <Hexagon className='text-red-500' />
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <img src={dashedLine}
-                className='absolute w-70 left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 h-10 rotate-90'
+      <div className="p-1 bg-gradient-to-r from-blue-300 to-blue-600"></div>
+      
+      <div className="grid sm:grid-cols-1 md:grid-cols-2 gap-6 p-4 sm:p-6">
+        {/* Student Profile Section */}
+        <div className="flex flex-col items-center sm:items-start sm:flex-row gap-4 sm:gap-6">
+          <div className="flex-shrink-0">
+            <img 
+              src={student.profilePhoto}
+              alt="Profile"
+              className="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-4 border-indigo-100 shadow-md"
             />
-            {/* Batch Side */}
-            <div className=''>
-                <div className='w-full'>
-                    <h1 className='text-4xl mt-1 font-bold text-indigo-900'>BE-4</h1>
-                    <h2 className='text-lg font-semibold text-indigo-900'>2025</h2>
-                    <div className='text-indigo-900 mt-3 space-y-3'>
-                        <div className='flex space-x-4'>
-                            <div>
-                                <UsersRound />
-                            </div>
-                            <span>
-                                30 Students
-                            </span>
-                        </div>
-                        <div className='flex space-x-4 '>
-                            <div>
-                                <BookOpenCheck />
-                            </div>
-                            <span>
-                                5 Tests taken
-                            </span>
-                        </div>
-                        <div className='flex space-x-4 '>
-                            <div>
-                                <BookOpen />
-                            </div>
-                            <div className='flex flex-wrap gap-1'>
-                                {
-                                    subjects.map((subject, idx) => (
-                                        <div
-                                            key={idx}
-                                            className='text-nowrap text-sm bg-blue-600/30 rounded-md py-2 px-4'>
-                                            {subject}
-                                        </div>
-                                    ))
-                                }
-                            </div>
-
-                        </div>
-                        <div className='flex space-x-4'>
-                            <div>
-                                <NotepadText />
-                            </div>
-                            <button className='hover:text-white hover:bg-indigo-900 hover:cursor-pointer border-indigo-900 rounded-lg px-4 py-1 text-sm border'>
-                                View syllabus
-                            </button>
-                        </div>
-                    </div>
+          </div>
+          
+          <div className="space-y-3 sm:space-y-4 text-center sm:text-left">
+            <h1 className="text-2xl sm:text-3xl font-bold text-indigo-900">{student.name}</h1>
+            
+            <div className="space-y-2 sm:space-y-3 text-gray-700">
+              <div className="flex sm:flex-row items-center sm:items-center gap-3 sm:gap-3">
+                <Mail size={18} className="text-blue-600" />
+                <span className="text-sm sm:text-base break-all">{student.email}</span>
+              </div>
+              
+              <div className="flex  sm:flex-row items-center sm:items-center gap-3 sm:gap-3">
+                
+                <Phone size={18} className="text-blue-600" />
+                <span className="text-sm sm:text-base">{student.phone}</span>
+              </div>
+              
+              {/* <div className="flex flex-col sm:flex-row items-center sm:items-start gap-1 sm:gap-3">
+                <div className="flex flex-wrap justify-center sm:justify-start gap-2">
+                  {student.certifications.map((cert, idx) => (
+                    <span
+                      key={idx}
+                      className="text-xs font-medium bg-blue-100 text-blue-800 px-2 sm:px-3 py-1 rounded-full"
+                    >
+                      {cert}
+                    </span>
+                  ))}
                 </div>
+              </div> */}
+              
+              {/* <div className="flex flex-col sm:flex-row items-center sm:items-center gap-1 sm:gap-3">
+                <Award size={18} className="text-blue-600" />
+                <div className="flex gap-1">
+                  {[1, 2, 3, 4].map((_, idx) => (
+                    <Hexagon key={idx} size={18} className="text-red-500 fill-red-100" />
+                  ))}
+                </div>
+              </div> */}
             </div>
+          </div>
         </div>
-    )
+        
+        {/* Divider visible on all screen sizes */}
+        <div className="h-px w-full bg-gray-200 md:hidden"></div>
+        
+        {/* Batch Details Section */}
+        <div className="space-y-3 sm:space-y-4 text-center sm:text-left">
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-blue-900">BE-4</h2>
+            <p className="text-base sm:text-lg font-medium text-blue-700">2025</p>
+          </div>
+          
+          <div className="space-y-2 sm:space-y-3 text-gray-700">
+            <div className="flex  sm:flex-row items-center sm:items-center gap-3 sm:gap-3">
+              <UsersRound size={18} className="text-blue-600" />
+              <span className="text-sm sm:text-base">30 Students</span>
+            </div>
+            
+            <div className="flex  sm:flex-row items-center sm:items-center gap-3 sm:gap-3">
+              <BookOpenCheck size={18} className="text-blue-600" />
+              <span className="text-sm sm:text-base">5 Tests taken</span>
+            </div>
+            
+            <div className="flex  sm:flex-row items-center sm:items-start gap-3 sm:gap-3">
+              <BookOpen size={18} className="text-blue-600 sm:mt-2" />
+              <div className="flex flex-wrap justify-center sm:justify-start gap-2">
+                {subjects.map((subject, idx) => (
+                  <span
+                    key={idx}
+                    className="text-xs font-medium bg-blue-100 text-blue-800 px-2 sm:px-3 py-3 rounded-full"
+                  >
+                    {subject}
+                  </span>
+                ))}
+              </div>
+            </div>
+            
+            <div className="flex sm:flex-row items-center sm:items-center gap-1 sm:gap-3 pt-1">
+              <NotepadText size={18} className="text-blue-600" />
+              <button className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-blue-700 border border-blue-300 rounded-lg hover:bg-blue-800 hover:text-white transition-colors">
+                View syllabus
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
-
-export default StudentDetails
