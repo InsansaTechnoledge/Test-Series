@@ -121,7 +121,7 @@ const Navbar = () => {
           <div className="text-2xl font-bold bg-gradient-to-r from-blue-200 to-violet-200 bg-clip-text text-transparent">
             myApp
           </div>
-        </div>"
+        </div>
 
         {/* Navigation Links */}
         <ul className="flex space-x-8 font-medium">

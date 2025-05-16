@@ -8,10 +8,10 @@ const LoginHeader = (props) => {
     return (
         <div className="bg-gradient-to-r from-blue-800 to-blue-600 pt-6 px-4">
             <button
-                className='group flex justify-center items-center bg-amber-50 text-blue-950 border-2 border-white px-8 rounded-4xl'
+                className='group flex justify-center items-center bg-transparent text-gray-100 px-6 rounded-4xl'
                 onClick={() => navigate('/')}
             >
-                <ArrowLeft className=' my-4 mr-3 h-5 w-6 group-hover:-translate-x-3  text-blue-400 duration-400' />
+                <ArrowLeft className=' my-3 mr-3 h-5 w-6 group-hover:-translate-x-3  text-gray-100 duration-400' />
                 Back
             </button>
             <div className="pt-6 pb-12 md:pb-20 container mx-auto">
