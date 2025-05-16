@@ -18,7 +18,7 @@ export default function ExamLinksComponent({Data}) {
               >
                 <div className="p-3 rounded-full mb-4">
                     {     
-                       Icon ?  <Icon size={32} /> : <div>{Rank}</div>
+                       Icon ?  <Icon size={32} /> : <div className="text-blue-900 font-bold text-4xl ">{Rank}</div>
                     }
                 </div>
                 <h3 className="text-xl font-semibold">{card.name}</h3>

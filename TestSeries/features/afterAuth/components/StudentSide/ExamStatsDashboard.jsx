@@ -5,6 +5,7 @@ import ExamRankLineChart from './StatsComponent/ExamRankLineChart'
 import MarksVsExamsChart from './StatsComponent/MarksVsExamsChart'
 import ExamBreakdown from './StatsComponent/ExamBreakdown'
 import HeadingUtil from '../../utility/HeadingUtil'
+import ViewAllButton from './StatsComponent/ViewAllButton'
 
 const ExamStatsDashboard = () => {
     return (
@@ -14,6 +15,7 @@ const ExamStatsDashboard = () => {
             <ExamRankLineChart />
             <MarksVsExamsChart />
             <ExamBreakdown />
+            <ViewAllButton/>
         </div>
 
     )
