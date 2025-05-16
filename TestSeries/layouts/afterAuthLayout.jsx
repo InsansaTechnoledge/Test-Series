@@ -7,7 +7,7 @@ const AfterAuthLayout = ({ children }) => {
   return (
     <div className="relative">
       {/* <Navbar />  */}
-      <main className="px-10">
+      <main className="">
         {children || <Outlet />}
       </main>
      
