@@ -1,19 +1,27 @@
-import React from 'react'
+import React from 'react';
 import heroBanner from '../../../../assests/StudentLanding/heroBanner.jpg';
 
 const StudentHero = () => {
   return (
-    <div className='relative bg-black/60'>
-        <img src={heroBanner} 
-        className='-z-10 absolute w-full h-full'
-        />
-        <div className='px-20'>
-            <h1 className='pt-20 pb-40 text-white text-5xl font-bold'>
-                Organization Name
-            </h1>
-        </div>
-    </div>
-  )
-}
+    <section className="relative w-full h-[40vh] md:h-[60vh] mt-16 rounded-4xl overflow-hidden flex items-center justify-center">
+      {/* Background Image */}
+      <img
+        src={heroBanner}
+        alt="Hero Banner"
+        className="absolute inset-0 w-full h-full object-cover z-0"
+      />
 
-export default StudentHero
+      {/* Dark Overlay */}
+      <div className="absolute inset-0 bg-black/60 z-10" />
+
+      {/* Centered Content */}
+      <div className="relative z-20 text-center px-4 md:px-20">
+        <h1 className="text-white text-4xl md:text-6xl font-bold leading-tight">
+          Organization Name
+        </h1>
+      </div>
+    </section>
+  );
+};
+
+export default StudentHero;
