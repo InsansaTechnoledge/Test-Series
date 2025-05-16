@@ -1,14 +1,17 @@
 import { Atom, Codepen, GraduationCap } from 'lucide-react';
 import React from 'react'
+import HeadingUtil from '../../utility/HeadingUtil';
 
 const subjects = ["Physics", "Chemistry", "Maths", "English", "Computer Science"];
 
 const SubjectCards = () => {
   return (
     <div className='bg-white py-16 px-6 md:px-20"'>
-        <h1 className='text-4xl text-center text-blue-900 font-bold'>
-            Subject Details
-        </h1>
+        {/* <h1 className='text-4xl text-center text-indigo-900 font-bold'>
+git a            Subject Details
+        </h1> */}
+        <HeadingUtil heading="Subject Details"/>
+        
         <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-8 px-40 mt-10'>
             {
                 subjects.map((subject,idx) => (
