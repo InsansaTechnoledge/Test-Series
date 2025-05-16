@@ -16,7 +16,8 @@ const student = {
   email: "jayf29112003@gmail.com",
   phone: "+91 9726535193",
   profilePhoto: `https://ui-avatars.com/api/?name=Jay%20Fanse&background=random`,
-  certifications: ['Table-Topper', 'Early-Bird', 'All-Nighter', 'Finisher', 'Early-Bird', 'All-Nighter', 'Finisher']
+//   certifications: ['Table-Topper', 'Early-Bird', 'All-Nighter', 'Finisher', 'Early-Bird', 'All-Nighter', 'Finisher']
+certifications:[]
 };
 
 const subjects = ["Physics", "Chemistry", "Maths", "English", "Computer science"];
@@ -53,18 +54,29 @@ export default function StudentDetails() {
                 <span className="text-sm sm:text-base">{student.phone}</span>
               </div>
               
-              {/* <div className="flex flex-col sm:flex-row items-center sm:items-start gap-1 sm:gap-3">
-                <div className="flex flex-wrap justify-center sm:justify-start gap-2">
-                  {student.certifications.map((cert, idx) => (
-                    <span
-                      key={idx}
-                      className="text-xs font-medium bg-blue-100 text-blue-800 px-2 sm:px-3 py-1 rounded-full"
-                    >
-                      {cert}
-                    </span>
-                  ))}
-                </div>
-              </div> */}
+              {
+                student.certifications && student.certifications.length > 0 ? (
+                    <div className="flex flex-col sm:flex-row items-center sm:items-start gap-1 sm:gap-3">
+                    <div className="flex flex-wrap justify-center sm:justify-start gap-2">
+                        {student.certifications.map((cert, idx) => (
+                        <span
+                            key={idx}
+                            className="text-xs font-medium bg-blue-100 text-blue-800 px-2 sm:px-3 py-1 rounded-full"
+                        >
+                            {cert}
+                        </span>
+                        ))}
+                    </div>
+                    </div>
+                ) : (
+                    <div>
+                    <h1 className="text-sm text-gray-500 italic">No certifications at present</h1>
+                    </div>
+                )
+
+                }
+
+                            
               
               {/* <div className="flex flex-col sm:flex-row items-center sm:items-center gap-1 sm:gap-3">
                 <Award size={18} className="text-blue-600" />
