@@ -14,6 +14,7 @@ const SubjectCards = () => {
                 subjects.map((subject,idx) => (
                     <div 
                     className='
+                    hover:cursor-pointer
                     hover:scale-105 transition-all duration-200 
                     relative overflow-hidden
                     bg-gradient-to-br from-blue-200 to-white
