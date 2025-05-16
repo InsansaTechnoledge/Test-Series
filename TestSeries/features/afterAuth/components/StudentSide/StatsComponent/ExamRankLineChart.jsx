@@ -22,6 +22,7 @@ const data = [
 const ExamRankLineChart = () => {
     return (
         <div>
+            <h1 className="text-blue-900 font-bold text-2xl text-center mt-14 mb-4">Comparison of Ranks Across Exams</h1>
             <ResponsiveContainer height={300}>
                 <LineChart
                     data={data}
