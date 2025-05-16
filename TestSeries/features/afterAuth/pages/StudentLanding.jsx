@@ -11,15 +11,15 @@ const StudentLanding = () => {
         <>
         <div className='m-2 md:m-10 rounded-4xl overflow-hidden shadow-md'>
             <StudentHero />
-            <div className='px-30 py-8'>
+            <div className=' py-8'>
                 <StudentDetails />
             </div>
         </div>
                     <ExamLinksComponent/>
                 {/* <AiWorkingSteps /> */}
                 {/* <div className="w-16 h-1 bg-blue-800 mx-auto mb-4 rounded"></div> */}
-                <SubjectCards />
                 <FacultySection />
+                <SubjectCards />
         </>
     )
 }
