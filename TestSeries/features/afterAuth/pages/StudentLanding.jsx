@@ -18,7 +18,7 @@ const StudentLanding = () => {
                 <StudentDetails />
             </div>
         </div>  
-        <div className='py-12'>
+        <div className='my-12'>
                 <HeadingUtil heading="Quick Link's to Exams" description="View and access all your examination resources"/>
                 <ExamLinksComponent Data={cards} />
         </div>
