@@ -6,12 +6,12 @@ import { Outlet } from 'react-router-dom';
 const AfterAuthLayout = ({ children }) => {
   return (
     <div className="relative">
-      {/* <Navbar /> */}
-      <main className="">
+      {/* <Navbar />  */}
+      <main className="px-10">
         {children || <Outlet />}
       </main>
      
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 };
