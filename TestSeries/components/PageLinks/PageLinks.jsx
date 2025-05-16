@@ -5,6 +5,10 @@ import BeforeAuthLayout from '../../layouts/BeforeAuthLayout';
 import AuthLayout from '../../layouts/authLayout';
 import LoginMainPage from '../../features/auth/pages/LoginMainPage';
 import InstituteRegistrationPage from '../../features/auth/pages/InstituteRegistrationPage';
+import StudentHero from '../../features/afterAuth/components/StudentSide/StudentHero';
+import AfterAuthLayout from '../../layouts/afterAuthLayout';
+import InstituteLanding from '../../features/afterAuth/pages/InstituteLanding';
+import StudentLanding from '../../features/afterAuth/pages/StudentLanding';
 
 const PageLinks = () => {
   return (
@@ -18,6 +22,11 @@ const PageLinks = () => {
         <Route element={<AuthLayout />}>
           <Route path='/institute-registration' element={<InstituteRegistrationPage />} />
           <Route path='/login' element={<LoginMainPage />} />
+        </Route>
+
+        <Route element={<AfterAuthLayout/>}>
+          <Route path='/institute-landing' element={<InstituteLanding />} />
+          <Route path='/student-landing' element={<StudentLanding />} />
         </Route>
       </Routes>
     </Router>
