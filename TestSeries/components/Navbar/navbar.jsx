@@ -111,6 +111,11 @@ const Navbar = () => {
 
         {/* Login Options */}
         <div className="flex items-center space-x-4">
+           <button  className="flex items-center space-x-2 bg-blue-800 bg-opacity-50 hover:bg-opacity-70 text-white font-medium px-4 py-2 rounded-lg transition-all duration-200" 
+            onClick={()=>click()} >
+              1 Btn 10 APIs
+                <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
           <div className="relative">
             <button
               className="flex items-center space-x-2 bg-blue-800 bg-opacity-50 hover:bg-opacity-70 text-white font-medium px-4 py-2 rounded-lg transition-all duration-200"
@@ -120,11 +125,7 @@ const Navbar = () => {
               <span>Login</span>
               <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`} />
             </button >
-            <button  className="flex items-center space-x-2 bg-blue-800 bg-opacity-50 hover:bg-opacity-70 text-white font-medium px-4 py-2 rounded-lg transition-all duration-200" 
-            onClick={()=>click()} >
-              Click Me
-                <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`} />
-            </button>
+           
 
             {/* Dropdown Menu */}
             {dropdownOpen && (
