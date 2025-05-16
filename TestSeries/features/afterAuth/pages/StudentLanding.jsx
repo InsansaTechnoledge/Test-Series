@@ -3,6 +3,7 @@ import StudentHero from '../components/StudentSide/StudentHero'
 import StudentDetails from '../components/StudentSide/StudentDetails'
 import AiWorkingSteps from '../components/StudentSide/AiWorkingSteps'
 import FacultySection from '../components/StudentSide/FacultySection'
+import SubjectCards from '../components/StudentSide/SubjectCards'
 
 const StudentLanding = () => {
     return (
@@ -13,9 +14,10 @@ const StudentLanding = () => {
                 <StudentDetails />
             </div>
         </div>
-                <AiWorkingSteps />
+                {/* <AiWorkingSteps />
                 <div className="w-16 h-1 bg-blue-800 mx-auto mb-4 rounded"></div>
-                <FacultySection />
+                <FacultySection /> */}
+                <SubjectCards />
         </>
     )
 }
