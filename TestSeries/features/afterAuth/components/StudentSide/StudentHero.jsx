@@ -1,27 +1,34 @@
 import React from 'react';
 import heroBanner from '../../../../assests/StudentLanding/heroBanner.jpg';
-
+import { Building, Mail, Phone } from 'lucide-react';
 const StudentHero = () => {
-  return (
-    <section className="relative w-full h-[40vh] md:h-[60vh] mt-16 rounded-4xl overflow-hidden flex items-center justify-center">
-      {/* Background Image */}
-      <img
-        src={heroBanner}
-        alt="Hero Banner"
-        className="absolute inset-0 w-full h-full object-cover z-0"
-      />
+    return (
+        <div className='relative bg-black/60 shadow-gray-600'>
+            <img src={heroBanner}
+                alt='heroBanner'
+                className='-z-10 absolute w-full h-full'
+            />
+            {/* banner */}
+            <div className='px-20 py-10'>
+                <h1 className='text-center text-white text-4xl font-bold'>
+                    Organization Name
+                <Building className='mx-auto mt-6 w-20 h-20'/>    
+                </h1>
+                <div className='text-white max-w-2/5 text-wrap my-5 mb-20 mx-auto text-center'>
+                    Lorem ipsum dolor sit amet Lorem, ipsum dolor sit amet consectetur adim autem officiis eum repudiandae adipisicing elit. Magni, dolor. Lorem ipsum dolor sit amet.
+                </div>
+                <div className='mx-auto w-fit flex flex-col justify-center'>
+                    <div className='text-white text-xl'>Connect with us on:</div>
+                    <div className='w-fit flex justify-center space-x-8 mx-auto mt-5'>
+                        <Mail className='text-white' />
+                        <Phone className='text-white' />
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    )
+}
 
-      {/* Dark Overlay */}
-      <div className="absolute inset-0 bg-black/60 z-10" />
-
-      {/* Centered Content */}
-      <div className="relative z-20 text-center px-4 md:px-20">
-        <h1 className="text-white text-4xl md:text-6xl font-bold leading-tight">
-          Organization Name
-        </h1>
-      </div>
-    </section>
-  );
-};
 
 export default StudentHero;
