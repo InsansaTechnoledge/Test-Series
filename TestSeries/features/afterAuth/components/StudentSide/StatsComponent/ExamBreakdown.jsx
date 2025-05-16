@@ -10,7 +10,7 @@ const ExamBreakdown = () => {
             <h1 className="text-blue-900 font-bold text-2xl text-center mt-14 mb-4">Exams Status breakdown</h1>
 
             <div className="flex justify-end">
-                <span className="text-xs text-gray-700 my-auto">Toal Exams: 26</span>
+                <span className="text-xs text-gray-700 my-auto mb-2">Toal Exams: 26</span>
             </div>
             <div className="flex items-center gap-2 mb-4">
                 <div className="w-full bg-gray-200 rounded-full overflow-hidden h-2.5">
