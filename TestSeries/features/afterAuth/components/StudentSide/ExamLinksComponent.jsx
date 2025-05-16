@@ -1,19 +1,11 @@
 import React from 'react';
 
 
-
 export default function ExamLinksComponent({Data}) {
   return (
-    <div className="py-12 px-4">
+    <div className=" px-4">
       <div className="max-w-5xl mx-auto">
-        {/* Header with gradient */}
-        <div className="text-center mb-12">
-          <h1 className="text-3xl md:text-4xl font-bold bg-blue-900 bg-clip-text text-transparent">
-            Quick Link's to Exams 
-          </h1>
-          <p className="text-gray-600 mt-3">View and access all your examination resources</p>
-        </div>
-        
+               
         {/* Data */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
           {Data.map((card, index) => {
