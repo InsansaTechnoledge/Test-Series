@@ -8,7 +8,7 @@ const SubjectCards = () => {
   return (
     <div className='bg-white py-16 px-6 md:px-20"'>
         
-        <HeadingUtil heading="Subject Details" description="Below is the list of all included subjects in your course"/>
+        <HeadingUtil heading="Subject Details" description="Below is list of all included subjects in your course"/>
         
         <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-8 px-40 mt-10'>
             {

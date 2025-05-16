@@ -9,7 +9,7 @@ import ViewAllButton from './StatsComponent/ViewAllButton'
 
 const ExamStatsDashboard = () => {
     return (
-        <div className=' mx-6 md:mx-40 py-10 px-20 bg-blue-50 rounded-3xl mb-10'>
+        <div className=' mx-6 md:mx-40 py-10 px-20 bg-blue-50/50 rounded-3xl mb-10'>
             <HeadingUtil heading="Overall Analytics" description="for more detailed view visit dedicated page" />
             <ExamLinksComponent Data={Rank} />
             <ExamRankLineChart />
