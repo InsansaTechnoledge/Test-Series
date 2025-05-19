@@ -24,7 +24,6 @@ export const CreateOrganization = async (req, res) => {
     if (req.file && req.file.path) {
         data.logoUrl = req.file.path;
       }
-  
       const existing = await Organization.findOne({
         $or: [{ email: data.email }, { phone: data.phone }]
       });

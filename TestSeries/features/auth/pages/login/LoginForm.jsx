@@ -52,7 +52,7 @@ const LoginForm = () => {
     setErrors((prev) => ({ ...prev, [field]: error }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
 
     const newErrors = {};
@@ -73,7 +73,8 @@ const LoginForm = () => {
       // Call the API for Institute login
       console.log('Logging in as Institute');
       try{      
-        const response=orgLogin(formData);
+        const response=await orgLogin(formData);
+        console.log(response);
         if(response.status===200)
         {
           console.log("institute logged in successfully!!")
@@ -94,7 +95,7 @@ const LoginForm = () => {
     else if(role === 'Student') {
       // Call the API for Student login
       console.log('Logging in as Student');
-      const response=studentLogin(formData);
+      const response=await studentLogin(formData);
       if(response.status===200)
       {
       setFormData({
