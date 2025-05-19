@@ -1,14 +1,28 @@
-import React from 'react'
 import Heading from './Heading'
 import { NotepadText, Search } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import { fetchBatchList } from '../../../../utils/services/batchService';
 
 const BatchList = () => {
-    const batches = [
-        {
-            name: "BE-4",
-            year: 2025
+
+    const fetchBatchListFunction = async () => {
+        const response = await fetchBatchList();
+        if (response.status !== 200) {
+            throw new Error('Network response was not ok');
         }
-    ]
+        console.log(response.data);
+        return response.data;
+    }
+    
+    const { data: batches=[], isLoading, isError } = useQuery({
+        queryKey:['batches'],
+        queryFn:()=> fetchBatchListFunction(),
+        refetchOnWindowFocus: false,
+        refetchOnMount: false,
+        staleTime:Infinity,
+        cacheTime:24*60*60*1000,
+        retry:0,
+    });
 
     return (
         <>
@@ -18,7 +32,7 @@ const BatchList = () => {
             <div className='rounded-xl p-5 bg-gray-200 inset-shadow-md'>
                 <div className='flex justify-between space-x-4 mb-5'>
                     <div className='my-auto'>
-                        <h2 className='font-bold text-lg text-blue-900'>Total Batches: {batches.length}</h2>
+                        <h2 className='font-bold text-lg text-blue-900'>Total Batches: {batches?.length}</h2>
                     </div>
                     <div className='flex space-x-4'>
                         <select className='rounded-md bg-white py-2 px-4'>
@@ -60,7 +74,7 @@ const BatchList = () => {
                             </tr>
                         </thead>
                         {
-                            batches.map((batch, idx) => (
+                            batches?.map((batch, idx) => (
                                 <tbody key={idx}>
                                     <tr className="bg-white border-b border-gray-200 hover:bg-gray-50 text-blue-600 text-lg">
                                         <th scope="row" className="px-6 py-4 font-medium text-blue-600 whitespace-nowrap ">

@@ -247,11 +247,7 @@ const OrganizationRegistrationForm = () => {
       console.log('Form data:', formData);
       formData.logoUrl = logoFile ? previewUrl : ''; // Set logo URL if a file is provided
       const response=await createOrganization(formData);
-      console.log(response);
-      // API call would go here
-      // For example: await createOrganization(payload);
-
-      setMsg('✅ Organization created successfully!');
+      setMsg(`✅ Institute created successfully by the name ${response.data.name}!`);
       setFormData({
         name: '',
         email: '',
