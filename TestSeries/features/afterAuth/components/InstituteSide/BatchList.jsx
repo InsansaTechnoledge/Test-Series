@@ -50,7 +50,7 @@ const BatchList = () => {
 
                 <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
                     <table className="w-full text-sm text-left rtl:text-right text-blue-950">
-                        <thead className="text-xs text-blue-950 uppercase bg-gray-50">
+                        <thead className="text-xs text-blue-950 text-center uppercase bg-gray-50">
                             <tr>
                                 <th scope="col" className="w-3/10 px-6 py-3">
                                     Batch name
@@ -74,11 +74,11 @@ const BatchList = () => {
                                         <th scope="row" className="px-6 py-4 font-medium text-blue-600 whitespace-nowrap ">
                                             {batch.name}
                                         </th>
-                                        <td className="px-6 py-4">
+                                        <td className="px-6 py-4 text-center">
                                             {batch.year}
                                         </td>
                                         <td className="px-6 py-4">
-                                            <button className='flex space-x-2 hover:cursor-pointer hover:underline'>
+                                            <button className='mx-auto flex space-x-2 hover:cursor-pointer hover:underline'>
                                                 <div>
                                                     <NotepadText />
                                                 </div>
@@ -87,7 +87,8 @@ const BatchList = () => {
                                                 </span>
                                             </button>
                                         </td>
-                                        <td className="w-fit px-6 py-4 space-x-8">
+                                        <td className="text-center w-fit px-6 py-4 space-x-8">
+                                            
                                             <button
                                                className="font-medium text-black hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer">
                                                 view
