@@ -1,6 +1,6 @@
 import React, { createContext ,useContext,useState} from "react";
 
-const currentUserContext = createContext(null);
+const currentUserContext = createContext();
 
 export const UserProvider = ({children}) => {
     const [user, setUser] = useState();
@@ -10,7 +10,7 @@ export const UserProvider = ({children}) => {
             {children}
         </currentUserContext.Provider>
     );
-}
+};
 
 export const useUser = () => {
     return useContext(currentUserContext);
