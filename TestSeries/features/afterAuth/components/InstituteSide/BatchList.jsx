@@ -16,20 +16,25 @@ const BatchList = () => {
                 <Heading title={"All Batches"} />
             </div>
             <div className='rounded-xl p-5 bg-gray-200 inset-shadow-md'>
-                <div className='flex justify-end space-x-4 mb-5'>
-                    <select className='rounded-md bg-white py-2 px-4'>
-                        <option>--select year--</option>
-                    </select>
-                    <label className='space-x-2 flex rounded-md bg-white py-2 px-4'>
-                        <div>
-                            <Search />
-                        </div>
-                        <input
+                <div className='flex justify-between space-x-4 mb-5'>
+                    <div className='my-auto'>
+                        <h2 className='font-bold text-lg text-blue-900'>Total Batches: {batches.length}</h2>
+                    </div>
+                    <div className='flex space-x-4'>
+                        <select className='rounded-md bg-white py-2 px-4'>
+                            <option>--select year--</option>
+                        </select>
+                        <label className='space-x-2 flex rounded-md bg-white py-2 px-4'>
+                            <div>
+                                <Search />
+                            </div>
+                            <input
 
-                            className='focus: outline-0'
-                            placeholder='search batch'
-                        />
-                    </label>
+                                className='focus: outline-0'
+                                placeholder='search batch'
+                            />
+                        </label>
+                    </div>
                 </div>
 
                 {/* batch list */}
