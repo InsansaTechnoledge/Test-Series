@@ -1,8 +1,7 @@
 import { KeyRound, LogIn, Mail } from 'lucide-react';
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { userLogin } from '../../../../utils/services/authService';
-import { connOne } from '../../../../../Backend/database/MongoDB';
+import { orgLogin,studentLogin } from '../../../../utils/services/authService';
 
 
 const LoginForm = () => {
@@ -74,7 +73,7 @@ const LoginForm = () => {
       // Call the API for Institute login
       console.log('Logging in as Institute');
       try{      
-        const response=userLogin(formData);
+        const response=orgLogin(formData);
         if(response.status===200)
         {
           console.log("institute logged in successfully!!")
@@ -95,10 +94,17 @@ const LoginForm = () => {
     else if(role === 'Student') {
       // Call the API for Student login
       console.log('Logging in as Student');
+      const response=studentLogin(formData);
+      if(response.status===200)
+      {
       setFormData({
         email:'',
         password:''
       });
+      console.log("student logged in successfully!!")
+      setErrors({});
+      }
+    
       //setUser(response.data.user);
     }
   };

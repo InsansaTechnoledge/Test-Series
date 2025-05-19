@@ -10,12 +10,27 @@ import AfterAuthLayout from '../../layouts/afterAuthLayout';
 import InstituteLanding from '../../features/afterAuth/pages/InstituteLanding';
 import StudentLanding from '../../features/afterAuth/pages/StudentLanding';
 import { useUser } from '../../contexts/currentUserContext';
+import { checkAuth } from '../../utils/services/authService';
 
 const PageLinks = () => {
   const {user,setUser} = useUser();
 
-  useEffect(() => {
+  const fetchUser = () => {
+    try {
+      const response = checkAuth();
+      if (response.status === 200) {
+        setUser(response.data);
+      } else {
+        setUser(null);
+      }
+    } catch (error) {
+      console.error('Error fetching user:', error);
+      setUser(null);
+    }
+  };
 
+  useEffect(() => {
+    fetchUser();
   }, []);
 
   return (
