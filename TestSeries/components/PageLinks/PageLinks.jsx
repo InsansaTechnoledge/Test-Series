@@ -15,22 +15,25 @@ import { checkAuth } from '../../utils/services/authService';
 const PageLinks = () => {
   const {user,setUser} = useUser();
 
-  const fetchUser = () => {
+  const fetchUser = async() => {
     try {
-      const response = checkAuth();
+      const response = await checkAuth();
       if (response.status === 200) {
         setUser(response.data);
       } else {
         setUser(null);
       }
     } catch (error) {
+      alert("Something went wrong while fetching user data");
       console.error('Error fetching user:', error);
       setUser(null);
     }
   };
 
   useEffect(() => {
-    fetchUser();
+    if(!user){
+      fetchUser();
+    }
   }, []);
 
   return (
