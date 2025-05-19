@@ -2,13 +2,19 @@ import { Book, BookOpen, Info, LogOut, Menu, User } from 'lucide-react'
 import React, { useState } from 'react'
 import Heading from '../components/InstituteSide/Heading';
 import BatchList from '../components/InstituteSide/BatchList';
+import AdminList from '../components/InstituteSide/UserList';
+import UserList from '../components/InstituteSide/UserList';
 
 const InstituteLanding = () => {
-  const [currentControl, setCurrentControl] = useState("All Batches");
+  const [currentControl, setCurrentControl] = useState("User Details");
 
   const controls = [
     {
       name: "All Batches",
+      icon: User
+    },
+    {
+      name: "User Details",
       icon: User
     },
     {
@@ -24,7 +30,7 @@ const InstituteLanding = () => {
   return (
     <div className='h-screen relative'>
       {/* Sidebar */}
-      <div className="z-50 fixed bg-indigo-950 pb-2 pr-2 flex flex-col group hover:w-[14.2857%] h-full w-fit border transition-all duration-300">
+      <div className="z-50 fixed bg-indigo-950 pb-2 mr-2 flex flex-col group hover:w-[14.2857%] h-full w-fit transition-all duration-300">
         <div className='mb-5 space-x-2 flex w-full items-center p-2 text-xl'>
           <div className="">
             <BookOpen className='text-white w-7 h-7 group-hover:mr-5' />
@@ -38,7 +44,7 @@ const InstituteLanding = () => {
             {controls.map((control, idx) => (
               <button
                 onClick={() => setCurrentControl(control.name)}
-                className="flex text-white w-full items-center p-2 text-xl" key={idx}>
+                className={`flex ${currentControl===control.name ? 'bg-white text-indigo-900' : 'text-white'}  w-full items-center p-2 text-xl`} key={idx}>
                 <div className="">
                   <control.icon className='group-hover:mr-2 w-7 h-7' />
                 </div>
@@ -77,8 +83,8 @@ const InstituteLanding = () => {
             case "All Batches":
               return <BatchList />;
 
-            case "Students":
-              return <div>Students Content</div>;
+            case "User Details":
+              return <UserList />;
 
             case "Reports":
               return <div>Reports Content</div>;

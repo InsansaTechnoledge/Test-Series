@@ -2,6 +2,7 @@ import Heading from './Heading'
 import { NotepadText, Search } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { fetchBatchList } from '../../../../utils/services/batchService';
+import { LucidePlusSquare, NotepadText, PlusSquare, Search } from 'lucide-react'
 
 const BatchList = () => {
 
@@ -35,6 +36,14 @@ const BatchList = () => {
                         <h2 className='font-bold text-lg text-blue-900'>Total Batches: {batches?.length}</h2>
                     </div>
                     <div className='flex space-x-4'>
+                        <button className='bg-blue-900 text-white py-2 px-4 rounded-md hover:cursor-pointer font-semibold hover:scale-105 flex space-x-2 transition-all duration-300'>
+                            <span>
+                                Create Batch 
+                            </span>
+                            <div>
+                                <PlusSquare />
+                            </div>
+                        </button>
                         <select className='rounded-md bg-white py-2 px-4'>
                             <option>--select year--</option>
                         </select>
@@ -56,7 +65,7 @@ const BatchList = () => {
 
                 <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
                     <table className="w-full text-sm text-left rtl:text-right text-blue-950">
-                        <thead className="text-xs text-blue-950 uppercase bg-gray-50">
+                        <thead className="text-xs text-blue-950 text-center uppercase bg-gray-50">
                             <tr>
                                 <th scope="col" className="w-3/10 px-6 py-3">
                                     Batch name
@@ -80,11 +89,11 @@ const BatchList = () => {
                                         <th scope="row" className="px-6 py-4 font-medium text-blue-600 whitespace-nowrap ">
                                             {batch.name}
                                         </th>
-                                        <td className="px-6 py-4">
+                                        <td className="px-6 py-4 text-center">
                                             {batch.year}
                                         </td>
                                         <td className="px-6 py-4">
-                                            <button className='flex space-x-2 hover:cursor-pointer hover:underline'>
+                                            <button className='mx-auto flex space-x-2 hover:cursor-pointer hover:underline'>
                                                 <div>
                                                     <NotepadText />
                                                 </div>
@@ -93,7 +102,8 @@ const BatchList = () => {
                                                 </span>
                                             </button>
                                         </td>
-                                        <td className="w-fit px-6 py-4 space-x-8">
+                                        <td className="text-center w-fit px-6 py-4 space-x-8">
+                                            
                                             <button
                                                className="font-medium text-black hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer">
                                                 view
