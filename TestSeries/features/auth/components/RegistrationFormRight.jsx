@@ -3,6 +3,7 @@ import React, { useState, useRef } from 'react';
 import { Building, Mail, Phone, Image, Globe, MapPin, Check, Loader, Lock, Upload, X } from 'lucide-react';
 import { Country, State, City } from 'country-state-city';
 import { useEffect } from 'react';
+import { createOrganization } from '../../../utils/services/organizationService';
 
 const OrganizationRegistrationForm = () => {
   const [formData, setFormData] = useState({
@@ -48,8 +49,6 @@ const OrganizationRegistrationForm = () => {
       setCities(City.getCitiesOfState(selectedCountryCode, selectedStateCode));
     }
   },[selectedStateCode, selectedCountryCode]);
-  // const states = formData.address.country ? State.getStatesOfCountry(selectedCountryCode) : [];
-  // const cities = formData.address.state ? City.getCitiesOfState(selectedCountryCode,selectedStateCode) : [];
 
 
   // New state for logo file handling
@@ -77,7 +76,7 @@ const OrganizationRegistrationForm = () => {
         }
         return '';
       case 'confirm_password':
-        return value === formData.password ? '' : 'Passwords do not match';
+        return value === formData?.password ? '' : 'Passwords do not match';
       case 'phone':
         return /^(\+\d{1,3}[- ]?)?\d{10}$/.test(value) ? '' : 'Please enter a valid phone number';
       case 'pincode':
@@ -121,8 +120,6 @@ const OrganizationRegistrationForm = () => {
       setErrors(prev => ({ ...prev, [field]: error }));
     }
 
-        console.log(formData);
-    console.log(value);
   };
 
   // Logo file handling functions
@@ -247,41 +244,31 @@ const OrganizationRegistrationForm = () => {
     }
 
     try {
-      // Create a copy of the form data to submit
-      const payload = {
-        ...formData,
-        // Remove confirm_password as it's not in the schema
-        confirm_password: undefined
-      };
-
-      // Handle logo file upload
-      if (logoFile) {
-        // In a real implementation, here you would:
-        // 1. Create a FormData object
-        const formData = new FormData();
-        formData.append('logo', logoFile);
-
-        // 2. Upload the file to your cloud storage API
-        // const response = await fetch('your-upload-api-endpoint', {
-        //   method: 'POST',
-        //   body: formData
-        // });
-        // const data = await response.json();
-        // payload.logoUrl = data.url;
-
-        // For demo, we're simulating a successful upload
-        payload.logoUrl = previewUrl;
-
-        // Then you would continue with organization creation using the returned URL
-      } else if (!payload.logoUrl) {
-        // Generate default logo URL if not provided
-        payload.logoUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(payload.name)}&background=random`;
-      }
-
+      console.log('Form data:', formData);
+      formData.logoUrl = logoFile ? previewUrl : ''; // Set logo URL if a file is provided
+      const response=await createOrganization(formData);
+      console.log(response);
       // API call would go here
       // For example: await createOrganization(payload);
 
       setMsg('✅ Organization created successfully!');
+      setFormData({
+        name: '',
+        email: '',
+        password: '',
+        confirm_password: '',
+        phone: '',
+        logoUrl: '',
+        website: '',
+        address: {
+          line1: '',
+          line2: '',
+          city: '',
+          state: '',
+          country: '',
+          pincode: '',
+        },
+      });
       // Reset form or redirect
     } catch (err) {
       setMsg('❌ Error creating organization: ' + (err.message || 'Unknown error'));
@@ -610,147 +597,3 @@ const OrganizationRegistrationForm = () => {
 
 export default OrganizationRegistrationForm;
 
-
-
-// import React, { useState, useRef } from 'react';
-// import { Country, State, City } from 'country-state-city';
-
-// const OrganizationRegistrationForm = () => {
-//   const [formData, setFormData] = useState({
-//     name: '',
-//     email: '',
-//     password: '',
-//     confirm_password: '',
-//     phone: '',
-//     logoUrl: '',
-//     website: '',
-//     address: {
-//       line1: '',
-//       line2: '',
-//       city: '',
-//       state: '',
-//       country: '',
-//       pincode: '',
-//     },
-//     subscription: {
-//       status: 'trialing',
-//     },
-//     active: true,
-//   });
-
-//   const countries = Country.getAllCountries();
-//   const states = formData.address.country ? State.getStatesOfCountry(formData.address.country) : [];
-//   const cities = formData.address.state ? City.getCitiesOfState(formData.address.country, formData.address.state) : [];
-
-//   const handleChange = (e, field, parent = null) => {
-//     const value = e.target.value;
-//     if (parent) {
-//       setFormData((prev) => ({
-//         ...prev,
-//         [parent]: {
-//           ...prev[parent],
-//           [field]: value,
-//         },
-//       }));
-//     } else {
-//       setFormData((prev) => ({
-//         ...prev,
-//         [field]: value,
-//       }));
-//     }
-//   };
-
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-//     // Submit logic here
-//     console.log(formData);
-//   };
-
-//   return (
-//     <form onSubmit={handleSubmit} className="space-y-4 p-4 max-w-2xl mx-auto bg-white shadow rounded">
-//       <div>
-//         <label>Institute Name*</label>
-//         <input type="text" value={formData.name} onChange={(e) => handleChange(e, 'name')} className="w-full border p-2" />
-//       </div>
-
-//       <div>
-//         <label>Email*</label>
-//         <input type="email" value={formData.email} onChange={(e) => handleChange(e, 'email')} className="w-full border p-2" />
-//       </div>
-
-//       <div>
-//         <label>Password*</label>
-//         <input type="password" value={formData.password} onChange={(e) => handleChange(e, 'password')} className="w-full border p-2" />
-//       </div>
-
-//       <div>
-//         <label>Confirm Password*</label>
-//         <input type="password" value={formData.confirm_password} onChange={(e) => handleChange(e, 'confirm_password')} className="w-full border p-2" />
-//       </div>
-
-//       <div>
-//         <label>Phone*</label>
-//         <input type="text" value={formData.phone} onChange={(e) => handleChange(e, 'phone')} className="w-full border p-2" />
-//       </div>
-
-//       <div>
-//         <label>Website</label>
-//         <input type="url" value={formData.website} onChange={(e) => handleChange(e, 'website')} className="w-full border p-2" />
-//       </div>
-
-//       <div>
-//         <label>Country*</label>
-//         <select value={formData.address.country} onChange={(e) => handleChange(e, 'country', 'address')} className="w-full border p-2">
-//           <option value="">Select Country</option>
-//           {countries.map((c) => (
-//             <option key={c.isoCode} value={c.isoCode}>{c.name}</option>
-//           ))}
-//         </select>
-//       </div>
-
-//       <div>
-//         <label>State*</label>
-//         <select value={formData.address.state} onChange={(e) => handleChange(e, 'state', 'address')} className="w-full border p-2">
-//           <option value="">Select State</option>
-//           {states.map((s) => (
-//             <option key={s.isoCode} value={s.isoCode}>{s.name}</option>
-//           ))}
-//         </select>
-//       </div>
-
-//       <div>
-//         <label>City*</label>
-//         <select value={formData.address.city} onChange={(e) => handleChange(e, 'city', 'address')} className="w-full border p-2">
-//           <option value="">Select City</option>
-//           {cities.map((c) => (
-//             <option key={c.name} value={c.name}>{c.name}</option>
-//           ))}
-//         </select>
-//       </div>
-
-//       <div>
-//         <label>Postal Code*</label>
-//         <input type="text" value={formData.address.pincode} onChange={(e) => handleChange(e, 'pincode', 'address')} className="w-full border p-2" />
-//       </div>
-
-//       <div>
-//         <label>Address Line 1*</label>
-//         <input type="text" value={formData.address.line1} onChange={(e) => handleChange(e, 'line1', 'address')} className="w-full border p-2" />
-//       </div>
-
-//       <div>
-//         <label>Address Line 2</label>
-//         <input type="text" value={formData.address.line2} onChange={(e) => handleChange(e, 'line2', 'address')} className="w-full border p-2" />
-//       </div>
-
-//       <div>
-//         <label>Logo URL</label>
-//         <input type="url" value={formData.logoUrl} onChange={(e) => handleChange(e, 'logoUrl')} className="w-full border p-2" />
-//       </div>
-
-//       <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Register</button>
-//     </form>
-//   );
-// };
-
-// export default OrganizationRegistrationForm;

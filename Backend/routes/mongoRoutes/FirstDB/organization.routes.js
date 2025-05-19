@@ -4,7 +4,7 @@ import { upload } from '../../../middleware/uploadLogoAndProfile.moddleware.js'
 
 const router = express.Router()
 
-router.post('/add-organization' ,upload.single('logo'),  CreateOrganization)
+router.post('/add-organization' ,upload.single('logoUrl'),  CreateOrganization)
 router.get('/all-organization', getAllOrganization)
 router.get('/detail/:id' , getOrganizationById )
 router.patch('/update/:id' , updateOrganization)

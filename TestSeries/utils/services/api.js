@@ -42,6 +42,9 @@ api.interceptors.response.use(
         case 500:
           console.error('Server Error:', data?.message);
           break;
+        case 409:
+          console.warn('Conflict:', data?.message);
+          break;
         default:
           console.warn('Unhandled Error:', data?.message);
       }
