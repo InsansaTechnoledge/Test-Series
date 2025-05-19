@@ -1,6 +1,6 @@
 import React from 'react'
 import Heading from './Heading'
-import { NotepadText, Search } from 'lucide-react'
+import { LucidePlusSquare, NotepadText, PlusSquare, Search } from 'lucide-react'
 
 const BatchList = () => {
     const batches = [
@@ -21,6 +21,14 @@ const BatchList = () => {
                         <h2 className='font-bold text-lg text-blue-900'>Total Batches: {batches.length}</h2>
                     </div>
                     <div className='flex space-x-4'>
+                        <button className='bg-blue-900 text-white py-2 px-4 rounded-md hover:cursor-pointer font-semibold hover:scale-105 flex space-x-2 transition-all duration-300'>
+                            <span>
+                                Create Batch 
+                            </span>
+                            <div>
+                                <PlusSquare />
+                            </div>
+                        </button>
                         <select className='rounded-md bg-white py-2 px-4'>
                             <option>--select year--</option>
                         </select>
