@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import BeforeAuthLanding from '../../features/beforeAuth/BeforeAuthLanding';
 import BeforeAuthLayout from '../../layouts/BeforeAuthLayout';
@@ -9,8 +9,15 @@ import StudentHero from '../../features/afterAuth/components/StudentSide/Student
 import AfterAuthLayout from '../../layouts/afterAuthLayout';
 import InstituteLanding from '../../features/afterAuth/pages/InstituteLanding';
 import StudentLanding from '../../features/afterAuth/pages/StudentLanding';
+import { useUser } from '../../contexts/currentUserContext';
 
 const PageLinks = () => {
+  const {user,setUser} = useUser();
+
+  useEffect(() => {
+
+  }, []);
+
   return (
     <Router>
       <Routes>
