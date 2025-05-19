@@ -24,7 +24,7 @@ const PageLinks = () => {
         setUser(null);
       }
     } catch (error) {
-      alert("Something went wrong while fetching user data");
+      // alert("Something went wrong while fetching user data");
       console.error('Error fetching user:', error);
       setUser(null);
     }
