@@ -18,47 +18,45 @@ import {
 const Footer = () => {
   return (
     <footer className="bg-gradient-to-b from-blue-900 to-blue-950 text-white">
-
       
       {/* Main Footer Content */}
-      <div className="max-w-screen-xl mx-auto py-12 px-6">
-        <div className="grid grid-cols-5 gap-8">
+      <div className="max-w-screen-xl mx-auto py-8 md:py-12 px-4 md:px-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-8">
           {/* Company Info */}
-          <div className="col-span-2">
-            <div className="flex items-center space-x-2 mb-6">
-            
+          <div className="col-span-1 sm:col-span-2">
+            <div className="flex items-center space-x-2 mb-4 md:mb-6">
               <div className="text-2xl font-bold bg-gradient-to-r from-blue-200 to-violet-200 bg-clip-text text-transparent">
                 myApp
               </div>
             </div>
             
-            <p className="text-blue-200 mb-6 pr-8">
+            <p className="text-blue-200 mb-6 pr-0 md:pr-8">
               The leading AI-powered proctoring solution trusted by educational institutions and certification providers worldwide. Ensuring integrity in online examinations with advanced technology and exceptional service.
             </p>
             
-            <div className="flex space-x-4">
-              <a href="#" className="bg-blue-800 hover:bg-blue-700 h-10 w-10 rounded-full flex items-center justify-center transition-colors duration-300">
-                <Facebook className="h-5 w-5" />
+            <div className="flex space-x-4 mb-8 md:mb-0">
+              <a href="#" className="bg-blue-800 hover:bg-blue-700 h-8 w-8 md:h-10 md:w-10 rounded-full flex items-center justify-center transition-colors duration-300">
+                <Facebook className="h-4 w-4 md:h-5 md:w-5" />
               </a>
-              <a href="#" className="bg-blue-800 hover:bg-blue-700 h-10 w-10 rounded-full flex items-center justify-center transition-colors duration-300">
-                <Twitter className="h-5 w-5" />
+              <a href="#" className="bg-blue-800 hover:bg-blue-700 h-8 w-8 md:h-10 md:w-10 rounded-full flex items-center justify-center transition-colors duration-300">
+                <Twitter className="h-4 w-4 md:h-5 md:w-5" />
               </a>
-              <a href="#" className="bg-blue-800 hover:bg-blue-700 h-10 w-10 rounded-full flex items-center justify-center transition-colors duration-300">
-                <Instagram className="h-5 w-5" />
+              <a href="#" className="bg-blue-800 hover:bg-blue-700 h-8 w-8 md:h-10 md:w-10 rounded-full flex items-center justify-center transition-colors duration-300">
+                <Instagram className="h-4 w-4 md:h-5 md:w-5" />
               </a>
-              <a href="#" className="bg-blue-800 hover:bg-blue-700 h-10 w-10 rounded-full flex items-center justify-center transition-colors duration-300">
-                <Linkedin className="h-5 w-5" />
+              <a href="#" className="bg-blue-800 hover:bg-blue-700 h-8 w-8 md:h-10 md:w-10 rounded-full flex items-center justify-center transition-colors duration-300">
+                <Linkedin className="h-4 w-4 md:h-5 md:w-5" />
               </a>
-              <a href="#" className="bg-blue-800 hover:bg-blue-700 h-10 w-10 rounded-full flex items-center justify-center transition-colors duration-300">
-                <Youtube className="h-5 w-5" />
+              <a href="#" className="bg-blue-800 hover:bg-blue-700 h-8 w-8 md:h-10 md:w-10 rounded-full flex items-center justify-center transition-colors duration-300">
+                <Youtube className="h-4 w-4 md:h-5 md:w-5" />
               </a>
             </div>
           </div>
           
           {/* Quick Links */}
-          <div>
-            <h3 className="text-lg font-bold mb-6 border-b border-blue-700 pb-2">Quick Links</h3>
-            <ul className="space-y-3">
+          <div className="col-span-1">
+            <h3 className="text-lg font-bold mb-4 md:mb-6 border-b border-blue-700 pb-2">Quick Links</h3>
+            <ul className="space-y-2 md:space-y-3">
               <li><a href="#" className="text-blue-200 hover:text-white flex items-center"><ArrowRight className="h-4 w-4 mr-2" /> Home</a></li>
               <li><a href="#" className="text-blue-200 hover:text-white flex items-center"><ArrowRight className="h-4 w-4 mr-2" /> About Us</a></li>
               <li><a href="#" className="text-blue-200 hover:text-white flex items-center"><ArrowRight className="h-4 w-4 mr-2" /> Features</a></li>
@@ -68,9 +66,9 @@ const Footer = () => {
           </div>
           
           {/* Resources */}
-          <div>
-            <h3 className="text-lg font-bold mb-6 border-b border-blue-700 pb-2">Resources</h3>
-            <ul className="space-y-3">
+          <div className="col-span-1">
+            <h3 className="text-lg font-bold mb-4 md:mb-6 border-b border-blue-700 pb-2">Resources</h3>
+            <ul className="space-y-2 md:space-y-3">
               <li><a href="#" className="text-blue-200 hover:text-white flex items-center"><ArrowRight className="h-4 w-4 mr-2" /> Help Center</a></li>
               <li><a href="#" className="text-blue-200 hover:text-white flex items-center"><ArrowRight className="h-4 w-4 mr-2" /> Blog</a></li>
               <li><a href="#" className="text-blue-200 hover:text-white flex items-center"><ArrowRight className="h-4 w-4 mr-2" /> Webinars</a></li>
@@ -80,9 +78,9 @@ const Footer = () => {
           </div>
           
           {/* Contact Info */}
-          <div>
-            <h3 className="text-lg font-bold mb-6 border-b border-blue-700 pb-2">Contact Us</h3>
-            <ul className="space-y-4">
+          <div className="col-span-1">
+            <h3 className="text-lg font-bold mb-4 md:mb-6 border-b border-blue-700 pb-2">Contact Us</h3>
+            <ul className="space-y-3 md:space-y-4">
               <li className="flex items-start">
                 <MapPin className="h-5 w-5 text-blue-300 mr-3 mt-1 flex-shrink-0" />
                 <span className="text-blue-200">123 Education Lane, Learning City, ED 12345</span>
@@ -100,14 +98,13 @@ const Footer = () => {
         </div>
       </div>
       
-    
       {/* Copyright */}
-      <div className="bg-blue-950 py-6">
-        <div className="max-w-screen-xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-blue-300 text-sm mb-4 md:mb-0">
+      <div className="bg-blue-950 py-4 md:py-6">
+        <div className="max-w-screen-xl mx-auto px-4 md:px-6 flex flex-col md:flex-row justify-between items-center">
+          <p className="text-blue-300 text-sm mb-4 md:mb-0 text-center md:text-left">
             © {new Date().getFullYear()} myapp. All rights reserved.
           </p>
-          <div className="flex space-x-6">
+          <div className="flex flex-wrap justify-center md:justify-end space-x-4 md:space-x-6">
             <a href="#" className="text-blue-300 hover:text-white text-sm transition-colors duration-200">Privacy Policy</a>
             <a href="#" className="text-blue-300 hover:text-white text-sm transition-colors duration-200">Terms of Service</a>
             <a href="#" className="text-blue-300 hover:text-white text-sm transition-colors duration-200">Cookie Policy</a>
