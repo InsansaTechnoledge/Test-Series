@@ -14,6 +14,12 @@ const RoleSchema = new Schema({
         },
         trim: true,
     },
+    description: {
+        type: String,
+        trim: true,
+        maxlength: [500, 'Description cannot exceed 500 characters'],
+        default: ''
+      },
     features: {
         type: [{type: Types.ObjectId, ref: 'Feature'}],
         required: [true, 'Features are required'],
