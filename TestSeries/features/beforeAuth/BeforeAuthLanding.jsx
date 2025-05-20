@@ -10,6 +10,8 @@ import ProctoringWorking from './pages/ProctoringWorking';
 import RegisterCTA from './pages/RegisterCTA';
 import Testimonials from './pages/Testimonials';
 import FAQSection from './pages/FAQSection';
+import { studentFAQs , teacherFAQs } from './data/FAQ';
+import { leftCapabilities , rightCapabilities , benefits } from './data/Capabilities';
 
 const BeforeAuthLanding = () => {
   return (
@@ -20,10 +22,10 @@ const BeforeAuthLanding = () => {
       <TestTypes />
       <AiBranding/>
       <ProctoringWorking/>
-      <SoftwareCapabilities />
+      <SoftwareCapabilities leftCapabilities={leftCapabilities} rightCapabilities={rightCapabilities} benefits={benefits} />
       <RegisterCTA/>
-      <FAQSection/>
-      <Testimonials />
+      <FAQSection studentFAQs={studentFAQs} teacherFAQs={teacherFAQs} />
+      <Testimonials />        
     </>
     
   );

@@ -30,7 +30,7 @@ export const Rank = [
     shadow: 'shadow-blue-200/50'
   },
   {
-    name: "Highes Rank",
+    name: "Highest Rank",
     rank: 1,
     color: 'bg-blue-100 text-blue-600 border-blue-200',
     shadow: 'shadow-blue-200/50'
