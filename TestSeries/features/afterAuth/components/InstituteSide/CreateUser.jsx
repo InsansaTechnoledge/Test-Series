@@ -30,7 +30,7 @@ const CreateUser = () => {
     const [batchesVisible, setBatchesVisible] = useState(false);
     const [formData, setFormData] = useState({});
     const [selectedBatches, setSelectedBatches] = useState([]);
-    const [profile, setProfile] = useState(profileDefault);
+    const [profile, setProfile] = useState(null);
 
     useEffect(() => {
         console.log(formData);
@@ -76,15 +76,26 @@ const CreateUser = () => {
                 <Heading title={"Create User"} />
             </div>
             <div className='bg-gray-200 p-6 rounded-lg'>
-                <div className='flex gap-8'>
-                    <img
-                        src={profile} // fallback image if nothing is selected
-                        className='rounded-full w-20 h-20'
-                        alt='Profile'
-                    />
+                <div className='flex flex-col md:flex-row gap-8'>
+                    <div className='w-fit mx-auto md:mx-0'>
+                        <img
+ 
+                            src={profile || profileDefault} // fallback image if nothing is selected
+                            className='rounded-full w-20 h-20'
+                            alt='Profile'
+                        />
+                    </div>
 
-                    <label className='bg-blue-900 h-fit my-auto text-white py-2 px-4 rounded-md cursor-pointer'>
-                        Upload profile photo
+                    <label className='text-center bg-blue-900 h-fit my-auto text-white py-2 px-4 rounded-md cursor-pointer'>
+                        {
+                            profile
+                            ?
+                            "Change profile photo"
+                            :
+                            "Upload profile photo"
+
+                        }
+                        
                         <input
                             type='file'
                             accept='image/*'
@@ -104,7 +115,7 @@ const CreateUser = () => {
                     </label>
 
                 </div>
-                <div className='grid grid-cols-2 gap-x-26 mx-auto gap-y-8 mt-10 w-4/5'>
+                <div className='grid lg:grid-cols-2 gap-x-26 mx-auto gap-y-8 mt-10 w-4/5'>
                     <div className='flex flex-col gap-2'>
                         <label htmlFor='fname' className='text-lg font-semibold'>First name<span className='text-red-600'>*</span></label>
                         <input type='text'
