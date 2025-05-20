@@ -17,6 +17,7 @@ import UserList from '../../features/afterAuth/components/InstituteSide/UserList
 import CreateUser from '../../features/afterAuth/components/InstituteSide/CreateUser';
 import CreateBatch from '../../features/afterAuth/components/InstituteSide/CreateBatch';
 import CreateStudent from '../../features/afterAuth/components/InstituteSide/AddStudent';
+import FeatureBasedRoleGroups from '../../features/afterAuth/components/InstituteSide/RoleGroup';
 
 const PageLinks = () => {
   const { user, setUser } = useUser();
@@ -62,6 +63,8 @@ const PageLinks = () => {
             <Route path='create-user' element={<CreateUser />} />
             <Route path='create-batch' element={<CreateBatch />} />
             <Route path='add-student' element={<CreateStudent />} />
+            <Route path='create-role-group' element={<FeatureBasedRoleGroups />} />
+
             <Route path='*' element={<div>Invalid path</div>} />
           </Route>
           <Route path='student-landing' element={<StudentLanding />} />
