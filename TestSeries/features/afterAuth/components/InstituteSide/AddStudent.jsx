@@ -1,11 +1,12 @@
 import React from 'react'
-import Heading from './Heading'
+import HeadingUtil from '../../utility/HeadingUtil'
 
 const AddStudent = () => {
   return (
     <div className='flex flex-col'>
         <div className='mb-5'>
-                <Heading title={"Add User"} />
+                <HeadingUtil heading="Add Student" description="you can add new students to any batch"/>
+      
             </div>
 
     </div>
