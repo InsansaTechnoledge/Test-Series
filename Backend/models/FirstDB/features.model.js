@@ -25,7 +25,14 @@ const FeaturesSchema = new Schema(
       },
       default: 'active',
       index: true
+    },
+    category: {
+      type:String,
+      trim: true,
+      maxlength: [100, 'Category cannot exceed 100 characters'],
+      default: ''
     }
+
   },
   {
     timestamps: true,
