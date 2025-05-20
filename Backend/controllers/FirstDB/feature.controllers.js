@@ -16,7 +16,9 @@ export const createFeature = async (req, res) => {
         return new APIError(400, 'Each feature must have a name').send(res);
       }
 
-      const data = await Feature.insertMany(body, { ordered: false });
+      const hydratedDocs = body.map((item) => item.createdAt ? item : { ...item, createdAt: new Date() });
+const data = await Feature.insertMany(hydratedDocs);
+
       return new APIResponse(200, data, 'Features created successfully').send(res);
     }
 
