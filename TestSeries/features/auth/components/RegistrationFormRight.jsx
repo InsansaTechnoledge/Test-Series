@@ -12,8 +12,8 @@ const OrganizationRegistrationForm = () => {
     password: '',
     confirm_password: '',
     phone: '',
-    logoUrl: '',
     website: '',
+    logoUrl: '', 
     address: {
       line1: '',
       line2: '',
@@ -244,9 +244,30 @@ const OrganizationRegistrationForm = () => {
     }
 
     try {
-      console.log('Form data:', formData);
-      formData.logoUrl = logoFile ? previewUrl : ''; // Set logo URL if a file is provided
-      const response=await createOrganization(formData);
+    //   console.log('Form data:', formData);
+    //   formData.logoUrl = logoFile ? previewUrl : '';
+    //   const response=await createOrganization(formData);
+        
+        const form = new FormData();
+
+        for(let key in formData) { 
+            if(key === 'address' || key === 'subscription') {
+                form.append(key, JSON.stringify(formData[key]))
+            } else if(key !== 'logoUrl') {
+                form.append(key, formData[key])
+            }
+        }
+
+        if(logoFile) {
+            form.append('logoUrl' , logoFile)
+        }
+
+        const response = await createOrganization(form);
+
+        console.log("✅ Server response:", response); 
+        console.log("✅ Uploaded logo URL:", response?.data?.logoUrl); 
+
+
       setMsg(`✅ Institute created successfully by the name ${response.data.name}!`);
       setFormData({
         name: '',
@@ -254,8 +275,8 @@ const OrganizationRegistrationForm = () => {
         password: '',
         confirm_password: '',
         phone: '',
-        logoUrl: '',
         website: '',
+        logoUrl: response.data.logoUrl || '',
         address: {
           line1: '',
           line2: '',

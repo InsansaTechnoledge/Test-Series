@@ -21,9 +21,23 @@ export const CreateOrganization = async (req, res) => {
     //     };
     //   }
 
-    if (req.file && req.file.path) {
-        data.logoUrl = req.file.path;
-      }
+    if (typeof data.address === 'string') {
+      data.address = JSON.parse(data.address);
+    }
+
+    if (typeof data.subscription === 'string') {
+      data.subscription = JSON.parse(data.subscription);
+    }
+
+    // if (req.file && req.file.path) {
+    //     data.logoUrl = req.file.path;
+    //   }
+
+    if (req.file) {
+      data.logoUrl = req.file.path || req.file.secure_url || '';
+      console.log('Uploaded file info:', req.file); 
+    }
+    
       const existing = await Organization.findOne({
         $or: [{ email: data.email }, { phone: data.phone }]
       });
