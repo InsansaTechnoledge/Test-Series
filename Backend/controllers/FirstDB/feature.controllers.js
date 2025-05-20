@@ -3,20 +3,40 @@ import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js"
 import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js"
 
 
-export const createFeature = async (req,res) => {
-    try{
-        const body = req.body
+export const createFeature = async (req, res) => {
+  try {
+    const body = req.body;
+    if (Array.isArray(body)) {
+      if (body.length === 0) {
+        return new APIError(400, 'Empty array provided').send(res);
+      }
 
-        if(!body.name) return new APIError(404, 'feature name is required').send(res)
+      const invalid = body.find((item) => !item.name);
+      if (invalid) {
+        return new APIError(400, 'Each feature must have a name').send(res);
+      }
 
-        const data = await Feature.create(body)
+      const hydratedDocs = body.map((item) => item.createdAt ? item : { ...item, createdAt: new Date() });
+const data = await Feature.insertMany(hydratedDocs);
 
-        return new APIResponse(200, data , 'feature created successfully').send(res)
-    } catch(e) {
-        new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while creating the feature", err.message || ""]).send(res);
-
+      return new APIResponse(200, data, 'Features created successfully').send(res);
     }
-}
+
+    // Handle single object insert
+    if (!body.name) {
+      return new APIError(400, 'Feature name is required').send(res);
+    }
+
+    const data = await Feature.create(body);
+    return new APIResponse(200, data, 'Feature created successfully').send(res);
+  } catch (err) {
+    new APIError(
+      err?.response?.status || err?.status || 500,
+      ['Something went wrong while creating the feature', err.message || '']
+    ).send(res);
+  }
+};
+
 
 export const fetchAllFeatures = async(req,res) => {
     try{

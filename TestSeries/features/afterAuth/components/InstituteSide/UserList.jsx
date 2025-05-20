@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import Heading from './Heading'
-import { NotepadText, PlusSquare, Search } from 'lucide-react'
+import { Edit, Eye, NotepadText, PlusSquare, Search, Trash } from 'lucide-react'
 
 const UserList = () => {
     const users = [
@@ -187,18 +187,18 @@ const UserList = () => {
                                                     {user.role}
                                                 </div>
                                             </td>
-                                            <td className="flex justify-center flex-wrap mx-auto w-fit px-6 py-4 gap-8">
+                                            <td className="flex justify-center mx-auto w-fit px-6 py-4 gap-8">
                                                 <button
                                                     className="font-medium text-black hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer">
-                                                    view
+                                                    <Eye/>
                                                 </button>
                                                 <button
                                                     className="font-medium text-blue-500 hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer">
-                                                    Edit
+                                                    <Edit/>
                                                 </button>
                                                 <button
                                                     className="font-medium text-red-500 hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer">
-                                                    Delete
+                                                    <Trash/>
                                                 </button>
                                             </td>
                                         </tr>
