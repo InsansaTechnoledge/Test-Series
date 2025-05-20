@@ -1,6 +1,6 @@
 import React from 'react';
 import { CheckCircle } from 'lucide-react';
-import laptop from '../../../assests/Landing/TestTypes/laptop.svg'
+import laptop from '../../../assests/Landing/TestTypes/laptop3.png'
 const types = [
   "MCQs",
   "MSQ",
@@ -15,9 +15,7 @@ const types = [
 const TestTypes = () => {
   return (
     <div className="relative py-12 md:py-20 px-4 md:px-12 lg:px-24 overflow-hidden">
-      
-      <div className="absolute inset-0 bg-gradient-to-r from-indigo-50 to-transparent z-0 transform -skew-y-3"></div>
-      
+            
       <div className="relative z-10 max-w-7xl mx-auto">
         <div className="flex flex-col lg:flex-row items-center gap-12">
           {/* Left content */}

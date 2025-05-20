@@ -3,7 +3,7 @@ import aiImage from '../../../assests/Landing/proctorBanner/ai.svg';
 
 const AiBranding = () => {
   return (
-    <div className="w-full bg-blue-900 flex flex-col items-center justify-center py-16 px-4 mt-8 mb-8 text-center text-white">
+    <div className=" hidden w-full bg-blue-900 md:flex flex-col items-center justify-center py-16 px-4 mt-8 mb-8 text-center text-white">
       {/* Logo */}
       <img src={aiImage} alt="AI logo" className="w-36 h-36 mb-6" />
 

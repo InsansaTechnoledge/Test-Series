@@ -1,101 +1,53 @@
 import React from 'react';
-import { ArrowRight, Check, Shield, Clock, BookOpen } from 'lucide-react';
-import plane from '../../../assests/Landing/Hero/planeButton.svg';
-import rings from '../../../assests/Landing/Hero/rings.svg';
-import mirrorBg from '../../../assests/Landing/Hero/mirrorBg.svg';
+import landingIllustration from '../../../assests/Landing/Hero/herobg2.png';
 
-const HeroSection = () => {
-  const features = [
-    { text: "Secure exam environment", icon: Shield },
-    { text: "Real-time monitoring", icon: Clock },
-    { text: "Comprehensive assessment tools", icon: BookOpen }
-  ];
-
+const LandingCover = () => {
   return (
-    <div className="relative 
-    bg-[linear-gradient(to_right,_#0c0077,_#2C2AB7,_#1F26F9,_#4B64F1,_#6C87DE,_#CCDDFF)] 
-    overflow-hidden">
-      <img
-        src={rings}
-        alt='rings'
-        className='h-full absolute top-14 left-0' />
-      <div className="container mx-30 py-18 md:py-24 px-4 md:px-8 lg:px-12 relative">
-
-        <div className="grid lg:grid-cols-2 items-center">
-          {/* Left content - Text area */}
-          <div className="z-10 ">
-
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
-              Transform your <span className="text-indigo-300 relative">
-                examination
-                <svg className="absolute bottom-1 left-0 w-full" height="6" viewBox="0 0 200 6" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M0,3 C50,0 150,6 200,3" stroke="white" strokeWidth="4" fill="none" />
-                </svg>
-              </span> process
+    <div className="flex flex-col bg-white">
+      {/* Hero Section */}
+      <main className="flex flex-col-reverse md:flex-row items-center justify-between px-6 md:px-16 lg:px-24 py-12 h-full">
+        {/* Left: Text Content */}
+        <div className="w-full md:w-3/4 md:ml-10 space-y-8 text-center md:text-left pt-8 md:pt-0">
+          <div className="space-y-4">
+            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 leading-tight">
+            Create.<br className=" md:block" />
+            <span className='text-blue-700 text-bold'>Attempt.<br className=" md:block" /></span>
+              Get Results and <span className='text-blue-700 text-bold'>Analytics</span>.
             </h1>
-
-            <p className="text-lg text-indigo-100 mb-8 max-w-lg">
-              Our comprehensive platform helps educational institutions create, administer, and analyze assessments with powerful tools and actionable insights.
+            <p className="text-gray-600 text-lg md:text-xl max-w-md mx-auto md:mx-0">
+             <span className='border-b-2 border-blue-800'>Organizations</span> create tests effortlessly.  <span className='border-b-2 border-blue-800'>Students/Users</span>  take them seamlessly. Get instant results with powerful analytics to measure performance.
             </p>
+          </div>         
+        </div>
 
-            {/* Feature points */}
-            {/* <div className="mb-8 space-y-3">
-              {features.map((feature, index) => (
-                <div key={index} className="flex items-center">
-                  
-                  <span className="text-indigo-100">{feature.text}</span>
-                </div>
-              ))}
-            </div> */}
-
-            {/* CTA buttons */}
-            <div className="flex flex-col sm:flex-row gap-4">
-              <button className="bg-indigo-500 hover:bg-indigo-600 text-white px-8 py-3 rounded-4xl font-medium text-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center">
-                Get Registered
-                {/* <ArrowRight className="ml-2 w-5 h-5" /> */}
-                <img src={plane} alt="" className='ml-2 w-5 h-5' />
-              </button>
-
-            </div>
-
-
-          </div>
-
-          {/* Right content - Image area */}
+        {/* Right: Image Container */}
+        <div className="w-full md:w-1/2 flex justify-center md:justify-end items-center">
           <div className="relative">
-            <div>
-              <img
-                src={mirrorBg}
-                alt='mirror bg'
-                className='' />
-            </div>
-            <div className="mt-5 ml-14">
-              <p className="text-md text-gray-200 mb-4">Trusted by leading institutions</p>
-              <div className="flex flex-wrap gap-8 items-center">
-                <UniversityLogo name="Stanford" />
-                <UniversityLogo name="Harvard" />
-                <UniversityLogo name="MIT" />
-                <UniversityLogo name="Oxford" />
-              </div>
-            </div>
+           
+            {/* Main illustration */}
+            <img
+              src={landingIllustration}
+              alt="Creative thinking illustration"
+              className="w-full max-w-xl md:mr-50 relative z-10"
+            />
           </div>
         </div>
-      </div>
-
-      {/* Wavy divider */}
-      <div className="relative h-16 mt-8">
-        <svg className="absolute bottom-0 w-full h-full" preserveAspectRatio="none" viewBox="0 0 1440 74" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M0,37 C240,74 480,0 720,37 C960,74 1200,0 1440,37 L1440 74 L0 74 Z" fill="#dbeafe" />
-        </svg>
+      </main>
+      
+     
+      <div className="bg-white py-6 px-6 md:px-16">
+        <div className="max-w-7xl mx-auto">
+          <p className="text-gray-500 text-sm text-center mb-4">Trusted by innovative teams worldwide</p>
+          <div className="flex justify-center space-x-12 opacity-60">
+            <div className="h-8 w-24 bg-gray-300 rounded"></div>
+            <div className="h-8 w-24 bg-gray-300 rounded"></div>
+            <div className="h-8 w-24 bg-gray-300 rounded"></div>
+            <div className="h-8 w-24 bg-gray-300 rounded"></div>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
 
-
-const UniversityLogo = ({ name }) => (
-  <div className="font-bold text-white text-lg">{name}</div>
-);
-
-export default HeroSection;
-
+export default LandingCover;

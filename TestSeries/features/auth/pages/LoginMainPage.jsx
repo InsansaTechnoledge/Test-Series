@@ -19,7 +19,7 @@ const LoginMainPage = () => {
         }
     }, [role])
 
-    console.log(role);
+    // console.log(role);
     return (
         <div>
             <LoginHeader loginFor={loginFor} />
