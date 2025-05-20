@@ -114,7 +114,7 @@ const LoginForm = () => {
     }catch(err){
       console.log(err);
         setErrors(err.response.data.errors || "Something went wrong");
-        alert(err.response.data.errors || "Something went wrong")
+        alert(err.response.data.errors || "Something went wrong") 
     }
     }
   };
