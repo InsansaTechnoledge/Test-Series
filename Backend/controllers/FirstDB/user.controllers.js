@@ -6,6 +6,10 @@ export const registerUser = async (req, res) => {
     try {
         //when we get register one default email will send to user with id and password
         const userData = req.body;
+        userData.createdBy = {
+            id: req.user._id|| req.user.id,
+            model: req.user.role === "organization" ? "Organization" : "User"
+        };
         const user = await User.create(userData);
 
         return new APIResponse(200, user,"User registered successfully!!",).send(res);
@@ -26,6 +30,10 @@ export const updateUser = async (req, res) => {
         if (!Data) {
             return new APIError(400, ["Data is required!!"]).send(res);
         }
+        Data.createdBy = {
+            id: req.user._id || req.user.id,
+            model: req.user.role === "organization" ? "Organization" : "User"
+        };
         const user = await User.findByIdAndUpdate(
              userId ,
             { $set: Data },
