@@ -84,7 +84,7 @@ const LoginForm = () => {
             email:'',
             password:''
           });
-         setUser(response.data.user);
+         setUser(response.data);
         }
         
       }catch(err){
@@ -110,7 +110,7 @@ const LoginForm = () => {
       setErrors({});
       }
     
-      setUser(response.data.user);
+      setUser(response.data);
     }catch(err){
       console.log(err);
         setErrors(err.response.data.errors || "Something went wrong");

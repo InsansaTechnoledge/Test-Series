@@ -21,6 +21,11 @@ const OrganizationLayout = () => {
             name: "Add User",
             path: "create-user",
             icon: User
+        },
+        {
+            name: "Create Batch",
+            path: "create-batch",
+            icon: User
         }
     ]
 

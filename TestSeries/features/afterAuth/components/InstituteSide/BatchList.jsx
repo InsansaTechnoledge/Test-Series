@@ -5,15 +5,20 @@ import { LucidePlusSquare, NotepadText, PlusSquare, Search } from 'lucide-react'
 import { useEffect, useState } from 'react';
 
 const BatchList = () => {
-     const fetchBatchListFunction = async () => {
+
+    const [filteredBatches, setFilteredBatches] = useState([]);
+    const [selectedYear, setSelectedYear] = useState('');
+
+    const fetchBatchListFunction = async () => {
         const response = await fetchBatchList();
         if (response.status !== 200) {
             throw new Error('Network response was not ok');
         }
         console.log(response.data);
+        setFilteredBatches(response.data);
         return response.data;
     }
-    
+
     const { data: batches = [], isLoading, isError } = useQuery({
         queryKey: ['batches'],
         queryFn: () => fetchBatchListFunction(),
@@ -25,20 +30,18 @@ const BatchList = () => {
     });
 
 
-    const [selectedYear, setSelectedYear] = useState('');
-    const [filteredBatches, setFilteredBatches] = useState(batches);
 
     const uniqueYears = [...new Set(batches.map(batch => batch.year))];
 
     useEffect(() => {
- if (selectedYear) {
-      setFilteredBatches(batches.filter(batch => batch.year === parseInt(selectedYear)));
-    } else {
-      setFilteredBatches(batches);
-    }
-  }, [selectedYear, batches]);
+        if (selectedYear) {
+            setFilteredBatches(batches.filter(batch => batch.year === parseInt(selectedYear)));
+        } else {
+            setFilteredBatches(batches);
+        }
+    }, [selectedYear]);
 
-   
+
     // const batches = [
     //     {
     //         name: "BE-4",
@@ -142,7 +145,7 @@ const BatchList = () => {
             <div className='h-full flex flex-col'>
                 <div className='mb-5'>
                     <Heading title={selectedYear ? `Batch List for ${selectedYear}` : "All Batches"}
-                     />
+                    />
                 </div>
                 <div className='rounded-xl p-5 bg-gray-200 inset-shadow-md flex-grow flex flex-col overflow-auto'>
                     <div className='flex flex-col lg:flex-row justify-between gap-4 mb-5'>
@@ -162,8 +165,8 @@ const BatchList = () => {
                                 onChange={(e) => setSelectedYear(e.target.value)}>
                                 <option value={""}>--select year--</option>
                                 {uniqueYears.map(year => (
-          <option key={year} value={year}>{year}</option>
-        ))}
+                                    <option key={year} value={year}>{year}</option>
+                                ))}
 
                             </select>
                             <label className='space-x-2 flex rounded-md bg-white py-2 px-4'>
