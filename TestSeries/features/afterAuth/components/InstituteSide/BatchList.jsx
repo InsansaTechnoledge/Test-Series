@@ -2,10 +2,10 @@ import Heading from './Heading'
 import { useQuery } from '@tanstack/react-query'
 import { fetchBatchList } from '../../../../utils/services/batchService';
 import { LucidePlusSquare, NotepadText, PlusSquare, Search } from 'lucide-react'
+import { useEffect, useState } from 'react';
 
 const BatchList = () => {
-
-    const fetchBatchListFunction = async () => {
+     const fetchBatchListFunction = async () => {
         const response = await fetchBatchList();
         if (response.status !== 200) {
             throw new Error('Network response was not ok');
@@ -24,6 +24,21 @@ const BatchList = () => {
         retry: 0,
     });
 
+
+    const [selectedYear, setSelectedYear] = useState('');
+    const [filteredBatches, setFilteredBatches] = useState(batches);
+
+    const uniqueYears = [...new Set(batches.map(batch => batch.year))];
+
+    useEffect(() => {
+ if (selectedYear) {
+      setFilteredBatches(batches.filter(batch => batch.year === parseInt(selectedYear)));
+    } else {
+      setFilteredBatches(batches);
+    }
+  }, [selectedYear, batches]);
+
+   
     // const batches = [
     //     {
     //         name: "BE-4",
@@ -126,12 +141,13 @@ const BatchList = () => {
         <>
             <div className='h-full flex flex-col'>
                 <div className='mb-5'>
-                    <Heading title={"All Batches"} />
+                    <Heading title={selectedYear ? `Batch List for ${selectedYear}` : "All Batches"}
+                     />
                 </div>
                 <div className='rounded-xl p-5 bg-gray-200 inset-shadow-md flex-grow flex flex-col overflow-auto'>
                     <div className='flex flex-col lg:flex-row justify-between gap-4 mb-5'>
                         <div className='my-auto'>
-                            <h2 className='font-bold text-lg text-blue-900'>Total Batches: {batches?.length}</h2>
+                            <h2 className='font-bold text-lg text-blue-900'>Total Batches: {filteredBatches?.length}</h2>
                         </div>
                         <div className='flex flex-col md:flex-row gap-4'>
                             <button className='bg-blue-900 text-white py-2 px-4 rounded-md hover:cursor-pointer font-semibold hover:scale-105 flex space-x-2 transition-all duration-300'>
@@ -142,8 +158,13 @@ const BatchList = () => {
                                     <PlusSquare />
                                 </div>
                             </button>
-                            <select className='rounded-md bg-white py-2 px-4'>
-                                <option>--select year--</option>
+                            <select className='rounded-md bg-white py-2 px-4'
+                                onChange={(e) => setSelectedYear(e.target.value)}>
+                                <option value={""}>--select year--</option>
+                                {uniqueYears.map(year => (
+          <option key={year} value={year}>{year}</option>
+        ))}
+
                             </select>
                             <label className='space-x-2 flex rounded-md bg-white py-2 px-4'>
                                 <div>
@@ -181,7 +202,7 @@ const BatchList = () => {
                                 </tr>
                             </thead>
                             {
-                                batches?.map((batch, idx) => (
+                                filteredBatches?.map((batch, idx) => (
                                     <tbody key={idx}>
                                         <tr className="bg-white border-b border-gray-200 hover:bg-gray-50 text-blue-600 text-lg">
                                             <th scope="row" className="px-6 py-4 font-medium text-blue-600 whitespace-nowrap ">

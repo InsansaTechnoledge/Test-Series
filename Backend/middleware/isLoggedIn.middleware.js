@@ -30,10 +30,10 @@ export const isUserAuthenticated = async (req, res, next) => {
 
 export const isOrgAndUserAuthenticated = async (req, res, next) => {
 
-
+   req.mergedQuery = { ...req.query }; 
   if (req.isAuthenticated() && (req.user?.role === 'user' || req.user?.role === 'student')) {
 
-    req.mergedQuery = { ...req.query }; 
+   
 
     if (!req.mergedQuery.id && req.user?.batch) {
       req.mergedQuery.id = Array.isArray(req.user.batch) ? req.user.batch : [req.user.batch];
@@ -47,7 +47,7 @@ export const isOrgAndUserAuthenticated = async (req, res, next) => {
   };
 
   if (req.isAuthenticated() && (req.user?.role === 'organization')) {
-    req.query.organization_id = req.user?._id;
+    req.mergedQuery.organization_id = req.user?._id;
     return next()
   }
 
