@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Heading from './Heading'
 import { Edit, Eye, NotepadText, PlusSquare, Search, Trash } from 'lucide-react'
+import HeadingUtil from '../../utility/HeadingUtil'
 
 const UserList = () => {
     const users = [
@@ -76,8 +77,9 @@ const UserList = () => {
     return (
         <> 
             <div className='h-full flex flex-col'>
-                <div className='mb-5'>
-                    <Heading title={"All Users"} />
+                <div>
+                    <HeadingUtil heading="All Users" description="you can view all users of your institute and filter them based on year"/>
+      
                 </div>
                 <div className='rounded-xl p-5 bg-gray-200 inset-shadow-md flex-grow flex flex-col overflow-auto'>
                     <div className='flex flex-col lg:flex-row justify-between gap-4 mb-5'>

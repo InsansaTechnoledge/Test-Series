@@ -144,7 +144,7 @@ const BatchList = () => {
     return (
         <>
             <div className='h-full flex flex-col'>
-                <div className='mb-5'>
+                <div className=''>
                     {/* <Heading title={selectedYear ? `Batch List for ${selectedYear}` : "All Batches"} */}
                     <HeadingUtil heading={selectedYear ? `Batch List for ${selectedYear}` : "All Batches"} description="you can view list of all batches in your institute"/>
       

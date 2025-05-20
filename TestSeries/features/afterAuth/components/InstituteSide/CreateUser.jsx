@@ -73,7 +73,7 @@ const CreateUser = () => {
 
     return (
         <div className='flex flex-col'>
-            <div className='mb-5'>
+            <div className=''>
                 <HeadingUtil heading="Add User" description="you can add users to your institute and assign them specific roles"/>
       
             </div>
