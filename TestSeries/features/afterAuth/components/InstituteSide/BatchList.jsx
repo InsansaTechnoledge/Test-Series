@@ -4,8 +4,10 @@ import { fetchBatchList } from '../../../../utils/services/batchService';
 import { Edit, Eye, LucidePlusSquare, NotepadText, PlusSquare, Search, Trash } from 'lucide-react'
 import { useEffect, useState } from 'react';
 import HeadingUtil from '../../utility/HeadingUtil';
+import {  useNavigate } from 'react-router-dom';
 
 const BatchList = () => {
+    const navigate=useNavigate();
 
     const [filteredBatches, setFilteredBatches] = useState([]);
     const [selectedYear, setSelectedYear] = useState('');
@@ -30,8 +32,6 @@ const BatchList = () => {
         retry: 0,
     });
 
-
-
     const uniqueYears = [...new Set(batches.map(batch => batch.year))];
 
     useEffect(() => {
@@ -41,105 +41,6 @@ const BatchList = () => {
             setFilteredBatches(batches);
         }
     }, [selectedYear]);
-
-
-    // const batches = [
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    // ]
 
     return (
         <>
@@ -156,7 +57,8 @@ const BatchList = () => {
                             <h2 className='font-bold text-lg text-blue-900'>Total Batches: {filteredBatches?.length}</h2>
                         </div>
                         <div className='flex flex-col md:flex-row gap-4'>
-                            <button className='bg-blue-900 text-white py-2 px-4 rounded-md hover:cursor-pointer font-semibold hover:scale-105 flex space-x-2 transition-all duration-300'>
+                            <button className='bg-blue-900 text-white py-2 px-4 rounded-md hover:cursor-pointer font-semibold hover:scale-105 flex space-x-2 transition-all duration-300'
+                            onClick={() => navigate('/institute/create-batch')}>
                                 <span>
                                     Create Batch
                                 </span>

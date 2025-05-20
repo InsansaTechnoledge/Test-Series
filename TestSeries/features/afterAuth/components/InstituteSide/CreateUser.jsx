@@ -98,7 +98,8 @@ const CreateUser = () => {
                         />
                     </div>
 
-                    <label className='text-center bg-blue-900 h-fit my-auto text-white py-2 px-4 rounded-md cursor-pointer'>
+                    <div className='flex flex-col justify-center'>
+                    <label className='text-center bg-blue-900 h-fit text-white py-2 px-3 rounded-md cursor-pointer'>
                         {
                             profile
                                 ?
@@ -107,7 +108,7 @@ const CreateUser = () => {
                                 "Upload profile photo"
 
                         }
-
+                       
                         <input
                             type='file'
                             accept='image/*'
@@ -125,6 +126,8 @@ const CreateUser = () => {
                             }}
                         />
                     </label>
+                    <span className='text-sm text-gray-600'>you may add the profile photo of the user.</span>
+                     </div>
 
                 </div>
                 <div className='grid lg:grid-cols-2 gap-x-26 mx-auto gap-y-8 mt-10 w-4/5'>
