@@ -26,17 +26,14 @@ const BatchList = () => {
 
 
     const [selectedYear, setSelectedYear] = useState('');
-    const [filteredBatches, setFilteredBatches] = useState(batches);
+
+    const filteredBatches = selectedYear
+  ? batches.filter(batch => batch.year === parseInt(selectedYear))
+  : batches;
+
+    // const [filteredBatches, setFilteredBatches] = useState(batches);
 
     const uniqueYears = [...new Set(batches.map(batch => batch.year))];
-
-    useEffect(() => {
- if (selectedYear) {
-      setFilteredBatches(batches.filter(batch => batch.year === parseInt(selectedYear)));
-    } else {
-      setFilteredBatches(batches);
-    }
-  }, [selectedYear, batches]);
 
    
     // const batches = [

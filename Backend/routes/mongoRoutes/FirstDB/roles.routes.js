@@ -4,9 +4,9 @@ import { addRole, deleteRole, fetchRoleDetails, fetchRolesForOrganization, updat
 const router = express.Router();
 
 router.post('/', addRole);
+router.get('/', fetchRolesForOrganization);
 router.delete('/:id', deleteRole);
 router.patch('/:id', updateRole);
-router.get('/organization/:id', fetchRolesForOrganization);
 router.get('/:id', fetchRoleDetails);
 
 export default router;

@@ -1,21 +1,64 @@
 import { Role } from "../../models/FirstDB/roles.model.js";
 import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
 import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
+import { mongoose,Types } from "mongoose";
+
+// export const addRole = async (req, res) => {
+//     try {
+//         const orgId = req.user.id || req.user._id
+
+//         const roleData = req.body;
+
+//         const newRole = await Role.create(roleData);
+
+//         return new APIResponse(200, newRole, "New role Created successfully!").send(res);
+//     }
+//     catch (err) {
+//         console.log(err);
+//         return new APIError(err?.response?.status || 500, ['Something went wrong while creating role', err.message]).send(res);
+//     }
+
+// }
 
 export const addRole = async (req, res) => {
     try {
-        const roleData = req.body;
-
-        const newRole = await Role.create(roleData);
-
-        return new APIResponse(200, newRole, "New role Created successfully!").send(res);
+      const rawOrgId = req.user.id || req.user._id;
+  
+      const orgId = new Types.ObjectId(
+        Buffer.isBuffer(rawOrgId) ? rawOrgId.toString("hex") : rawOrgId
+      );
+  
+      const { name, description, featureIds } = req.body;
+  
+      if (!name || !Array.isArray(featureIds)) {
+        return res.status(400).json({ message: "Name and featureIds are required" });
+      }
+  
+      const roleData = {
+        name,
+        description,
+        organizationId: orgId,
+        features: featureIds.map(id => new Types.ObjectId(id)),
+      };
+  
+      const newRole = await Role.create(roleData);
+  
+      return res.status(200).json({
+        success: true,
+        data: newRole,
+        message: "New role created successfully!",
+      });
+    } catch (err) {
+      console.error("Error while creating role:", err);
+      return res.status(500).json({
+        success: false,
+        message: "Something went wrong while creating role",
+        error: err.message,
+      });
     }
-    catch (err) {
-        console.log(err);
-        return new APIError(err?.response?.status || 500, ['Something went wrong while creating role', err.message]).send(res);
-    }
-
-}
+  };
+  
+  
 
 export const deleteRole = async (req, res) => {
     try {
@@ -48,8 +91,8 @@ export const updateRole = async (req, res) => {
 export const fetchRolesForOrganization = async (req,res) => {
     try{
 
-        const {id} = req.params;
-        const OrgRoles = await Role.find({organizationId: id}).populate('features').lean();
+        const id = req.user.id || req.user._id;
+        const OrgRoles = await Role.find({organizationId: id}).populate('features')
         if(!OrgRoles || OrgRoles.length===0){
             return new APIError(404, ["Roles for organization not found"]).send(res);
         }
@@ -60,6 +103,32 @@ export const fetchRolesForOrganization = async (req,res) => {
         return new APIError(err?.response?.status || 500, ['Something went wrong while fetching roles for organization', err.message]).send(res);
     }
 }
+
+// export const fetchRolesForOrganization = async (req, res) => {
+//     try {
+//       const rawOrgId = req.user.id || req.user._id;
+  
+//       const orgId = new mongoose.Types.ObjectId(
+//         Buffer.isBuffer(rawOrgId) ? rawOrgId.toString("hex") : rawOrgId
+//       );
+  
+//       const OrgRoles = await Role.find({ organizationId: orgId })
+//         .populate("features")
+//         .lean();
+  
+//       if (!OrgRoles || OrgRoles.length === 0) {
+//         return new APIError(404, ["Roles for organization not found"]).send(res);
+//       }
+  
+//       return new APIResponse(200, OrgRoles, "Roles for organization fetched").send(res);
+//     } catch (err) {
+//       console.error(err);
+//       return new APIError(
+//         err?.response?.status || 500,
+//         ["Something went wrong while fetching roles for organization", err.message]
+//       ).send(res);
+//     }
+//   };
 
 export const fetchRoleDetails = async (req,res) => {
     try{

@@ -1,0 +1,24 @@
+import { User } from 'lucide-react'
+
+export const controls = [
+    {
+        name: "All Batches",
+        path: 'batch-list',
+        icon: User
+    },
+    {
+        name: "User Details",
+        path: "user-list",
+        icon: User
+    },
+    {
+        name: "Add User",
+        path: "create-user",
+        icon: User
+    },
+    {
+        name: "Create Role Group",
+        path: "create-role-group",
+        icon: User
+    }
+]
