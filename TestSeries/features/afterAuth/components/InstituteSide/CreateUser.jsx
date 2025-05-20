@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Heading from './Heading'
 import profileDefault from '../../../../assests/Institute/profile.png';
+import HeadingUtil from '../../utility/HeadingUtil';
 
 const CreateUser = () => {
 
@@ -73,7 +74,8 @@ const CreateUser = () => {
     return (
         <div className='flex flex-col'>
             <div className='mb-5'>
-                <Heading title={"Create User"} />
+                <HeadingUtil heading="Add User" description="you can add users to your institute and assign them specific roles"/>
+      
             </div>
             <div className='bg-gray-200 p-6 rounded-lg'>
                 <div className='flex flex-col md:flex-row gap-8'>

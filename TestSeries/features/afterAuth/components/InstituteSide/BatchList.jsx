@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { fetchBatchList } from '../../../../utils/services/batchService';
 import { Edit, Eye, LucidePlusSquare, NotepadText, PlusSquare, Search, Trash } from 'lucide-react'
 import { useEffect, useState } from 'react';
+import HeadingUtil from '../../utility/HeadingUtil';
 
 const BatchList = () => {
 
@@ -144,8 +145,10 @@ const BatchList = () => {
         <>
             <div className='h-full flex flex-col'>
                 <div className='mb-5'>
-                    <Heading title={selectedYear ? `Batch List for ${selectedYear}` : "All Batches"}
-                    />
+                    {/* <Heading title={selectedYear ? `Batch List for ${selectedYear}` : "All Batches"} */}
+                    <HeadingUtil heading={selectedYear ? `Batch List for ${selectedYear}` : "All Batches"} description="you can view list of all batches in your institute"/>
+      
+                    
                 </div>
                 <div className='rounded-xl p-5 bg-gray-200 inset-shadow-md flex-grow flex flex-col overflow-auto'>
                     <div className='flex flex-col lg:flex-row justify-between gap-4 mb-5'>
