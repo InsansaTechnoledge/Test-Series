@@ -11,11 +11,15 @@ import InstituteLanding from '../../features/afterAuth/pages/InstituteLanding';
 import StudentLanding from '../../features/afterAuth/pages/StudentLanding';
 import { useUser } from '../../contexts/currentUserContext';
 import { checkAuth } from '../../utils/services/authService';
+import OrganizationLayout from '../../layouts/OrganizationLayout';
+import BatchList from '../../features/afterAuth/components/InstituteSide/BatchList';
+import UserList from '../../features/afterAuth/components/InstituteSide/UserList';
+import CreateUser from '../../features/afterAuth/components/InstituteSide/CreateUser';
 
 const PageLinks = () => {
-  const {user,setUser} = useUser();
+  const { user, setUser } = useUser();
 
-  const fetchUser = async() => {
+  const fetchUser = async () => {
     try {
       const response = await checkAuth();
       if (response.status === 200) {
@@ -31,7 +35,7 @@ const PageLinks = () => {
   };
 
   useEffect(() => {
-    if(!user){
+    if (!user) {
       fetchUser();
     }
   }, []);
@@ -49,10 +53,16 @@ const PageLinks = () => {
           <Route path='/login' element={<LoginMainPage />} />
         </Route>
 
-        <Route element={<AfterAuthLayout/>}>
-          <Route path='/institute-landing' element={<InstituteLanding />} />
-          <Route path='/student-landing' element={<StudentLanding />} />
+        <Route element={<AfterAuthLayout />}>
+          <Route path='/institute' element={<OrganizationLayout />}>
+            <Route path='batch-list' element={<BatchList />} />
+            <Route path='user-list' element={<UserList />} />
+            <Route path='create-user' element={<CreateUser />} />
+            <Route path='*' element={<div>Invalid path</div>} />
+          </Route>
+          <Route path='student-landing' element={<StudentLanding />} />
         </Route>
+
       </Routes>
     </Router>
   );
