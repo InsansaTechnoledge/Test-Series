@@ -1,7 +1,7 @@
 import Heading from './Heading'
 import { useQuery } from '@tanstack/react-query'
 import { fetchBatchList } from '../../../../utils/services/batchService';
-import { LucidePlusSquare, NotepadText, PlusSquare, Search } from 'lucide-react'
+import { Edit, Eye, LucidePlusSquare, NotepadText, PlusSquare, Search, Trash } from 'lucide-react'
 import { useEffect, useState } from 'react';
 
 const BatchList = () => {
@@ -224,19 +224,19 @@ const BatchList = () => {
                                                     </span>
                                                 </button>
                                             </td>
-                                            <td className="mx-auto w-fit px-6 py-4  flex flex-wrap justify-center gap-8">
+                                            <td className="mx-auto w-fit px-6 py-4 flex justify-center gap-8">
 
                                                 <button
                                                     className=" font-medium text-black hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer">
-                                                    view
+                                                    <Eye/>
                                                 </button>
                                                 <button
                                                     className="font-medium text-blue-500 hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer">
-                                                    Edit
+                                                    <Edit/>
                                                 </button>
                                                 <button
                                                     className="font-medium text-red-500 hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer">
-                                                    Delete
+                                                    <Trash />
                                                 </button>
                                             </td>
                                         </tr>
