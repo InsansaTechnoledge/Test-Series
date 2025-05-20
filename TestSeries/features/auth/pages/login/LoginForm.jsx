@@ -2,9 +2,11 @@ import { KeyRound, LogIn, Mail } from 'lucide-react';
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { orgLogin,studentLogin } from '../../../../utils/services/authService';
+import { useUser } from '../../../../contexts/currentUserContext';
 
 
 const LoginForm = () => {
+  const {user,setUser} = useUser();
         const [searchParams] = useSearchParams();
         const role = searchParams.get('role');
 
@@ -82,12 +84,13 @@ const LoginForm = () => {
             email:'',
             password:''
           });
-         // setUser(response.data.user);
+         setUser(response.data.user);
         }
         
       }catch(err){
         console.log(err);
-        setErrors(response.message);
+        setErrors(err.response.data.errors || "Something went wrong");
+        alert(err.response.data.errors || "Something went wrong")
       }
 
 
@@ -95,7 +98,8 @@ const LoginForm = () => {
     else if(role === 'Student') {
       // Call the API for Student login
       console.log('Logging in as Student');
-      const response=await studentLogin(formData);
+      try{
+        const response=await studentLogin(formData);
       if(response.status===200)
       {
       setFormData({
@@ -106,7 +110,12 @@ const LoginForm = () => {
       setErrors({});
       }
     
-      //setUser(response.data.user);
+      setUser(response.data.user);
+    }catch(err){
+      console.log(err);
+        setErrors(err.response.data.errors || "Something went wrong");
+        alert(err.response.data.errors || "Something went wrong")
+    }
     }
   };
 
