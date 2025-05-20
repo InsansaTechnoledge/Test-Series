@@ -208,7 +208,13 @@ const CreateUser = () => {
                                 :
                                 <>
                                     <div className='flex gap-2'>
-                                        <div className="text-nowrap">Assigned Batches</div>
+                                        {
+                                            selectedBatches.length>0
+                                            ?
+                                            <div className="text-nowrap">Assigned Batches</div>
+                                            :
+                                            null
+                                        }
                                         <div className='flex gap-2 flex-wrap'>
                                             {
                                                 selectedBatches.map((batch, idx) => (
