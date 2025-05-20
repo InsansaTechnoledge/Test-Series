@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import Heading from './Heading'
 import profileDefault from '../../../../assests/Institute/profile.png';
+import HeadingUtil from '../../utility/HeadingUtil';
+import { Eye, EyeOff, RefreshCcw } from 'lucide-react';
+import { generatePassword } from '../../utility/GenerateRandomPassword';
 
 const CreateUser = () => {
 
@@ -31,6 +33,9 @@ const CreateUser = () => {
     const [formData, setFormData] = useState({});
     const [selectedBatches, setSelectedBatches] = useState([]);
     const [profile, setProfile] = useState(null);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
 
     useEffect(() => {
         console.log(formData);
@@ -70,32 +75,40 @@ const CreateUser = () => {
         }));
     }, [selectedBatches])
 
+    function generateRandomPassword() {
+        const password = generatePassword();
+        document.getElementById("password").value = password;
+        document.getElementById("cpassword").value = password;
+    }
+
     return (
         <div className='flex flex-col'>
-            <div className='mb-5'>
-                <Heading title={"Create User"} />
+            <div className=''>
+                <HeadingUtil heading="Add User" description="you can add users to your institute and assign them specific roles" />
+
             </div>
             <div className='bg-gray-200 p-6 rounded-lg'>
                 <div className='flex flex-col md:flex-row gap-8'>
                     <div className='w-fit mx-auto md:mx-0'>
                         <img
- 
+
                             src={profile || profileDefault} // fallback image if nothing is selected
                             className='rounded-full w-20 h-20'
                             alt='Profile'
                         />
                     </div>
 
-                    <label className='text-center bg-blue-900 h-fit my-auto text-white py-2 px-4 rounded-md cursor-pointer'>
+                    <div className='flex flex-col justify-center'>
+                    <label className='text-center bg-blue-900 h-fit text-white py-2 px-3 rounded-md cursor-pointer'>
                         {
                             profile
-                            ?
-                            "Change profile photo"
-                            :
-                            "Upload profile photo"
+                                ?
+                                "Change profile photo"
+                                :
+                                "Upload profile photo"
 
                         }
-                        
+                       
                         <input
                             type='file'
                             accept='image/*'
@@ -113,6 +126,8 @@ const CreateUser = () => {
                             }}
                         />
                     </label>
+                    <span className='text-sm text-gray-600'>you may add the profile photo of the user.</span>
+                     </div>
 
                 </div>
                 <div className='grid lg:grid-cols-2 gap-x-26 mx-auto gap-y-8 mt-10 w-4/5'>
@@ -148,23 +163,73 @@ const CreateUser = () => {
                     </div>
                     <div className='flex flex-col gap-2'>
                         <label htmlFor='password' className='text-lg font-semibold'>Password<span className='text-red-600'>*</span></label>
-                        <input type='password'
-                            id='password'
-                            name='password'
-                            onChange={(e) => onChangeHandler(e)}
-                            className='p-2 bg-white rounded-md'
-                            placeholder='Enter password'
-                        />
+                        <div className='flex gap-2'>
+                            <div className='relative w-full'>
+                                <input
+                                    type={showPassword ? 'text' : 'password'}
+                                    id='password'
+                                    name='password'
+                                    onChange={(e) => onChangeHandler(e)}
+                                    className='p-2 bg-white rounded-md w-full pr-10'
+                                    placeholder='Enter password'
+                                />
+                                <div
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-600"
+                                    onClick={() => setShowPassword(prev => !prev)}
+                                >
+                                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                </div>
+                            </div>
+                            <button
+                                onClick={generateRandomPassword}
+                                className='bg-white hover:cursor-pointer rounded-md px-2'>
+                                <RefreshCcw className='w-6 h-6' />
+                            </button>
+                        </div>
                     </div>
                     <div className='flex flex-col gap-2'>
                         <label htmlFor='cpassword' className='text-lg font-semibold'>Confirm Password<span className='text-red-600'>*</span></label>
-                        <input type='password'
-                            id='cpassword'
-                            name='cpassword'
+                        <div className='relative w-full'>
+                            <input
+                                type={showConfirmPassword ? 'text' : 'password'}
+                                id='cpassword'
+                                name='cpassword'
+                                onChange={(e) => onChangeHandler(e)}
+                                className='p-2 bg-white rounded-md w-full pr-10'
+                                placeholder='Confirm password'
+                            />
+                            <div
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-600"
+                                onClick={() => setShowConfirmPassword(prev => !prev)}
+                            >
+                                {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                            </div>
+                        </div>
+                    </div>
+                    <div className='flex flex-col gap-2'>
+                        <label htmlFor='userid' className='text-lg font-semibold'>User ID</label>
+                        <input type='test'
+                            id='userid'
+                            name='userid'
                             onChange={(e) => onChangeHandler(e)}
                             className='p-2 bg-white rounded-md'
-                            placeholder='Enter password'
+                            placeholder='Enter User ID provided by institute'
                         />
+                    </div>
+                    <div className='flex flex-col gap-2'>
+                        <label htmlFor='gender' className='text-lg font-semibold'>Gender<span className='text-red-600'>*</span></label>
+                        <select
+                            id='gender'
+                            name='gender'
+                            className='p-2 bg-white rounded-md'
+                            onChange={(e) => onChangeHandler(e)}
+                        >
+                            <option value={''}>--Select Gender--</option>
+                            <option value={"Male"}>Male</option>
+                            <option value={"Female"}>Female</option>
+                            <option value={"Others"}>Others</option>
+                        </select>
+
                     </div>
                     <div className='flex flex-col gap-2'>
                         <label htmlFor='role' className='text-lg font-semibold'>Role group<span className='text-red-600'>*</span></label>
@@ -209,11 +274,11 @@ const CreateUser = () => {
                                 <>
                                     <div className='flex gap-2'>
                                         {
-                                            selectedBatches.length>0
-                                            ?
-                                            <div className="text-nowrap">Assigned Batches</div>
-                                            :
-                                            null
+                                            selectedBatches.length > 0
+                                                ?
+                                                <div className="text-nowrap">Assigned Batches</div>
+                                                :
+                                                null
                                         }
                                         <div className='flex gap-2 flex-wrap'>
                                             {
@@ -236,8 +301,8 @@ const CreateUser = () => {
                         </button>
                     </div>
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     )
 }
 

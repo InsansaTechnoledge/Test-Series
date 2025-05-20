@@ -39,6 +39,10 @@ export const addRole = async (req, res) => {
         description,
         organizationId: orgId,
         features: featureIds.map(id => new Types.ObjectId(id)),
+        createdBy: {
+          id: orgId,
+          model: req.user.role === "organization" ? "Organization" : "User",
+        },
       };
   
       const newRole = await Role.create(roleData);

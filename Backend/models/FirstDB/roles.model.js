@@ -21,7 +21,7 @@ const RoleSchema = new Schema({
         default: ''
       },
     features: {
-        type: [{type: Types.ObjectId, ref: 'Feature'}],
+        type: [{ type: Types.ObjectId, ref: 'Feature' }],
         required: [true, 'Features are required'],
         default: []
     },
@@ -29,11 +29,21 @@ const RoleSchema = new Schema({
         type: Types.ObjectId,
         ref: 'Organization',
         required: [true, 'Organization id is required']
+    },
+    createdBy: {
+        id: {
+            type: Schema.Types.ObjectId,
+            required: true,
+        },
+        model: {
+            type: String,
+            required: true,
+            enum: ['User', 'Organization'],
+        }
     }
-},{
+
+}, {
     timestamps: true
 });
 
-
-
-export const Role = connOne.model('Role' , RoleSchema)
+export const Role = connOne.model('Role', RoleSchema)

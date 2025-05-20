@@ -15,6 +15,8 @@ import OrganizationLayout from '../../layouts/OrganizationLayout';
 import BatchList from '../../features/afterAuth/components/InstituteSide/BatchList';
 import UserList from '../../features/afterAuth/components/InstituteSide/UserList';
 import CreateUser from '../../features/afterAuth/components/InstituteSide/CreateUser';
+import CreateBatch from '../../features/afterAuth/components/InstituteSide/CreateBatch';
+import CreateStudent from '../../features/afterAuth/components/InstituteSide/AddStudent';
 import FeatureBasedRoleGroups from '../../features/afterAuth/components/InstituteSide/RoleGroup';
 
 const PageLinks = () => {
@@ -59,6 +61,8 @@ const PageLinks = () => {
             <Route path='batch-list' element={<BatchList />} />
             <Route path='user-list' element={<UserList />} />
             <Route path='create-user' element={<CreateUser />} />
+            <Route path='create-batch' element={<CreateBatch />} />
+            <Route path='add-student' element={<CreateStudent />} />
             <Route path='create-role-group' element={<FeatureBasedRoleGroups />} />
 
             <Route path='*' element={<div>Invalid path</div>} />

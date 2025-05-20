@@ -3,8 +3,11 @@ import { useQuery } from '@tanstack/react-query'
 import { fetchBatchList } from '../../../../utils/services/batchService';
 import { Edit, Eye, LucidePlusSquare, NotepadText, PlusSquare, Search, Trash } from 'lucide-react'
 import { useEffect, useState } from 'react';
+import HeadingUtil from '../../utility/HeadingUtil';
+import {  useNavigate } from 'react-router-dom';
 
 const BatchList = () => {
+    const navigate=useNavigate();
 
     const [filteredBatches, setFilteredBatches] = useState([]);
     const [selectedYear, setSelectedYear] = useState('');
@@ -29,8 +32,6 @@ const BatchList = () => {
         retry: 0,
     });
 
-
-
     const uniqueYears = [...new Set(batches.map(batch => batch.year))];
 
     useEffect(() => {
@@ -41,111 +42,14 @@ const BatchList = () => {
         }
     }, [selectedYear]);
 
-
-    // const batches = [
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    //     {
-    //         name: "BE-4",
-    //         year: 2025,
-
-    //     },
-    // ]
-
     return (
         <>
             <div className='h-full flex flex-col'>
-                <div className='mb-5'>
-                    <Heading title={selectedYear ? `Batch List for ${selectedYear}` : "All Batches"}
-                    />
+                <div className=''>
+                    {/* <Heading title={selectedYear ? `Batch List for ${selectedYear}` : "All Batches"} */}
+                    <HeadingUtil heading={selectedYear ? `Batch List for ${selectedYear}` : "All Batches"} description="you can view list of all batches in your institute"/>
+      
+                    
                 </div>
                 <div className='rounded-xl p-5 bg-gray-200 inset-shadow-md flex-grow flex flex-col overflow-auto'>
                     <div className='flex flex-col lg:flex-row justify-between gap-4 mb-5'>
@@ -153,7 +57,8 @@ const BatchList = () => {
                             <h2 className='font-bold text-lg text-blue-900'>Total Batches: {filteredBatches?.length}</h2>
                         </div>
                         <div className='flex flex-col md:flex-row gap-4'>
-                            <button className='bg-blue-900 text-white py-2 px-4 rounded-md hover:cursor-pointer font-semibold hover:scale-105 flex space-x-2 transition-all duration-300'>
+                            <button className='bg-blue-900 text-white py-2 px-4 rounded-md hover:cursor-pointer font-semibold hover:scale-105 flex space-x-2 transition-all duration-300'
+                            onClick={() => navigate('/institute/create-batch')}>
                                 <span>
                                     Create Batch
                                 </span>

@@ -17,8 +17,18 @@ export const controls = [
         icon: User
     },
     {
+        name: "Create Batch",
+        path: "create-batch",
+        icon: User
+    },
+    {
         name: "Create Role Group",
         path: "create-role-group",
+        icon: User
+    },
+    {
+        name: "Add Student",
+        path: "add-student",
         icon: User
     }
 ]

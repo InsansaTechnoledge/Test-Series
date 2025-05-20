@@ -77,9 +77,23 @@ const userSchema = new Schema({
     type: String,
     enum: ['Male', 'Female', 'Others'],
     required: true
+  },
+  createdBy: {
+    id: {
+      type: Schema.Types.ObjectId,
+      required: true,
+    },
+    model: {
+      type: String,
+      required: true,
+      enum: ['User', 'Organization'],
+    }
   }
+
+
 }, {
   timestamps: true
+
 });
 
 userSchema.pre('save', async function (next) {
