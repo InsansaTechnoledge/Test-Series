@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Heading from './Heading'
 import { X } from 'lucide-react';
+import HeadingUtil from '../../utility/HeadingUtil';
 
 const CreateBatch = () => {
     const [formData, setFormData] = useState({});
@@ -89,8 +90,9 @@ const CreateBatch = () => {
 
     return (
         <div className='flex flex-col'>
-            <div className='mb-5'>
-                <Heading title={"Create Batch"} />
+            <div className=''>
+                <HeadingUtil heading="Create Batch" description="you can create new batches for your institute"/>
+      
             </div>
             <div className='flex justify-end mb-5'>
                 <button className='bg-blue-900 hover:cursor-pointer hover:scale-105 duration-300 transition-all text-white px-4 py-2 rounded-md'>
