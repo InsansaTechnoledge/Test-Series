@@ -15,6 +15,7 @@ const storage = new CloudinaryStorage({
   const multerInstance = multer({ storage });
   
   export const upload = {
+  
     single: (fieldName) => {
       return (req, res, next) => {
         multerInstance.single(fieldName)(req, res, (err) => {

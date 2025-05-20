@@ -1,6 +1,9 @@
 
 import React, { useState, useRef } from 'react';
 import { Building, Mail, Phone, Image, Globe, MapPin, Check, Loader, Lock, Upload, X } from 'lucide-react';
+import { Country, State, City } from 'country-state-city';
+import { useEffect } from 'react';
+import { createOrganization } from '../../../utils/services/organizationService';
 
 const OrganizationRegistrationForm = () => {
   const [formData, setFormData] = useState({
@@ -29,7 +32,25 @@ const OrganizationRegistrationForm = () => {
   const [msg, setMsg] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [errors, setErrors] = useState({});
-  
+  const [selectedCountryCode, setSelectedCountryCode] = useState('');
+  const [selectedStateCode, setSelectedStateCode] = useState('');
+  const [states, setStates] = useState([]);
+  const [cities, setCities] = useState([]);
+
+  const countries = Country.getAllCountries();
+  useEffect(() => {
+    if(selectedCountryCode){
+      setStates(State.getStatesOfCountry(selectedCountryCode));
+    }
+  },[selectedCountryCode]);
+
+  useEffect(() => {
+    if(selectedStateCode && selectedCountryCode){
+      setCities(City.getCitiesOfState(selectedCountryCode, selectedStateCode));
+    }
+  },[selectedStateCode, selectedCountryCode]);
+
+
   // New state for logo file handling
   const [logoFile, setLogoFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
@@ -41,21 +62,21 @@ const OrganizationRegistrationForm = () => {
       case 'name':
         return value.length >= 3 && value.length <= 32 ? '' : 'Name must be between 3-32 characters';
       case 'email':
-        return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value) && 
-               value.length >= 10 && value.length <= 60 ? '' : 'Please enter a valid email address';
+        return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value) &&
+          value.length >= 10 && value.length <= 60 ? '' : 'Please enter a valid email address';
       case 'password':
         const hasUpperCase = /[A-Z]/.test(value);
         const hasLowerCase = /[a-z]/.test(value);
         const hasNumbers = /\d/.test(value);
         const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value);
         const isLongEnough = value.length >= 8;
-        
+
         if (!isLongEnough || !hasUpperCase || !hasLowerCase || !hasNumbers || !hasSpecialChar) {
           return 'Password must be at least 8 characters with uppercase, lowercase, number, and special character';
         }
         return '';
       case 'confirm_password':
-        return value === formData.password ? '' : 'Passwords do not match';
+        return value === formData?.password ? '' : 'Passwords do not match';
       case 'phone':
         return /^(\+\d{1,3}[- ]?)?\d{10}$/.test(value) ? '' : 'Please enter a valid phone number';
       case 'pincode':
@@ -66,7 +87,12 @@ const OrganizationRegistrationForm = () => {
   };
 
   const handleChange = (e, field, nested = null) => {
-    const value = e.target.value;
+
+    const value = field==='country' ?
+    countries.find(country => country.isoCode === e.target.value).name :
+    field==='state' ?
+    states.find(state => state.isoCode === e.target.value).name :
+    e.target.value;
 
     if (nested) {
       setFormData((prev) => ({
@@ -79,78 +105,79 @@ const OrganizationRegistrationForm = () => {
 
       if (field === 'pincode') {
         const error = validateField(field, value);
-        setErrors(prev => ({ 
-          ...prev, 
-          [nested]: { 
-            ...prev[nested], 
-            [field]: error 
-          } 
+        setErrors(prev => ({
+          ...prev,
+          [nested]: {
+            ...prev[nested],
+            [field]: error
+          }
         }));
       }
     } else {
       setFormData((prev) => ({ ...prev, [field]: value }));
-      
+
       const error = validateField(field, value);
       setErrors(prev => ({ ...prev, [field]: error }));
     }
+
   };
 
   // Logo file handling functions
   const handleLogoChange = (file) => {
     if (!file) return;
-    
+
     // Validate file type
     if (!file.type.match(/image\/(jpeg|jpg|png|gif|svg\+xml)/)) {
       setErrors(prev => ({ ...prev, logo: 'Please upload a valid image file (JPEG, PNG, GIF, SVG)' }));
       return;
     }
-    
+
     // Validate file size (5MB max)
     if (file.size > 5 * 1024 * 1024) {
       setErrors(prev => ({ ...prev, logo: 'Image size should be less than 5MB' }));
       return;
     }
-    
+
     // Clear any previous errors
     setErrors(prev => ({ ...prev, logo: '' }));
-    
+
     // Set the file in state
     setLogoFile(file);
-    
+
     // Create a preview URL
     const fileUrl = URL.createObjectURL(file);
     setPreviewUrl(fileUrl);
   };
-  
+
   const handleDragOver = (e) => {
     e.preventDefault();
     setIsDragging(true);
   };
-  
+
   const handleDragLeave = (e) => {
     e.preventDefault();
     setIsDragging(false);
   };
-  
+
   const handleDrop = (e) => {
     e.preventDefault();
     setIsDragging(false);
-    
+
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       handleLogoChange(e.dataTransfer.files[0]);
     }
   };
-  
+
   const handleFileInputChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       handleLogoChange(e.target.files[0]);
     }
   };
-  
+
   const triggerFileInput = () => {
     fileInputRef.current.click();
   };
-  
+
   const removeLogo = () => {
     setLogoFile(null);
     setPreviewUrl('');
@@ -217,41 +244,27 @@ const OrganizationRegistrationForm = () => {
     }
 
     try {
-      // Create a copy of the form data to submit
-      const payload = { 
-        ...formData,
-        // Remove confirm_password as it's not in the schema
-        confirm_password: undefined
-      };
-
-      // Handle logo file upload
-      if (logoFile) {
-        // In a real implementation, here you would:
-        // 1. Create a FormData object
-        const formData = new FormData();
-        formData.append('logo', logoFile);
-        
-        // 2. Upload the file to your cloud storage API
-        // const response = await fetch('your-upload-api-endpoint', {
-        //   method: 'POST',
-        //   body: formData
-        // });
-        // const data = await response.json();
-        // payload.logoUrl = data.url;
-        
-        // For demo, we're simulating a successful upload
-        payload.logoUrl = previewUrl;
-        
-        // Then you would continue with organization creation using the returned URL
-      } else if (!payload.logoUrl) {
-        // Generate default logo URL if not provided
-        payload.logoUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(payload.name)}&background=random`;
-      }
-
-      // API call would go here
-      // For example: await createOrganization(payload);
-      
-      setMsg('✅ Organization created successfully!');
+      console.log('Form data:', formData);
+      formData.logoUrl = logoFile ? previewUrl : ''; // Set logo URL if a file is provided
+      const response=await createOrganization(formData);
+      setMsg(`✅ Institute created successfully by the name ${response.data.name}!`);
+      setFormData({
+        name: '',
+        email: '',
+        password: '',
+        confirm_password: '',
+        phone: '',
+        logoUrl: '',
+        website: '',
+        address: {
+          line1: '',
+          line2: '',
+          city: '',
+          state: '',
+          country: '',
+          pincode: '',
+        },
+      });
       // Reset form or redirect
     } catch (err) {
       setMsg('❌ Error creating organization: ' + (err.message || 'Unknown error'));
@@ -271,7 +284,7 @@ const OrganizationRegistrationForm = () => {
         </div>
         <div className="grid md:grid-cols-1 gap-6">
           <div>
-            <label className="block text-gray-700 text-sm font-medium mb-1">Organization Name*</label>
+            <label className="block text-gray-700 text-sm font-medium mb-1">Institute Name*</label>
             <div className="relative">
               <input
                 type="text"
@@ -279,7 +292,7 @@ const OrganizationRegistrationForm = () => {
                 required
                 value={formData.name}
                 onChange={(e) => handleChange(e, 'name')}
-                placeholder="Enter your organization name"
+                placeholder="Enter your Institute name"
                 minLength={3}
                 maxLength={32}
               />
@@ -324,8 +337,8 @@ const OrganizationRegistrationForm = () => {
         </div>
 
         <div>
-          <label className="block text-gray-700 text-sm font-medium mb-1">Organization Logo</label>
-          
+          <label className="block text-gray-700 text-sm font-medium mb-1">Institute Logo</label>
+
           {/* File upload area with drag and drop */}
           <div
             className={`border-2 border-dashed ${isDragging ? 'border-blue-500 bg-blue-50' : 'border-blue-200'} 
@@ -342,7 +355,7 @@ const OrganizationRegistrationForm = () => {
               className="hidden"
               accept="image/jpeg,image/png,image/gif,image/svg+xml"
             />
-            
+
             {previewUrl ? (
               <div className="relative h-full flex items-center justify-center">
                 <img
@@ -371,7 +384,7 @@ const OrganizationRegistrationForm = () => {
               </div>
             )}
           </div>
-          
+
           {errors.logo && <p className="text-red-500 text-xs mt-1">{errors.logo}</p>}
           <p className="text-xs text-gray-500 mt-1">
             If no logo is provided, a default logo will be generated based on your organization name
@@ -404,21 +417,21 @@ const OrganizationRegistrationForm = () => {
             {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
             <p className="text-xs text-gray-500 mt-1">Must be a valid email between 10-60 characters</p>
           </div>
-          
+
           <div>
             <label className="block text-gray-700 text-sm font-medium mb-1">Password*</label>
             <div className="relative">
-              <input 
+              <input
                 type={passwordVisible ? "text" : "password"}
                 className={`w-full pl-10 pr-12 py-3 border ${errors.password ? 'border-red-500' : 'border-blue-200'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all`}
                 required
                 value={formData.password}
                 onChange={(e) => handleChange(e, 'password')}
-                placeholder="Create a secure password" 
+                placeholder="Create a secure password"
                 minLength="8"
               />
               <Lock className="absolute left-3 top-3.5 text-blue-500" size={18} />
-              <button 
+              <button
                 type="button"
                 onClick={togglePasswordVisibility}
                 className="absolute right-3 top-3.5 text-gray-500 hover:text-blue-700"
@@ -484,45 +497,60 @@ const OrganizationRegistrationForm = () => {
 
         <div className="grid grid-cols-2 gap-6">
           <div>
-            <label className="block text-gray-700 text-sm font-medium mb-1">City*</label>
-            <input
-              type="text"
-              className={`w-full px-4 py-3 border ${errors.address?.city ? 'border-red-500' : 'border-blue-200'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all`}
-              required
-              value={formData.address.city}
-              onChange={(e) => handleChange(e, 'city', 'address')}
-              placeholder="City"
-            />
-            {errors.address?.city && <p className="text-red-500 text-xs mt-1">{errors.address.city}</p>}
+            <label className="block text-gray-700 text-sm font-medium mb-1">Country*</label>
+            <select 
+            onChange={(e) => {
+              setSelectedCountryCode(e.target.value);
+              console.log(e.target);
+              handleChange(e, 'country', 'address');
+            }}
+            className='w-full px-4 py-3 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all'>
+              <option value="">Select Country</option>
+              {countries.map((country) => (
+                <option key={country.isoCode} value={country.isoCode}
+                >
+                  {country.name}
+                </option>
+              ))} 
+            </select>
+            {errors.address?.country && <p className="text-red-500 text-xs mt-1">{errors.address.country}</p>}
           </div>
           <div>
             <label className="block text-gray-700 text-sm font-medium mb-1">State/Province*</label>
-            <input
-              type="text"
-              className={`w-full px-4 py-3 border ${errors.address?.state ? 'border-red-500' : 'border-blue-200'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all`}
-              required
-              value={formData.address.state}
-              onChange={(e) => handleChange(e, 'state', 'address')}
-              placeholder="State or Province"
-            />
+             <select 
+            onChange={(e) =>{setSelectedStateCode(e.target.value)
+              console.log(e.target.key);  
+              handleChange(e, 'state', 'address');
+            }}
+            className='w-full px-4 py-3 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all'>
+              <option value="">Select State</option>
+              {states.map((state) => (
+                <option key={state.isoCode} value={state.isoCode}>
+                  {state.name}
+                </option>
+              ))} 
+            </select>
             {errors.address?.state && <p className="text-red-500 text-xs mt-1">{errors.address.state}</p>}
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-6">
           <div>
-            <label className="block text-gray-700 text-sm font-medium mb-1">Country*</label>
-            <input
-              type="text"
-              className={`w-full px-4 py-3 border ${errors.address?.country ? 'border-red-500' : 'border-blue-200'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all`}
-              required
-              value={formData.address.country}
-              onChange={(e) => handleChange(e, 'country', 'address')}
-              placeholder="Country"
-            />
-            {errors.address?.country && <p className="text-red-500 text-xs mt-1">{errors.address.country}</p>}
+            <label className="block text-gray-700 text-sm font-medium mb-1">City*</label>
+             <select 
+            onChange={(e) => handleChange(e, 'city', 'address')}
+            className='w-full px-4 py-3 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all'>
+              <option value="">Select City</option>
+              {cities.map((city) => (
+                <option key={city.isoCode} value={city.name }>
+                  {city.name}
+                </option>
+              ))} 
+            </select>
+            {errors.address?.city && <p className="text-red-500 text-xs mt-1">{errors.address.city}</p>}
           </div>
           <div>
+
             <label className="block text-gray-700 text-sm font-medium mb-1">Postal/ZIP Code*</label>
             <input
               type="text"
@@ -564,3 +592,4 @@ const OrganizationRegistrationForm = () => {
 };
 
 export default OrganizationRegistrationForm;
+

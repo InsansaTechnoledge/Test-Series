@@ -1,6 +1,7 @@
 import { KeyRound, LogIn, Mail } from 'lucide-react';
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { orgLogin,studentLogin } from '../../../../utils/services/authService';
 
 
 const LoginForm = () => {
@@ -51,7 +52,7 @@ const LoginForm = () => {
     setErrors((prev) => ({ ...prev, [field]: error }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
 
     const newErrors = {};
@@ -71,10 +72,41 @@ const LoginForm = () => {
     if(role === 'Institute') {
       // Call the API for Institute login
       console.log('Logging in as Institute');
+      try{      
+        const response=await orgLogin(formData);
+        console.log(response);
+        if(response.status===200)
+        {
+          console.log("institute logged in successfully!!")
+          setFormData({
+            email:'',
+            password:''
+          });
+         // setUser(response.data.user);
+        }
+        
+      }catch(err){
+        console.log(err);
+        setErrors(response.message);
+      }
+
+
     }
     else if(role === 'Student') {
       // Call the API for Student login
       console.log('Logging in as Student');
+      const response=await studentLogin(formData);
+      if(response.status===200)
+      {
+      setFormData({
+        email:'',
+        password:''
+      });
+      console.log("student logged in successfully!!")
+      setErrors({});
+      }
+    
+      //setUser(response.data.user);
     }
   };
 

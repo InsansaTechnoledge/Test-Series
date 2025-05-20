@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import BeforeAuthLanding from '../../features/beforeAuth/BeforeAuthLanding';
 import BeforeAuthLayout from '../../layouts/BeforeAuthLayout';
@@ -9,8 +9,37 @@ import StudentHero from '../../features/afterAuth/components/StudentSide/Student
 import AfterAuthLayout from '../../layouts/afterAuthLayout';
 import InstituteLanding from '../../features/afterAuth/pages/InstituteLanding';
 import StudentLanding from '../../features/afterAuth/pages/StudentLanding';
+import { useUser } from '../../contexts/currentUserContext';
+import { checkAuth } from '../../utils/services/authService';
+import OrganizationLayout from '../../layouts/OrganizationLayout';
+import BatchList from '../../features/afterAuth/components/InstituteSide/BatchList';
+import UserList from '../../features/afterAuth/components/InstituteSide/UserList';
+import CreateUser from '../../features/afterAuth/components/InstituteSide/CreateUser';
 
 const PageLinks = () => {
+  const { user, setUser } = useUser();
+
+  const fetchUser = async () => {
+    try {
+      const response = await checkAuth();
+      if (response.status === 200) {
+        setUser(response.data);
+      } else {
+        setUser(null);
+      }
+    } catch (error) {
+      // alert("Something went wrong while fetching user data");
+      console.error('Error fetching user:', error);
+      setUser(null);
+    }
+  };
+
+  useEffect(() => {
+    if (!user) {
+      fetchUser();
+    }
+  }, []);
+
   return (
     <Router>
       <Routes>
@@ -24,10 +53,16 @@ const PageLinks = () => {
           <Route path='/login' element={<LoginMainPage />} />
         </Route>
 
-        <Route element={<AfterAuthLayout/>}>
-          <Route path='/institute-landing' element={<InstituteLanding />} />
-          <Route path='/student-landing' element={<StudentLanding />} />
+        <Route element={<AfterAuthLayout />}>
+          <Route path='/institute' element={<OrganizationLayout />}>
+            <Route path='batch-list' element={<BatchList />} />
+            <Route path='user-list' element={<UserList />} />
+            <Route path='create-user' element={<CreateUser />} />
+            <Route path='*' element={<div>Invalid path</div>} />
+          </Route>
+          <Route path='student-landing' element={<StudentLanding />} />
         </Route>
+
       </Routes>
     </Router>
   );
