@@ -8,6 +8,7 @@ import { postRoleGroup , fetchAllRoleGroups , deleteRoleGroup, updateRoleGroup }
 import { useQuery } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
 import GuiderComponent from './components/GuiderComponent';
+import NeedHelpComponent from './components/NeedHelpComponent';
 
 export default function FeatureBasedRoleGroups() {
     const {data : featuresData = [] , isLoading} = useQuery({
@@ -343,7 +344,8 @@ export default function FeatureBasedRoleGroups() {
   return (
     <div className="w-full p-6 bg-white rounded-lg">
       <HeadingUtil heading="Role Group" description="you can assing all the required roles into a single group"/>
-      <GuiderComponent question={question} answer={answer}/>
+
+      <NeedHelpComponent heading="creating Roles ?" about="roles help users to access systems fucntionality" question={question} answer={answer}/>
       {/* Group List and Management */}
       <div className="mb-6">
         <div className="flex justify-between items-center mb-4">

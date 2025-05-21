@@ -1,7 +1,16 @@
 import React from 'react';
-import profile from '../../../../assests/Institute/profile.png';
+import profile2 from '../../../../assests/Institute/profile.png';
+import { useUser } from '../../../../contexts/currentUserContext';
 
 const Navbar = () => {
+  const {user} = useUser();
+  console.log(user)
+
+  console.log(user?.user.logoUrl)
+  
+  const User = user?.user
+  const profile = User.logoUrl || profile2
+
   return (
     <div className="w-full z-40 bg-indigo-950 border-b border-gray-200">
       <div className="max-w-screen-xl flex items-center justify-between mx-auto p-4">
@@ -9,7 +18,7 @@ const Navbar = () => {
         {/* Logo on the left */}
         <a href="/" className="flex items-center space-x-3">
           <img src={profile} className="h-8" alt="Logo" />
-          <span className="text-2xl font-semibold text-white">Institute's Name</span>
+          <span className="text-2xl font-semibold text-white">{User.name}</span>
         </a>
 
         {/* Centered Nav Links */}
@@ -36,8 +45,8 @@ const Navbar = () => {
           {/* Dropdown on hover */}
           <div className="absolute top-full right-0 z-50 hidden group-hover:block w-48 bg-gray-100 text-indigo-950 rounded-lg shadow-md">
             <div className="px-4 py-3">
-              <span className="block text-sm">Bonnie Green</span>
-              <span className="block text-sm text-gray-600 truncate">name@flowbite.com</span>
+              <span className="block text-sm">{User.name}</span>
+              <span className="block text-sm text-gray-600 truncate">{User.email}</span>
             </div>
             <ul className="py-2">
               <li><a href="#" className="block px-4 py-2 hover:bg-gray-600">Dashboard</a></li>
