@@ -1,36 +1,22 @@
 import { useState } from 'react';
 import { Plus, X, Save, Edit, UserPlus, Users, Shield, Check } from 'lucide-react';
 import HeadingUtil from '../../utility/HeadingUtil';
-import { Features , Roles } from '../../data/RoleGroupFeature';
-import { fetchFeatures } from '../../../../utils/services/FeaturesService';
-import { postRoleGroup , fetchAllRoleGroups , deleteRoleGroup, updateRoleGroup } from '../../../../utils/services/RoleGroupService';
-
-import { useQuery } from '@tanstack/react-query';
+import { postRoleGroup ,  deleteRoleGroup, updateRoleGroup } from '../../../../utils/services/RoleGroupService';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCachedRoleGroup } from '../../../../hooks/useCachedRoleGroup';
 import GuiderComponent from './components/GuiderComponent';
 import NeedHelpComponent from './components/NeedHelpComponent';
 import RefreshButton from '../../utility/RefreshButton';
 import { useUser } from '../../../../contexts/currentUserContext';
+import { useCachedFeatures } from '../../../../hooks/useCachedFeatures';
 
 export default function FeatureBasedRoleGroups() {
   const {user} = useUser();
-
-    const {data : featuresData = [] , isLoading} = useQuery({
-        queryKey: ['features', user._id],
-        queryFn: fetchFeatures,
-        staleTime: Infinity,
-    });
+  const {featuresData, isLoading} = useCachedFeatures();
 
   const queryClient = useQueryClient();
 
-  // const { data: roleGroups = [], isLoading: rolesLoading } = useQuery({
-  //   queryKey: ['roleGroups'],
-  //   queryFn: fetchAllRoleGroups,
-  //   staleTime: Infinity,
-  // });
   const{roleGroups,rolesLoading}=useCachedRoleGroup();
-
   const [isAddingGroup, setIsAddingGroup] = useState(false);
   const [editingGroupId, setEditingGroupId] = useState(null);
   const [newGroup, setNewGroup] = useState({ name: '', description: '', features: [] });

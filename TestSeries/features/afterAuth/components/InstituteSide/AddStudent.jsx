@@ -1,45 +1,83 @@
-import React, { useState } from 'react'
-import { RefreshCcw, Upload, Download, Plus, Trash2, Eye, EyeOff, Users, FileSpreadsheet, CheckCircle } from 'lucide-react'
-import { generatePassword } from '../../utility/GenerateRandomPassword'
-import { useQuery } from '@tanstack/react-query'
-import { fetchBatchList } from '../../../../utils/services/batchService'
-import { useUser } from '../../../../contexts/currentUserContext'
-import * as XLSX from 'xlsx'
-import { addSingleStudent, uploadStudentExcel } from '../../../../utils/services/studentService'
-import GuiderComponent from './components/GuiderComponent'
-import NeedHelpComponent from './components/NeedHelpComponent'
+import  { useState } from 'react'
 import HeadingUtil from '../../utility/HeadingUtil'
+import { generatePassword } from '../../utility/GenerateRandomPassword'
+import * as XLSX from 'xlsx'
+import { addSingleStudent , uploadStudentExcel } from '../../../../utils/services/studentService'
+import { useCachedBatches } from '../../../../hooks/useCachedBatches'
+import { RefreshCcw, Upload, Download, Plus, Trash2, Eye, EyeOff, Users, FileSpreadsheet, CheckCircle } from 'lucide-react'
+import NeedHelpComponent from './components/NeedHelpComponent'
 
 const AddStudent = () => {
-  const { user } = useUser()
   const [batch, setBatch] = useState('')
   const [students, setStudents] = useState([getEmptyStudent()])
   const [showPassword, setShowPassword] = useState({})
   const [excelData, setExcelData] = useState([])
   const [activeTab, setActiveTab] = useState('manual') // 'manual' or 'bulk'
-  
+  const {batches,isLoading}=useCachedBatches();
+  const [errors, setErrors] = useState([getEmptyStudent()])
+
   // Generate empty student object
   function getEmptyStudent() {
-    const password = generatePassword()
     return {
       fname: '',
       lname: '',
       number: '',
       email: '',
-      password,
-      cpassword: password,
+      password:'',
+      cpassword:'',
       pnumber: '',
       pemail: '',
       gender: ''
     }
   }
 
-  // Handle form field changes for each student
+  const validateField = (name, value) => {
+    switch (name) {
+      case 'fname':
+      case 'lname':
+        return value.length >= 3 && value.length <= 32 ? '' : 'Name must be between 3-32 characters';
+      case 'email':
+      case 'pemail':
+        return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value) &&
+          value.length >= 10 && value.length <= 60 ? '' : 'Please enter a valid email address';
+      case 'password':
+        const hasUpperCase = /[A-Z]/.test(value);
+        const hasLowerCase = /[a-z]/.test(value);
+        const hasNumbers = /\d/.test(value);
+        const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value);
+        const isLongEnough = value.length >= 8;
+
+        if (!isLongEnough || !hasUpperCase || !hasLowerCase || !hasNumbers || !hasSpecialChar) {
+          return 'Password must be at least 8 characters with uppercase, lowercase, number, and special character';
+        }
+        return '';
+      case 'cpassword':
+        return value === formData?.password ? '' : 'Passwords do not match';
+      case 'number' :
+      case 'pnumber':
+        return /^(\+\d{1,3}[- ]?)?\d{10}$/.test(value) ? '' : 'Please enter a valid phone number';
+      case 'gender':
+        return value ? '' : 'Please select the gender';
+      default:
+        return '';
+    }
+  };
+
+
+
   const handleStudentChange = (index, field, value) => {
-    const updatedStudents = [...students]
-    updatedStudents[index] = { ...updatedStudents[index], [field]: value }
-    setStudents(updatedStudents)
-  }
+  const updatedStudents = [...students];
+  updatedStudents[index] = { ...updatedStudents[index], [field]: value };
+  setStudents(updatedStudents);
+
+  const errorMessage = validateField(field, value);
+  const updatedErrors = [...errors];
+  updatedErrors[index] = {
+    ...updatedErrors[index],
+    [field]: errorMessage
+  };
+  setErrors(updatedErrors);
+};
 
   // Add a new student form
   const addStudentForm = () => {
@@ -130,25 +168,6 @@ const AddStudent = () => {
     XLSX.writeFile(workbook, 'example_student_template.xlsx')
   }
 
-  // Fetch batch list
-  const fetchBatchListFunction = async () => {
-    const response = await fetchBatchList()
-    if (response.status !== 200) {
-      throw new Error('Network response was not ok')
-    }
-    return response.data
-  }
-
-  const { data: batches = [], isLoading } = useQuery({
-    queryKey: ['batches', user._id],
-    queryFn: fetchBatchListFunction,
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    staleTime: Infinity,
-    cacheTime: 24 * 60 * 60 * 1000,
-    retry: 0,
-  })
-
   // Submit form data
   const handleSubmit = async () => {
     try {
@@ -210,11 +229,10 @@ const AddStudent = () => {
             <select 
               onChange={(e) => setBatch(e.target.value)}
               className="flex-grow bg-white border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-              value={batch}
             >
               <option value="">Select a batch</option>
               {batches.map((batch, idx) => (
-                <option key={idx} value={batch.name}>{batch.name}</option>
+                <option key={idx} value={batch.id}>{batch.name}</option>
               ))}
             </select>
           </div>
@@ -275,6 +293,8 @@ const AddStudent = () => {
                           className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           placeholder="Enter first name"
                         />
+                        {errors[index]?.fname && <p className="text-red-500">{errors[index].fname}</p>}
+
                       </div>
 
                       <div className="flex flex-col gap-2">
@@ -286,6 +306,7 @@ const AddStudent = () => {
                           className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           placeholder="Enter last name"
                         />
+                             {errors[index]?.lname && <p className="text-red-500">{errors[index].lname}</p>}
                       </div>
 
                       <div className="flex flex-col gap-2">
@@ -300,6 +321,7 @@ const AddStudent = () => {
                           <option value="Female">Female</option>
                           <option value="Other">Other</option>
                         </select>
+                             {errors[index]?.gender && <p className="text-red-500">{errors[index].gender}</p>}
                       </div>
                     </div>
                   </div>
@@ -317,6 +339,7 @@ const AddStudent = () => {
                           className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           placeholder="Enter phone number"
                         />
+                             {errors[index]?.number && <p className="text-red-500">{errors[index].number}</p>}
                       </div>
 
                       <div className="flex flex-col gap-2">
@@ -328,6 +351,7 @@ const AddStudent = () => {
                           className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           placeholder="Enter email"
                         />
+                             {errors[index]?.email && <p className="text-red-500">{errors[index].email}</p>}
                       </div>
                     </div>
                   </div>
@@ -347,6 +371,7 @@ const AddStudent = () => {
                               className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full pr-10"
                               placeholder="Enter password"
                             />
+                                 {errors[index]?.password && <p className="text-red-500">{errors[index].password}</p>}
                             <div
                               className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400 hover:text-gray-600"
                               onClick={() => togglePasswordVisibility(index, 'password')}
@@ -374,6 +399,7 @@ const AddStudent = () => {
                             className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full pr-10"
                             placeholder="Confirm password"
                           />
+                               {errors[index]?.cpassword && <p className="text-red-500">{errors[index].cpassword}</p>}
                           <div
                             className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400 hover:text-gray-600"
                             onClick={() => togglePasswordVisibility(index, 'cpassword')}
@@ -381,6 +407,7 @@ const AddStudent = () => {
                             {showPassword[`${index}-cpassword`] ? <EyeOff size={20} /> : <Eye size={20} />}
                           </div>
                         </div>
+                        
                       </div>
                     </div>
                   </div>
@@ -398,6 +425,7 @@ const AddStudent = () => {
                           className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           placeholder="Enter parent's phone number"
                         />
+                         {errors[index]?.pnumber && <p className="text-red-500">{errors[index].pnumber}</p>}
                       </div>
 
                       <div className="flex flex-col gap-2">
@@ -409,6 +437,7 @@ const AddStudent = () => {
                           className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           placeholder="Enter parent's email"
                         />
+                         {errors[index]?.pemail && <p className="text-red-500">{errors[index].pemail}</p>}
                       </div>
                     </div>
                   </div>

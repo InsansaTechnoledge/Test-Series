@@ -1,7 +1,7 @@
 import React from 'react';
 import { MailIcon, LinkedinIcon, TwitterIcon } from 'lucide-react';
-import Profile from '../../../../assests/Landing/Testimonials/profile.png';
-import HeadingUtil from '../../utility/HeadingUtil';
+import Profile from '../../../../../assests/Landing/Testimonials/profile.png';
+import HeadingUtil from '../../../utility/HeadingUtil';
 
 const facultyData = [
   {

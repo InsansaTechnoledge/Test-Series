@@ -30,8 +30,6 @@ const UserList = () => {
         }
     },[users])
 
-    const uniqueYears = [...new Set(batches.map(batch => batch.year))];
-
     useEffect(() => {
         if (selectedBatch) {
             setFilteredUsers(users.filter(user => user.batch?.includes(selectedBatch)));
