@@ -111,9 +111,13 @@ export const deleteUser = async (req, res) => {
 
 //for the profile page
 export const getUser = async (req, res) => {
-    const { userId } = req.params;
+    const { userId } = req.query;
     try {
-        const user = await User.findOne(userId ).lean();
+        let user;
+        if(userId)
+         user = await User.findOne(userId ).lean();
+        else
+        user=await User.find().lean();
         if (!user) {
             return new APIError(404, ["User not found!!"]).send(res);
         };

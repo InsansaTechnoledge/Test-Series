@@ -138,6 +138,7 @@ const CreateUser = () => {
 
         const payload=new FormData();
         payload.append("name",`${formData.firstName} ${formData.lastName}`);
+        payload.append('batch',selectedBatches.map(batch => batch.id));
         for (let key in formData) {
         if(key!== ("profilePhoto" && "firstName"  && "lastName" )){
             payload.append(key, formData[key]);
@@ -161,7 +162,7 @@ const CreateUser = () => {
         console.error("Error creating user:", error);
         setError({
             ...error,
-            form: error.response.data.message || error.message
+            form: error.response.data.errors[1] || error.message
         });
     }
 
@@ -325,11 +326,11 @@ const CreateUser = () => {
 
                     </div>
                     <div className='flex flex-col gap-2'>
-                        <label htmlFor='role' className='text-lg font-semibold'>Role group<span className='text-red-600'>*</span></label>
+                        <label htmlFor='roleId' className='text-lg font-semibold'>Role group<span className='text-red-600'>*</span></label>
                         <select
-                            name='role'
+                            name='roleId'
                             onChange={(e) => onChangeHandler(e)}
-                            id='role' className='p-2 bg-white rounded-md'>
+                            id='roleId' className='p-2 bg-white rounded-md'>
                             <option value=''>--select role--</option>
                             {
                                 roleGroups.map((role, idx) => (

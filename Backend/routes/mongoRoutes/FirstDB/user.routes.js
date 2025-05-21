@@ -6,7 +6,7 @@ router.post('/create', registerUser);
 router.patch('/update',updateUser);
 router.patch('/changePassword', changePassword);
 router.patch('/forgotPassword', forgotPassword);router.delete('/delete/:id', deleteUser);
-router.get('/getUser/:id', getUser);
+router.get('/getUser/', getUser);
 router.get('/batch/:id', getUsersFromBatch);
 
 
