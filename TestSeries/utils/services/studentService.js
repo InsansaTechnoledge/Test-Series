@@ -15,4 +15,14 @@ export const uploadStudentExcel = async (file) => {
     });
   
     return response.data;
-  };
+};
+
+export const fetchStudents = async () => {
+    const response = await axios.get('/v1/student/all-student'); 
+    return response.data;
+};
+  
+export const deleteStudentById = async (id) => {
+    const response = await axios.delete(`/v1/student/delete/${id}`);
+    return response.data;
+};

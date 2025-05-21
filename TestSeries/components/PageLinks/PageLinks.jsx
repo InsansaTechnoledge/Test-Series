@@ -21,7 +21,7 @@ import FeatureBasedRoleGroups from '../../features/afterAuth/components/Institut
 import SessionExpireError from '../Error/SessionExpireError';
 import InstituteLandingPage from '../../features/afterAuth/components/InstituteSide/components/InstituteLandingPage';
 import AuthRoutes from '../../routes/AuthRoutes';
-
+import StudentListPage from '../../features/afterAuth/components/InstituteSide/StudentListComponent';
 const PageLinks = () => {
   const { user, setUser } = useUser();
   const fetchUser = async () => {
@@ -68,6 +68,7 @@ const PageLinks = () => {
               <Route path='create-user' element={<CreateUser />} />
               <Route path='create-batch' element={<CreateBatch />} />
               <Route path='add-student' element={<CreateStudent />} />
+              <Route path='student-list' element={<StudentListPage />} />
               <Route path='create-role-group' element={<FeatureBasedRoleGroups />} />
               <Route path='add-student' element={<CreateStudent />} />
               <Route path='institute-landing' element={<InstituteLandingPage />} />

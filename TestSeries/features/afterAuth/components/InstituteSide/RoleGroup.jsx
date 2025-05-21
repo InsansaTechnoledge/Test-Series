@@ -5,6 +5,7 @@ import { postRoleGroup ,  deleteRoleGroup, updateRoleGroup } from '../../../../u
 import { useQueryClient } from '@tanstack/react-query';
 import { useCachedRoleGroup } from '../../../../hooks/useCachedRoleGroup';
 import GuiderComponent from './components/GuiderComponent';
+import NeedHelpComponent from './components/NeedHelpComponent';
 import RefreshButton from '../../utility/RefreshButton';
 import { useUser } from '../../../../contexts/currentUserContext';
 import { useCachedFeatures } from '../../../../hooks/useCachedFeatures';
@@ -340,7 +341,8 @@ export default function FeatureBasedRoleGroups() {
   return (
     <div className="w-full p-6 bg-white rounded-lg">
       <HeadingUtil heading="Role Group" description="you can assing all the required roles into a single group"/>
-      <GuiderComponent question={question} answer={answer}/>
+
+      <NeedHelpComponent heading="creating Roles ?" about="roles help users to access systems fucntionality" question={question} answer={answer}/>
       {/* Group List and Management */}
       <div className="mb-6">
         <div className="flex justify-between items-center mb-4">
