@@ -5,6 +5,7 @@ import HeadingUtil from '../../utility/HeadingUtil'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import {fetchUserList} from '../../../../utils/services/userService'
+import RefreshButton from '../../utility/RefreshButton'
 
 const UserList = () => {
     const [filteredUsers, setFilteredUsers] = useState([]);
@@ -68,6 +69,7 @@ const UserList = () => {
                             <h2 className='font-bold text-lg text-blue-900'>Total Users: {users.length}</h2>
                         </div>
                         <div className='flex flex-col md:flex-row gap-4'>
+                            <RefreshButton />
                             <button className='bg-blue-900 text-white py-2 px-4 rounded-md hover:cursor-pointer font-semibold hover:scale-105 flex space-x-2 transition-all duration-300'
                             onClick={()=>{
                                 navigate('/institute/create-user')

@@ -8,6 +8,7 @@ import { postRoleGroup , fetchAllRoleGroups , deleteRoleGroup, updateRoleGroup }
 import { useQuery } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
 import GuiderComponent from './components/GuiderComponent';
+import RefreshButton from '../../utility/RefreshButton';
 
 export default function FeatureBasedRoleGroups() {
     const {data : featuresData = [] , isLoading} = useQuery({
@@ -348,19 +349,22 @@ export default function FeatureBasedRoleGroups() {
       <div className="mb-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold text-gray-700">Existing Role Groups</h2>
-          {!isAddingGroup && (
-            <button 
-              className="bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 flex items-center gap-1"
-              onClick={() => {
-                setIsAddingGroup(true);
-                setEditingGroupId(null);
-                setNewGroup({ name: '', description: '', features: [] });
-              }}
-            >
-              <Plus size={16} />
-              <span>Create Role Group</span>
-            </button>
+            <div className='flex gap-4'>
+              <RefreshButton />
+            {!isAddingGroup && (
+              <button 
+                className="bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 flex items-center gap-1"
+                onClick={() => {
+                  setIsAddingGroup(true);
+                  setEditingGroupId(null);
+                  setNewGroup({ name: '', description: '', features: [] });
+                }}
+              >
+                <Plus size={16} />
+                <span>Create Role Group</span>
+              </button>
           )}
+          </div>
         </div>
         
         {/* Role Groups List */}
