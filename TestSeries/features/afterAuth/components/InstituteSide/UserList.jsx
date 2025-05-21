@@ -15,7 +15,7 @@ const UserList = () => {
     const { batches } = useCachedBatches();
     const { roleGroups, rolesLoading } = useCachedRoleGroup();
     const [filteredUsers, setFilteredUsers] = useState(users);
-    const [selectedYear, setSelectedYear] = useState('');
+    const [selectedBatch, setSelectedBatch] = useState('');
     const queryClient = useQueryClient();
 
     const refreshFunction = () => {
@@ -33,18 +33,12 @@ const UserList = () => {
     const uniqueYears = [...new Set(batches.map(batch => batch.year))];
 
     useEffect(() => {
-        if (selectedYear) {
-            const filtered = users.filter(user =>
-                user.batch?.some(batchId => {
-                    const batch = batchMap[batchId];
-                    return batch?.year === parseInt(selectedYear);
-                })
-            );
-            setFilteredUsers(filtered);
+        if (selectedBatch) {
+            setFilteredUsers(users.filter(user => user.batch?.includes(selectedBatch)));
         } else {
             setFilteredUsers(users);
         }
-    }, [selectedYear]);
+    }, [selectedBatch]);
 
     const [expandedUsers, setExpandedUsers] = useState(filteredUsers);
     const navigate = useNavigate();
@@ -55,10 +49,6 @@ const UserList = () => {
             [id]: prev[id] ? !prev[id] : true
         }));
     }
-
-    useEffect(() => {
-        console.log(expandedUsers);
-    }, [expandedUsers]);
 
     const batchMap = Object.fromEntries(batches?.map(b => [b.id, b]));
     const roleMap = Object.fromEntries(roleGroups?.map(r => [r._id, r]));
@@ -89,10 +79,11 @@ const UserList = () => {
                                     <PlusSquare />
                                 </div>
                             </button>
-                            <select className='rounded-md bg-white py-2 px-4'>
-                                <option value=''>--select year--</option>
-                                {uniqueYears.map(year => (
-                                    <option key={year} value={year}>{year}</option>
+                            <select className='rounded-md bg-white py-2 px-4'
+                                onChange={(e) => setSelectedBatch(e.target.value)}>
+                                <option value=''>--select Batch--</option>
+                                {batches.map(batch => (
+                                    <option key={batch.id} value={batch.id}>{batch.name}</option>
                                 ))}
                             </select>
                             <label className='space-x-2 flex rounded-md bg-white py-2 px-4'>
@@ -131,7 +122,7 @@ const UserList = () => {
                                 </tr>
                             </thead>
                             {
-                                users.map((user, idx) => (
+                                filteredUsers.map((user, idx) => (
                                     <tbody key={idx}>
                                         <tr className=" bg-white border-b border-gray-200 hover:bg-gray-50 text-blue-600 text-lg">
                                             <th scope="row" className="px-6 py-4 font-medium text-blue-600 whitespace-nowrap ">

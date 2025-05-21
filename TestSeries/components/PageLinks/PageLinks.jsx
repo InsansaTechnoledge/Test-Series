@@ -24,6 +24,7 @@ import AuthRoutes from '../../routes/AuthRoutes';
 import StudentLayout from '../../layouts/StudentLayout';
 import UpcomingExam from '../../features/afterAuth/components/StudentSide/UpcomingExams/UpcomingExam';
 
+import StudentListPage from '../../features/afterAuth/components/InstituteSide/StudentListComponent';
 const PageLinks = () => {
   const { user, setUser } = useUser();
   const fetchUser = async () => {
@@ -70,6 +71,7 @@ const PageLinks = () => {
               <Route path='create-user' element={<CreateUser />} />
               <Route path='create-batch' element={<CreateBatch />} />
               <Route path='add-student' element={<CreateStudent />} />
+              <Route path='student-list' element={<StudentListPage />} />
               <Route path='create-role-group' element={<FeatureBasedRoleGroups />} />
               <Route path='add-student' element={<CreateStudent />} />
               <Route path='institute-landing' element={<InstituteLandingPage />} />

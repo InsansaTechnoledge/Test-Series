@@ -86,7 +86,7 @@ const LoginForm = () => {
             email:'',
             password:''
           });
-         setUser(response.data);
+         setUser(response.data.user);
 
          navigate('/institute/institute-landing'); 
           
@@ -117,7 +117,7 @@ const LoginForm = () => {
       setErrors({});
     }
     
-    setUser(response.data);
+    setUser(response.data.user);
     navigate('/student-landing');
     }catch(err){
       console.log(err);
