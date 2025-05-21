@@ -1,6 +1,8 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function ExamLinksComponent({ Data }) {
+  const navigate = useNavigate();
   return (
     <div className="px-4 py-8">
       <div className="max-w-6xl mx-auto">
@@ -11,9 +13,10 @@ export default function ExamLinksComponent({ Data }) {
             const Rank = card?.rank;
 
             return (
-              <div
+              <button
                 key={index}
                 className={`rounded-xl border p-6 flex flex-col items-center text-center transition-all duration-300 transform hover:scale-105 cursor-pointer ${card.color} ${card.shadow}`}
+                onClick={()=>navigate(card.path)}
               >
                 <div className="p-3 rounded-full mb-4 bg-white shadow-inner w-14 h-14 flex items-center justify-center">
                   {Icon ? (
@@ -23,7 +26,7 @@ export default function ExamLinksComponent({ Data }) {
                   )}
                 </div>
                 <h3 className="text-lg md:text-xl font-semibold text-gray-800">{card.name}</h3>
-              </div>
+              </button>
             );
           })}
         </div>

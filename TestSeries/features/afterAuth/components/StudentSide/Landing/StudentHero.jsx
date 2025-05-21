@@ -1,5 +1,5 @@
 import React from 'react';
-import heroBanner from '../../../../assests/StudentLanding/heroBanner.jpg';
+import heroBanner from '../../../../../assests/StudentLanding/heroBanner.jpg';
 import { Building, Mail, Phone } from 'lucide-react';
 const StudentHero = () => {
     return (

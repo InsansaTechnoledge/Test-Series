@@ -6,7 +6,8 @@ export const cards = [
       name: 'Upcoming Exam',
       icon: Calendar,
       color: 'bg-blue-100 text-blue-600 border-blue-200',
-      shadow: 'shadow-blue-200/50'
+      shadow: 'shadow-blue-200/50',
+      path: '/student/upcoming-exams'
     },
     { 
       name: 'Live Exam', 

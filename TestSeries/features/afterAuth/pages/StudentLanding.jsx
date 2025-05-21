@@ -1,12 +1,12 @@
 import React from 'react'
-import StudentHero from '../components/StudentSide/StudentHero'
-import StudentDetails from '../components/StudentSide/StudentDetails'
-import AiWorkingSteps from '../components/StudentSide/AiWorkingSteps'
-import FacultySection from '../components/StudentSide/FacultySection'
-import SubjectCards from '../components/StudentSide/SubjectCards'
-import ExamLinksComponent from '../components/StudentSide/ExamLinksComponent'
+import StudentHero from '../components/StudentSide/Landing/StudentHero'
+import StudentDetails from '../components/StudentSide/Landing/StudentDetails'
+import AiWorkingSteps from '../components/StudentSide/Landing/AiWorkingSteps'
+import FacultySection from '../components/StudentSide/Landing/FacultySection'
+import SubjectCards from '../components/StudentSide/Landing/SubjectCards'
+import ExamLinksComponent from '../components/StudentSide/Landing/ExamLinksComponent'
 import { cards } from '../data/DisplayComponentData'
-import ExamStatsDashboard from '../components/StudentSide/ExamStatsDashboard'
+import ExamStatsDashboard from '../components/StudentSide/Landing/ExamStatsDashboard'
 import HeadingUtil from '../utility/HeadingUtil';
 
 const StudentLanding = () => {

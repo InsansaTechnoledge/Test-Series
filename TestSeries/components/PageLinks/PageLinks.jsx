@@ -5,7 +5,7 @@ import BeforeAuthLayout from '../../layouts/BeforeAuthLayout';
 import AuthLayout from '../../layouts/authLayout';
 import LoginMainPage from '../../features/auth/pages/LoginMainPage';
 import InstituteRegistrationPage from '../../features/auth/pages/InstituteRegistrationPage';
-import StudentHero from '../../features/afterAuth/components/StudentSide/StudentHero';
+import StudentHero from '../../features/afterAuth/components/StudentSide/Landing/StudentHero';
 import AfterAuthLayout from '../../layouts/afterAuthLayout';
 import InstituteLanding from '../../features/afterAuth/pages/InstituteLanding';
 import StudentLanding from '../../features/afterAuth/pages/StudentLanding';
@@ -21,6 +21,8 @@ import FeatureBasedRoleGroups from '../../features/afterAuth/components/Institut
 import SessionExpireError from '../Error/SessionExpireError';
 import InstituteLandingPage from '../../features/afterAuth/components/InstituteSide/components/InstituteLandingPage';
 import AuthRoutes from '../../routes/AuthRoutes';
+import StudentLayout from '../../layouts/StudentLayout';
+import UpcomingExam from '../../features/afterAuth/components/StudentSide/UpcomingExams/UpcomingExam';
 
 const PageLinks = () => {
   const { user, setUser } = useUser();
@@ -73,7 +75,10 @@ const PageLinks = () => {
               <Route path='institute-landing' element={<InstituteLandingPage />} />
               <Route path='*' element={<div>Invalid path</div>} />
             </Route>
-            <Route path='student-landing' element={<StudentLanding />} />
+            <Route path='/student' element={<StudentLayout />}>
+              <Route path='student-landing' element={<StudentLanding />} />
+              <Route path='upcoming-exams' element={<UpcomingExam />} />
+            </Route>
           </Route>
         </Route>
 
