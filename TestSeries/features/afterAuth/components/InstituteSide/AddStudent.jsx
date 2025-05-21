@@ -14,7 +14,7 @@ const AddStudent = () => {
   const [excelData, setExcelData] = useState([])
   const [activeTab, setActiveTab] = useState('manual') // 'manual' or 'bulk'
   const {batches,isLoading}=useCachedBatches();
-  const [errors, setErrors] = useState([getEmptyStudent()])
+  const [errors, setErrors] = useState([])
 
   // Generate empty student object
   function getEmptyStudent() {
@@ -31,7 +31,7 @@ const AddStudent = () => {
     }
   }
 
-  const validateField = (name, value) => {
+  const validateField = (name, value,index) => {
     switch (name) {
       case 'fname':
       case 'lname':
@@ -52,7 +52,7 @@ const AddStudent = () => {
         }
         return '';
       case 'cpassword':
-        return value === formData?.password ? '' : 'Passwords do not match';
+        return value === students[index]?.password ? '' : 'Passwords do not match';
       case 'number' :
       case 'pnumber':
         return /^(\+\d{1,3}[- ]?)?\d{10}$/.test(value) ? '' : 'Please enter a valid phone number';
@@ -70,7 +70,7 @@ const AddStudent = () => {
   updatedStudents[index] = { ...updatedStudents[index], [field]: value };
   setStudents(updatedStudents);
 
-  const errorMessage = validateField(field, value);
+  const errorMessage = validateField(field, value,index);
   const updatedErrors = [...errors];
   updatedErrors[index] = {
     ...updatedErrors[index],
