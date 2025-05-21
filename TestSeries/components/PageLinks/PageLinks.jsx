@@ -60,7 +60,7 @@ const PageLinks = () => {
         </Route>
         {/* <AuthRoutes> */}
 
-        <Route element={<AuthRoutes />}>
+        <Route element={<AuthRoutes/>}>
           <Route element={<AfterAuthLayout />}>
             <Route path='/institute' element={<OrganizationLayout />}>
               <Route path='batch-list' element={<BatchList />} />

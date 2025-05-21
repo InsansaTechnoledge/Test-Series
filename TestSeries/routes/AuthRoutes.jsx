@@ -1,14 +1,14 @@
 import React from 'react'
 import { useUser } from '../contexts/currentUserContext'
-import { useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 
-const AuthRoutes = ({ children }) => {
+const AuthRoutes = () => {
     const { user } = useUser();
     const navigate = useNavigate();
     return (
         user
         ?
-        {children}
+        <Outlet />
         :
         navigate("/session-expired")
   )
