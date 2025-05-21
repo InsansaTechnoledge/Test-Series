@@ -48,7 +48,7 @@ const AddStudent = () => {
   }
 
   const { data: batches = [], isLoading, isError } = useQuery({
-    queryKey: ['batches', user._id],
+    queryKey: ['batches'],
     queryFn: () => fetchBatchListFunction(),
     refetchOnWindowFocus: false,
     refetchOnMount: false,

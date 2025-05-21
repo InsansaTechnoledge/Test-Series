@@ -61,8 +61,8 @@ export default function OrganizationLayout() {
           :
           null
       }
-      <Navbar />
-      <div className="pt-15 flex h-screen w-screen overflow-hidden">
+
+      <div className="flex h-screen w-screen overflow-hidden">
 
         {/* Mobile Overlay */}
         {isMobile && isSidebarOpen && (
@@ -196,21 +196,26 @@ export default function OrganizationLayout() {
         </aside>
 
         {/* Main content */}
-        <main className="flex-1 overflow-y-auto relative">
-          {/* Mobile menu toggle button */}
-          {isMobile && (
-            <button
-              onClick={toggleMobileSidebar}
-              className="fixed top-4 left-4 z-30 bg-indigo-950 text-white p-2 rounded-lg shadow-md"
-            >
-              {isSidebarOpen ? <ChevronLeft size={24} /> : <ChevronRight size={24} />}
-            </button>
-          )}
+        <div className='flex flex-col flex-1'>
 
-          <div className="p-6 md:p-10 max-w-7xl mx-auto">
-            <Outlet />
-          </div>
-        </main>
+          <Navbar />
+          <main className="flex-1 flex-col overflow-y-auto relative">
+            {/* Mobile menu toggle button */}
+            {isMobile && (
+              <button
+                onClick={toggleMobileSidebar}
+                className="fixed top-4 left-4 z-30 bg-indigo-950 text-white p-2 rounded-lg shadow-md"
+              >
+                {isSidebarOpen ? <ChevronLeft size={24} /> : <ChevronRight size={24} />}
+              </button>
+            )}
+
+            <div className="mt-12 p-6 md:p-10 max-w-7xl mx-auto">
+              <Outlet />
+            </div>
+          </main>
+        </div>
+
       </div>
 
     </>
