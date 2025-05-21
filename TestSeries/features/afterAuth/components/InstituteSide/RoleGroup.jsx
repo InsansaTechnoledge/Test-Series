@@ -10,10 +10,13 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useCachedRoleGroup } from '../../../../hooks/useCachedRoleGroup';
 import GuiderComponent from './components/GuiderComponent';
 import RefreshButton from '../../utility/RefreshButton';
+import { useUser } from '../../../../contexts/currentUserContext';
 
 export default function FeatureBasedRoleGroups() {
+  const {user} = useUser();
+
     const {data : featuresData = [] , isLoading} = useQuery({
-        queryKey: ['features'],
+        queryKey: ['features', user._id],
         queryFn: fetchFeatures,
         staleTime: Infinity,
     });
@@ -56,13 +59,18 @@ export default function FeatureBasedRoleGroups() {
 
     try {
       const response = await postRoleGroup(newGroup);
-      await queryClient.invalidateQueries(['roleGroups']);
+      await queryClient.invalidateQueries(['roleGroups', user._id]);
       setNewGroup({ name: '', description: '', features: [] });
       setIsAddingGroup(false);
     } catch (error) {
       console.error("Error posting role group:", error);
     }
   };
+
+  const refreshFunction = () => {
+    invalidateQueries(['roleGroups', user._id]);
+    invalidateQueries(['features', user._id]);
+  }
   
   const handleEditGroup = (group) => {
     // Extract feature IDs consistently
@@ -84,7 +92,7 @@ export default function FeatureBasedRoleGroups() {
   
     try {
       await updateRoleGroup(editingGroupId, newGroup);
-      await queryClient.invalidateQueries(['roleGroups']);
+      await queryClient.invalidateQueries(['roleGroups', user._id]);
       setNewGroup({ name: '', description: '', features: [] });
       setEditingGroupId(null);
     } catch (error) {
@@ -95,7 +103,7 @@ export default function FeatureBasedRoleGroups() {
   const handleDeleteGroup = async (groupId) => {
     try {
       await deleteRoleGroup(groupId);
-      await queryClient.invalidateQueries(['roleGroups']);
+      await queryClient.invalidateQueries(['roleGroups', user._id]);
     } catch (error) {
       console.error("Error deleting role group:", error);
     }
@@ -352,7 +360,7 @@ export default function FeatureBasedRoleGroups() {
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold text-gray-700">Existing Role Groups</h2>
             <div className='flex gap-4'>
-              <RefreshButton />
+              <RefreshButton refreshFunction={refreshFunction}/>
             {!isAddingGroup && (
               <button 
                 className="bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 flex items-center gap-1"

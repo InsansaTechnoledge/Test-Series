@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { fetchBatchList } from '../utils/services/batchService';
+import { useUser } from '../contexts/currentUserContext';
 
 export const useCachedBatches = () => {
-
+    const {user} = useUser();
     const fetchBatchListFunction = async () => {
     try{
         const response = await fetchBatchList();
@@ -19,7 +20,7 @@ export const useCachedBatches = () => {
     }
 
     const { data: batches = [], isLoading, isError } = useQuery({
-        queryKey: ['batches'],
+        queryKey: ['batches', user._id],
         queryFn: () => fetchBatchListFunction(),
         refetchOnWindowFocus: false,
         refetchOnMount: false,

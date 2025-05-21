@@ -1,7 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchAllRoleGroups } from "../utils/services/RoleGroupService";
+import { useUser } from "../contexts/currentUserContext";
 
 export const useCachedRoleGroup = () => {
+    const {user} = useUser();
     const fetchRoleGroupListFunction = async () => {
         try {
             const response = await fetchAllRoleGroups();
@@ -15,7 +17,7 @@ export const useCachedRoleGroup = () => {
     };
 
       const { data: roleGroups = [], isLoading: rolesLoading } = useQuery({
-        queryKey: ['roleGroups'],
+        queryKey: ['roleGroups', user._id],
         queryFn:fetchRoleGroupListFunction,
        refetchOnWindowFocus: false,
            refetchOnMount: false,

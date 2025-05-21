@@ -7,8 +7,11 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchBatchList } from '../../../../utils/services/batchService';
 import { fetchAllRoleGroups } from '../../../../utils/services/RoleGroupService';
 import { createUser } from '../../../../utils/services/userService';
+import { useUser } from '../../../../contexts/currentUserContext';
 
 const CreateUser = () => {
+        const {user} = useUser();
+
         const fetchBatchListFunction = async () => {
         const response = await fetchBatchList();
         if (response.status !== 200) {
@@ -19,7 +22,7 @@ const CreateUser = () => {
     }
 
     const { data: batches = [], isLoading, isError } = useQuery({
-        queryKey: ['batches'],
+        queryKey: ['batches', user._id],
         queryFn: () => fetchBatchListFunction(),
         refetchOnWindowFocus: false,
         refetchOnMount: false,
@@ -29,7 +32,7 @@ const CreateUser = () => {
     });
 
     const { data: roleGroups = [], isLoading: rolesLoading } = useQuery({
-        queryKey: ['roleGroups'],
+        queryKey: ['roleGroups', user._id],
         queryFn: fetchAllRoleGroups,
         staleTime: Infinity,
       });
