@@ -1,36 +1,17 @@
 import Heading from './Heading'
-import { useQuery } from '@tanstack/react-query'
-import { fetchBatchList } from '../../../../utils/services/batchService';
 import { Edit, Eye, LucidePlusSquare, NotepadText, PlusSquare, Search, Trash } from 'lucide-react'
 import { useEffect, useState } from 'react';
 import HeadingUtil from '../../utility/HeadingUtil';
 import {  useNavigate } from 'react-router-dom';
+import { useCachedBatches } from '../../../../hooks/useCachedBatches';
 
 const BatchList = () => {
     const navigate=useNavigate();
-
-    const [filteredBatches, setFilteredBatches] = useState([]);
+        const {batches,isloading,isError}=useCachedBatches();
+    const [filteredBatches, setFilteredBatches] = useState(batches);
     const [selectedYear, setSelectedYear] = useState('');
 
-    const fetchBatchListFunction = async () => {
-        const response = await fetchBatchList();
-        if (response.status !== 200) {
-            throw new Error('Network response was not ok');
-        }
-        console.log(response.data);
-        setFilteredBatches(response.data);
-        return response.data;
-    }
 
-    const { data: batches = [], isLoading, isError } = useQuery({
-        queryKey: ['batches'],
-        queryFn: () => fetchBatchListFunction(),
-        refetchOnWindowFocus: false,
-        refetchOnMount: false,
-        staleTime: Infinity,
-        cacheTime: 24 * 60 * 60 * 1000,
-        retry: 0,
-    });
 
     const uniqueYears = [...new Set(batches.map(batch => batch.year))];
 

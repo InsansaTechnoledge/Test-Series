@@ -7,6 +7,7 @@ import { postRoleGroup , fetchAllRoleGroups , deleteRoleGroup, updateRoleGroup }
 
 import { useQuery } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
+import { useCachedRoleGroup } from '../../../../hooks/useCachedRoleGroup';
 
 export default function FeatureBasedRoleGroups() {
     const {data : featuresData = [] , isLoading} = useQuery({
@@ -17,11 +18,12 @@ export default function FeatureBasedRoleGroups() {
 
   const queryClient = useQueryClient();
 
-  const { data: roleGroups = [], isLoading: rolesLoading } = useQuery({
-    queryKey: ['roleGroups'],
-    queryFn: fetchAllRoleGroups,
-    staleTime: Infinity,
-  });
+  // const { data: roleGroups = [], isLoading: rolesLoading } = useQuery({
+  //   queryKey: ['roleGroups'],
+  //   queryFn: fetchAllRoleGroups,
+  //   staleTime: Infinity,
+  // });
+  const{roleGroups,rolesLoading}=useCachedRoleGroup();
 
   const [isAddingGroup, setIsAddingGroup] = useState(false);
   const [editingGroupId, setEditingGroupId] = useState(null);
