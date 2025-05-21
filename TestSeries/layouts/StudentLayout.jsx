@@ -9,7 +9,9 @@ const StudentLayout = () => {
         <div>
           <Navbar />
         </div>
-        <Outlet />
+        <div className='p-6 md:p-10 max-w-7xl mx-auto'>
+          <Outlet />
+        </div>
       </div>
     </>
   )
