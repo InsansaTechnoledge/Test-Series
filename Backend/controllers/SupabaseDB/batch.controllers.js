@@ -18,7 +18,7 @@ export const createOrgBatch = async (req, res) => {
       return new APIResponse(201, batch, 'Batch created successfully').send(res);
     } catch (err) {
       console.log(err);
-      new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while creating the batch", err.message || ""]).send(res);
+      new APIError(err?.response?.stastus || err?.status || 500, ["Something went wrong while creating the batch", err.message || ""]).send(res);
 
     }
   };
