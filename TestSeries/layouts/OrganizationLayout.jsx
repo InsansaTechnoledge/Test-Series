@@ -153,7 +153,7 @@ export default function OrganizationLayout() {
             <div className="p-2 border-t border-indigo-900">
             
               {/* About Organization Button */}
-              <button className="flex items-center w-full text-gray-300 p-3 hover:bg-indigo-800 hover:text-white rounded-lg transition-colors duration-200">
+              <button onClick={() => {navigate('/institute/institute-landing')}} className="flex items-center w-full text-gray-300 p-3 hover:bg-indigo-800 hover:text-white rounded-lg transition-colors duration-200">
                 <div className="w-6 flex-shrink-0 flex justify-center">
                   <Info className="w-6 h-6" />
                 </div>
@@ -161,7 +161,7 @@ export default function OrganizationLayout() {
                 ml-3 overflow-hidden transition-all duration-200
                 ${showLabels ? 'w-40' : 'w-0'}
               `}>
-                  <button onClick={() => {navigate('/institute/institute-landing')}} className="whitespace-nowrap">About Organization</button>
+                  <span className="whitespace-nowrap">About Organization</span>
                 </div>
               </button>
             </div>

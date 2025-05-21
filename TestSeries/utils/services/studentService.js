@@ -18,11 +18,11 @@ export const uploadStudentExcel = async (file) => {
 };
 
 export const fetchStudents = async () => {
-    const response = await axios.get('/v1/student/all-student'); 
+    const response = await api.get('/v1/student/all-student'); 
     return response.data;
 };
   
 export const deleteStudentById = async (id) => {
-    const response = await axios.delete(`/v1/student/delete/${id}`);
+    const response = await api.delete(`/v1/student/delete/${id}`);
     return response.data;
 };
