@@ -61,8 +61,8 @@ export default function OrganizationLayout() {
           :
           null
       }
-      <Navbar />
-      <div className="pt-15 flex h-screen w-screen overflow-hidden">
+
+      <div className="flex h-screen w-screen overflow-hidden">
 
         {/* Mobile Overlay */}
         {isMobile && isSidebarOpen && (
@@ -151,19 +151,7 @@ export default function OrganizationLayout() {
 
             {/* Footer Actions */}
             <div className="p-2 border-t border-indigo-900">
-              {/* Settings Button */}
-              <button className="flex items-center w-full text-gray-300 p-3 hover:bg-indigo-800 hover:text-white rounded-lg transition-colors duration-200">
-                <div className="w-6 flex-shrink-0 flex justify-center">
-                  <Settings className="w-6 h-6" />
-                </div>
-                <div className={`
-                ml-3 overflow-hidden transition-all duration-200
-                ${showLabels ? 'w-40' : 'w-0'}
-              `}>
-                  <span className="whitespace-nowrap">Settings</span>
-                </div>
-              </button>
-
+            
               {/* About Organization Button */}
               <button className="flex items-center w-full text-gray-300 p-3 hover:bg-indigo-800 hover:text-white rounded-lg transition-colors duration-200">
                 <div className="w-6 flex-shrink-0 flex justify-center">
@@ -173,22 +161,7 @@ export default function OrganizationLayout() {
                 ml-3 overflow-hidden transition-all duration-200
                 ${showLabels ? 'w-40' : 'w-0'}
               `}>
-                  <span className="whitespace-nowrap">About Organization</span>
-                </div>
-              </button>
-
-              {/* Logout Button */}
-              <button
-                onClick={() => setShowLogoutModal(true)}
-                className="flex items-center w-full text-gray-300 p-3 hover:bg-indigo-800 hover:text-white rounded-lg transition-colors duration-200">
-                <div className="w-6 flex-shrink-0 flex justify-center">
-                  <LogOut className="w-6 h-6" />
-                </div>
-                <div className={`
-                ml-3 overflow-hidden transition-all duration-200
-                ${showLabels ? 'w-40' : 'w-0'}
-              `}>
-                  <span className="whitespace-nowrap">Logout</span>
+                  <button onClick={() => {navigate('/institute/institute-landing')}} className="whitespace-nowrap">About Organization</button>
                 </div>
               </button>
             </div>
@@ -196,21 +169,26 @@ export default function OrganizationLayout() {
         </aside>
 
         {/* Main content */}
-        <main className="flex-1 overflow-y-auto relative">
-          {/* Mobile menu toggle button */}
-          {isMobile && (
-            <button
-              onClick={toggleMobileSidebar}
-              className="fixed top-4 left-4 z-30 bg-indigo-950 text-white p-2 rounded-lg shadow-md"
-            >
-              {isSidebarOpen ? <ChevronLeft size={24} /> : <ChevronRight size={24} />}
-            </button>
-          )}
+        <div className='flex flex-col flex-1'>
 
-          <div className="p-6 md:p-10 max-w-7xl mx-auto">
-            <Outlet />
-          </div>
-        </main>
+          <Navbar />
+          <main className="flex-1 flex-col overflow-y-auto relative">
+            {/* Mobile menu toggle button */}
+            {isMobile && (
+              <button
+                onClick={toggleMobileSidebar}
+                className="fixed top-4 left-4 z-30 bg-indigo-950 text-white p-2 rounded-lg shadow-md"
+              >
+                {isSidebarOpen ? <ChevronLeft size={24} /> : <ChevronRight size={24} />}
+              </button>
+            )}
+
+            <div className="mt-12 p-6 md:p-10 max-w-7xl mx-auto">
+              <Outlet />
+            </div>
+          </main>
+        </div>
+
       </div>
 
     </>

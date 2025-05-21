@@ -1,15 +1,17 @@
 import React from 'react'
 import { logout } from '../../utils/services/authService'
 import { useUser } from '../../contexts/currentUserContext'
+import { useNavigate } from 'react-router-dom';
 
 const LogoutModal = ({setShowLogoutModal}) => {
     const {setUser} = useUser();
+    const navigate = useNavigate();
     const handleLogout = async () => {
         
         const response = await logout();
         if(response.status==200){
             setUser(null);
-            alert("logout successful");
+            navigate('/');
             setShowLogoutModal(false);   
         }
     }

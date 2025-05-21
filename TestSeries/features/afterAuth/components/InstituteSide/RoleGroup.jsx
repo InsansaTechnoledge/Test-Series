@@ -8,6 +8,7 @@ import { postRoleGroup , fetchAllRoleGroups , deleteRoleGroup, updateRoleGroup }
 import { useQuery } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCachedRoleGroup } from '../../../../hooks/useCachedRoleGroup';
+import GuiderComponent from './components/GuiderComponent';
 
 export default function FeatureBasedRoleGroups() {
     const {data : featuresData = [] , isLoading} = useQuery({
@@ -164,6 +165,9 @@ export default function FeatureBasedRoleGroups() {
     
     return matchingCount;
   };
+
+  const question = "How To assign role groups to users ?"
+  const answer = "Use the created role groups to assign permissions to users in your add user section."
  
   if (isLoading) return <div>Loading features...</div>;
 
@@ -341,7 +345,7 @@ export default function FeatureBasedRoleGroups() {
   return (
     <div className="w-full p-6 bg-white rounded-lg">
       <HeadingUtil heading="Role Group" description="you can assing all the required roles into a single group"/>
-      
+      <GuiderComponent question={question} answer={answer}/>
       {/* Group List and Management */}
       <div className="mb-6">
         <div className="flex justify-between items-center mb-4">
@@ -590,12 +594,7 @@ export default function FeatureBasedRoleGroups() {
         </div>
       )}
       
-      <div className="p-4 border rounded-md bg-blue-50 text-blue-700 flex items-start gap-3">
-        <div>
-          <p className="font-medium">How To assign role groups to users ?<span className="text-red-600 px-2">* </span></p>
-          <p className="text-sm">Use the created role groups to assign permissions to users in your add user section.</p>
-        </div>
-      </div>
+     
     </div>
   );
 }

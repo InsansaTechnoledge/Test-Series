@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
 import BeforeAuthLanding from '../../features/beforeAuth/BeforeAuthLanding';
 import BeforeAuthLayout from '../../layouts/BeforeAuthLayout';
 import AuthLayout from '../../layouts/authLayout';
@@ -20,10 +20,10 @@ import CreateStudent from '../../features/afterAuth/components/InstituteSide/Add
 import FeatureBasedRoleGroups from '../../features/afterAuth/components/InstituteSide/RoleGroup';
 import SessionExpireError from '../Error/SessionExpireError';
 import InstituteLandingPage from '../../features/afterAuth/components/InstituteSide/components/InstituteLandingPage';
+import AuthRoutes from '../../routes/AuthRoutes';
 
 const PageLinks = () => {
   const { user, setUser } = useUser();
-
   const fetchUser = async () => {
     try {
       const response = await checkAuth();
@@ -52,27 +52,32 @@ const PageLinks = () => {
         <Route element={<BeforeAuthLayout />}>
           <Route path="/" element={<BeforeAuthLanding />} />
         </Route>
-
+      </Routes>
+      <Routes>
         <Route element={<AuthLayout />}>
           <Route path='/institute-registration' element={<InstituteRegistrationPage />} />
           <Route path='/login' element={<LoginMainPage />} />
         </Route>
+        {/* <AuthRoutes> */}
 
-        <Route element={<AfterAuthLayout />}>
-          <Route path='/institute' element={<OrganizationLayout />}>
-            <Route path='batch-list' element={<BatchList />} />
-            <Route path='user-list' element={<UserList />} />
-            <Route path='create-user' element={<CreateUser />} />
-            <Route path='create-batch' element={<CreateBatch />} />
-            <Route path='add-student' element={<CreateStudent />} />
-            <Route path='create-role-group' element={<FeatureBasedRoleGroups />} />
-            <Route path='add-student' element={<CreateStudent />} />
-            <Route path='institute-landing' element={<InstituteLandingPage />} />
-            <Route path='*' element={<div>Invalid path</div>} />
+        <Route element={<AuthRoutes/>}>
+          <Route element={<AfterAuthLayout />}>
+            <Route path='/institute' element={<OrganizationLayout />}>
+              <Route path='batch-list' element={<BatchList />} />
+              <Route path='user-list' element={<UserList />} />
+              <Route path='create-user' element={<CreateUser />} />
+              <Route path='create-batch' element={<CreateBatch />} />
+              <Route path='add-student' element={<CreateStudent />} />
+              <Route path='create-role-group' element={<FeatureBasedRoleGroups />} />
+              <Route path='add-student' element={<CreateStudent />} />
+              <Route path='institute-landing' element={<InstituteLandingPage />} />
+              <Route path='*' element={<div>Invalid path</div>} />
+            </Route>
+            <Route path='student-landing' element={<StudentLanding />} />
           </Route>
-          <Route path='session-expired' element={<SessionExpireError />} />
-          <Route path='student-landing' element={<StudentLanding />} />
         </Route>
+
+        <Route path='session-expired' element={<SessionExpireError />} />
 
       </Routes>
     </Router>

@@ -3,7 +3,7 @@ import profile from '../../../../assests/Institute/profile.png';
 
 const Navbar = () => {
   return (
-    <nav className="fixed w-full z-40 bg-indigo-950 border-b border-gray-200">
+    <div className="w-full z-40 bg-indigo-950 border-b border-gray-200">
       <div className="max-w-screen-xl flex items-center justify-between mx-auto p-4">
 
         {/* Logo on the left */}
@@ -48,7 +48,7 @@ const Navbar = () => {
           </div>
         </div>
       </div>
-    </nav>
+    </div>
   );
 };
 

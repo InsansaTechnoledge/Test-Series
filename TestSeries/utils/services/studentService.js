@@ -1,0 +1,18 @@
+import api from './api';
+
+// For manual add: single student
+export const addSingleStudent = async (data) => {
+  const response = await api.post('/v1/student/bulk-add', data);
+  return response.data;
+};
+
+export const uploadStudentExcel = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+  
+    const response = await api.post('/v1/student/upload-excel', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  
+    return response.data;
+  };
