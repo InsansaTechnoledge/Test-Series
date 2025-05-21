@@ -8,33 +8,24 @@ import { useCachedBatches } from '../../../../hooks/useCachedBatches'
 import { useCachedRoleGroup } from '../../../../hooks/useCachedRoleGroup'
 
 const UserList = () => {
-       const { users, isLoading, isError } = useCachedUser();
-           const { batches } = useCachedBatches();
-    const {roleGroups,rolesLoading} = useCachedRoleGroup();
+    const { users, isLoading, isError } = useCachedUser();
     const [filteredUsers, setFilteredUsers] = useState(users);
-       const [selectedYear, setSelectedYear] = useState('');
+    const { batches } = useCachedBatches();
+    const { roleGroups, rolesLoading } = useCachedRoleGroup();
+
+    const [selectedBatch, setSelectedBatch] = useState('');
 
 
-
-   
-       const uniqueYears = [...new Set(batches.map(batch => batch.year))];
-   
-       useEffect(() => {
-           if (selectedYear) {
-                const filtered = users.filter(user =>
-      user.batch?.some(batchId => {
-        const batch = batchMap[batchId];
-        return batch?.year === parseInt(selectedYear);
-      })
-    );
-    setFilteredUsers(filtered);
-           } else {
-               setFilteredUsers(users);
-           }
-       }, [selectedYear]);
+    useEffect(() => {
+        if (selectedBatch) {
+            setFilteredUsers(users.filter(user => user.batch?.includes(selectedBatch)));
+        } else {
+            setFilteredUsers(users);
+        }
+    }, [selectedBatch]);
 
     const [expandedUsers, setExpandedUsers] = useState(filteredUsers);
-    const navigate=useNavigate();
+    const navigate = useNavigate();
 
     const handleExpandedUsers = (id) => {
         setExpandedUsers(prev => ({
@@ -43,20 +34,16 @@ const UserList = () => {
         }));
     }
 
-    useEffect(() => {
-        console.log(expandedUsers);
-    }, [expandedUsers]);
-
     const batchMap = Object.fromEntries(batches?.map(b => [b.id, b]));
-    const roleMap = Object.fromEntries(roleGroups?.map(r => [r._id, r]));   
+    const roleMap = Object.fromEntries(roleGroups?.map(r => [r._id, r]));
 
 
     return (
-        <> 
+        <>
             <div className='h-full flex flex-col'>
                 <div>
-                    <HeadingUtil heading="All Users" description="you can view all users of your institute and filter them based on year"/>
-      
+                    <HeadingUtil heading="All Users" description="you can view all users of your institute and filter them based on year" />
+
                 </div>
                 <div className='rounded-xl p-5 bg-gray-200 inset-shadow-md flex-grow flex flex-col overflow-auto'>
                     <div className='flex flex-col lg:flex-row justify-between gap-4 mb-5'>
@@ -66,9 +53,9 @@ const UserList = () => {
                         <div className='flex flex-col md:flex-row gap-4'>
                             <RefreshButton />
                             <button className='bg-blue-900 text-white py-2 px-4 rounded-md hover:cursor-pointer font-semibold hover:scale-105 flex space-x-2 transition-all duration-300'
-                            onClick={()=>{
-                                navigate('/institute/create-user')
-                            }}>
+                                onClick={() => {
+                                    navigate('/institute/create-user')
+                                }}>
                                 <span>
                                     Add User
                                 </span>
@@ -76,10 +63,11 @@ const UserList = () => {
                                     <PlusSquare />
                                 </div>
                             </button>
-                            <select className='rounded-md bg-white py-2 px-4'>
-                                <option value=''>--select year--</option>
-                                 {uniqueYears.map(year => (
-                                    <option key={year} value={year}>{year}</option>
+                            <select className='rounded-md bg-white py-2 px-4'
+                                onChange={(e) => setSelectedBatch(e.target.value)}>
+                                <option value=''>--select Batch--</option>
+                                {batches.map(batch => (
+                                    <option key={batch.id} value={batch.id}>{batch.name}</option>
                                 ))}
                             </select>
                             <label className='space-x-2 flex rounded-md bg-white py-2 px-4'>
@@ -118,7 +106,7 @@ const UserList = () => {
                                 </tr>
                             </thead>
                             {
-                                users.map((user, idx) => (
+                                filteredUsers.map((user, idx) => (
                                     <tbody key={idx}>
                                         <tr className=" bg-white border-b border-gray-200 hover:bg-gray-50 text-blue-600 text-lg">
                                             <th scope="row" className="px-6 py-4 font-medium text-blue-600 whitespace-nowrap ">
@@ -179,15 +167,15 @@ const UserList = () => {
                                             <td className="flex justify-center mx-auto w-fit px-6 py-4 gap-8">
                                                 <button
                                                     className="font-medium text-black hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer">
-                                                    <Eye/>
+                                                    <Eye />
                                                 </button>
                                                 <button
                                                     className="font-medium text-blue-500 hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer">
-                                                    <Edit/>
+                                                    <Edit />
                                                 </button>
                                                 <button
                                                     className="font-medium text-red-500 hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer">
-                                                    <Trash/>
+                                                    <Trash />
                                                 </button>
                                             </td>
                                         </tr>
