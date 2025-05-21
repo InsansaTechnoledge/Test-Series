@@ -1,48 +1,39 @@
 import React, { useEffect, useState } from 'react'
-import Heading from './Heading'
-import { Edit, Eye, NotepadText, PlusSquare, Search, Trash } from 'lucide-react'
+import { Edit, Eye, PlusSquare, Search, Trash } from 'lucide-react'
 import HeadingUtil from '../../utility/HeadingUtil'
 import { useNavigate } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
-import {fetchUserList} from '../../../../utils/services/userService'
 import RefreshButton from '../../utility/RefreshButton'
+import { useCachedUser } from '../../../../hooks/useCachedUser'
+import { useCachedBatches } from '../../../../hooks/useCachedBatches'
+import { useCachedRoleGroup } from '../../../../hooks/useCachedRoleGroup'
 
 const UserList = () => {
-    const [filteredUsers, setFilteredUsers] = useState([]);
+       const { users, isLoading, isError } = useCachedUser();
+           const { batches } = useCachedBatches();
+    const {roleGroups,rolesLoading} = useCachedRoleGroup();
+    const [filteredUsers, setFilteredUsers] = useState(users);
        const [selectedYear, setSelectedYear] = useState('');
-   
-       const fetchUserListFunction = async () => {
-           const response = await fetchUserList();
-           if (response.status !== 200) {
-               throw new Error('Network response was not ok');
-           }
-           console.log(response.data);
-           setFilteredUsers(response.data);
-           return response.data;
-       }
-   
-       const { data: users = [], isLoading, isError } = useQuery({
-           queryKey: ['Users'],
-           queryFn: () => fetchUserListFunction(),
-           refetchOnWindowFocus: false,
-           refetchOnMount: false,
-           staleTime: Infinity,
-           cacheTime: 24 * 60 * 60 * 1000,
-           retry: 0,
-       });
 
-       
+
+
    
-    //    const uniqueYears = [...new Set(users.map(user => user.year))];
+       const uniqueYears = [...new Set(batches.map(batch => batch.year))];
    
-    //    useEffect(() => {
-    //        if (selectedYear) {
-    //            setFilteredUsers(users.filter(user => user.year === parseInt(selectedYear)));
-    //        } else {
-    //            setFilteredBatches(users);
-    //        }
-    //    }, [selectedYear]);
-    const [expandedUsers, setExpandedUsers] = useState({});
+       useEffect(() => {
+           if (selectedYear) {
+                const filtered = users.filter(user =>
+      user.batch?.some(batchId => {
+        const batch = batchMap[batchId];
+        return batch?.year === parseInt(selectedYear);
+      })
+    );
+    setFilteredUsers(filtered);
+           } else {
+               setFilteredUsers(users);
+           }
+       }, [selectedYear]);
+
+    const [expandedUsers, setExpandedUsers] = useState(filteredUsers);
     const navigate=useNavigate();
 
     const handleExpandedUsers = (id) => {
@@ -54,7 +45,11 @@ const UserList = () => {
 
     useEffect(() => {
         console.log(expandedUsers);
-    }, [expandedUsers])
+    }, [expandedUsers]);
+
+    const batchMap = Object.fromEntries(batches?.map(b => [b.id, b]));
+    const roleMap = Object.fromEntries(roleGroups?.map(r => [r._id, r]));   
+
 
     return (
         <> 
@@ -66,7 +61,7 @@ const UserList = () => {
                 <div className='rounded-xl p-5 bg-gray-200 inset-shadow-md flex-grow flex flex-col overflow-auto'>
                     <div className='flex flex-col lg:flex-row justify-between gap-4 mb-5'>
                         <div className='my-auto'>
-                            <h2 className='font-bold text-lg text-blue-900'>Total Users: {users.length}</h2>
+                            <h2 className='font-bold text-lg text-blue-900'>Total Users: {filteredUsers.length}</h2>
                         </div>
                         <div className='flex flex-col md:flex-row gap-4'>
                             <RefreshButton />
@@ -82,7 +77,10 @@ const UserList = () => {
                                 </div>
                             </button>
                             <select className='rounded-md bg-white py-2 px-4'>
-                                <option>--select year--</option>
+                                <option value=''>--select year--</option>
+                                 {uniqueYears.map(year => (
+                                    <option key={year} value={year}>{year}</option>
+                                ))}
                             </select>
                             <label className='space-x-2 flex rounded-md bg-white py-2 px-4'>
                                 <div>
@@ -138,7 +136,7 @@ const UserList = () => {
                                                                         <div key={idx}
                                                                             className='flex rounded-md bg-blue-50  px-4 py-1'
                                                                         >
-                                                                            {batch}
+                                                                            {batchMap[batch]?.name} - {batchMap[batch]?.year}
                                                                         </div>
                                                                     ))
                                                                 }
@@ -155,7 +153,7 @@ const UserList = () => {
                                                                     <div key={idx}
                                                                         className='flex rounded-md bg-blue-50  px-4 py-1'
                                                                     >
-                                                                        {batch}
+                                                                        {batchMap[batch]?.name} - {batchMap[batch]?.year}
                                                                     </div>
 
                                                                 ))}
@@ -175,7 +173,7 @@ const UserList = () => {
                                             </td>
                                             <td className="px-6 py-4 ">
                                                 <div className='mx-auto py-1 px-4 rounded-full bg-blue-50 w-fit'>
-                                                    {user.roleId}
+                                                    {roleMap[user.roleId]?.name}
                                                 </div>
                                             </td>
                                             <td className="flex justify-center mx-auto w-fit px-6 py-4 gap-8">

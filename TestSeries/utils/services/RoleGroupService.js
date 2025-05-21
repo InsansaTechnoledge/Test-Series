@@ -12,7 +12,7 @@ export const postRoleGroup = async (groupData) => {
 
 export const fetchAllRoleGroups = async () => {
     const response = await api.get("/v1/role");
-    return response.data.data; 
+    return response.data; 
 };
   
 export const deleteRoleGroup = async (groupId) => {
