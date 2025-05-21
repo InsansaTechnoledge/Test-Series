@@ -160,8 +160,8 @@ const AddStudent = () => {
           email: s.email,
           password: s.password,
           phone: s.number,
-          gender: 'Male', // Optional: Default or add a gender field
-          batchId: batch, // Or use batch _id if your select has _id
+          gender: 'Male', 
+          batchId: batch, 
           parentEmail: s.pemail,
           parentPhone: s.pnumber
         }));
