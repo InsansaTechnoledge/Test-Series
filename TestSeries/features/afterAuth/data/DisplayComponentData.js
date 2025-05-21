@@ -13,13 +13,15 @@ export const cards = [
       name: 'Live Exam', 
       icon: Clock,
       color: 'bg-green-100 text-green-600 border-green-200',
-      shadow: 'shadow-green-200/50'
+      shadow: 'shadow-green-200/50',
+      path: ''
     },
     { 
       name: 'Results', 
       icon: CheckCircle,
       color: 'bg-blue-100 text-blue-600 border-blue-200',
-      shadow: 'shadow-blue-200/50'
+      shadow: 'shadow-blue-200/50',
+      path: '/student/completed-exams'
     }
   ];
 

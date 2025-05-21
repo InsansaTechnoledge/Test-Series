@@ -25,6 +25,7 @@ import StudentLayout from '../../layouts/StudentLayout';
 import UpcomingExam from '../../features/afterAuth/components/StudentSide/UpcomingExams/UpcomingExam';
 
 import StudentListPage from '../../features/afterAuth/components/InstituteSide/StudentListComponent';
+import ResultsPage from '../../features/afterAuth/components/StudentSide/CompletedExams/ResultsPage';
 const PageLinks = () => {
   const { user, setUser } = useUser();
   const fetchUser = async () => {
@@ -80,6 +81,7 @@ const PageLinks = () => {
             <Route path='/student' element={<StudentLayout />}>
               <Route path='student-landing' element={<StudentLanding />} />
               <Route path='upcoming-exams' element={<UpcomingExam />} />
+              <Route path='completed-exams' element={<ResultsPage />} />
             </Route>
           </Route>
         </Route>
