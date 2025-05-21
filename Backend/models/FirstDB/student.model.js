@@ -64,21 +64,21 @@ const studentSchema = new Schema({
     phone: {
         type: Number,
         unique: [true, 'Phone number already exists'],
-        validate: {
-            validator: function (v) {
-                return /^[6-9]\d{9}$/.test(v); // Indian mobile number format
-            },
-            message: 'Please enter a valid 10-digit phone number',
-        },
+        // validate: {
+        //     validator: function (v) {
+        //         return /^[6-9]\d{9}$/.test(v); // Indian mobile number format
+        //     },
+        //     message: 'Please enter a valid 10-digit phone number',
+        // },
     },
     parentPhone: {
         type: Number,
-        validate: {
-            validator: function (v) {
-                return /^[6-9]\d{9}$/.test(v);
-            },
-            message: 'Please enter a valid 10-digit parent phone number',
-        },
+        // validate: {
+        //     validator: function (v) {
+        //         return /^[6-9]\d{9}$/.test(v);
+        //     },
+        //     message: 'Please enter a valid 10-digit parent phone number',
+        // },
     },
     parentEmail: {
         type: String,

@@ -62,17 +62,65 @@ export const uploadStudentExcel = async (req, res) => {
     const sheet = workbook.Sheets[sheetName];
     const rawData = xlsx.utils.sheet_to_json(sheet);
 
+    // const students = await Promise.all(
+    //   rawData.map(async (s, i) => {
+    //     if (!s.name || !s.email || !s.password || !s.gender) {
+    //       throw new Error(`Row ${i + 2} is missing required fields`);
+    //     }
+    //     return {
+    //       ...s,
+    //       password: await bcrypt.hash(s.password, 10)
+    //     };
+    //   })
+    // );
+
     const students = await Promise.all(
       rawData.map(async (s, i) => {
-        if (!s.name || !s.email || !s.password || !s.gender) {
+        const name = `${s.FirstName || ''} ${s.LastName || ''}`.trim();
+        const email = s.Email?.trim();
+        const password = s.Password || generateRandomPassword();
+        const gender = normalizeGender(s.Gender);
+        const phone = normalizePhone(s.PhoneNumber);
+        const parentPhone = normalizePhone(s.ParentPhone);
+        const parentEmail = s.ParentEmail?.trim();
+    
+        if (!name || !email || !password || !gender) {
           throw new Error(`Row ${i + 2} is missing required fields`);
         }
+    
         return {
-          ...s,
-          password: await bcrypt.hash(s.password, 10)
+          name,
+          email,
+          gender,
+          phone,
+          parentPhone,
+          parentEmail,
+          password: await bcrypt.hash(password, 10)
         };
       })
     );
+    
+    function normalizeGender(gender) {
+      if (!gender) return '';
+      const g = gender.toString().trim().toLowerCase();
+    
+      if (g === 'm' || g === 'male') return 'Male';
+      if (g === 'f' || g === 'female') return 'Female';
+      if (g === 'o' || g === 'others' || g === 'other') return 'Others';
+      
+      return ''; 
+    }
+    
+    
+    function normalizePhone(p) {
+      if (!p) return '';
+      const digits = p.toString().replace(/\D/g, '').slice(-10);
+      return digits;
+    }
+    
+    function generateRandomPassword() {
+      return 'Temp@1234'; 
+    }
 
     const inserted = await Student.insertMany(students);
 
