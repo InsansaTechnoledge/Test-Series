@@ -1,21 +1,19 @@
-import React, { useState } from 'react'
+import  { useState } from 'react'
 import HeadingUtil from '../../utility/HeadingUtil'
 import { RefreshCcw, Upload, Download, Plus, Trash2, Eye, EyeOff } from 'lucide-react'
 import { generatePassword } from '../../utility/GenerateRandomPassword'
-import { useQuery } from '@tanstack/react-query'
-import { fetchBatchList } from '../../../../utils/services/batchService'
-import { useUser } from '../../../../contexts/currentUserContext'
 import GuiderComponent from './components/GuiderComponent'
 import * as XLSX from 'xlsx'
-import Papa from 'papaparse'
 import { addSingleStudent , uploadStudentExcel } from '../../../../utils/services/studentService'
+import { useCachedBatches } from '../../../../hooks/useCachedBatches'
+
 const AddStudent = () => {
-  const { user } = useUser()
   const [batch, setBatch] = useState('')
   const [students, setStudents] = useState([getEmptyStudent()])
   const [showPassword, setShowPassword] = useState({})
   const [excelData, setExcelData] = useState([])
   const [activeTab, setActiveTab] = useState('manual') // 'manual' or 'bulk'
+  const {batches,isLoading}=useCachedBatches();
 
   // Generate empty student object
   function getEmptyStudent() {
@@ -126,25 +124,6 @@ const AddStudent = () => {
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Students')
     XLSX.writeFile(workbook, 'example_student_template.xlsx')
   }
-
-  // Fetch batch list
-  const fetchBatchListFunction = async () => {
-    const response = await fetchBatchList()
-    if (response.status !== 200) {
-      throw new Error('Network response was not ok')
-    }
-    return response.data
-  }
-
-  const { data: batches = [], isLoading } = useQuery({
-    queryKey: ['batches', user._id],
-    queryFn: fetchBatchListFunction,
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    staleTime: Infinity,
-    cacheTime: 24 * 60 * 60 * 1000,
-    retry: 0,
-  })
 
   // Submit form data
   const handleSubmit = async () => {

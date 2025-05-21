@@ -1,42 +1,15 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import profileDefault from '../../../../assests/Institute/profile.png';
 import HeadingUtil from '../../utility/HeadingUtil';
 import { Eye, EyeOff, RefreshCcw } from 'lucide-react';
 import { generatePassword } from '../../utility/GenerateRandomPassword';
-import { useQuery } from '@tanstack/react-query';
-import { fetchBatchList } from '../../../../utils/services/batchService';
-import { fetchAllRoleGroups } from '../../../../utils/services/RoleGroupService';
 import { createUser } from '../../../../utils/services/userService';
-import { useUser } from '../../../../contexts/currentUserContext';
+import { useCachedBatches } from '../../../../hooks/useCachedBatches';
+import { useCachedRoleGroup } from '../../../../hooks/useCachedRoleGroup';
 
 const CreateUser = () => {
-        const {user} = useUser();
-
-        const fetchBatchListFunction = async () => {
-        const response = await fetchBatchList();
-        if (response.status !== 200) {
-            throw new Error('Network response was not ok');
-        }
-        console.log(response.data);
-        return response.data;
-    }
-
-    const { data: batches = [], isLoading, isError } = useQuery({
-        queryKey: ['batches', user._id],
-        queryFn: () => fetchBatchListFunction(),
-        refetchOnWindowFocus: false,
-        refetchOnMount: false,
-        staleTime: Infinity,
-        cacheTime: 24 * 60 * 60 * 1000,
-        retry: 0,
-    });
-
-    const { data: roleGroups = [], isLoading: rolesLoading } = useQuery({
-        queryKey: ['roleGroups', user._id],
-        queryFn: fetchAllRoleGroups,
-        staleTime: Infinity,
-      });
-
+    const {batches, isLoading, isError} = useCachedBatches();
+    const {roleGroups, rolesLoading} = useCachedRoleGroup();
     const [batchesVisible, setBatchesVisible] = useState(false);
     const [formData, setFormData] = useState({});
     const [selectedBatches, setSelectedBatches] = useState([]);
