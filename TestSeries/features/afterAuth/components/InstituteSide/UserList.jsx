@@ -2,66 +2,47 @@ import React, { useEffect, useState } from 'react'
 import Heading from './Heading'
 import { Edit, Eye, NotepadText, PlusSquare, Search, Trash } from 'lucide-react'
 import HeadingUtil from '../../utility/HeadingUtil'
+import { useNavigate } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
+import {fetchUserList} from '../../../../utils/services/userService'
 
 const UserList = () => {
-    const users = [
-        {
-            _id: 1,
-            name: "User Demo",
-            role: "Admin",
-            batches: ["batch1", "batch2", "batch1", "batch2", "batch1", "batch2", "batch1", "batch2"]
-        },
-        {
-            _id: 2,
-            name: "User Demo",
-            role: "Admin",
-            batches: ["batch2", "batch1", "batch2", "batch1", "batch2"]
-        },
-        {
-            _id: 3,
-            name: "User Demo",
-            role: "Admin",
-            batches: ["batch1", "batch2", "batch1", "batch2", "batch1", "batch2", "batch1", "batch2"]
-        },
-        {
-            _id: 1,
-            name: "User Demo",
-            role: "Admin",
-            batches: ["batch1", "batch2", "batch1", "batch2", "batch1", "batch2", "batch1", "batch2"]
-        },
-        {
-            _id: 2,
-            name: "User Demo",
-            role: "Admin",
-            batches: ["batch2", "batch1", "batch2", "batch1", "batch2"]
-        },
-        {
-            _id: 3,
-            name: "User Demo",
-            role: "Admin",
-            batches: ["batch1", "batch2", "batch1", "batch2", "batch1", "batch2", "batch1", "batch2"]
-        },
-        {
-            _id: 1,
-            name: "User Demo",
-            role: "Admin",
-            batches: ["batch1", "batch2", "batch1", "batch2", "batch1", "batch2", "batch1", "batch2"]
-        },
-        {
-            _id: 2,
-            name: "User Demo",
-            role: "Admin",
-            batches: ["batch2", "batch1", "batch2", "batch1", "batch2"]
-        },
-        {
-            _id: 3,
-            name: "User Demo",
-            role: "Admin",
-            batches: ["batch1", "batch2", "batch1", "batch2", "batch1", "batch2", "batch1", "batch2"]
-        },
-    ]
+    const [filteredUsers, setFilteredUsers] = useState([]);
+       const [selectedYear, setSelectedYear] = useState('');
+   
+       const fetchUserListFunction = async () => {
+           const response = await fetchUserList();
+           if (response.status !== 200) {
+               throw new Error('Network response was not ok');
+           }
+           console.log(response.data);
+           setFilteredUsers(response.data);
+           return response.data;
+       }
+   
+       const { data: users = [], isLoading, isError } = useQuery({
+           queryKey: ['Users'],
+           queryFn: () => fetchUserListFunction(),
+           refetchOnWindowFocus: false,
+           refetchOnMount: false,
+           staleTime: Infinity,
+           cacheTime: 24 * 60 * 60 * 1000,
+           retry: 0,
+       });
 
+       
+   
+    //    const uniqueYears = [...new Set(users.map(user => user.year))];
+   
+    //    useEffect(() => {
+    //        if (selectedYear) {
+    //            setFilteredUsers(users.filter(user => user.year === parseInt(selectedYear)));
+    //        } else {
+    //            setFilteredBatches(users);
+    //        }
+    //    }, [selectedYear]);
     const [expandedUsers, setExpandedUsers] = useState({});
+    const navigate=useNavigate();
 
     const handleExpandedUsers = (id) => {
         setExpandedUsers(prev => ({
@@ -87,9 +68,12 @@ const UserList = () => {
                             <h2 className='font-bold text-lg text-blue-900'>Total Users: {users.length}</h2>
                         </div>
                         <div className='flex flex-col md:flex-row gap-4'>
-                            <button className='bg-blue-900 text-white py-2 px-4 rounded-md hover:cursor-pointer font-semibold hover:scale-105 flex space-x-2 transition-all duration-300'>
+                            <button className='bg-blue-900 text-white py-2 px-4 rounded-md hover:cursor-pointer font-semibold hover:scale-105 flex space-x-2 transition-all duration-300'
+                            onClick={()=>{
+                                navigate('/institute/create-user')
+                            }}>
                                 <span>
-                                    Add Admin 
+                                    Add User
                                 </span>
                                 <div>
                                     <PlusSquare />
@@ -148,7 +132,7 @@ const UserList = () => {
                                                             ?
                                                             <>
                                                                 {
-                                                                    user.batches.map((batch, idx) => (
+                                                                    user.batch?.map((batch, idx) => (
                                                                         <div key={idx}
                                                                             className='flex rounded-md bg-blue-50  px-4 py-1'
                                                                         >
@@ -165,7 +149,7 @@ const UserList = () => {
                                                             </>
                                                             :
                                                             <>
-                                                                {user.batches.slice(0, 2).map((batch, idx) => (
+                                                                {user.batch?.slice(0, 2).map((batch, idx) => (
                                                                     <div key={idx}
                                                                         className='flex rounded-md bg-blue-50  px-4 py-1'
                                                                     >
@@ -173,12 +157,15 @@ const UserList = () => {
                                                                     </div>
 
                                                                 ))}
-                                                                <div
-                                                                    className='my-auto hover:cursor-pointer hover:underline'
-                                                                    onClick={() => handleExpandedUsers(user?._id)}
-                                                                >
-                                                                    ...{user.batches.length - 2} more
-                                                                </div>
+                                                                {
+                                                                    user.batch?.length > 2 &&
+                                                                    <div
+                                                                        className='my-auto hover:cursor-pointer hover:underline'
+                                                                        onClick={() => handleExpandedUsers(user?._id)}
+                                                                    >
+                                                                        ... + {user.batch?.length - 2} more
+                                                                    </div>
+                                                                }
                                                             </>
 
                                                     }
@@ -186,7 +173,7 @@ const UserList = () => {
                                             </td>
                                             <td className="px-6 py-4 ">
                                                 <div className='mx-auto py-1 px-4 rounded-full bg-blue-50 w-fit'>
-                                                    {user.role}
+                                                    {user.roleId}
                                                 </div>
                                             </td>
                                             <td className="flex justify-center mx-auto w-fit px-6 py-4 gap-8">
