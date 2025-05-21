@@ -159,7 +159,9 @@ export default function OrganizationLayout() {
                 ml-3 overflow-hidden transition-all duration-200
                 ${showLabels ? 'w-40' : 'w-0'}
               `}>
-                <span className="whitespace-nowrap">About Organization</span>
+              <button onClick={() => navigate('/institute/institute-landing')} className="whitespace-nowrap">
+                About Organization
+              </button>
               </div>
             </button>
             

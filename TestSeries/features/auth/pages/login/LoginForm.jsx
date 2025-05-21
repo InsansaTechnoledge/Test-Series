@@ -1,9 +1,9 @@
 import { KeyRound, LogIn, Mail } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useState  } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { orgLogin,studentLogin } from '../../../../utils/services/authService';
 import { useUser } from '../../../../contexts/currentUserContext';
-
+import { useNavigate } from 'react-router-dom';
 
 const LoginForm = () => {
   const {user,setUser} = useUser();
@@ -16,6 +16,7 @@ const LoginForm = () => {
   });
 
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate()
 
   const validateField = (name, value) => {
     switch (name) {
@@ -79,12 +80,16 @@ const LoginForm = () => {
         console.log(response);
         if(response.status===200)
         {
+          
           console.log("institute logged in successfully!!")
           setFormData({
             email:'',
             password:''
           });
          setUser(response.data);
+
+         navigate('/institute/institute-landing'); 
+          
         }
         
       }catch(err){
@@ -106,11 +111,14 @@ const LoginForm = () => {
         email:'',
         password:''
       });
+
+      
       console.log("student logged in successfully!!")
       setErrors({});
-      }
+    }
     
-      setUser(response.data);
+    setUser(response.data);
+    navigate('/student-landing');
     }catch(err){
       console.log(err);
         setErrors(err.response.data.errors || "Something went wrong");
