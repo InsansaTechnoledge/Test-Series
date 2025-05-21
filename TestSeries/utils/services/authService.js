@@ -18,5 +18,9 @@ export const checkAuth=async ()=>{
     return response.data;
 }
 
+export const logout = async () => {
+    const response = await api.post(`/v1/auth/logout`);
+    return response.data;
+}
 
 

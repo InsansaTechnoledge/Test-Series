@@ -5,10 +5,14 @@ import { Eye, EyeOff } from 'lucide-react';
 import { generatePassword } from '../../utility/GenerateRandomPassword';
 import { useQuery } from '@tanstack/react-query';
 import { fetchBatchList } from '../../../../utils/services/batchService';
+import { useUser } from '../../../../contexts/currentUserContext';
+import { useNavigate } from 'react-router-dom';
+import SessionExpireError from '../../../../components/Error/SessionExpireError';
 
 
 const AddStudent = () => {
 
+  const {user} = useUser();
   const [formData, setFormData] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -44,7 +48,7 @@ const AddStudent = () => {
   }
 
   const { data: batches = [], isLoading, isError } = useQuery({
-    queryKey: ['batches'],
+    queryKey: ['batches', user._id],
     queryFn: () => fetchBatchListFunction(),
     refetchOnWindowFocus: false,
     refetchOnMount: false,

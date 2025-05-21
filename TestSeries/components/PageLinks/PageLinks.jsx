@@ -18,6 +18,8 @@ import CreateUser from '../../features/afterAuth/components/InstituteSide/Create
 import CreateBatch from '../../features/afterAuth/components/InstituteSide/CreateBatch';
 import CreateStudent from '../../features/afterAuth/components/InstituteSide/AddStudent';
 import FeatureBasedRoleGroups from '../../features/afterAuth/components/InstituteSide/RoleGroup';
+import SessionExpireError from '../Error/SessionExpireError';
+import InstituteLandingPage from '../../features/afterAuth/components/InstituteSide/components/InstituteLandingPage';
 
 const PageLinks = () => {
   const { user, setUser } = useUser();
@@ -64,9 +66,11 @@ const PageLinks = () => {
             <Route path='create-batch' element={<CreateBatch />} />
             <Route path='add-student' element={<CreateStudent />} />
             <Route path='create-role-group' element={<FeatureBasedRoleGroups />} />
-
+            <Route path='add-student' element={<CreateStudent />} />
+            <Route path='institute-landing' element={<InstituteLandingPage />} />
             <Route path='*' element={<div>Invalid path</div>} />
           </Route>
+          <Route path='session-expired' element={<SessionExpireError />} />
           <Route path='student-landing' element={<StudentLanding />} />
         </Route>
 
