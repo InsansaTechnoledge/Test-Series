@@ -1,37 +1,25 @@
 import Heading from './Heading'
-import { useQuery } from '@tanstack/react-query'
-import { fetchBatchList } from '../../../../utils/services/batchService';
 import { Edit, Eye, LucidePlusSquare, NotepadText, PlusSquare, Search, Trash } from 'lucide-react'
 import { useEffect, useState } from 'react';
 import HeadingUtil from '../../utility/HeadingUtil';
-import {  useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useCachedBatches } from '../../../../hooks/useCachedBatches';
 import RefreshButton from '../../utility/RefreshButton';
+import { useQueryClient } from '@tanstack/react-query';
+import { useUser } from '../../../../contexts/currentUserContext';
 
 const BatchList = () => {
-    const navigate=useNavigate();
+    const navigate = useNavigate();
 
-    const [filteredBatches, setFilteredBatches] = useState([]);
+    const {user} = useUser();
+    const { batches, isloading, isError } = useCachedBatches();
+    const [filteredBatches, setFilteredBatches] = useState(batches);
     const [selectedYear, setSelectedYear] = useState('');
+    const queryClient = useQueryClient();
 
-    const fetchBatchListFunction = async () => {
-        const response = await fetchBatchList();
-        if (response.status !== 200) {
-            throw new Error('Network response was not ok');
-        }
-        console.log(response.data);
-        setFilteredBatches(response.data);
-        return response.data;
+    const refreshFunction = () => {
+        queryClient.invalidateQueries(['batches', user._id]);
     }
-
-    const { data: batches = [], isLoading, isError } = useQuery({
-        queryKey: ['batches'],
-        queryFn: () => fetchBatchListFunction(),
-        refetchOnWindowFocus: false,
-        refetchOnMount: false,
-        staleTime: Infinity,
-        cacheTime: 24 * 60 * 60 * 1000,
-        retry: 0,
-    });
 
     const uniqueYears = [...new Set(batches.map(batch => batch.year))];
 
@@ -43,14 +31,20 @@ const BatchList = () => {
         }
     }, [selectedYear]);
 
+    useEffect(()=>{
+        if(batches){
+            setFilteredBatches(batches);
+        }
+    },[batches])
+
     return (
         <>
             <div className='h-full flex flex-col'>
                 <div className=''>
                     {/* <Heading title={selectedYear ? `Batch List for ${selectedYear}` : "All Batches"} */}
-                    <HeadingUtil heading={selectedYear ? `Batch List for ${selectedYear}` : "All Batches"} description="you can view list of all batches in your institute"/>
-      
-                    
+                    <HeadingUtil heading={selectedYear ? `Batch List for ${selectedYear}` : "All Batches"} description="you can view list of all batches in your institute" />
+
+
                 </div>
                 <div className='rounded-xl p-5 bg-gray-200 inset-shadow-md flex-grow flex flex-col overflow-auto'>
                     <div className='flex flex-col lg:flex-row justify-between gap-4 mb-5'>
@@ -58,9 +52,9 @@ const BatchList = () => {
                             <h2 className='font-bold text-lg text-blue-900'>Total Batches: {filteredBatches?.length}</h2>
                         </div>
                         <div className='flex flex-col md:flex-row gap-4'>
-                            <RefreshButton />
+                            <RefreshButton refreshFunction={refreshFunction}/>
                             <button className='bg-blue-900 text-white py-2 px-4 rounded-md hover:cursor-pointer font-semibold hover:scale-105 flex space-x-2 transition-all duration-300'
-                            onClick={() => navigate('/institute/create-batch')}>
+                                onClick={() => navigate('/institute/create-batch')}>
                                 <span>
                                     Create Batch
                                 </span>
@@ -135,11 +129,11 @@ const BatchList = () => {
 
                                                 <button
                                                     className=" font-medium text-black hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer">
-                                                    <Eye/>
+                                                    <Eye />
                                                 </button>
                                                 <button
                                                     className="font-medium text-blue-500 hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer">
-                                                    <Edit/>
+                                                    <Edit />
                                                 </button>
                                                 <button
                                                     className="font-medium text-red-500 hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer">
