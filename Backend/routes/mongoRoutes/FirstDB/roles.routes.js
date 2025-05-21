@@ -5,8 +5,8 @@ const router = express.Router();
 
 router.post('/', addRole);
 router.get('/', fetchRolesForOrganization);
+router.patch('/', updateRole);
 router.delete('/:id', deleteRole);
-router.patch('/:id', updateRole);
 router.get('/:id', fetchRoleDetails);
 
 export default router;

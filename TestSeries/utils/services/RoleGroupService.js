@@ -5,7 +5,7 @@ export const postRoleGroup = async (groupData) => {
       
       name: groupData.name,
       description: groupData.description,
-      featureIds: groupData.features,
+      featureIds: groupData.features.map(f => (typeof f === 'string' ? f : f._id)),
     });
     return response.data;
   };
@@ -15,3 +15,19 @@ export const fetchAllRoleGroups = async () => {
     return response.data.data; 
 };
   
+export const deleteRoleGroup = async (groupId) => {
+  const response = await api.delete(`/v1/role/${groupId}`);
+  return response.data;
+};
+
+export const updateRoleGroup = async (id, groupData) => {
+  const response = await api.patch('/v1/role', {
+    id,
+    name: groupData.name,
+    description: groupData.description,
+    featureIds: groupData.features.map(f => (typeof f === 'string' ? f : f._id)),
+  });
+  return response.data;
+};
+
+

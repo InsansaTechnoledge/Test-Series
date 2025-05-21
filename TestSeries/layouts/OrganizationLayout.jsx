@@ -56,10 +56,10 @@ export default function OrganizationLayout() {
     <>
       {
         showLogoutModal
-        ?
-        <LogoutModal setShowLogoutModal={setShowLogoutModal}/>
-        :
-        null
+          ?
+          <LogoutModal setShowLogoutModal={setShowLogoutModal} />
+          :
+          null
       }
       <Navbar />
       <div className="pt-15 flex h-screen w-screen overflow-hidden">
@@ -178,9 +178,9 @@ export default function OrganizationLayout() {
               </button>
 
               {/* Logout Button */}
-              <button 
-              onClick={()=>setShowLogoutModal(true)}
-              className="flex items-center w-full text-gray-300 p-3 hover:bg-indigo-800 hover:text-white rounded-lg transition-colors duration-200">
+              <button
+                onClick={() => setShowLogoutModal(true)}
+                className="flex items-center w-full text-gray-300 p-3 hover:bg-indigo-800 hover:text-white rounded-lg transition-colors duration-200">
                 <div className="w-6 flex-shrink-0 flex justify-center">
                   <LogOut className="w-6 h-6" />
                 </div>

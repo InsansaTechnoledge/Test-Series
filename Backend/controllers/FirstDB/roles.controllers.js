@@ -78,20 +78,58 @@ export const deleteRole = async (req, res) => {
     }
 }
 
+// export const updateRole = async (req, res) => {
+//     try {
+//         const { id } = req.params;
+//         const roleData = req.body;
+//         const role = await Role.findByIdAndUpdate(id, roleData, {new: true});
+
+//         return new APIResponse(200, role, 'Role updated successfully').send(res);
+//     }
+//     catch (err) {
+//         console.log(err);
+//         return new APIError(err?.response?.status || 500, ['Something went wrong while deleting role', err.message]).send(res);
+//     }
+// }
+
 export const updateRole = async (req, res) => {
     try {
-        const { id } = req.params;
-        const roleData = req.body;
-        const role = await Role.findByIdAndUpdate(id, roleData, {new: true});
-
-        return new APIResponse(200, role, 'Role updated successfully').send(res);
+      const { id, name, description, featureIds } = req.body;
+  
+      if (!id) {
+        return new APIError(400, ['Missing role group ID']).send(res);
+      }
+  
+      const updateData = {
+        name,
+        description,
+        features: Array.isArray(featureIds)
+          ? featureIds.map(f => new Types.ObjectId(f))
+          : [],
+      };
+  
+      // Update and fetch updated version
+      const updatedRole = await Role.findByIdAndUpdate(id, updateData, {
+        new: true,
+      }).populate('features');
+  
+      if (!updatedRole) {
+        return new APIError(404, ['Role group not found']).send(res);
+      }
+  
+      return new APIResponse(200, updatedRole, 'Role updated successfully').send(res);
+    } catch (err) {
+      console.error(err);
+      return new APIError(
+        err?.response?.status || 500,
+        ['Something went wrong while updating role', err.message]
+      ).send(res);
     }
-    catch (err) {
-        console.log(err);
-        return new APIError(err?.response?.status || 500, ['Something went wrong while deleting role', err.message]).send(res);
-    }
-}
+  };
+  
+  
 
+  
 export const fetchRolesForOrganization = async (req,res) => {
     try{
 

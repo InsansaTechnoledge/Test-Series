@@ -3,31 +3,36 @@ import profileDefault from '../../../../assests/Institute/profile.png';
 import HeadingUtil from '../../utility/HeadingUtil';
 import { Eye, EyeOff, RefreshCcw } from 'lucide-react';
 import { generatePassword } from '../../utility/GenerateRandomPassword';
+import { useQuery } from '@tanstack/react-query';
+import { fetchBatchList } from '../../../../utils/services/batchService';
+import { fetchAllRoleGroups } from '../../../../utils/services/RoleGroupService';
+import { createUser } from '../../../../utils/services/userService';
 
 const CreateUser = () => {
+        const fetchBatchListFunction = async () => {
+        const response = await fetchBatchList();
+        if (response.status !== 200) {
+            throw new Error('Network response was not ok');
+        }
+        console.log(response.data);
+        return response.data;
+    }
 
-    const batches = [
-        {
-            _id: 1,
-            name: "BE-4",
-            year: 2025
-        },
-        {
-            _id: 2,
-            name: "BE-4",
-            year: 2025
-        },
-        {
-            _id: 3,
-            name: "BE-4",
-            year: 2025
-        },
-        {
-            _id: 4,
-            name: "BE-4",
-            year: 2025
-        },
-    ]
+    const { data: batches = [], isLoading, isError } = useQuery({
+        queryKey: ['batches'],
+        queryFn: () => fetchBatchListFunction(),
+        refetchOnWindowFocus: false,
+        refetchOnMount: false,
+        staleTime: Infinity,
+        cacheTime: 24 * 60 * 60 * 1000,
+        retry: 0,
+    });
+
+    const { data: roleGroups = [], isLoading: rolesLoading } = useQuery({
+        queryKey: ['roleGroups'],
+        queryFn: fetchAllRoleGroups,
+        staleTime: Infinity,
+      });
 
     const [batchesVisible, setBatchesVisible] = useState(false);
     const [formData, setFormData] = useState({});
@@ -35,32 +40,66 @@ const CreateUser = () => {
     const [profile, setProfile] = useState(null);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [error, setError] = useState({});
 
+  const validateField = (name, value) => {
+    switch (name) {
+      case 'firstName':
+        return value.length >= 3 && value.length <= 32 ? '' : 'Name must be between 3-32 characters';
+       case 'lastName':
+        return value.length >= 3 && value.length <= 32 ? '' : 'Name must be between 3-32 characters';
+      case 'email':
+        return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value) &&
+          value.length >= 10 && value.length <= 60 ? '' : 'Please enter a valid email address';
+      case 'password':
+        const hasUpperCase = /[A-Z]/.test(value);
+        const hasLowerCase = /[a-z]/.test(value);
+        const hasNumbers = /\d/.test(value);
+        const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value);
+        const isLongEnough = value.length >= 8;
+
+        if (!isLongEnough || !hasUpperCase || !hasLowerCase || !hasNumbers || !hasSpecialChar) {
+          return 'Password must be at least 8 characters with uppercase, lowercase, number, and special character';
+        }
+        return '';
+      case 'confirm_password':
+        return value === formData?.password ? '' : 'Passwords do not match';
+      case 'userId':
+        return value===''?'userId of institute is required':'';
+      default:
+        return '';
+    }
+  };
 
     useEffect(() => {
         console.log(formData);
     }, [formData]);
 
     const onChangeHandler = (e) => {
-        const name = e.target.name;
-        const value = e.target.value;
+        const {name,value} = e.target;
+        const error=validateField(name, value);
 
         setFormData((prev) => ({
             ...prev,
             [name]: value
         }));
+
+        setError((prev) => ({
+            ...prev,
+            [name]: error
+        }));
     }
 
     const toggleBatch = (batch) => {
-        const key = batch._id;
+        const key = batch.id;
 
         setSelectedBatches((prev) => {
             const exists = prev.some(
-                (b) => b._id === key
+                (b) => b.id === key
             );
             if (exists) {
                 return prev.filter(
-                    (b) => b._id !== key
+                    (b) => b.id !== key
                 );
             } else {
                 return [...prev, batch];
@@ -77,9 +116,56 @@ const CreateUser = () => {
 
     function generateRandomPassword() {
         const password = generatePassword();
+        setFormData(prev => ({
+            ...prev,
+            password: password,
+            confirm_password: password
+        }));
         document.getElementById("password").value = password;
-        document.getElementById("cpassword").value = password;
+        document.getElementById("confirm_password").value = password;
+
+        setError(prev => ({
+            ...prev,
+            password: '',
+            confirm_password:''
+        }));
     }
+
+    const onsubmitForm = async () => {
+        console.log("Form submitted");
+        console.log(formData);
+        
+
+        const payload=new FormData();
+        payload.append("name",`${formData.firstName} ${formData.lastName}`);
+        for (let key in formData) {
+        if(key!== ("profilePhoto" && "firstName"  && "lastName" )){
+            payload.append(key, formData[key]);
+        }
+        }
+        if (profile) {
+            payload.append('profilePhoto', profile);
+        }
+        console.log(payload);
+        try{
+
+        const response = await createUser(payload);
+        console.log(response);
+        if (response.status === 200) {
+            console.log("User created successfully");
+            alert("successful!!")
+        } else {
+            console.log("Error creating user");
+        }
+    }catch (error) {
+        console.error("Error creating user:", error);
+        setError({
+            ...error,
+            form: error.response.data.message || error.message
+        });
+    }
+
+    };
 
     return (
         <div className='flex flex-col'>
@@ -132,24 +218,27 @@ const CreateUser = () => {
                 </div>
                 <div className='grid lg:grid-cols-2 gap-x-26 mx-auto gap-y-8 mt-10 w-4/5'>
                     <div className='flex flex-col gap-2'>
-                        <label htmlFor='fname' className='text-lg font-semibold'>First name<span className='text-red-600'>*</span></label>
+                        <label htmlFor='firstName' className='text-lg font-semibold'>First name<span className='text-red-600'>*</span></label>
                         <input type='text'
-                            id='fname'
-                            name='fname'
+                            id='firstName'
+                            name='firstName'
                             onChange={(e) => onChangeHandler(e)}
                             className='p-2 bg-white rounded-md'
                             placeholder='Enter first name'
                         />
+                        {error.firstName && <p className='text-red-500 text-sm'>{error.firstName}</p>}
+
                     </div>
                     <div className='flex flex-col gap-2'>
-                        <label htmlFor='lname' className='text-lg font-semibold'>Last name<span className='text-red-600'>*</span></label>
+                        <label htmlFor='lastName' className='text-lg font-semibold'>Last name<span className='text-red-600'>*</span></label>
                         <input type='text'
-                            id='lname'
-                            name='lname'
+                            id='lastName'
+                            name='lastName'
                             onChange={(e) => onChangeHandler(e)}
                             className='p-2 bg-white rounded-md'
                             placeholder='Enter last name'
                         />
+                        {error.lastName && <p className='text-red-500 text-sm'>{error.lastName}</p>}
                     </div>
                     <div className='flex flex-col gap-2'>
                         <label htmlFor='email' className='text-lg font-semibold'>Email<span className='text-red-600'>*</span></label>
@@ -160,6 +249,7 @@ const CreateUser = () => {
                             className='p-2 bg-white rounded-md'
                             placeholder='Enter email'
                         />
+                        {error.email && <p className='text-red-500 text-sm'>{error.email}</p>}
                     </div>
                     <div className='flex flex-col gap-2'>
                         <label htmlFor='password' className='text-lg font-semibold'>Password<span className='text-red-600'>*</span></label>
@@ -171,7 +261,7 @@ const CreateUser = () => {
                                     name='password'
                                     onChange={(e) => onChangeHandler(e)}
                                     className='p-2 bg-white rounded-md w-full pr-10'
-                                    placeholder='Enter password'
+                                    placeholder='Enter password or Generate the password on click'
                                 />
                                 <div
                                     className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-600"
@@ -179,6 +269,7 @@ const CreateUser = () => {
                                 >
                                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                                 </div>
+                                {error.password && <p className='text-red-500 text-sm'>{error.password}</p>}
                             </div>
                             <button
                                 onClick={generateRandomPassword}
@@ -188,12 +279,12 @@ const CreateUser = () => {
                         </div>
                     </div>
                     <div className='flex flex-col gap-2'>
-                        <label htmlFor='cpassword' className='text-lg font-semibold'>Confirm Password<span className='text-red-600'>*</span></label>
+                        <label htmlFor='confirm_password' className='text-lg font-semibold'>Confirm Password<span className='text-red-600'>*</span></label>
                         <div className='relative w-full'>
                             <input
                                 type={showConfirmPassword ? 'text' : 'password'}
-                                id='cpassword'
-                                name='cpassword'
+                                id='confirm_password'
+                                name='confirm_password'
                                 onChange={(e) => onChangeHandler(e)}
                                 className='p-2 bg-white rounded-md w-full pr-10'
                                 placeholder='Confirm password'
@@ -204,17 +295,19 @@ const CreateUser = () => {
                             >
                                 {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                             </div>
+                            {error.confirm_password && <p className='text-red-500 text-sm'>{error.confirm_password}</p>}
                         </div>
                     </div>
                     <div className='flex flex-col gap-2'>
-                        <label htmlFor='userid' className='text-lg font-semibold'>User ID</label>
+                        <label htmlFor='userId' className='text-lg font-semibold'>User ID <span className='text-red-600'>*</span></label>
                         <input type='test'
-                            id='userid'
-                            name='userid'
+                            id='userId'
+                            name='userId'
                             onChange={(e) => onChangeHandler(e)}
                             className='p-2 bg-white rounded-md'
                             placeholder='Enter User ID provided by institute'
                         />
+                         {error.confirm_password && <p className='text-red-500 text-sm'>{error.confirm_password}</p>}
                     </div>
                     <div className='flex flex-col gap-2'>
                         <label htmlFor='gender' className='text-lg font-semibold'>Gender<span className='text-red-600'>*</span></label>
@@ -237,7 +330,13 @@ const CreateUser = () => {
                             name='role'
                             onChange={(e) => onChangeHandler(e)}
                             id='role' className='p-2 bg-white rounded-md'>
-                            <option>--select role--</option>
+                            <option value=''>--select role--</option>
+                            {
+                                roleGroups.map((role, idx) => (
+                                    <option key={idx} value={role._id}>{role.name} - {role.description}</option>
+                                ))
+                            }
+
                         </select>
 
                     </div>
@@ -264,7 +363,7 @@ const CreateUser = () => {
                                             <div
                                                 onClick={() => toggleBatch(batch)}
                                                 key={idx}
-                                                className={`hover:cursor-pointer rounded-full ${selectedBatches.some(b => b._id === batch._id) ? 'bg-green-500' : 'bg-white'} py-1 px-4`}>
+                                                className={`hover:cursor-pointer rounded-full ${selectedBatches.some(b => b.id === batch.id) ? 'bg-green-500' : 'bg-white'} py-1 px-4`}>
                                                 {batch.name} - {batch.year}
                                             </div>
                                         ))
@@ -296,9 +395,13 @@ const CreateUser = () => {
                         }
                     </div>
                     <div className='flex flex-col gap-2 mt-10'>
-                        <button className='bg-blue-900 px-4 py-2 rounded-md w-fit text-white'>
+                        <button className='bg-blue-900 px-4 py-2 rounded-md w-fit text-white'
+                        onClick={(e)=>{
+                            onsubmitForm();
+                        }}>
                             Submit Form
                         </button>
+                        {error.form && <p className='text-red-500 text-sm'>{error.form}</p>}
                     </div>
                 </div>
             </div >
