@@ -1,6 +1,6 @@
 import { Atom, Codepen, GraduationCap } from 'lucide-react';
 import React from 'react'
-import HeadingUtil from '../../utility/HeadingUtil';
+import HeadingUtil from '../../../utility/HeadingUtil';
 
 const subjects = ["Physics", "Chemistry", "Maths", "English", "Computer Science"];
 

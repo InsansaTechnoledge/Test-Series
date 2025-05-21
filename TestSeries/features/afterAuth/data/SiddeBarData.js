@@ -30,5 +30,10 @@ export const controls = [
         name: "Add Student",
         path: "add-student",
         icon: User
+    },
+    {
+        name: "Student List",
+        path: "student-list",
+        icon: User
     }
 ]
