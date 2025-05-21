@@ -8,8 +8,8 @@ import { useCachedBatches } from '../../../../hooks/useCachedBatches';
 import { useCachedRoleGroup } from '../../../../hooks/useCachedRoleGroup';
 
 const CreateUser = () => {
-    const {batches, isLoading, isError} = useCachedBatches();
-    const {roleGroups, rolesLoading} = useCachedRoleGroup();
+    const { batches, isLoading, isError } = useCachedBatches();
+    const { roleGroups, rolesLoading } = useCachedRoleGroup();
     const [batchesVisible, setBatchesVisible] = useState(false);
     const [formData, setFormData] = useState({});
     const [selectedBatches, setSelectedBatches] = useState([]);
@@ -18,42 +18,44 @@ const CreateUser = () => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [error, setError] = useState({});
 
-  const validateField = (name, value) => {
-    switch (name) {
-      case 'firstName':
-        return value.length >= 3 && value.length <= 32 ? '' : 'Name must be between 3-32 characters';
-       case 'lastName':
-        return value.length >= 3 && value.length <= 32 ? '' : 'Name must be between 3-32 characters';
-      case 'email':
-        return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value) &&
-          value.length >= 10 && value.length <= 60 ? '' : 'Please enter a valid email address';
-      case 'password':
-        const hasUpperCase = /[A-Z]/.test(value);
-        const hasLowerCase = /[a-z]/.test(value);
-        const hasNumbers = /\d/.test(value);
-        const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value);
-        const isLongEnough = value.length >= 8;
+    const validateField = (name, value) => {
+        switch (name) {
+            case 'firstName':
+                return value.length >= 3 && value.length <= 32 ? '' : 'Name must be between 3-32 characters';
+            case 'lastName':
+                return value.length >= 3 && value.length <= 32 ? '' : 'Name must be between 3-32 characters';
+            case 'email':
+                return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value) &&
+                    value.length >= 10 && value.length <= 60 ? '' : 'Please enter a valid email address';
+            case 'password':
+                const hasUpperCase = /[A-Z]/.test(value);
+                const hasLowerCase = /[a-z]/.test(value);
+                const hasNumbers = /\d/.test(value);
+                const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value);
+                const isLongEnough = value.length >= 8;
 
-        if (!isLongEnough || !hasUpperCase || !hasLowerCase || !hasNumbers || !hasSpecialChar) {
-          return 'Password must be at least 8 characters with uppercase, lowercase, number, and special character';
+                if (!isLongEnough || !hasUpperCase || !hasLowerCase || !hasNumbers || !hasSpecialChar) {
+                    return 'Password must be at least 8 characters with uppercase, lowercase, number, and special character';
+                }
+                return '';
+            case 'confirm_password':
+                return value === formData?.password ? '' : 'Passwords do not match';
+            case 'userId':
+                return value === '' ? 'userId of institute is required' : '';
+            case 'gender':
+                return value ? '' : 'Please select the gender';
+            default:
+                return '';
         }
-        return '';
-      case 'confirm_password':
-        return value === formData?.password ? '' : 'Passwords do not match';
-      case 'userId':
-        return value===''?'userId of institute is required':'';
-      default:
-        return '';
-    }
-  };
+    };
 
     useEffect(() => {
         console.log(formData);
     }, [formData]);
 
     const onChangeHandler = (e) => {
-        const {name,value} = e.target;
-        const error=validateField(name, value);
+        const { name, value } = e.target;
+        const error = validateField(name, value);
 
         setFormData((prev) => ({
             ...prev,
@@ -103,44 +105,44 @@ const CreateUser = () => {
         setError(prev => ({
             ...prev,
             password: '',
-            confirm_password:''
+            confirm_password: ''
         }));
     }
 
     const onsubmitForm = async () => {
         console.log("Form submitted");
         console.log(formData);
-        
 
-        const payload=new FormData();
-        payload.append("name",`${formData.firstName} ${formData.lastName}`);
-        payload.append('batch',selectedBatches.map(batch => batch.id));
+
+        const payload = new FormData();
+        payload.append("name", `${formData.firstName} ${formData.lastName}`);
+        payload.append('batch', selectedBatches.map(batch => batch.id));
         for (let key in formData) {
-        if(key!== ("profilePhoto" && "firstName"  && "lastName" )){
-            payload.append(key, formData[key]);
-        }
+            if (key !== ("profilePhoto" && "firstName" && "lastName")) {
+                payload.append(key, formData[key]);
+            }
         }
         if (profile) {
             payload.append('profilePhoto', profile);
         }
         console.log(payload);
-        try{
+        try {
 
-        const response = await createUser(payload);
-        console.log(response);
-        if (response.status === 200) {
-            console.log("User created successfully");
-            alert("successful!!")
-        } else {
-            console.log("Error creating user");
+            const response = await createUser(payload);
+            console.log(response);
+            if (response.status === 200) {
+                console.log("User created successfully");
+                alert("successful!!")
+            } else {
+                console.log("Error creating user");
+            }
+        } catch (error) {
+            console.error("Error creating user:", error);
+            setError({
+                ...error,
+                form: error.response.data.errors[1] || error.message
+            });
         }
-    }catch (error) {
-        console.error("Error creating user:", error);
-        setError({
-            ...error,
-            form: error.response.data.errors[1] || error.message
-        });
-    }
 
     };
 
@@ -162,35 +164,35 @@ const CreateUser = () => {
                     </div>
 
                     <div className='flex flex-col justify-center'>
-                    <label className='text-center bg-blue-900 h-fit text-white py-2 px-3 rounded-md cursor-pointer'>
-                        {
-                            profile
-                                ?
-                                "Change profile photo"
-                                :
-                                "Upload profile photo"
+                        <label className='text-center bg-blue-900 h-fit text-white py-2 px-3 rounded-md cursor-pointer'>
+                            {
+                                profile
+                                    ?
+                                    "Change profile photo"
+                                    :
+                                    "Upload profile photo"
 
-                        }
-                       
-                        <input
-                            type='file'
-                            accept='image/*'
-                            className='hidden'
-                            onChange={(e) => {
-                                const file = e.target.files[0];
-                                if (file) {
-                                    const imageUrl = URL.createObjectURL(file);
-                                    setProfile(imageUrl); // show image
-                                    setFormData(prev => ({
-                                        ...prev,
-                                        profilePhoto: file // store file for upload
-                                    }));
-                                }
-                            }}
-                        />
-                    </label>
-                    <span className='text-sm text-gray-600'>you may add the profile photo of the user.</span>
-                     </div>
+                            }
+
+                            <input
+                                type='file'
+                                accept='image/*'
+                                className='hidden'
+                                onChange={(e) => {
+                                    const file = e.target.files[0];
+                                    if (file) {
+                                        const imageUrl = URL.createObjectURL(file);
+                                        setProfile(imageUrl); // show image
+                                        setFormData(prev => ({
+                                            ...prev,
+                                            profilePhoto: file // store file for upload
+                                        }));
+                                    }
+                                }}
+                            />
+                        </label>
+                        <span className='text-sm text-gray-600'>you may add the profile photo of the user.</span>
+                    </div>
 
                 </div>
                 <div className='grid lg:grid-cols-2 gap-x-26 mx-auto gap-y-8 mt-10 w-4/5'>
@@ -284,7 +286,7 @@ const CreateUser = () => {
                             className='p-2 bg-white rounded-md'
                             placeholder='Enter User ID provided by institute'
                         />
-                         {error.confirm_password && <p className='text-red-500 text-sm'>{error.confirm_password}</p>}
+                        {error.confirm_password && <p className='text-red-500 text-sm'>{error.confirm_password}</p>}
                     </div>
                     <div className='flex flex-col gap-2'>
                         <label htmlFor='gender' className='text-lg font-semibold'>Gender<span className='text-red-600'>*</span></label>
@@ -373,9 +375,9 @@ const CreateUser = () => {
                     </div>
                     <div className='flex flex-col gap-2 mt-10'>
                         <button className='bg-blue-900 px-4 py-2 rounded-md w-fit text-white'
-                        onClick={(e)=>{
-                            onsubmitForm();
-                        }}>
+                            onClick={(e) => {
+                                onsubmitForm();
+                            }}>
                             Submit Form
                         </button>
                         {error.form && <p className='text-red-500 text-sm'>{error.form}</p>}
