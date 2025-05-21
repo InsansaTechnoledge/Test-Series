@@ -6,35 +6,48 @@ import RefreshButton from '../../utility/RefreshButton'
 import { useCachedUser } from '../../../../hooks/useCachedUser'
 import { useCachedBatches } from '../../../../hooks/useCachedBatches'
 import { useCachedRoleGroup } from '../../../../hooks/useCachedRoleGroup'
+import { useQueryClient } from '@tanstack/react-query'
+import { useUser } from '../../../../contexts/currentUserContext'
 
 const UserList = () => {
-       const { users, isLoading, isError } = useCachedUser();
-           const { batches } = useCachedBatches();
-    const {roleGroups,rolesLoading} = useCachedRoleGroup();
+    const {user} = useUser();
+    const { users, isLoading, isError } = useCachedUser();
+    const { batches } = useCachedBatches();
+    const { roleGroups, rolesLoading } = useCachedRoleGroup();
     const [filteredUsers, setFilteredUsers] = useState(users);
-       const [selectedYear, setSelectedYear] = useState('');
+    const [selectedYear, setSelectedYear] = useState('');
+    const queryClient = useQueryClient();
 
+    const refreshFunction = () => {
+        queryClient.invalidateQueries(['Users', user._id]);
+        queryClient.invalidateQueries(['roleGroups', user._id]);
+        queryClient.invalidateQueries(['batches', user._id]);
+    }
 
+    useEffect(()=>{
+        if(users){
+            setFilteredUsers(users);
+        }
+    },[users])
 
-   
-       const uniqueYears = [...new Set(batches.map(batch => batch.year))];
-   
-       useEffect(() => {
-           if (selectedYear) {
-                const filtered = users.filter(user =>
-      user.batch?.some(batchId => {
-        const batch = batchMap[batchId];
-        return batch?.year === parseInt(selectedYear);
-      })
-    );
-    setFilteredUsers(filtered);
-           } else {
-               setFilteredUsers(users);
-           }
-       }, [selectedYear]);
+    const uniqueYears = [...new Set(batches.map(batch => batch.year))];
+
+    useEffect(() => {
+        if (selectedYear) {
+            const filtered = users.filter(user =>
+                user.batch?.some(batchId => {
+                    const batch = batchMap[batchId];
+                    return batch?.year === parseInt(selectedYear);
+                })
+            );
+            setFilteredUsers(filtered);
+        } else {
+            setFilteredUsers(users);
+        }
+    }, [selectedYear]);
 
     const [expandedUsers, setExpandedUsers] = useState(filteredUsers);
-    const navigate=useNavigate();
+    const navigate = useNavigate();
 
     const handleExpandedUsers = (id) => {
         setExpandedUsers(prev => ({
@@ -48,15 +61,15 @@ const UserList = () => {
     }, [expandedUsers]);
 
     const batchMap = Object.fromEntries(batches?.map(b => [b.id, b]));
-    const roleMap = Object.fromEntries(roleGroups?.map(r => [r._id, r]));   
+    const roleMap = Object.fromEntries(roleGroups?.map(r => [r._id, r]));
 
 
     return (
-        <> 
+        <>
             <div className='h-full flex flex-col'>
                 <div>
-                    <HeadingUtil heading="All Users" description="you can view all users of your institute and filter them based on year"/>
-      
+                    <HeadingUtil heading="All Users" description="you can view all users of your institute and filter them based on year" />
+
                 </div>
                 <div className='rounded-xl p-5 bg-gray-200 inset-shadow-md flex-grow flex flex-col overflow-auto'>
                     <div className='flex flex-col lg:flex-row justify-between gap-4 mb-5'>
@@ -64,11 +77,11 @@ const UserList = () => {
                             <h2 className='font-bold text-lg text-blue-900'>Total Users: {filteredUsers.length}</h2>
                         </div>
                         <div className='flex flex-col md:flex-row gap-4'>
-                            <RefreshButton />
+                            <RefreshButton refreshFunction={refreshFunction}/>
                             <button className='bg-blue-900 text-white py-2 px-4 rounded-md hover:cursor-pointer font-semibold hover:scale-105 flex space-x-2 transition-all duration-300'
-                            onClick={()=>{
-                                navigate('/institute/create-user')
-                            }}>
+                                onClick={() => {
+                                    navigate('/institute/create-user')
+                                }}>
                                 <span>
                                     Add User
                                 </span>
@@ -78,7 +91,7 @@ const UserList = () => {
                             </button>
                             <select className='rounded-md bg-white py-2 px-4'>
                                 <option value=''>--select year--</option>
-                                 {uniqueYears.map(year => (
+                                {uniqueYears.map(year => (
                                     <option key={year} value={year}>{year}</option>
                                 ))}
                             </select>
@@ -179,15 +192,15 @@ const UserList = () => {
                                             <td className="flex justify-center mx-auto w-fit px-6 py-4 gap-8">
                                                 <button
                                                     className="font-medium text-black hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer">
-                                                    <Eye/>
+                                                    <Eye />
                                                 </button>
                                                 <button
                                                     className="font-medium text-blue-500 hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer">
-                                                    <Edit/>
+                                                    <Edit />
                                                 </button>
                                                 <button
                                                     className="font-medium text-red-500 hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer">
-                                                    <Trash/>
+                                                    <Trash />
                                                 </button>
                                             </td>
                                         </tr>
