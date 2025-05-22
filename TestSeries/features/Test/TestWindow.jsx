@@ -22,7 +22,6 @@ const TestWindow = () => {
   const [showFinalPopup, setShowFinalPopup] = useState(false);
 
   const secretKey = 'secret-key-for-encryption';
-  const { user } = useUser();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const userId = searchParams.get('userId');
@@ -30,8 +29,8 @@ const TestWindow = () => {
   const eventId = searchParams.get('eventId');
   // const [proctorStatus, setProctorStatus] = useState('Initializing...');
 
-  // const {questions, isLoading: isQuestionLoading} = useCachedQuestions(examId);
-  const {exam, isLoading: isExamLoading} = useCachedExam("98c5c317-e42c-4fba-9e67-d58b29814e26");
+  const {questions, isLoading: isQuestionLoading} = useCachedQuestions("aa632eab-74ad-4a6b-a675-60c571257c00");
+  const {exam, isLoading: isExamLoading} = useCachedExam("aa632eab-74ad-4a6b-a675-60c571257c00");
 
   if(isExamLoading){
     return <div>Loading...</div>
@@ -155,7 +154,7 @@ const TestWindow = () => {
     }
   ];
 
-  const dummyExam = {
+const dummyExam = {
     id: "bd0c2f10-8d62-4c4b-97fc-fb289e28e72c",
     name: "Midterm Mathematics Exam",
     date: "2025-06-15",
@@ -181,14 +180,27 @@ const TestWindow = () => {
     planner_type: "exam",
     updated_at: "2025-05-22T10:00:00+05:30",
     updated_by: "admin@excelinstitute.com",
-    questions: dummyQuestions,
     subjects: ["Math", "Science", "English", "GK", "Geography", "Reading"]
   };
 
-
   useEffect(() => {
-    setEventDetails(dummyExam);
-  }, [])
+  if (questions && questions.length > 0) {
+    const subjectSet = new Set(questions.map(q => q.subject));
+
+    setEventDetails(prev => ({
+      ...prev,
+      ...dummyExam,
+      questions,
+      subjects: Array.from(subjectSet),
+    }));
+  }
+}, [questions]);
+  
+
+
+  // useEffect(() => {
+  //   setEventDetails(dummyExam);
+  // }, [])
 
 
 

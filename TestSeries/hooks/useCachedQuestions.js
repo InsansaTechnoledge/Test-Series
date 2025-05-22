@@ -1,10 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
+import { fetchQuestionsbyExam } from "../utils/services/examService";
 
-export const useCachedQuestions = ({examId}) => {
+export const useCachedQuestions = (examId) => {
 
     const fetchExamQuestions = async () => {
         try {
-            const response = await fetchExamQuestions(examId);
+            const response = await fetchQuestionsbyExam(examId);
             if (response.status !== 200) {
                 throw new Error("Network response was not ok");
             }

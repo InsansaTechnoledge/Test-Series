@@ -2,3 +2,4 @@
 -in the create batch jsx default check have to be add
 -create the syllabus page for the batchlist 
 -full question flow, in current only the simple crud with caching is done
+-RPCs for question fetching
