@@ -75,17 +75,17 @@ export const updateUsersFunction = async (userIds, Data, requestedUser) => {
     model: requestedUser.role === "organization" ? "Organization" : "User"
   };
 
-  // Prepare update operations
+
   const updateOps = {
     $set: { ...Data },
   };
 
-  // If Data.batch exists and is an array, push with $addToSet
+
   if (Data.batch) {
     updateOps.$addToSet = {
       batch: { $each: Array.isArray(Data.batch) ? Data.batch : [Data.batch] }
     };
-    // Remove batch from $set so it does not overwrite
+
     delete updateOps.$set.batch;
   }
 

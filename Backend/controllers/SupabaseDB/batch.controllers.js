@@ -4,38 +4,7 @@ import { CreateOrganizationBatch , getOrganizationBacthes ,updateOrganizationBat
 import { createSyllabus } from "../../utils/SqlQueries/syllabus.queries.js";
 import { updateUsersFunction } from "../FirstDB/user.controllers.js";
 
-///have to crete the function rpc call when i add the syllabus for the partoicular batch 
-
-// export const createOrgBatch = async (req, res) => {
-//     try {
-//       //body should be array of objects
-//       let data = req.body;
-//       data.upadted_at = new Date();
-//       data.updated_by = req.user.id;
-//       data.organization_id= req.user.role==='organization'? req.user._id:req.user.organization_id;
-//       data.created_by = req.user._id;
-
-//       let createdSyllabus={};
-//       if(data.syllabus && data.syllabus.length > 0){
-//        createdSyllabus=await createSyllabus(data);
-//        data.syllabus = createdSyllabus.id; 
-//       }
-
-//       const batch = await CreateOrganizationBatch(data);
-
-//       if(data.faculties && data.faculties.length > 0){
-//         const batchId = batch.id;
-//         const user=await updateUsersFunction(data.faculties, { batch: batchId }, req.user);
-
-//       }
-//       return new APIResponse(201, batch, 'Batch created successfully').send(res);
-//     } catch (err) {
-//       console.log(err);
-//       new APIError(err?.response?.stastus || err?.status || 500, ["Something went wrong while creating the batch", err.message || ""]).send(res);
-
-//     }
-//   };
-
+////have to crete the function rpc call when i add the syllabus for the partoicular batch 
 export const createOrgBatch = async (req, res) => {
   try {
     const { syllabus, faculties, ...data } = req.body;
@@ -44,27 +13,30 @@ export const createOrgBatch = async (req, res) => {
     data.organization_id = req.user.role === 'organization' ? req.user._id : req.user.organization_id;
     data.created_by = req.user._id;
 
-    let createdSyllabus = {};
-    if (data.syllabus && data.syllabus.length > 0) {
-      const syllabusData = {syllabus:syllabus,
+    let createdSyllabus ;
+    if (syllabus) {
+      const syllabusData = {
+        syllabus:syllabus,
         created_at: new Date(),
         updated_at: new Date(),
-        updated_by: req.user.id,
-        created_by: req.user.id
+        updated_by: req.user._id
       };
+
       createdSyllabus = await createSyllabus(syllabusData);
-      data.syllabus = createdSyllabus.id;
+      data.syllabus_id = createdSyllabus[0].id;
     }
+
 
     const batch = await CreateOrganizationBatch(data);
 
+
     if (faculties && faculties.length > 0) {
-      const batchId = batch.id;
+      const batchId = batch[0].id;
       // Pass batchId as an array to updateUsersFunction to push into batch array
       await updateUsersFunction(faculties, { batch: [batchId] }, req.user);
     }
 
-    return new APIResponse(201, batch, 'Batch created successfully').send(res);
+    return new APIResponse(200, batch, 'Batch created successfully').send(res);
   } catch (err) {
     console.log(err);
     new APIError(err?.response?.status || err?.status || 500,

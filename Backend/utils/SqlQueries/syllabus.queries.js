@@ -3,10 +3,9 @@ import { getSupabaseClient } from '../../database/SupabaseDB.js';
 const supabase = getSupabaseClient();
 
 export const createSyllabus = async (syllabusData) => {
-
     const { data, error } = await supabase
         .from('batch_syllabus')
-        .insert({ syllabusData })
+        .insert(syllabusData)
         .select();
 
     if (error) {
