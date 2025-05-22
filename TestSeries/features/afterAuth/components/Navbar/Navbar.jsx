@@ -9,8 +9,6 @@ const Navbar = () => {
 
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
-  console.log(user?.user.logoUrl)
-
   const User = user?.user || user;
   const profile = User.logoUrl || profile2
 
@@ -63,7 +61,9 @@ const Navbar = () => {
                 <li><button className="block px-4 py-2 hover:bg-gray-600">Dashboard</button></li>
                 <li><button className="block px-4 py-2 hover:bg-gray-600">Settings</button></li>
                 <li><button className="block px-4 py-2 hover:bg-gray-600">Earnings</button></li>
-                <li><button className="block px-4 py-2 hover:bg-gray-600">Sign out</button></li>
+                <li><button 
+                onClick={()=>setShowLogoutModal(true)}
+                className="block px-4 py-2 hover:bg-gray-600">Sign out</button></li>
               </ul>
             </div>
           </div>
