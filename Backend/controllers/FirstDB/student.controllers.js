@@ -193,18 +193,15 @@ export const updateStudent = async (req,res) => {
 
 export const deleteStudent = async (req, res) => {
     try{
-        const {id} = req.params
-
-        const student = await  Student.findById(id)
-
+        const {ids} = req.params;
+        const idsArray = ids.split(',');
+        if (!ids) return new APIError(401, 'Student ids not found').send(res);
+        const student = await  Student.deleteMany({_id: {$in: idsArray}})
         if (!student) return new APIError(401, 'Student not found').send(res);
-
-        await Student.findByIdAndDelete(id)
-
-        return new APIResponse(200, null , 'student data deleted').send(res);
+                return new APIResponse(200, null , 'student data deleted').send(res);
 
 
-    } catch(e) {
+    } catch(err) {
        new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while deleting the students", err.message || ""]).send(res);
        
 

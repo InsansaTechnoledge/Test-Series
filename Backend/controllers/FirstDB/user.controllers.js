@@ -10,6 +10,10 @@ export const registerUser = async (req, res) => {
             id: req.user._id|| req.user.id,
             model: req.user.role === "organization" ? "Organization" : "User"
         };
+        userData.updatedBy = {
+            id: req.user._id|| req.user.id,
+            model: req.user.role === "organization" ? "Organization" : "User"
+        };
         const user = await User.create(userData);
 
         return new APIResponse(200, user,"User registered successfully!!",).send(res);
