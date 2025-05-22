@@ -5,6 +5,8 @@ import CountdownTimer from './TestTimer/CountdownTimer';
 import CryptoJS from 'crypto-js';
 import { useLocation } from 'react-router-dom';
 import { useUser } from '../../contexts/currentUserContext';
+import { useCachedQuestions } from '../../hooks/useCachedQuestions';
+import { useCachedExam } from '../../hooks/useCachedExam';
 
 const TestWindow = () => {
   const [eventDetails, setEventDetails] = useState();
@@ -27,6 +29,15 @@ const TestWindow = () => {
   const examId = searchParams.get('examId');
   const eventId = searchParams.get('eventId');
   // const [proctorStatus, setProctorStatus] = useState('Initializing...');
+
+  // const {questions, isLoading: isQuestionLoading} = useCachedQuestions(examId);
+  const {exam, isLoading: isExamLoading} = useCachedExam("98c5c317-e42c-4fba-9e67-d58b29814e26");
+
+  if(isExamLoading){
+    return <div>Loading...</div>
+  }
+
+  console.log(exam);
 
   const dummyQuestions = [
     {
@@ -327,6 +338,8 @@ const TestWindow = () => {
       // if (response.status === 200) {
       //   console.log('✅ Test submitted successfully.');
       // }
+
+
 
       console.log(answers);
     } catch (err) {

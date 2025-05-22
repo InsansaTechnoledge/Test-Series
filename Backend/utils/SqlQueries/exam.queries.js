@@ -24,7 +24,12 @@ export const updateExam = async (examData, examId) => {
 }
 
 export const fetchSelective = async (conditions) => {
-    let query = supabase.from("exam").select("*");
+    let query = supabase.from("exam").
+    select(`*,
+        batch_id (
+            name,
+            year
+        `);
 
     // Dynamically apply filters based on conditions
     Object.entries(conditions).forEach(([key, value]) => {
