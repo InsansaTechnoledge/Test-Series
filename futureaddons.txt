@@ -1,0 +1,3 @@
+in the batch controller create batch , have to be rpc
+in the create batch jsx default check have to be add
+create the syllabus page for the batchlist 
