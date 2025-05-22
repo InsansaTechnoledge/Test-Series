@@ -1,4 +1,4 @@
-import { createExam, deleteExam, fetchSelective, updateExam } from '../../utils/SqlQueries/exam.queries.js';
+import { createExam, deleteExam, fetchSelective, updateExam , setExamLive, getExamOrganization } from '../../utils/SqlQueries/exam.queries.js';
 import {APIError} from '../../utils/ResponseAndError/ApiError.utils.js'
 import {APIResponse} from '../../utils/ResponseAndError/ApiResponse.utils.js'
 
@@ -73,3 +73,41 @@ export const deleteExamById = async (req,res) => {
     }
 }
 
+
+export const goLiveExamById = async (req, res) => {
+    try {
+      const { id } = req.params;
+  
+      const orgId =
+        req.user?.organizationId ||
+        req.user?.orgId ||
+        req.user?._id;
+  
+      if (!orgId) {
+        return new APIError(400, ['Missing organization ID in auth context']).send(res);
+      }
+  
+      const existingExam = await getExamOrganization(id);
+  
+      console.log("🟡 DB org ID:", existingExam.organization_id);
+      console.log("🟢 Auth org ID:", orgId);
+
+
+      if (String(existingExam.organization_id) !== String(orgId)) {
+        return new APIError(403, ['Unauthorized: This exam does not belong to your organization']).send(res);
+      }
+      
+
+      
+  
+      const exam = await setExamLive(id);
+  
+      return new APIResponse(200, exam, "Exam is now live").send(res);
+    } catch (err) {
+      console.error("❌ Error setting exam live:", err);
+      return new APIError(
+        err?.status || 500,
+        ["Something went wrong while going live", err?.message]
+      ).send(res);
+    }
+  };

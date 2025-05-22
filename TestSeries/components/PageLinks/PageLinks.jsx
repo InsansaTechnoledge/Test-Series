@@ -25,7 +25,7 @@ import StudentLayout from '../../layouts/StudentLayout';
 import UpcomingExam from '../../features/afterAuth/components/StudentSide/UpcomingExams/UpcomingExam';
 import StudentListPage from '../../features/afterAuth/components/InstituteSide/StudentListComponent';
 import CreateExam from '../../features/afterAuth/components/InstituteSide/ExamFlow/CreateExam';
-
+import ExamListPage from '../../features/afterAuth/components/InstituteSide/ExamListPage';
 import ResultsPage from '../../features/afterAuth/components/StudentSide/CompletedExams/ResultsPage';
 import TestWindow from '../../features/Test/TestWindow';
 const PageLinks = () => {
@@ -78,6 +78,7 @@ const PageLinks = () => {
               <Route path='create-role-group' element={<FeatureBasedRoleGroups />} />
               <Route path='add-student' element={<CreateStudent />} />
               <Route path='create-exam' element={<CreateExam />} />
+              <Route path='exam-list' element={<ExamListPage />} />
               <Route path='institute-landing' element={<InstituteLandingPage />} />
               <Route path='*' element={<div>Invalid path</div>} />
             </Route>

@@ -26,23 +26,27 @@ export const updateExam = async (examData, examId) => {
 };
 
 export const fetchSelective = async (conditions) => {
-    let query = supabase.from("batch_exam").
-    select(`*,
-        batch_id (
-            name,
-            year
-        `);
-
+    let query = supabase
+      .from("batch_exam")
+      .select(
+        `*,
+         batch_id (
+           name,
+           year
+         )`
+      );
+  
     Object.entries(conditions).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && value !== '') {
-            query = query.eq(key, value);
-        }
+      if (value !== undefined && value !== null && value !== '') {
+        query = query.eq(key, value);
+      }
     });
-
+  
     const { data, error } = await query;
     if (error) throw error;
     return data;
-};
+  };
+  
 
 export const deleteExam = async (id) => {
     const { data, error } = await supabase
@@ -55,3 +59,29 @@ export const deleteExam = async (id) => {
     if (error) throw error;
     return data;
 };
+
+export const setExamLive = async (examId) => {
+    const { data, error } = await supabase
+      .from('batch_exam')
+      .update({
+        go_live: true,   // this will also trigger status = 'live' if you added the trigger
+        updated_at: new Date()
+      })
+      .eq('id', examId)
+      .select()
+      .single();
+  
+    if (error) throw error;
+    return data;
+  };
+
+  export const getExamOrganization = async (id) => {
+    const { data, error } = await supabase
+      .from("batch_exam")
+      .select("organization_id")
+      .eq("id", id)
+      .single();
+  
+    if (error) throw error;
+    return data;
+  };
