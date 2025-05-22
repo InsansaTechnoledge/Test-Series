@@ -49,10 +49,6 @@ const CreateUser = () => {
         }
     };
 
-    useEffect(() => {
-        console.log(formData);
-    }, [formData]);
-
     const onChangeHandler = (e) => {
         const { name, value } = e.target;
         const error = validateField(name, value);
@@ -110,9 +106,6 @@ const CreateUser = () => {
     }
 
     const onsubmitForm = async () => {
-        console.log("Form submitted");
-        console.log(formData);
-
 
         const payload = new FormData();
         payload.append("name", `${formData.firstName} ${formData.lastName}`);
@@ -125,7 +118,6 @@ const CreateUser = () => {
         if (profile) {
             payload.append('profilePhoto', profile);
         }
-        console.log(payload);
         try {
 
             const response = await createUser(payload);

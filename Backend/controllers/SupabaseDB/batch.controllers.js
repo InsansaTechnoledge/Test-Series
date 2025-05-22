@@ -1,27 +1,78 @@
 import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
 import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
 import { CreateOrganizationBatch , getOrganizationBacthes ,updateOrganizationBatch , deleteOrganizationBatch} from "../../utils/SqlQueries/batch.queries.js";
+import { createSyllabus } from "../../utils/SqlQueries/syllabus.queries.js";
+import { updateUsersFunction } from "../FirstDB/user.controllers.js";
 
 ///have to crete the function rpc call when i add the syllabus for the partoicular batch 
 
-export const createOrgBatch = async (req, res) => {
-    try {
-      //body should be array of objects
-      let data = req.body;
-      data.upadted_at = new Date();
-      data.updated_by = req.user.id;
-      // if (!data.organization_id || !data.name || !data.year) {
-      //   return new APIError(400, 'Required fields missing').send(res);
-      // }
-  
-      const batch = await CreateOrganizationBatch(data);
-      return new APIResponse(201, batch, 'Batch created successfully').send(res);
-    } catch (err) {
-      console.log(err);
-      new APIError(err?.response?.stastus || err?.status || 500, ["Something went wrong while creating the batch", err.message || ""]).send(res);
+// export const createOrgBatch = async (req, res) => {
+//     try {
+//       //body should be array of objects
+//       let data = req.body;
+//       data.upadted_at = new Date();
+//       data.updated_by = req.user.id;
+//       data.organization_id= req.user.role==='organization'? req.user._id:req.user.organization_id;
+//       data.created_by = req.user._id;
 
+//       let createdSyllabus={};
+//       if(data.syllabus && data.syllabus.length > 0){
+//        createdSyllabus=await createSyllabus(data);
+//        data.syllabus = createdSyllabus.id; 
+//       }
+
+//       const batch = await CreateOrganizationBatch(data);
+
+//       if(data.faculties && data.faculties.length > 0){
+//         const batchId = batch.id;
+//         const user=await updateUsersFunction(data.faculties, { batch: batchId }, req.user);
+
+//       }
+//       return new APIResponse(201, batch, 'Batch created successfully').send(res);
+//     } catch (err) {
+//       console.log(err);
+//       new APIError(err?.response?.stastus || err?.status || 500, ["Something went wrong while creating the batch", err.message || ""]).send(res);
+
+//     }
+//   };
+
+export const createOrgBatch = async (req, res) => {
+  try {
+    const { syllabus, faculties, ...data } = req.body;
+    data.updated_at = new Date();
+    data.updated_by = req.user._id;
+    data.organization_id = req.user.role === 'organization' ? req.user._id : req.user.organization_id;
+    data.created_by = req.user._id;
+
+    let createdSyllabus = {};
+    if (data.syllabus && data.syllabus.length > 0) {
+      const syllabusData = {syllabus:syllabus,
+        created_at: new Date(),
+        updated_at: new Date(),
+        updated_by: req.user.id,
+        created_by: req.user.id
+      };
+      createdSyllabus = await createSyllabus(syllabusData);
+      data.syllabus = createdSyllabus.id;
     }
-  };
+
+    const batch = await CreateOrganizationBatch(data);
+
+    if (faculties && faculties.length > 0) {
+      const batchId = batch.id;
+      // Pass batchId as an array to updateUsersFunction to push into batch array
+      await updateUsersFunction(faculties, { batch: [batchId] }, req.user);
+    }
+
+    return new APIResponse(201, batch, 'Batch created successfully').send(res);
+  } catch (err) {
+    console.log(err);
+    new APIError(err?.response?.status || err?.status || 500,
+      ["Something went wrong while creating the batch", err.message || ""]
+    ).send(res);
+  }
+};
+
   
   export const getOrgBatches = async (req, res) => {
     try {

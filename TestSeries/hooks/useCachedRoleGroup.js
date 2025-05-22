@@ -26,8 +26,11 @@ export const useCachedRoleGroup = () => {
            retry: 0,
       });
 
+       const roleMap = Object.fromEntries(roleGroups?.map(r => [r._id, r]));
+
       return {
         roleGroups,
-        rolesLoading
+        rolesLoading,
+        roleMap
       }
 };

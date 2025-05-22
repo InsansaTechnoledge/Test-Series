@@ -1,4 +1,4 @@
-import { User } from 'lucide-react'
+import { icons, User } from 'lucide-react'
 
 export const controls = [
     {
@@ -34,6 +34,11 @@ export const controls = [
     {
         name: "Student List",
         path: "student-list",
+        icon: User
+    },
+    {
+        name: "Create Exams",
+        path: "create-exam",
         icon: User
     }
 ]
