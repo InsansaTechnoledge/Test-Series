@@ -4,29 +4,30 @@ const supabase = getSupabaseClient();
 
 export const createExam = async (examData) => {
     const { data, error } = await supabase
-        .from("exam")
-        .insert(examData)
+        .from("batch_exam")  
+        .insert([examData])
         .select()
+        .single(); // to return a single object
 
     if (error) throw error;
     return data;
-}
+};
 
 export const updateExam = async (examData, examId) => {
     const { data, error } = await supabase
-        .from("exam")
+        .from("batch_exam")
         .update(examData)
         .eq('id', examId)
         .select()
+        .single();
 
     if (error) throw error;
     return data;
-}
+};
 
 export const fetchSelective = async (conditions) => {
-    let query = supabase.from("exam").select("*");
+    let query = supabase.from("batch_exam").select("*");
 
-    // Dynamically apply filters based on conditions
     Object.entries(conditions).forEach(([key, value]) => {
         if (value !== undefined && value !== null && value !== '') {
             query = query.eq(key, value);
@@ -34,18 +35,18 @@ export const fetchSelective = async (conditions) => {
     });
 
     const { data, error } = await query;
+    if (error) throw error;
+    return data;
+};
+
+export const deleteExam = async (id) => {
+    const { data, error } = await supabase
+        .from("batch_exam")
+        .delete()
+        .eq('id', id)
+        .select()
+        .single();
 
     if (error) throw error;
     return data;
-}
-
-export const deleteExam = async (id) => {
-    const {data, error} = await supabase
-    .from("exam")
-    .delete()
-    .eq('id', id)
-    .select();
-
-    if(error) throw error;
-    return data;
-}
+};
