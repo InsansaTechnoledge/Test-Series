@@ -6,3 +6,4 @@
 -single select6ed oprion is not visible in the students list page
 - on the add user form the data clearation after the submission of form have to be complete
 -have to remove indexing on the mobile number in students
+-validation in the forms 
