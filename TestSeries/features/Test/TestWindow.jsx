@@ -29,13 +29,53 @@ const TestWindow = () => {
   const eventId = searchParams.get('eventId');
   // const [proctorStatus, setProctorStatus] = useState('Initializing...');
 
-  const {questions, isLoading: isQuestionLoading} = useCachedQuestions("aa632eab-74ad-4a6b-a675-60c571257c00");
-  const {exam, isLoading: isExamLoading} = useCachedExam("aa632eab-74ad-4a6b-a675-60c571257c00");
+  const { questions, isLoading: isQuestionLoading } = useCachedQuestions("aa632eab-74ad-4a6b-a675-60c571257c00");
+  const { exam, isLoading: isExamLoading } = useCachedExam("aa632eab-74ad-4a6b-a675-60c571257c00");
 
-  if(isExamLoading){
+  const dummyExam = {
+    id: "bd0c2f10-8d62-4c4b-97fc-fb289e28e72c",
+    name: "Midterm Mathematics Exam",
+    date: "2025-06-15",
+    batch: {
+      id: "a1b2c3d4-e5f6-7g8h-9i10-jk11lm12no13",
+      name: "Batch A - Second Semester"
+    },
+    organization: {
+      id: "org123",
+      name: "Excel Coaching Institute"
+    },
+    total_marks: 100,
+    duration: 90,
+    live_until: "2025-06-15T13:00:00+05:30",
+    description: "This is the midterm exam for 2nd semester.",
+    guidelines: "1. Do not switch tabs.\n2. Submit before time.",
+    status: "scheduled",
+    syllabus: {
+      Algebra: ["Linear Equations", "Quadratics"],
+      Geometry: ["Triangles", "Circles"]
+    },
+    created_at: "2025-05-22T10:00:00+05:30",
+    planner_type: "exam",
+    updated_at: "2025-05-22T10:00:00+05:30",
+    updated_by: "admin@excelinstitute.com",
+  };
+
+  useEffect(() => {
+    if (!isQuestionLoading && questions && questions.length > 0) {
+      const subjectSet = new Set(questions.map(q => q.subject));
+
+      setEventDetails(prev => ({
+        ...prev,
+        ...dummyExam,
+        questions,
+        subjects: Array.from(subjectSet),
+      }));
+    }
+  }, [questions, isQuestionLoading]);
+
+  if (isExamLoading || isQuestionLoading) {
     return <div>Loading...</div>
   }
-
   console.log(exam);
 
   const dummyQuestions = [
@@ -154,55 +194,13 @@ const TestWindow = () => {
     }
   ];
 
-const dummyExam = {
-    id: "bd0c2f10-8d62-4c4b-97fc-fb289e28e72c",
-    name: "Midterm Mathematics Exam",
-    date: "2025-06-15",
-    batch: {
-      id: "a1b2c3d4-e5f6-7g8h-9i10-jk11lm12no13",
-      name: "Batch A - Second Semester"
-    },
-    organization: {
-      id: "org123",
-      name: "Excel Coaching Institute"
-    },
-    total_marks: 100,
-    duration: 90,
-    live_until: "2025-06-15T13:00:00+05:30",
-    description: "This is the midterm exam for 2nd semester.",
-    guidelines: "1. Do not switch tabs.\n2. Submit before time.",
-    status: "scheduled",
-    syllabus: {
-      Algebra: ["Linear Equations", "Quadratics"],
-      Geometry: ["Triangles", "Circles"]
-    },
-    created_at: "2025-05-22T10:00:00+05:30",
-    planner_type: "exam",
-    updated_at: "2025-05-22T10:00:00+05:30",
-    updated_by: "admin@excelinstitute.com",
-    subjects: ["Math", "Science", "English", "GK", "Geography", "Reading"]
-  };
-
-  useEffect(() => {
-  if (questions && questions.length > 0) {
-    const subjectSet = new Set(questions.map(q => q.subject));
-
-    setEventDetails(prev => ({
-      ...prev,
-      ...dummyExam,
-      questions,
-      subjects: Array.from(subjectSet),
-    }));
-  }
-}, [questions]);
   
+
 
 
   // useEffect(() => {
   //   setEventDetails(dummyExam);
   // }, [])
-
-
 
 
   // useEffect(() => {
