@@ -10,9 +10,9 @@ const LogoutModal = ({setShowLogoutModal}) => {
         
         const response = await logout();
         if(response.status==200){
-            setUser(null);
             navigate('/');
             setShowLogoutModal(false);   
+            setUser(null);
         }
     }
   

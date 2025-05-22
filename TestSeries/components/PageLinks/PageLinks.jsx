@@ -27,13 +27,14 @@ import StudentListPage from '../../features/afterAuth/components/InstituteSide/S
 import CreateExam from '../../features/afterAuth/components/InstituteSide/ExamFlow/CreateExam';
 
 import ResultsPage from '../../features/afterAuth/components/StudentSide/CompletedExams/ResultsPage';
+import TestWindow from '../../features/Test/TestWindow';
 const PageLinks = () => {
   const { user, setUser } = useUser();
   const fetchUser = async () => {
     try {
       const response = await checkAuth();
       if (response.status === 200) {
-        setUser(response.data);
+        setUser(response.data.user);
       } else {
         setUser(null);
       }
@@ -88,6 +89,7 @@ const PageLinks = () => {
           </Route>
         </Route>
 
+        <Route path='test' element={<TestWindow />} />
         <Route path='session-expired' element={<SessionExpireError />} />
 
       </Routes>

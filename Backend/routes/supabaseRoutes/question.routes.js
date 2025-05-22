@@ -4,7 +4,7 @@ import { deleteQuestions, getAllQuestionsSelectively, updateQuestionById } from 
 const router = express.Router();
 
 router.patch('/:id', updateQuestionById);
-router.get('/:examId', getAllQuestionsSelectively);
+router.get('/', getAllQuestionsSelectively);
 router.delete('/', deleteQuestions);
 
 export default router;

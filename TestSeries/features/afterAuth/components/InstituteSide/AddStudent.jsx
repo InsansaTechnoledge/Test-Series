@@ -7,6 +7,7 @@ import { useCachedBatches } from '../../../../hooks/useCachedBatches'
 import { RefreshCcw, Upload, Download, Plus, Trash2, Eye, EyeOff, Users, FileSpreadsheet, CheckCircle } from 'lucide-react'
 import NeedHelpComponent from './components/NeedHelpComponent'
 
+
 const AddStudent = () => {
   const [batch, setBatch] = useState('')
   const [students, setStudents] = useState([getEmptyStudent()])
@@ -175,7 +176,6 @@ const AddStudent = () => {
         alert('Please select a batch before submitting.');
         return;
       }
-  
       if (activeTab === 'manual') {
         const preparedStudents = students.map(s => ({
           name: `${s.fname} ${s.lname}`,
@@ -187,10 +187,17 @@ const AddStudent = () => {
           parentEmail: s.pemail,
           parentPhone: s.pnumber
         }));
+
+
   
         const res = await addSingleStudent(preparedStudents);
         alert('Students added successfully!');
         console.log(res);
+        setStudents([getEmptyStudent()]); 
+        setErrors('')
+
+
+      // Reset the form after submission
       }
   
       if (activeTab === 'bulk') {
@@ -203,6 +210,7 @@ const AddStudent = () => {
         const res = await uploadStudentExcel(fileInput.files[0]);
         alert('Excel uploaded successfully!');
         console.log(res);
+
       }
     } catch (error) {
       console.error('Submission failed:', error);

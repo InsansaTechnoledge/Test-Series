@@ -12,8 +12,8 @@ import { useUser } from '../../../../contexts/currentUserContext'
 const UserList = () => {
     const {user} = useUser();
     const { users, isLoading, isError } = useCachedUser();
-    const { batches } = useCachedBatches();
-    const { roleGroups, rolesLoading } = useCachedRoleGroup();
+    const { batches,batchMap } = useCachedBatches();
+    const { roleMap} = useCachedRoleGroup();
     const [filteredUsers, setFilteredUsers] = useState(users);
     const [selectedBatch, setSelectedBatch] = useState('');
     const queryClient = useQueryClient();
@@ -24,11 +24,11 @@ const UserList = () => {
         queryClient.invalidateQueries(['batches', user._id]);
     }
 
-    useEffect(()=>{
-        if(users){
-            setFilteredUsers(users);
-        }
-    },[users])
+    // useEffect(()=>{
+    //     if(users){
+    //         setFilteredUsers(users);
+    //     }
+    // },[users])
 
     useEffect(() => {
         if (selectedBatch) {
@@ -47,10 +47,6 @@ const UserList = () => {
             [id]: prev[id] ? !prev[id] : true
         }));
     }
-
-    const batchMap = Object.fromEntries(batches?.map(b => [b.id, b]));
-    const roleMap = Object.fromEntries(roleGroups?.map(r => [r._id, r]));
-
 
     return (
         <>

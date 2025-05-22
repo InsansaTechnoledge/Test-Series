@@ -22,7 +22,7 @@ export const fetchStudents = async () => {
     return response.data;
 };
   
-export const deleteStudentById = async (id) => {
-    const response = await api.delete(`/v1/student/delete/${id}`);
+export const deleteStudentById = async (ids) => {
+    const response = await api.delete(`/v1/student/delete/${ids}`);
     return response.data;
 };

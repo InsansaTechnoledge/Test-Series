@@ -26,7 +26,8 @@ export const getAllQuestionsSelectively = async (req, res) => {
     try {
         const data = await fetchQuestionsSelectively(condition);
         return new APIResponse(200, data, "Questions fetched successfully!").send(res);
-    } catch (e) {
+    } catch (err) {
+        console.log(err);
         new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while updating the questions", err.message || ""]).send(res);
 
     }
