@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'; // Assuming you're using React Router
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
+  
   return (
     <nav className="flex justify-between items-center px-6 md:px-12 py-3 shadow-sm bg-white sticky top-0 z-50">
       {/* Logo */}

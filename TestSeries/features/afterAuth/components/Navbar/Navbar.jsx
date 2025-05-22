@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import profile2 from '../../../../assests/Institute/profile.png';
 import { useUser } from '../../../../contexts/currentUserContext';
 
 const Navbar = () => {
   const {user} = useUser();
   console.log(user)
+
+  const [showLogoutModal, setShowLogoutModal ] = useState(false);
 
   console.log(user?.user.logoUrl)
   
@@ -49,10 +51,10 @@ const Navbar = () => {
               <span className="block text-sm text-gray-600 truncate">{User.email}</span>
             </div>
             <ul className="py-2">
-              <li><a href="#" className="block px-4 py-2 hover:bg-gray-600">Dashboard</a></li>
-              <li><a href="#" className="block px-4 py-2 hover:bg-gray-600">Settings</a></li>
-              <li><a href="#" className="block px-4 py-2 hover:bg-gray-600">Earnings</a></li>
-              <li><a href="#" className="block px-4 py-2 hover:bg-gray-600">Sign out</a></li>
+              <li><button className="block px-4 py-2 hover:bg-gray-600">Dashboard</button></li>
+              <li><button className="block px-4 py-2 hover:bg-gray-600">Settings</button></li>
+              <li><button className="block px-4 py-2 hover:bg-gray-600">Earnings</button></li>
+              <li><button className="block px-4 py-2 hover:bg-gray-600">Sign out</button></li>
             </ul>
           </div>
         </div>
