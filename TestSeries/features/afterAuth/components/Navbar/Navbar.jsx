@@ -3,12 +3,8 @@ import profile2 from '../../../../assests/Institute/profile.png';
 import { useUser } from '../../../../contexts/currentUserContext';
 
 const Navbar = () => {
-  const {user} = useUser();
-  console.log(user)
-
-  console.log(user?.user.logoUrl)
-  
-  const User = user?.user
+  const {user} = useUser();  
+  const User = user?.user || user;
   const profile = User.logoUrl || profile2
 
   return (
