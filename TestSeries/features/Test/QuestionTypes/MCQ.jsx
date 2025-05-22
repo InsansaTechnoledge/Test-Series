@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
-const MCQ = ({ selectedQuestion, option, setOption}) => {
-    
+const MCQ = ({ selectedQuestion, option, setOption }) => {
+
 
     useEffect(() => {
         if (selectedQuestion) {
@@ -13,10 +13,16 @@ const MCQ = ({ selectedQuestion, option, setOption}) => {
         setOption(option);
 
     }
-    
+
 
     return (
         <div>
+            <div className='flex justify-end mb-2'>
+                <div className='text-green-700 font-bold  rounded-lg px-4 py-2'>Correct: +{selectedQuestion.positive_marks}</div>
+                <div className='text-red-700 font-bold  rounded-lg px-4 py-2'>Wrong: -{selectedQuestion.negative_marks}</div>
+                <div className='text-gray-700 font-bold  rounded-lg px-4 py-2'>Unattempted: 0</div>
+
+            </div>
             <h3 className='font-bold text-3xl '>Q{selectedQuestion.index}. {selectedQuestion.question_text}</h3>
             {
                 selectedQuestion.image

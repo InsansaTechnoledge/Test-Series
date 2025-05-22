@@ -36,7 +36,7 @@ const TestSubjectSelectionBar = ({setSubjectSelectionVisible, eventDetails, sele
                 </div>
             <button 
             onClick={()=>setSubjectSelectionVisible(false)}
-            className='mb-5 mx-auto border h-min w-fit px-4 py-2 bg-purple-600 text-white rounded-md'>Hide Subject selection</button>
+            className='mb-5 mx-auto border h-min w-fit px-4 py-2 bg-blue-900 text-white rounded-md'>Hide Subject selection</button>
         </div>
     )
 }

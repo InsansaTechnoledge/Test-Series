@@ -437,7 +437,7 @@ const TestWindow = () => {
 
         <button
           onClick={handleSubmitTest}
-          className='mx-auto mt-10 rounded-md text-lg font-semibold bg-purple-600 px-4 py-2 w-fit text-white'
+          className='mx-auto mt-10 rounded-md text-lg font-semibold bg-blue-900 px-4 py-2 w-fit text-white'
         >
           Submit Test
         </button>

@@ -202,7 +202,7 @@ const QuestionSection = ({ setSelectedQuestion, selectedQuestion, selectedSubjec
                             ?
                             <button
                                 onClick={handlePrevious}
-                                className='px-4 py-2 bg-purple-600 text-white rounded-md font-semibold'>Previous</button>
+                                className='px-4 py-2 bg-blue-900 text-white rounded-md font-semibold'>Previous</button>
                             :
                             <div>
                             </div>
@@ -212,22 +212,22 @@ const QuestionSection = ({ setSelectedQuestion, selectedQuestion, selectedSubjec
 
                         <button
                             onClick={()=>setOption(handleClearResponse(selectedQuestion))}
-                            className='px-4 py-2 bg-purple-600 text-white rounded-md font-semibold'>Clear response</button>
+                            className='px-4 py-2 bg-blue-900 text-white rounded-md font-semibold'>Clear response</button>
                         {
                             subjectSpecificQuestions[selectedSubject][selectedQuestion.index - 1]?.status === 'markedForReview'
                                 ?
                                 <button
                                     onClick={handleUnMarkForReview}
-                                    className='px-4 py-2 bg-purple-600 text-white rounded-md font-semibold'>Unmark for review and next</button>
+                                    className='px-4 py-2 bg-blue-900 text-white rounded-md font-semibold'>Unmark for review and next</button>
                                 :
                                 <button
                                     onClick={handleMarkForReview}
-                                    className='px-4 py-2 bg-purple-600 text-white rounded-md font-semibold'>Mark for review and next</button>
+                                    className='px-4 py-2 bg-blue-900 text-white rounded-md font-semibold'>Mark for review and next</button>
 
                         }
                         <button
                             onClick={handleNext}
-                            className='px-4 py-2 bg-purple-600 text-white rounded-md font-semibold'>Next</button>
+                            className='px-4 py-2 bg-blue-900 text-white rounded-md font-semibold'>Next</button>
 
 
                     </div>

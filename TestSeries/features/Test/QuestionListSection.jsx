@@ -26,7 +26,7 @@ const QuestionListSection = ({eventDetails, selectedQuestion, setSelectedQuestio
                         </div>
                         <button 
                         onClick={()=>setSubjectSelectionVisible(true)}
-                        className='border h-min w-fit px-4 py-2 bg-purple-600 text-white rounded-md'>Select Subject</button>
+                        className='border h-min w-fit px-4 py-2 bg-blue-900 text-white rounded-md'>Select Subject</button>
                     </div>
                 </>
                 :
