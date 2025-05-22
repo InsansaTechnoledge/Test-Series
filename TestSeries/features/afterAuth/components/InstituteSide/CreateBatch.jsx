@@ -88,7 +88,7 @@ const CreateBatch = () => {
     setUser((prev) => [...prev, facultyToRemove]);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async() => {
     if (!formData.name || !formData.year || !formData.subjects?.length || !formData.batchMode) {
       alert('Please fill all required fields.');
       return;
@@ -113,6 +113,7 @@ const CreateBatch = () => {
         processedSyllabus[subject] = chaptersArray;
       }
     }
+    console.log("📊 Processed Syllabus:", processedSyllabus);
   
     const payload = {
       name: formData.name,
@@ -124,8 +125,8 @@ const CreateBatch = () => {
     };
   
     console.log("✅ Final JSON payload to submit:", payload);
-    const response=createBatch(payload);
-    if (response) {
+    const response=await createBatch(payload);
+    if (response.status===200) {
       alert('Batch created successfully!');
       setFormData({"batchMode": "only-subjects"});
       setSelectedFaculties([]);

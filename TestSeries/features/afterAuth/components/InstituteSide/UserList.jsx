@@ -24,11 +24,11 @@ const UserList = () => {
         queryClient.invalidateQueries(['batches', user._id]);
     }
 
-    useEffect(()=>{
-        if(users){
-            setFilteredUsers(users);
-        }
-    },[users])
+    // useEffect(()=>{
+    //     if(users){
+    //         setFilteredUsers(users);
+    //     }
+    // },[users])
 
     useEffect(() => {
         if (selectedBatch) {

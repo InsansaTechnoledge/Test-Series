@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import { orgLogin,studentLogin } from '../../../../utils/services/authService';
 import { useUser } from '../../../../contexts/currentUserContext';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 const LoginForm = () => {
   const {user,setUser} = useUser();
@@ -14,6 +15,15 @@ const LoginForm = () => {
     email: '',
     password: '',
   });
+
+  useEffect(()=>{
+    if(user && role === 'Institute') {
+      console.log(user);
+      navigate('/institute/institute-landing');
+    } else if(user && role === 'Student') {
+      navigate('/student/student-landing');
+    }
+  },[user])
 
   const [errors, setErrors] = useState({});
   const navigate = useNavigate()
@@ -86,9 +96,9 @@ const LoginForm = () => {
             email:'',
             password:''
           });
-         setUser(response.data.user);
 
-         navigate('/institute/institute-landing'); 
+            console.log("😏",response.data.user);
+         setUser(response.data.user);
           
         }
         
@@ -116,9 +126,8 @@ const LoginForm = () => {
       console.log("student logged in successfully!!")
       setErrors({});
     }
-    
+    console.log("😏",response);
     setUser(response.data.user);
-    navigate('/student-landing');
     }catch(err){
       console.log(err);
         setErrors(err.response.data.errors || "Something went wrong");
