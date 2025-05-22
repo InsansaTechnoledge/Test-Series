@@ -88,6 +88,17 @@ const userSchema = new Schema({
       required: true,
       enum: ['User', 'Organization'],
     }
+  },
+   updatedBy: {
+    id: {
+      type: Schema.Types.ObjectId,
+      required: true,
+    },
+    model: {
+      type: String,
+      required: true,
+      enum: ['User', 'Organization'],
+    }
   }
 
 

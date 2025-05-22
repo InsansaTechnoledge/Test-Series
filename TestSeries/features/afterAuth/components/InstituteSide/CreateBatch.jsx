@@ -3,19 +3,22 @@ import { X, Upload, CheckCircle, PlusCircle, FileSpreadsheet, Users } from 'luci
 import * as XLSX from 'xlsx';
 import NeedHelpComponent from './components/NeedHelpComponent';
 import HeadingUtil from '../../utility/HeadingUtil';
+import { useCachedUser } from '../../../../hooks/useCachedUser';
+import { useCachedRoleGroup } from '../../../../hooks/useCachedRoleGroup';
+import { createBatch } from '../../../../utils/services/batchService';
 
 const CreateBatch = () => {
   const [formData, setFormData] = useState({});
   const [selectedFaculties, setSelectedFaculties] = useState([]);
-  const [users, setUsers] = useState([
-    { _id: 1, name: 'Dasgupta' },
-    { _id: 2, name: 'Chaterjee' },
-    { _id: 3, name: 'Tarafdar' }
-  ]);
-
+  const [user, setUser] = useState([])
+  const {users,isLoading} = useCachedUser();
+  const {roleMap}=useCachedRoleGroup();
+  
   useEffect(() => {
-    console.log(formData);
-  }, [formData]);
+    if (users) {
+      setUser(users);
+    }
+  }, [users]);
 
   const onChangeHandler = (name, value) => {
     setFormData((prev) => ({
@@ -59,13 +62,13 @@ const CreateBatch = () => {
   };
 
   const handleFacultySelect = (e) => {
-    const selectedName = e.target.value;
-    if (!selectedName) return;
-    const selectedUser = users.find((user) => user.name === selectedName);
+    const selectedId = e.target.value;
+    if (!selectedId) return;
+    const selectedUser = user.find((user) => user._id === selectedId);
     if (!selectedUser) return;
 
     setSelectedFaculties((prev) => [...prev, selectedUser]);
-    setUsers((prev) => prev.filter((user) => user.name !== selectedName));
+    setUser((prev) => prev.filter((user) => user._id !== selectedId));
     e.target.value = '';
   };
 
@@ -74,7 +77,7 @@ const CreateBatch = () => {
     if (!facultyToRemove) return;
 
     setSelectedFaculties((prev) => prev.filter((f) => f._id !== facultyId));
-    setUsers((prev) => [...prev, facultyToRemove]);
+    setUser((prev) => [...prev, facultyToRemove]);
   };
 
   const handleSubmit = () => {
@@ -106,13 +109,24 @@ const CreateBatch = () => {
     const payload = {
       name: formData.name,
       year: formData.year,
-      batchMode: formData.batchMode,
-      subjects: formData.subjects,
+      // batchMode: formData.batchMode,
+      // subjects: formData.subjects,
       faculties: selectedFaculties.map(f => f._id),
       syllabus: processedSyllabus,
     };
   
     console.log("✅ Final JSON payload to submit:", payload);
+    const response=createBatch(payload);
+    if (response) {
+      alert('Batch created successfully!');
+      setFormData({});
+      setSelectedFaculties([]);
+    }else{
+      alert('Failed to create batch. Please try again.');
+      console.error('Error creating batch:', response);
+    }
+
+
   };
 
   return (
@@ -336,8 +350,8 @@ const CreateBatch = () => {
                     onChange={handleFacultySelect}
                   >
                     <option value="">Select faculty member</option>
-                    {users.map((user, idx) => (
-                      <option key={idx} value={user.name}>{user.name}</option>
+                    {user.map((user, idx) => (
+                      <option key={idx} value={user._id}>{user.name}- {roleMap[user.roleId]?.name || 'Unknown Role'}</option>
                     ))}
                   </select>
                 </div>
@@ -349,7 +363,9 @@ const CreateBatch = () => {
                     <div className="flex flex-wrap gap-2">
                       {selectedFaculties.map((user, idx) => (
                         <div key={idx} className="flex items-center gap-2 bg-purple-100 text-purple-800 rounded-full px-4 py-2 transition-all hover:bg-purple-200">
-                          <span>{user.name}</span>
+                          <span>{user.name}- <>
+                          <span key={user._id} className="text-sm text-gray-600">
+                             {roleMap[user.roleId]?.name || 'Unknown Role'} - {roleMap[user.roleId]?.description || ''}</span></></span>
                           <button 
                             onClick={() => handleFacultyRemove(user._id)}
                             className="text-purple-700 hover:text-purple-900 transition-all"

@@ -30,7 +30,7 @@ export const updateUser = async (req, res) => {
         if (!Data) {
             return new APIError(400, ["Data is required!!"]).send(res);
         }
-        Data.createdBy = {
+        Data.updatedBy = {
             id: req.user._id || req.user.id,
             model: req.user.role === "organization" ? "Organization" : "User"
         };
@@ -51,6 +51,56 @@ export const updateUser = async (req, res) => {
     }
 
 };
+
+
+// export const updateUsersFunction = async (userIds, Data, requestedUser) => {
+
+//     Data.updatedBy = {
+//         id: requestedUser._id || requestedUser.id,
+//         model: requestedUser.role === "organization" ? "Organization" : "User"
+//     };
+//     const user = await User.updateMany(
+//         { _id: { $in: userIds } },
+//          { $addToSet: { batch: { $each: Data } } },
+//          {$set: Data},
+//     );
+//     if (!user) {
+//         return new Error(404, ["User not found"]);
+//     }
+// }
+
+export const updateUsersFunction = async (userIds, Data, requestedUser) => {
+  Data.updatedBy = {
+    id: requestedUser._id || requestedUser.id,
+    model: requestedUser.role === "organization" ? "Organization" : "User"
+  };
+
+  // Prepare update operations
+  const updateOps = {
+    $set: { ...Data },
+  };
+
+  // If Data.batch exists and is an array, push with $addToSet
+  if (Data.batch) {
+    updateOps.$addToSet = {
+      batch: { $each: Array.isArray(Data.batch) ? Data.batch : [Data.batch] }
+    };
+    // Remove batch from $set so it does not overwrite
+    delete updateOps.$set.batch;
+  }
+
+  const result = await User.updateMany(
+    { _id: { $in: userIds } },
+    updateOps
+  );
+
+  if (result.matchedCount === 0) {
+    throw new Error("User(s) not found");
+  }
+
+  return result;
+};
+
 
 export const changePassword = async (req, res) => {
     const { userId, oldPassword, newPassword } = req.body;
