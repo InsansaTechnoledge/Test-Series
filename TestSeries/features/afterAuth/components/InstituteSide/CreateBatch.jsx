@@ -8,7 +8,7 @@ import { useCachedRoleGroup } from '../../../../hooks/useCachedRoleGroup';
 import { createBatch } from '../../../../utils/services/batchService';
 
 const CreateBatch = () => {
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({batchMode:'only-subjects'});
   const [selectedFaculties, setSelectedFaculties] = useState([]);
   const [user, setUser] = useState([])
   const {users,isLoading} = useCachedUser();
@@ -27,6 +27,12 @@ const CreateBatch = () => {
     }));
   };
 
+  useEffect(()=>{
+    if(formData){
+      console.log(formData);
+    }
+  },[formData])
+
   const deleteSubject = (indexToDelete) => {
     setFormData((prev) => ({
       ...prev,
@@ -44,6 +50,7 @@ const CreateBatch = () => {
     document.getElementById('subjects').value = '';
     document.getElementById('subjects').focus();
   };
+
 
   const generateExcelTemplate = (subjects) => {
     const workbook = XLSX.utils.book_new();
@@ -68,6 +75,7 @@ const CreateBatch = () => {
     if (!selectedUser) return;
 
     setSelectedFaculties((prev) => [...prev, selectedUser]);
+
     setUser((prev) => prev.filter((user) => user._id !== selectedId));
     e.target.value = '';
   };
@@ -120,8 +128,9 @@ const CreateBatch = () => {
     const response=await createBatch(payload);
     if (response.status===200) {
       alert('Batch created successfully!');
-      setFormData({});
+      setFormData({"batchMode": "only-subjects"});
       setSelectedFaculties([]);
+      setUser(prev => ([...prev,...selectedFaculties]));
     }else{
       alert('Failed to create batch. Please try again.');
       console.error('Error creating batch:', response);
@@ -149,6 +158,7 @@ const CreateBatch = () => {
                 type="radio"
                 name="batchMode"
                 value="only-subjects"
+                defaultChecked
                 onChange={(e) => onChangeHandler('batchMode', e.target.value)}
                 checked={formData.batchMode === 'only-subjects'}
                 className="accent-black"
@@ -205,6 +215,7 @@ const CreateBatch = () => {
                   type="text"
                   id="name"
                   name="name"
+                  value={formData.name || ''}
                   onChange={(e) => onChangeHandler('name', e.target.value)}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                   placeholder="Enter batch name"
@@ -219,6 +230,7 @@ const CreateBatch = () => {
                 <select
                   id="year"
                   name="year"
+                  value={formData.year || ''}
                   onChange={(e) => onChangeHandler('year', parseInt(e.target.value))}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                 >
@@ -262,6 +274,7 @@ const CreateBatch = () => {
                       <input
                         id="dropzone-file"
                         type="file"
+                        value={formData.syllabus || ''}
                         className="hidden"
                         accept=".xlsx"
                         onChange={(e) => {

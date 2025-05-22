@@ -27,6 +27,7 @@ import StudentListPage from '../../features/afterAuth/components/InstituteSide/S
 import CreateExam from '../../features/afterAuth/components/InstituteSide/ExamFlow/CreateExam';
 
 import ResultsPage from '../../features/afterAuth/components/StudentSide/CompletedExams/ResultsPage';
+import TestWindow from '../../features/Test/TestWindow';
 const PageLinks = () => {
   const { user, setUser } = useUser();
   const fetchUser = async () => {
@@ -88,6 +89,7 @@ const PageLinks = () => {
           </Route>
         </Route>
 
+        <Route path='test' element={<TestWindow />} />
         <Route path='session-expired' element={<SessionExpireError />} />
 
       </Routes>
