@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Clock, Users, CheckCircle, PlayCircle, Loader2, Calendar, BookOpen, Globe, Heading } from 'lucide-react';
-import { fetchExam, goLiveExam , fetchExamsByOrganization } from '../../../../utils/services/examService';
+import { goLiveExam , fetchExamsByOrganization } from '../../../../utils/services/examService';
 import HeadingUtil from '../../utility/HeadingUtil';
 import NeedHelpComponent from './components/NeedHelpComponent';
 

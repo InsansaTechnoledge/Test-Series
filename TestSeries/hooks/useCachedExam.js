@@ -31,5 +31,5 @@ export const useCachedExam = (examId) => {
         retry: 0,
     });
 
-    return { exam, isLoading, isError };
+    return { exam: exam[0], isLoading, isError };
 };
