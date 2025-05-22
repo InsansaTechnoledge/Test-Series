@@ -28,10 +28,11 @@ export const useCachedBatches = () => {
         cacheTime: 24 * 60 * 60 * 1000,
         retry: 0,
     });
-
+     const batchMap = Object.fromEntries(batches?.map(b => [b.id, b]));
     return {
         batches,
         isLoading,
-        isError
+        isError,
+        batchMap
     }
 };

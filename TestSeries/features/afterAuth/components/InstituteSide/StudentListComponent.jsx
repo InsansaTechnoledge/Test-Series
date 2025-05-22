@@ -1,78 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import { Search, Filter, Trash2, MoreHorizontal, Eye, Edit, UserX, Check, X, ChevronUp, ChevronDown } from 'lucide-react'
-import { fetchStudents } from '../../../../utils/services/studentService';
+import { useCachedStudents } from '../../../../hooks/useCachedStudents';
+import { deleteStudentById } from '../../../../utils/services/studentService';
+import { useCachedBatches } from '../../../../hooks/useCachedBatches';
+import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 
 const SimplifiedStudentManagement = () => {
-  // Sample data - would typically come from an API
-//   const [students, setStudents] = useState([
-//     {
-//       id: '1',
-//       name: 'Tanmay Seth',
-//       email: 'tanmay@gmail.com',
-//       phone: '1234567890',
-//       batch: 'Batch 2023-A',
-//     },
-//     {
-//       id: '2',
-//       name: 'Priya Sharma',
-//       email: 'priya@gmail.com',
-//       phone: '2345678901',
-//       batch: 'Batch 2023-B',
-//     },
-//     {
-//       id: '3',
-//       name: 'Rahul Patel',
-//       email: 'rahul@gmail.com',
-//       phone: '3456789012',
-//       batch: 'Batch 2023-A',
-//     },
-//     {
-//       id: '4',
-//       name: 'Anjali Mishra',
-//       email: 'anjali@gmail.com',
-//       phone: '4567890123',
-//       batch: 'Batch 2023-C',
-//     },
-//     {
-//       id: '5',
-//       name: 'Vikram Singh',
-//       email: 'vikram@gmail.com',
-//       phone: '5678901234',
-//       batch: 'Batch 2023-B',
-//     }
-//   ])
 
-const [students, setStudents] = useState([]);
-const [batches, setBatches] = useState([]);
-
-useEffect(() => {
-    const getStudents = async () => {
-      try {
-        const response = await fetchStudents();
-        
-        const data = response.data; 
-        
-        console.log('D', data)
-        setStudents(data);
-  
-        // Extract unique batch names
-        const batchSet = new Set(data.map((student) => student.batchId)); 
-        const uniqueBatches = Array.from(batchSet).map((name, index) => ({
-          id: `${index + 1}`,
-          name
-        }));
-  
-        setBatches(uniqueBatches);
-      } catch (error) {
-        console.error("Error fetching students", error);
-      }
-    };
-  
-    getStudents();
-  }, []);
-  
-  
-
+  const {students, isLoading, isError} = useCachedStudents();
+  const [showStudents, setShowStudents] = useState([]);
+  const{batches,batchMap}=useCachedBatches();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedBatch, setSelectedBatch] = useState('')
   const [showFilters, setShowFilters] = useState(false)
@@ -83,19 +23,24 @@ useEffect(() => {
   const [studentsToDelete, setStudentsToDelete] = useState([])
   const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' })
 
+useEffect(() => {
+    if (students.length > 0) {
+      setShowStudents(students)
+    }
+}, [students]);
 
   // Filter students based on search and batch filter
-  const filteredStudents = students.filter(student => {
+  const filteredStudents = showStudents.filter(student => {
     const matchesSearch =
       student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       `${student.phone}`.includes(searchTerm);
-  
+
     const matchesBatch = selectedBatch ? student.batchId === selectedBatch : true;
-  
+
     return matchesSearch && matchesBatch;
   });
-  
+
 
   // Sort students
   const sortedStudents = [...filteredStudents].sort((a, b) => {
@@ -151,11 +96,24 @@ useEffect(() => {
   }
 
   // Delete students
-  const deleteStudents = () => {
-    setStudents(students.filter(student => !studentsToDelete.includes(student.id)))
-    setSelectedStudents([])
+  const deleteStudents =async () => {
+    try{
+      
+        console.log("Deleting students:", studentsToDelete);
+        const response=await deleteStudentById(studentsToDelete);
+        if (response.status === 200) {
+          console.log("Students deleted successfully:", response.data);
+          queryClient.invalidateQueries(["Students"]);
+        }
+
+    }catch(error){
+      console.error("Error deleting students:", error);
+
+    }
+        setSelectedStudents([])
     setSelectAll(false)
     setShowConfirmDelete(false)
+
   }
 
   return (
@@ -170,7 +128,7 @@ useEffect(() => {
             </div>
             <div className="flex flex-col sm:flex-row gap-3">
               {selectedStudents.length > 0 && (
-                <button 
+                <button
                   onClick={confirmDeleteSelected}
                   className="inline-flex items-center justify-center gap-2 bg-red-100 text-red-700 hover:bg-red-200 px-4 py-2.5 rounded-lg transition font-medium"
                 >
@@ -180,6 +138,11 @@ useEffect(() => {
               )}
               <button
                 className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg transition font-medium"
+                onClick={() => {
+                  // Add new student logic here
+                  console.log("Add new student clicked")
+                  navigate('/institute/add-student');
+                }}
               >
                 Add New Student
               </button>
@@ -230,7 +193,7 @@ useEffect(() => {
                 >
                   <option value="">All Batches</option>
                   {batches.map((batch) => (
-                    <option key={batch.id} value={batch.name}>{batch.name}</option>
+                    <option key={batch.id} value={batch.id}>{batch.name}</option>
                   ))}
                 </select>
               </div>
@@ -252,8 +215,8 @@ useEffect(() => {
                         onChange={() => setSelectAll(!selectAll)}
                         className="w-4 h-4 rounded text-blue-600"
                       />
-                      <button 
-                        onClick={() => requestSort('name')} 
+                      <button
+                        onClick={() => requestSort('name')}
                         className="group flex items-center gap-1 font-medium text-gray-700"
                       >
                         Student
@@ -270,8 +233,8 @@ useEffect(() => {
                     </div>
                   </th>
                   <th className="px-6 py-3.5 text-left">
-                    <button 
-                      onClick={() => requestSort('batch')} 
+                    <button
+                      onClick={() => requestSort('batch')}
                       className="group flex items-center gap-1 font-medium text-gray-700"
                     >
                       Batch
@@ -310,10 +273,10 @@ useEffect(() => {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        {student.batchId}
-                    </span>
-                    </td>
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          {batchMap[student.batchId]?.name || 'N/A'}
+                        </span>
+                      </td>
 
                       <td className="px-6 py-4 text-right">
                         <div className="relative">
@@ -323,7 +286,7 @@ useEffect(() => {
                           >
                             <MoreHorizontal size={18} />
                           </button>
-                          
+
                           {isDropdownOpen === student._id && (
                             <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200">
                               <div className="py-1">
@@ -365,7 +328,7 @@ useEffect(() => {
                         <h3 className="text-lg font-medium text-gray-900 mb-1">No students found</h3>
                         <p className="text-gray-500">
                           {searchTerm || selectedBatch
-                            ? "Try adjusting your filters or search term" 
+                            ? "Try adjusting your filters or search term"
                             : "Get started by adding a new student"}
                         </p>
                       </div>

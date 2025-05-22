@@ -11,7 +11,7 @@ router.post('/upload-excel', fileUpload.single('file'), uploadStudentExcel)
 router.get('/all-student' , getAllStudents)
 router.post('/:id/upload-profile-photo' , upload.single('profilePic'), uploadProfileImage)
 router.patch('/update/:id', updateStudent)
-router.delete('/delete:id', deleteStudent)
+router.delete('/delete/:ids', deleteStudent)
 router.patch('/change-batch/:id', changeStudentBatch)
 router.get('/get-all-student-batch/:id' , getAllStudentOfBatch)
 

@@ -3,3 +3,6 @@
 -create the syllabus page for the batchlist 
 -full question flow, in current only the simple crud with caching is done
 -RPCs for question fetching
+-single select6ed oprion is not visible in the students list page
+- on the add user form the data clearation after the submission of form have to be complete
+-have to remove indexing on the mobile number in students
