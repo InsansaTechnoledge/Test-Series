@@ -7,7 +7,7 @@ const router = express.Router();
 router.post('/user-login',authenticateUserMiddleware, UserLogin);
 router.post('/logout',Logout);
 router.post('/org-login',authenticateOrganizationMiddleware,organizationLogin);
-router.post('student-login',authenticateStudentMiddleware,studentLogin);
+router.post('/student-login',authenticateStudentMiddleware,studentLogin);
 router.get('/check-auth',isLoggedInMiddleware,checkAuth);
 
 export default router;

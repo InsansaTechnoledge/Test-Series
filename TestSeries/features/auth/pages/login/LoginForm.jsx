@@ -20,8 +20,8 @@ const LoginForm = () => {
     if(user && role === 'Institute') {
       console.log(user);
       navigate('/institute/institute-landing');
-    } else if(user && role === 'student') {
-      navigate('/student-landing');
+    } else if(user && role === 'Student') {
+      navigate('/student/student-landing');
     }
   },[user])
 
