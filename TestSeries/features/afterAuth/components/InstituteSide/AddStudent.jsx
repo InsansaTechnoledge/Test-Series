@@ -6,6 +6,7 @@ import { addSingleStudent , uploadStudentExcel } from '../../../../utils/service
 import { useCachedBatches } from '../../../../hooks/useCachedBatches'
 import { RefreshCcw, Upload, Download, Plus, Trash2, Eye, EyeOff, Users, FileSpreadsheet, CheckCircle } from 'lucide-react'
 import NeedHelpComponent from './components/NeedHelpComponent'
+import { QueryClient } from '@tanstack/react-query'
 
 
 const AddStudent = () => {
@@ -15,7 +16,8 @@ const AddStudent = () => {
   const [excelData, setExcelData] = useState([])
   const [activeTab, setActiveTab] = useState('manual') // 'manual' or 'bulk'
   const {batches,isLoading}=useCachedBatches();
-  const [errors, setErrors] = useState([])
+  const [errors, setErrors] = useState([]);
+  const queryClient = new QueryClient();
 
   // Generate empty student object
   function getEmptyStudent() {
@@ -50,6 +52,9 @@ const AddStudent = () => {
 
         if (!isLongEnough || !hasUpperCase || !hasLowerCase || !hasNumbers || !hasSpecialChar) {
           return 'Password must be at least 8 characters with uppercase, lowercase, number, and special character';
+        }
+        if(cpassworrd && value !== students[index]?.cpassword){
+          return 'Passwords do not match';
         }
         return '';
       case 'cpassword':
@@ -195,6 +200,7 @@ const AddStudent = () => {
         console.log(res);
         setStudents([getEmptyStudent()]); 
         setErrors('')
+        queryClient.invalidateQueries(['Students']) // Invalidate the students query to refresh the data
 
 
       // Reset the form after submission
