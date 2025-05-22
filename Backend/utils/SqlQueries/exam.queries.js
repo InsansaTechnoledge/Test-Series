@@ -4,7 +4,7 @@ const supabase = getSupabaseClient();
 
 export const createExam = async (examData) => {
     const { data, error } = await supabase
-        .from("batch_exam")  
+        .from("batch_exam")
         .insert([examData])
         .select()
         .single(); // to return a single object
@@ -27,11 +27,12 @@ export const updateExam = async (examData, examId) => {
 
 export const fetchSelective = async (conditions) => {
     let query = supabase.from("batch_exam").
-    select(`*,
+        select(`*,
         batch_id (
             name,
             year
-        `);
+        )`)
+        .single();
 
     Object.entries(conditions).forEach(([key, value]) => {
         if (value !== undefined && value !== null && value !== '') {

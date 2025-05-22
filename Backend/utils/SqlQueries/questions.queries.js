@@ -90,7 +90,7 @@ export const fetchQuestionsSelectively = async (conditions) => {
 
 
   const filteredEnrichedQuestions = enrichedQuestions.filter(q => !allComprehensionQuestionIds.includes(q.id));
-  console.log(enrichedQuestions);
+  // console.log(enrichedQuestions);
   return filteredEnrichedQuestions;
 };
 

@@ -5,7 +5,7 @@ export const fetchQuestionsbyExam = async (examId) => {
     return response.data;
 }
 
-export const fetchExam = async (examId) => {
+export const fetchExamById = async (examId) => {
     const response = await api.get(`v1/exam?id=${examId}`);
     return response.data;
 }

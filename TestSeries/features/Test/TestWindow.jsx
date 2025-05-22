@@ -32,170 +32,175 @@ const TestWindow = () => {
   const { questions, isLoading: isQuestionLoading } = useCachedQuestions("aa632eab-74ad-4a6b-a675-60c571257c00");
   const { exam, isLoading: isExamLoading } = useCachedExam("aa632eab-74ad-4a6b-a675-60c571257c00");
 
-  const dummyExam = {
-    id: "bd0c2f10-8d62-4c4b-97fc-fb289e28e72c",
-    name: "Midterm Mathematics Exam",
-    date: "2025-06-15",
-    batch: {
-      id: "a1b2c3d4-e5f6-7g8h-9i10-jk11lm12no13",
-      name: "Batch A - Second Semester"
-    },
-    organization: {
-      id: "org123",
-      name: "Excel Coaching Institute"
-    },
-    total_marks: 100,
-    duration: 90,
-    live_until: "2025-06-15T13:00:00+05:30",
-    description: "This is the midterm exam for 2nd semester.",
-    guidelines: "1. Do not switch tabs.\n2. Submit before time.",
-    status: "scheduled",
-    syllabus: {
-      Algebra: ["Linear Equations", "Quadratics"],
-      Geometry: ["Triangles", "Circles"]
-    },
-    created_at: "2025-05-22T10:00:00+05:30",
-    planner_type: "exam",
-    updated_at: "2025-05-22T10:00:00+05:30",
-    updated_by: "admin@excelinstitute.com",
-  };
+  // const dummyExam = {
+  //   id: "bd0c2f10-8d62-4c4b-97fc-fb289e28e72c",
+  //   name: "Midterm Mathematics Exam",
+  //   date: "2025-06-15",
+  //   batch: {
+  //     id: "a1b2c3d4-e5f6-7g8h-9i10-jk11lm12no13",
+  //     name: "Batch A - Second Semester"
+  //   },
+  //   organization: {
+  //     id: "org123",
+  //     name: "Excel Coaching Institute"
+  //   },
+  //   total_marks: 100,
+  //   duration: 90,
+  //   live_until: "2025-06-15T13:00:00+05:30",
+  //   description: "This is the midterm exam for 2nd semester.",
+  //   guidelines: "1. Do not switch tabs.\n2. Submit before time.",
+  //   status: "scheduled",
+  //   syllabus: {
+  //     Algebra: ["Linear Equations", "Quadratics"],
+  //     Geometry: ["Triangles", "Circles"]
+  //   },
+  //   created_at: "2025-05-22T10:00:00+05:30",
+  //   planner_type: "exam",
+  //   updated_at: "2025-05-22T10:00:00+05:30",
+  //   updated_by: "admin@excelinstitute.com",
+  // };
+
+  // useEffect(()=>{
+  //   if(!isExamLoading){
+  //     console.log("EXXXX", exam);
+  //   }
+  // },[isExamLoading]);
+
 
   useEffect(() => {
-    if (!isQuestionLoading && questions && questions.length > 0) {
+    if (!isExamLoading && !isQuestionLoading && questions && questions.length > 0) {
+
+
       const subjectSet = new Set(questions.map(q => q.subject));
+
 
       setEventDetails(prev => ({
         ...prev,
-        ...dummyExam,
+        ...exam,
         questions,
         subjects: Array.from(subjectSet),
       }));
     }
-  }, [questions, isQuestionLoading]);
+  }, [questions, isQuestionLoading, isExamLoading]);
 
-  if (isExamLoading || isQuestionLoading) {
-    return <div>Loading...</div>
-  }
+
   console.log(exam);
 
-  const dummyQuestions = [
-    {
-      id: 'q1',
-      exam_id: 'exam1',
-      organization_id: 'org1',
-      subject: 'Math',
-      chapter: 'Algebra',
-      question_type: 'mcq',
-      difficulty: 'medium',
-      positive_marks: 1,
-      negative_marks: 0.25,
-      question_text: 'What is the value of x in the equation 2x + 3 = 7?',
-      options: ['1', '2', '3', '4'],
-      correct_option: 'B',
-      explanation: '2x + 3 = 7 => 2x = 4 => x = 2'
-    },
-    {
-      id: 'q2',
-      organization_id: 'org1',
-      subject: 'Science',
-      chapter: 'Physics',
-      question_type: 'msq',
-      difficulty: 'easy',
-      positive_marks: 2,
-      negative_marks: 0.5,
-      question_text: 'Which of the following are SI units?',
-      options: ['Meter', 'Second', 'Inch', 'Foot'],
-      correct_options: [0, 1]
-    },
-    {
-      id: 'q3',
-      organization_id: 'org1',
-      subject: 'English',
-      chapter: 'Grammar',
-      question_type: 'fill',
-      difficulty: 'easy',
-      positive_marks: 1,
-      negative_marks: 0,
-      question_text: 'The sun ___ in the east.',
-      correct_answer: 'rises'
-    },
-    {
-      id: 'q4',
-      organization_id: 'org1',
-      subject: 'GK',
-      chapter: 'History',
-      question_type: 'tf',
-      difficulty: 'easy',
-      positive_marks: 1,
-      negative_marks: 0.25,
-      statement: 'The Taj Mahal is located in Delhi.',
-      is_true: false
-    },
-    {
-      id: 'q5',
-      organization_id: 'org1',
-      subject: 'Geography',
-      chapter: 'Maps',
-      question_type: 'match',
-      difficulty: 'medium',
-      positive_marks: 2,
-      negative_marks: 0.5,
-      left_items: ['India', 'USA', 'UK'],
-      right_items: ['Washington D.C.', 'London', 'New Delhi'],
-      correct_pairs: {
-        India: 'New Delhi',
-        USA: 'Washington D.C.',
-        UK: 'London'
-      }
-    },
-    {
-      id: 'q6',
-      organization_id: 'org1',
-      subject: 'Reading',
-      chapter: 'Comprehension',
-      question_type: 'comprehension',
-      difficulty: 'medium',
-      positive_marks: 4,
-      negative_marks: 0,
-      passage: 'Climate change refers to long-term shifts in temperatures and weather patterns...',
-      sub_questions: [
-        {
-          id: 'q6_1',
-          index: 1,
-          question_type: 'mcq',
-          positive_marks: 1,
-          negative_marks: 0.25,
-          question_text: 'What is climate change?',
-          options: ['Short-term weather shifts', 'Seasonal changes', 'Long-term shifts', 'Daily temperature changes'],
-          correct_option: 'C'
-        },
-        {
-          id: 'q6_2',
-          index: 2,
-          question_type: 'tf',
-          positive_marks: 1,
-          negative_marks: 0.25,
-          statement: 'Climate change occurs over decades.',
-          is_true: true
-        }
-      ]
-    },
-    {
-      id: 'q7',
-      organization_id: 'org1',
-      subject: 'Math',
-      chapter: 'Numbers',
-      question_type: 'numerical',
-      difficulty: 'medium',
-      positive_marks: 2,
-      negative_marks: 0.5,
-      question_text: 'Calculate the square root of 49.',
-      correct_answer: 7
-    }
-  ];
-
-  
-
+  // const dummyQuestions = [
+  //   {
+  //     id: 'q1',
+  //     exam_id: 'exam1',
+  //     organization_id: 'org1',
+  //     subject: 'Math',
+  //     chapter: 'Algebra',
+  //     question_type: 'mcq',
+  //     difficulty: 'medium',
+  //     positive_marks: 1,
+  //     negative_marks: 0.25,
+  //     question_text: 'What is the value of x in the equation 2x + 3 = 7?',
+  //     options: ['1', '2', '3', '4'],
+  //     correct_option: 'B',
+  //     explanation: '2x + 3 = 7 => 2x = 4 => x = 2'
+  //   },
+  //   {
+  //     id: 'q2',
+  //     organization_id: 'org1',
+  //     subject: 'Science',
+  //     chapter: 'Physics',
+  //     question_type: 'msq',
+  //     difficulty: 'easy',
+  //     positive_marks: 2,
+  //     negative_marks: 0.5,
+  //     question_text: 'Which of the following are SI units?',
+  //     options: ['Meter', 'Second', 'Inch', 'Foot'],
+  //     correct_options: [0, 1]
+  //   },
+  //   {
+  //     id: 'q3',
+  //     organization_id: 'org1',
+  //     subject: 'English',
+  //     chapter: 'Grammar',
+  //     question_type: 'fill',
+  //     difficulty: 'easy',
+  //     positive_marks: 1,
+  //     negative_marks: 0,
+  //     question_text: 'The sun ___ in the east.',
+  //     correct_answer: 'rises'
+  //   },
+  //   {
+  //     id: 'q4',
+  //     organization_id: 'org1',
+  //     subject: 'GK',
+  //     chapter: 'History',
+  //     question_type: 'tf',
+  //     difficulty: 'easy',
+  //     positive_marks: 1,
+  //     negative_marks: 0.25,
+  //     statement: 'The Taj Mahal is located in Delhi.',
+  //     is_true: false
+  //   },
+  //   {
+  //     id: 'q5',
+  //     organization_id: 'org1',
+  //     subject: 'Geography',
+  //     chapter: 'Maps',
+  //     question_type: 'match',
+  //     difficulty: 'medium',
+  //     positive_marks: 2,
+  //     negative_marks: 0.5,
+  //     left_items: ['India', 'USA', 'UK'],
+  //     right_items: ['Washington D.C.', 'London', 'New Delhi'],
+  //     correct_pairs: {
+  //       India: 'New Delhi',
+  //       USA: 'Washington D.C.',
+  //       UK: 'London'
+  //     }
+  //   },
+  //   {
+  //     id: 'q6',
+  //     organization_id: 'org1',
+  //     subject: 'Reading',
+  //     chapter: 'Comprehension',
+  //     question_type: 'comprehension',
+  //     difficulty: 'medium',
+  //     positive_marks: 4,
+  //     negative_marks: 0,
+  //     passage: 'Climate change refers to long-term shifts in temperatures and weather patterns...',
+  //     sub_questions: [
+  //       {
+  //         id: 'q6_1',
+  //         index: 1,
+  //         question_type: 'mcq',
+  //         positive_marks: 1,
+  //         negative_marks: 0.25,
+  //         question_text: 'What is climate change?',
+  //         options: ['Short-term weather shifts', 'Seasonal changes', 'Long-term shifts', 'Daily temperature changes'],
+  //         correct_option: 'C'
+  //       },
+  //       {
+  //         id: 'q6_2',
+  //         index: 2,
+  //         question_type: 'tf',
+  //         positive_marks: 1,
+  //         negative_marks: 0.25,
+  //         statement: 'Climate change occurs over decades.',
+  //         is_true: true
+  //       }
+  //     ]
+  //   },
+  //   {
+  //     id: 'q7',
+  //     organization_id: 'org1',
+  //     subject: 'Math',
+  //     chapter: 'Numbers',
+  //     question_type: 'numerical',
+  //     difficulty: 'medium',
+  //     positive_marks: 2,
+  //     negative_marks: 0.5,
+  //     question_text: 'Calculate the square root of 49.',
+  //     correct_answer: 7
+  //   }
+  // ];
 
 
   // useEffect(() => {
@@ -329,6 +334,33 @@ const TestWindow = () => {
     }
   }, [selectedSubject]);
 
+
+  const getCorrectResponse = (question) => {
+    switch (question.question_type) {
+      case "mcq":
+        return question.correct_option;
+      case "msq":
+        return question.correct_options;
+      case "fill":
+      case "numerical":
+        return question.correct_answer;
+      case "tf":
+        return question.is_true;
+      case "match":
+        return question.correct_pairs;
+      case "comprehension":
+        return question.sub_questions.reduce((acc, sub_q) => {
+          const response = getCorrectResponse(sub_q);
+          return {
+            ...acc,
+            [sub_q.id]: response
+          };
+        },{})
+      default:
+        return question.correct_response;
+    }
+  }
+
   const handleSubmitTest = async () => {
     try {
       localStorage.removeItem('testQuestions');
@@ -338,8 +370,13 @@ const TestWindow = () => {
       const answers = Object.entries(subjectSpecificQuestions).reduce((acc, [, value]) => {
         const objs = value.map((val) => ({
           question_id: val.id,
-          response: val.response
+          user_response: val.response,
+          correct_response: getCorrectResponse(val),
+          question_type: val.question_type,
+          positive_marks: val.positive_marks,
+          negative_marks: val.negative_marks
         }));
+
         return [...acc, ...objs];
       }, []);
 
@@ -349,7 +386,7 @@ const TestWindow = () => {
       //   console.log('✅ Test submitted successfully.');
       // }
 
-
+      
 
       console.log(answers);
     } catch (err) {
@@ -361,6 +398,10 @@ const TestWindow = () => {
   };
 
   if (!eventDetails) return <div>Loading test...</div>;
+
+  if (isExamLoading || isQuestionLoading) {
+    return <div>Loading...</div>
+  }
 
   return (
     <div className='flex'>
@@ -414,7 +455,7 @@ const TestWindow = () => {
         {/* Header + Timer + Scoring Info */}
         <div className='flex w-full justify-between space-x-5'>
           <div className='font-bold p-5'>
-            <h1 className='text-3xl font-bold'>{eventDetails.batch.name}</h1>
+            <h1 className='text-3xl font-bold'>{eventDetails.batch_id.name} - {eventDetails.batch_id.year}</h1>
             <h2 className='text-lg font-bold'>{eventDetails.name}</h2>
           </div>
           <div className="flex items-center gap-2 text-red-700 font-semibold px-4 py-1.5 bg-red-100 border border-red-300 rounded-xl shadow-sm">
