@@ -4,7 +4,7 @@ import api from './api';
 export const orgLogin=async (data)=>{
     const response=await api.post(`/v1/auth/org-login`,
         data
-    );
+    );  
     return response.data;
 }
 

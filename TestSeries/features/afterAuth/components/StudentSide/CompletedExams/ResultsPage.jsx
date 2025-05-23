@@ -127,7 +127,7 @@ const ResultsPage = () => {
                                                 }
                                             </td>
                                             <td className="px-6 py-4 text-center">
-                                                {dateFormatter(result.date).split(' ')[0]}
+                                                {dateFormatter(result.resultDate).split(' ')[0]}
                                             </td>
                                             <td className="flex justify-center mx-auto w-fit px-6 py-4 gap-8">
                                                 <button

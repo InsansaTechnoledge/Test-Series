@@ -47,7 +47,7 @@ const resultSchema = new Schema({
         type: Number,
         min: [1, `Rank can't be negative`]
     },
-    resultData: {
+    resultDate: {
         type: Date,
         default: Date.now()
     }

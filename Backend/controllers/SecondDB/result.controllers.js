@@ -40,7 +40,7 @@ export const fetchStudentResults = async (req, res) => {
   
       let studentResults = await Result.find(
         { studentId },
-        { examId: 1, marks: 1, rank: 1, status: 1, createdAt: 1, updatedAt: 1 }
+        { examId: 1, marks: 1, rank: 1, status: 1, createdAt: 1, updatedAt: 1, resultDate: 1 }
       );
   
       if (!studentResults || studentResults.length === 0) {

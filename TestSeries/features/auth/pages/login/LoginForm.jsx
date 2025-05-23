@@ -18,7 +18,7 @@ const LoginForm = () => {
 
   useEffect(()=>{
     if(user && role === 'Institute') {
-      console.log(user);
+      console.log("loginForm",user);
       navigate('/institute/institute-landing');
     } else if(user && role === 'Student') {
       navigate('/student/student-landing');
