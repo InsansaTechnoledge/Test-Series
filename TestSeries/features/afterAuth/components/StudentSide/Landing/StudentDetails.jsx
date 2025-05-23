@@ -1,26 +1,24 @@
-import React from 'react';
 import { 
-  Award, 
-  BookOpen, 
-  BookOpenCheck, 
-  Hexagon, 
+  BookOpen,  
   Mail, 
-  Medal, 
   NotepadText, 
   Phone, 
-  UsersRound 
 } from 'lucide-react';
 import { useUser } from '../../../../../contexts/currentUserContext';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useCachedBatches } from '../../../../../hooks/useCachedBatches';
-
-const subjects = ["Physics", "Chemistry", "Maths", "English", "Computer science"];
 
 export default function StudentDetails() {
     const {user}=useUser();
     const [student,setStudent]=useState(user);
     const {batchMap}=useCachedBatches();
     const studentBatch=batchMap[user?.batchId];
+
+    useEffect(() => {
+        if (user) {
+            setStudent(user);
+        }
+    },[user])
 
   return (
     <div className="w-full max-w-7xl mx-auto bg-white rounded-xl  overflow-hidden">
