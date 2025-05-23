@@ -128,7 +128,8 @@ const BatchList = () => {
                                             <td className="mx-auto w-fit px-6 py-4 flex justify-center gap-8">
 
                                                 <button
-                                                    className=" font-medium text-black hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer">
+                                                    className=" font-medium text-black hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer"
+                                                    onClick={() => navigate(`/institute/batch/${batch.id}`)}>
                                                     <Eye />
                                                 </button>
                                                 <button

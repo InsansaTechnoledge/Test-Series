@@ -5,9 +5,7 @@ import BeforeAuthLayout from '../../layouts/BeforeAuthLayout';
 import AuthLayout from '../../layouts/authLayout';
 import LoginMainPage from '../../features/auth/pages/LoginMainPage';
 import InstituteRegistrationPage from '../../features/auth/pages/InstituteRegistrationPage';
-import StudentHero from '../../features/afterAuth/components/StudentSide/Landing/StudentHero';
 import AfterAuthLayout from '../../layouts/afterAuthLayout';
-import InstituteLanding from '../../features/afterAuth/pages/InstituteLanding';
 import StudentLanding from '../../features/afterAuth/pages/StudentLanding';
 import { useUser } from '../../contexts/currentUserContext';
 import { checkAuth } from '../../utils/services/authService';
@@ -28,6 +26,8 @@ import CreateExam from '../../features/afterAuth/components/InstituteSide/ExamFl
 import ExamListPage from '../../features/afterAuth/components/InstituteSide/ExamListPage';
 import ResultsPage from '../../features/afterAuth/components/StudentSide/CompletedExams/ResultsPage';
 import TestWindow from '../../features/Test/TestWindow';
+import BatchViewPage from '../../features/afterAuth/components/InstituteSide/ViewPages/BatchViewPage';
+
 const PageLinks = () => {
   const { user, setUser } = useUser();
   const fetchUser = async () => {
@@ -80,12 +80,14 @@ const PageLinks = () => {
               <Route path='create-exam' element={<CreateExam />} />
               <Route path='exam-list' element={<ExamListPage />} />
               <Route path='institute-landing' element={<InstituteLandingPage />} />
+              <Route path='batch/:batchId' element={<BatchViewPage />} />
               <Route path='*' element={<div>Invalid path</div>} />
             </Route>
             <Route path='/student' element={<StudentLayout />}>
               <Route path='student-landing' element={<StudentLanding />} />
               <Route path='upcoming-exams' element={<UpcomingExam />} />
               <Route path='completed-exams' element={<ResultsPage />} />
+              <Route path='batch' element={<BatchViewPage />} />
             </Route>
           </Route>
         </Route>

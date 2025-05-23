@@ -29,12 +29,13 @@ export const useCachedUser = () => {
         cacheTime: 24 * 60 * 60 * 1000,
         retry: 0,
     });
-
+    const userMap=Object.fromEntries(users.map((user) => [user._id, user]));
 
     return {
         users,
         isLoading,
-        isError
+        isError,
+        userMap
     }
 
 };
