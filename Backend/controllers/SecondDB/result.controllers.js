@@ -5,6 +5,7 @@ import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
 export const addResult = async (req, res) => {
     try {
         const resultData = req.body;
+        console.log(resultData);
         const result = await Result.create(resultData);
 
         return new APIResponse(200, result, "Result added successfully!").send(res);

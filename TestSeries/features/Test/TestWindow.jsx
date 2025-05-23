@@ -7,6 +7,8 @@ import { useLocation } from 'react-router-dom';
 import { useUser } from '../../contexts/currentUserContext';
 import { useCachedQuestions } from '../../hooks/useCachedQuestions';
 import { useCachedExam } from '../../hooks/useCachedExam';
+import { calculateResult } from './utils/resultCalculator';
+import { submitResult } from '../../utils/services/resultService';
 
 const TestWindow = () => {
   const [eventDetails, setEventDetails] = useState();
@@ -20,17 +22,19 @@ const TestWindow = () => {
   const [countdown, setCountdown] = useState(null);
   const [allWarnings, setAllWarnings] = useState([]);
   const [showFinalPopup, setShowFinalPopup] = useState(false);
-
+  const {user} = useUser();
   const secretKey = 'secret-key-for-encryption';
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const userId = searchParams.get('userId');
-  const examId = searchParams.get('examId');
-  const eventId = searchParams.get('eventId');
+  // const userId = searchParams.get('userId');
+  // const examId = searchParams.get('examId');
+  // const eventId = searchParams.get('eventId');
   // const [proctorStatus, setProctorStatus] = useState('Initializing...');
 
-  const { questions, isLoading: isQuestionLoading } = useCachedQuestions("aa632eab-74ad-4a6b-a675-60c571257c00");
-  const { exam, isLoading: isExamLoading } = useCachedExam("aa632eab-74ad-4a6b-a675-60c571257c00");
+
+  const examId = "aa632eab-74ad-4a6b-a675-60c571257c00";
+  const { questions, isLoading: isQuestionLoading } = useCachedQuestions(examId);
+  const { exam, isLoading: isExamLoading } = useCachedExam(examId);
 
   // const dummyExam = {
   //   id: "bd0c2f10-8d62-4c4b-97fc-fb289e28e72c",
@@ -302,7 +306,7 @@ const TestWindow = () => {
       console.log("subjectspecific", subjectSpecificQuestions);
     }
   }, [subjectSpecificQuestions]);
-  
+
   useEffect(() => {
     if (eventDetails) {
       const cached = localStorage.getItem('testQuestions');
@@ -331,7 +335,6 @@ const TestWindow = () => {
     }
   }, [selectedSubject]);
 
-
   const getCorrectResponse = (question) => {
     switch (question.question_type) {
       case "mcq":
@@ -350,13 +353,16 @@ const TestWindow = () => {
           const response = getCorrectResponse(sub_q);
           return {
             ...acc,
-            [sub_q.id]: response
+            [sub_q.id]: [response, sub_q.positive_marks, sub_q.negative_marks, sub_q.question_type]
           };
-        },{})
+        }, {})
       default:
         return question.correct_response;
     }
   }
+
+
+  
 
   const handleSubmitTest = async () => {
     try {
@@ -383,9 +389,28 @@ const TestWindow = () => {
       //   console.log('✅ Test submitted successfully.');
       // }
 
-      
-
       console.log(answers);
+
+      const result = calculateResult(answers);
+      console.log(result)
+
+      const payload = {
+        studentId: user._id,
+        examId: examId,
+        status: "attempted",
+        wrongAnswers: result.wrongAnswers,
+        unattempted: result.unattempted,
+        marks: result.totalMarks,
+    
+      }
+
+      console.log(payload);
+
+      const response = await submitResult(payload);
+      if(response.status==200){
+        console.log("Result submitted");
+      }
+
     } catch (err) {
       console.log(err);
     }
@@ -407,111 +432,111 @@ const TestWindow = () => {
           <div>Loading test</div>
         ) : (
           <>
-             <div className='p-3 flex flex-col'>
+            <div className='p-3 flex flex-col'>
 
-{/* <div className="text-center text-lg font-bold py-2 text-purple-600">
+              {/* <div className="text-center text-lg font-bold py-2 text-purple-600">
 {proctorStatus}
 </div> */}
 
-{warning && (
-  <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 bg-yellow-100 border-l-4 border-yellow-600 text-yellow-900 px-6 py-3 rounded-xl shadow-lg text-center w-[90%] sm:w-[500px] font-medium">
-    <span className="text-xl mr-2">⚠️</span>
-    {warning === "No face detected" && countdown !== null
-      ? `You have ${countdown} sec to come back to the screen`
-      : warning}
-  </div>
-)}
+              {warning && (
+                <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 bg-yellow-100 border-l-4 border-yellow-600 text-yellow-900 px-6 py-3 rounded-xl shadow-lg text-center w-[90%] sm:w-[500px] font-medium">
+                  <span className="text-xl mr-2">⚠️</span>
+                  {warning === "No face detected" && countdown !== null
+                    ? `You have ${countdown} sec to come back to the screen`
+                    : warning}
+                </div>
+              )}
 
-{showFinalPopup && (
-  <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center px-4 sm:px-0">
-    <div className="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 p-6 rounded-2xl shadow-2xl max-w-2xl w-full animate-fade-in">
-      <div className="text-center">
-        <h2 className="text-2xl sm:text-3xl font-bold text-red-600 flex items-center justify-center gap-2">
-          <span>🚨</span> Multiple Anomalies Detected
-        </h2>
-        <p className="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-300">
-          Your test is being auto-submitted due to repeated violations. Please review the detected incidents below:
-        </p>
-      </div>
+              {showFinalPopup && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center px-4 sm:px-0">
+                  <div className="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 p-6 rounded-2xl shadow-2xl max-w-2xl w-full animate-fade-in">
+                    <div className="text-center">
+                      <h2 className="text-2xl sm:text-3xl font-bold text-red-600 flex items-center justify-center gap-2">
+                        <span>🚨</span> Multiple Anomalies Detected
+                      </h2>
+                      <p className="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-300">
+                        Your test is being auto-submitted due to repeated violations. Please review the detected incidents below:
+                      </p>
+                    </div>
 
-      <ul className="mt-4 max-h-48 overflow-y-auto text-sm sm:text-base bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-600 rounded-md px-4 py-3 space-y-1 list-disc list-inside shadow-inner">
-        {allWarnings.map((item, idx) => (
-          <li key={idx} className="text-red-700 dark:text-red-300">
-            {item}
-          </li>
-        ))}
-      </ul>
+                    <ul className="mt-4 max-h-48 overflow-y-auto text-sm sm:text-base bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-600 rounded-md px-4 py-3 space-y-1 list-disc list-inside shadow-inner">
+                      {allWarnings.map((item, idx) => (
+                        <li key={idx} className="text-red-700 dark:text-red-300">
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
 
-      <div className="mt-6 text-center">
-        <button
-          onClick={handleSubmitTest}
-          className="inline-flex items-center justify-center px-6 py-2.5 text-white bg-purple-600 hover:bg-purple-700 rounded-lg text-base font-semibold transition duration-200 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-        >
-          Okay, Close Test
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+                    <div className="mt-6 text-center">
+                      <button
+                        onClick={handleSubmitTest}
+                        className="inline-flex items-center justify-center px-6 py-2.5 text-white bg-purple-600 hover:bg-purple-700 rounded-lg text-base font-semibold transition duration-200 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      >
+                        Okay, Close Test
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
 
-{/* Header + Timer + Scoring Info */}
-<div className='flex w-full justify-between space-x-5'>
-  <div className='font-bold p-5'>
-    <h1 className='text-3xl font-bold'>{eventDetails.batch_id.name}</h1>
-    <h2 className='text-lg font-bold'>{eventDetails.batch_id.name}</h2>
-  </div>
-  <div className="flex items-center gap-2 text-red-700 font-semibold px-4 py-1.5 bg-red-100 border border-red-300 rounded-xl shadow-sm">
-    <span className="text-lg">🚨</span>
-    Warnings: <span className="text-red-800 font-bold">{warningCount}</span>/5
-  </div>
+              {/* Header + Timer + Scoring Info */}
+              <div className='flex w-full justify-between space-x-5'>
+                <div className='font-bold p-5'>
+                  <h1 className='text-3xl font-bold'>{eventDetails.batch_id.name}</h1>
+                  <h2 className='text-lg font-bold'>{eventDetails.batch_id.name}</h2>
+                </div>
+                <div className="flex items-center gap-2 text-red-700 font-semibold px-4 py-1.5 bg-red-100 border border-red-300 rounded-xl shadow-sm">
+                  <span className="text-lg">🚨</span>
+                  Warnings: <span className="text-red-800 font-bold">{warningCount}</span>/5
+                </div>
 
-  <div className='flex justify-end space-x-3 bg-gray-100 border-purple-600 border-2 rounded-lg p-3'>
-    {/* <div className='text-green-700 font-bold border rounded-lg px-4 py-2'>Correct: +{eventDetails.exam.positive_marks}</div> */}
-    {/* <div className='text-red-700 font-bold border rounded-lg px-4 py-2'>Wrong: -{eventDetails.exam.negative_marks}</div> */}
-    {/* <div className='text-gray-700 font-bold border rounded-lg px-4 py-2'>Unattempted: 0</div> */}
-    <div className='px-4 py-2 bg-purple-200 rounded-lg font-semibold'>
-      <div>Time Left</div>
-      <div className='text-xl font-bold'>
-        {/* <CountdownTimer initialTime={eventDetails.duration} handleSubmitTest={handleSubmitTest} submitted={submitted} /> */}
-      </div>
-    </div>
-  </div>
-</div>
+                <div className='flex justify-end space-x-3 bg-gray-100 border-purple-600 border-2 rounded-lg p-3'>
+                  {/* <div className='text-green-700 font-bold border rounded-lg px-4 py-2'>Correct: +{eventDetails.exam.positive_marks}</div> */}
+                  {/* <div className='text-red-700 font-bold border rounded-lg px-4 py-2'>Wrong: -{eventDetails.exam.negative_marks}</div> */}
+                  {/* <div className='text-gray-700 font-bold border rounded-lg px-4 py-2'>Unattempted: 0</div> */}
+                  <div className='px-4 py-2 bg-purple-200 rounded-lg font-semibold'>
+                    <div>Time Left</div>
+                    <div className='text-xl font-bold'>
+                      {/* <CountdownTimer initialTime={eventDetails.duration} handleSubmitTest={handleSubmitTest} submitted={submitted} /> */}
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-<div className='grid grid-cols-5 mt-5 space-x-5 p-3'>
-  <div className='col-span-3 flex flex-col space-y-5 p-3'>
-    <QuestionSection
-      setSubjectSpecificQuestions={setSubjectSpecificQuestions}
-      setSelectedQuestion={setSelectedQuestion}
-      selectedQuestion={selectedQuestion}
-      selectedSubject={selectedSubject}
-      subjectSpecificQuestions={subjectSpecificQuestions}
-    />
-  </div>
-  <div className='col-span-2'>
-    <QuestionListSection
-      subjectSpecificQuestions={subjectSpecificQuestions}
-      setSubjectSpecificQuestions={setSubjectSpecificQuestions}
-      selectedSubject={selectedSubject}
-      setSelectedSubject={setSelectedSubject}
-      selectedQuestion={selectedQuestion}
-      setSelectedQuestion={setSelectedQuestion}
-      eventDetails={eventDetails}
-    />
-  </div>
-</div>
+              <div className='grid grid-cols-5 mt-5 space-x-5 p-3'>
+                <div className='col-span-3 flex flex-col space-y-5 p-3'>
+                  <QuestionSection
+                    setSubjectSpecificQuestions={setSubjectSpecificQuestions}
+                    setSelectedQuestion={setSelectedQuestion}
+                    selectedQuestion={selectedQuestion}
+                    selectedSubject={selectedSubject}
+                    subjectSpecificQuestions={subjectSpecificQuestions}
+                  />
+                </div>
+                <div className='col-span-2'>
+                  <QuestionListSection
+                    subjectSpecificQuestions={subjectSpecificQuestions}
+                    setSubjectSpecificQuestions={setSubjectSpecificQuestions}
+                    selectedSubject={selectedSubject}
+                    setSelectedSubject={setSelectedSubject}
+                    selectedQuestion={selectedQuestion}
+                    setSelectedQuestion={setSelectedQuestion}
+                    eventDetails={eventDetails}
+                  />
+                </div>
+              </div>
 
-<button
-  onClick={handleSubmitTest}
-  className='mx-auto mt-10 rounded-md text-lg font-semibold bg-blue-900 px-4 py-2 w-fit text-white'
->
-  Submit Test
-</button>
-</div>
+              <button
+                onClick={handleSubmitTest}
+                className='mx-auto mt-10 rounded-md text-lg font-semibold bg-blue-900 px-4 py-2 w-fit text-white'
+              >
+                Submit Test
+              </button>
+            </div>
           </>
         )
       }
-     
+
     </div>
   );
 };
