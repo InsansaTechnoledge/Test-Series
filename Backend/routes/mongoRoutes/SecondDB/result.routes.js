@@ -6,7 +6,7 @@ const router = express.Router();
 router.post('/', addResult);
 router.patch('/', updateResult);
 router.get('/', fetchStudentResults);
-router.get('/exam/:id', fetchAllResultsForExam);
+router.get('/exam/:examId', fetchAllResultsForExam);
 router.get('/:id', fetchDetailedResultById);
 router.delete('/:id', deleteResult);
 

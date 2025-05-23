@@ -28,6 +28,7 @@ import CreateExam from '../../features/afterAuth/components/InstituteSide/ExamFl
 import ExamListPage from '../../features/afterAuth/components/InstituteSide/ExamListPage';
 import ResultsPage from '../../features/afterAuth/components/StudentSide/CompletedExams/ResultsPage';
 import TestWindow from '../../features/Test/TestWindow';
+import ResultDetailPage from '../../features/afterAuth/components/StudentSide/CompletedExams/DetailedResultPage';
 import StudentRoutes from '../../routes/StudentRoutes';
 import InstituteRoutes from '../../routes/InstituteRoutes';
 import LandingRoutes from '../../routes/LandingRoutes';
@@ -90,6 +91,7 @@ const PageLinks = () => {
                 <Route path='student-landing' element={<StudentLanding />} />
                 <Route path='upcoming-exams' element={<UpcomingExam />} />
                 <Route path='completed-exams' element={<ResultsPage />} />
+              <Route path='result/:examId' element={<ResultDetailPage />} />
               </Route>
             </Route>
           </Route>

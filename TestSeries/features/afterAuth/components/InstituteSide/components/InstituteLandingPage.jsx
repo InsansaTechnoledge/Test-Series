@@ -14,10 +14,6 @@ const InstituteLandingPage = () => {
       </div>
     )
   }
-
-
-
-
   return (
     <div className="h-[600px] flex flex-col">
       <div className="relative flex items-center justify-center h-full bg-gradient-to-r from-blue-900 to-indigo-900 overflow-hidden">

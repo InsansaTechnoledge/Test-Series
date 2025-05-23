@@ -4,11 +4,14 @@ import NeedHelpComponent from '../../InstituteSide/components/NeedHelpComponent'
 import { Eye, Search } from 'lucide-react'
 import dateFormatter from '../../../../../utils/dateFormatter'
 import { getStudentResults } from '../../../../../utils/services/resultPage'
+import { useNavigate } from 'react-router-dom';
+
 const ResultsPage = () => {
 
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedResult, setSelectedResult] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -130,11 +133,13 @@ const ResultsPage = () => {
                                                 {dateFormatter(result.resultDate).split(' ')[0]}
                                             </td>
                                             <td className="flex justify-center mx-auto w-fit px-6 py-4 gap-8">
-                                                <button
-                                                    className="font-medium text-black hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer">
-                                                    <Eye />
-                                                </button>
-                                                
+                                            <button
+                                           onClick={() => navigate(`/student/result/${result.examId}?name=${encodeURIComponent(result.examName)}`)}
+
+                                            className="font-medium text-black hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer"
+                                            >
+                                            <Eye />
+                                            </button>                                                      
                                             </td>
                                         </tr>
 
