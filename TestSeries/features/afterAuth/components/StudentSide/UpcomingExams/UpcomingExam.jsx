@@ -22,10 +22,12 @@ const UpcomingExam = () => {
       try {
         const exams = await fetchUpcomingExams();
         
+      
         const upcoming = exams.filter(exam => exam.go_live === false || exam.go_live === "FALSE");
         setUpcomingExams(upcoming);
 
         const live = exams.filter(exam => exam.go_live === true || exam.go_live === "TRUE" )
+        
         setLiveExams(live)
       } catch (error) {
         console.error("❌ Error fetching upcoming exams:", error);

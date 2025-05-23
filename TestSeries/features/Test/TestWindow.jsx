@@ -26,11 +26,18 @@ const TestWindow = () => {
   const searchParams = new URLSearchParams(location.search);
   const userId = searchParams.get('userId');
   const examId = searchParams.get('examId');
-  const eventId = searchParams.get('eventId');
   // const [proctorStatus, setProctorStatus] = useState('Initializing...');
 
-  const { questions, isLoading: isQuestionLoading } = useCachedQuestions("aa632eab-74ad-4a6b-a675-60c571257c00");
-  const { exam, isLoading: isExamLoading } = useCachedExam("aa632eab-74ad-4a6b-a675-60c571257c00");
+  // const { questions, isLoading: isQuestionLoading } = useCachedQuestions("aa632eab-74ad-4a6b-a675-60c571257c00");
+  // const { exam, isLoading: isExamLoading } = useCachedExam("aa632eab-74ad-4a6b-a675-60c571257c00");
+
+  console.log(examId);
+
+  
+  
+  const { questions, isLoading: isQuestionLoading } = useCachedQuestions(examId);
+  const { exam, isLoading: isExamLoading } = useCachedExam(examId);
+
 
   // const dummyExam = {
   //   id: "bd0c2f10-8d62-4c4b-97fc-fb289e28e72c",

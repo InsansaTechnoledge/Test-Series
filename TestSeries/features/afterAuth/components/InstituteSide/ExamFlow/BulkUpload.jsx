@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import * as XLSX from 'xlsx';
 import { v4 as uuidv4 } from 'uuid';
-
+import { generateSampleExcel } from './SampleExcel';
 const BulkUpload = ({ setQuestions }) => {
     const [isUploading, setIsUploading] = useState(false);
     const [uploadResult, setUploadResult] = useState(null);
@@ -142,13 +142,27 @@ const BulkUpload = ({ setQuestions }) => {
               base.test_cases = parseJsonField(row.test_cases);
             }
       
+            // if (base.type === 'match') {
+            //   base.left_items = parseJsonField(row.left_items);
+            //   base.right_items = parseJsonField(row.right_items);
+            //   base.correct_pairs = typeof row.correct_pairs === 'string'
+            //     ? JSON.parse(row.correct_pairs)
+            //     : row.correct_pairs;
+            // }
+
             if (base.type === 'match') {
-              base.left_items = parseJsonField(row.left_items);
-              base.right_items = parseJsonField(row.right_items);
-              base.correct_pairs = typeof row.correct_pairs === 'string'
-                ? JSON.parse(row.correct_pairs)
-                : row.correct_pairs;
-            }
+                const leftItems = parseJsonField(row.left_items);
+                const rightItems = parseJsonField(row.right_items);
+                const correctPairs = typeof row.correct_pairs === 'string'
+                  ? JSON.parse(row.correct_pairs)
+                  : row.correct_pairs;
+              
+                base.left_items = leftItems;
+                base.right_items = rightItems;
+                base.correct_pairs = correctPairs || {};
+              }
+              
+              
       
 
             if (base.type === 'comprehension') {
@@ -216,7 +230,18 @@ const BulkUpload = ({ setQuestions }) => {
 
 
           </ul>
+
         </div>
+          <div>Sample Excel format Dwonload </div>
+          <p>Download the excel , fill the questions in it and then upload it </p>
+
+          <button
+            onClick={generateSampleExcel}
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+            Download Sample Excel
+          </button>
+
       </div>
     );
   };

@@ -235,15 +235,24 @@ const QuestionPreview = ({ questions , setQuestions , examDetails}) => {
                             </div>
                             </div>
 
-                            {q.correct_pairs && (
+                            {q.correct_pairs && typeof q.correct_pairs === 'object' ? (
                             <div className="mt-4">
+                               {console.log('Correct Pairs Preview:', q.correct_pairs, typeof q.correct_pairs)}
+
                                 <h4 className="font-semibold text-sm mb-1 text-green-700">Correct Pairs:</h4>
-                                <div className="text-sm text-gray-800 bg-green-50 border border-green-200 p-2 rounded">
-                                {Object.entries(q.correct_pairs).map(([leftIdx, rightChar], i) => (
-                                    <div key={i}>{`Left ${leftIdx} → Right ${rightChar}`}</div>
+                                <div className="text-sm text-gray-800 bg-green-50 border border-green-200 p-2 rounded space-y-1">
+                                {Object.entries(q.correct_pairs).map(([leftVal, rightVal], i) => (
+                                    <div key={i}>
+                                    <span className="font-medium">{leftVal}</span> → <span className="text-green-700 font-semibold">{rightVal}</span>
+                                    </div>
                                 ))}
+                                <p className="text-xs text-gray-500 italic mt-1">
+                                    Note: Right items will be shown in random order during the test.
+                                </p>
                                 </div>
                             </div>
+                            ) : (
+                            <div className="text-sm text-red-500 mt-2">❌ Correct pairs data missing or invalid</div>
                             )}
                         </div>
                         )}
