@@ -28,6 +28,7 @@ import CreateExam from '../../features/afterAuth/components/InstituteSide/ExamFl
 import ExamListPage from '../../features/afterAuth/components/InstituteSide/ExamListPage';
 import ResultsPage from '../../features/afterAuth/components/StudentSide/CompletedExams/ResultsPage';
 import TestWindow from '../../features/Test/TestWindow';
+import ResultDetailPage from '../../features/afterAuth/components/StudentSide/CompletedExams/DetailedResultPage';
 const PageLinks = () => {
   const { user, setUser } = useUser();
   const fetchUser = async () => {
@@ -82,10 +83,12 @@ const PageLinks = () => {
               <Route path='institute-landing' element={<InstituteLandingPage />} />
               <Route path='*' element={<div>Invalid path</div>} />
             </Route>
+
             <Route path='/student' element={<StudentLayout />}>
               <Route path='student-landing' element={<StudentLanding />} />
               <Route path='upcoming-exams' element={<UpcomingExam />} />
               <Route path='completed-exams' element={<ResultsPage />} />
+              <Route path='result/:examId' element={<ResultDetailPage />} />
             </Route>
           </Route>
         </Route>

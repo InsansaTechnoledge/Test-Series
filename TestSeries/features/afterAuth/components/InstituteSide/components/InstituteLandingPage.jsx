@@ -5,9 +5,9 @@ import { MapPin, Mail, Phone, Globe } from 'lucide-react'
 
 const InstituteLandingPage = () => {
   const { user } = useUser();
-  console.log(user);
+  console.log("@@",user);
 
-  const orgInfo = user?.user || {};
+  const orgInfo = user || {};
   const address = orgInfo.address || {};
 
   return (
