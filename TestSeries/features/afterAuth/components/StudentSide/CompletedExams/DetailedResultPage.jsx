@@ -329,6 +329,8 @@ const ResultPage = () => {
                         <span>Scored: <strong className="text-green-600">{scoredMarks}</strong></span>
                         <span>Out of: <strong>{totalMarks}</strong></span>
                         <span>Percentage: <strong className={`${percentage >= 60 ? "text-green-600" : "text-red-600"}`}>{percentage}%</strong></span>
+                        <span>Rank: <strong>{resultData.rank}</strong></span>
+
                     </div>
                 </div>
 
