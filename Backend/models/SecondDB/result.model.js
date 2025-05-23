@@ -8,7 +8,7 @@ const wrongAnswersSchema = new Schema({
         required: [true, 'questionId is required']
     },
     response: {
-        type: String,
+        type: Schema.Types.Mixed,
         required: [true, 'response is required']
     }
 },{

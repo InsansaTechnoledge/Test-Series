@@ -39,16 +39,17 @@ const QuestionSection = ({ setSelectedQuestion, selectedQuestion, selectedSubjec
                 return (
                     typeof option === 'object' &&
                     option !== null &&
-                    Object.keys(option).length === (left_items?.length || 0)
+                    // Object.keys(option).length === (left_items?.length || 0)
+                    Object.keys(option).length > 0
                 );
 
             case 'comprehension': // option is object with subquestion answers
                 return (
                     typeof option === 'object' &&
                     option !== null &&
-                    Array.isArray(sub_questions) &&
+                    Array.isArray(sub_questions) ||
                     sub_questions.every((subQ, i) => {
-                        const subOption = option[subQ.id];
+                        const subOption = option?.[subQ.id];
                         if (subQ.question_type === 'mcq') return typeof subOption === 'number';
                         if (subQ.question_type === 'msq') return Array.isArray(subOption) && subOption.length > 0;
                         if (subQ.question_type === 'fill') return typeof subOption === 'string' && subOption.trim() !== '';

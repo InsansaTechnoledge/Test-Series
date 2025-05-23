@@ -14,7 +14,7 @@ export const useCachedQuestions = (examId) => {
             return response.data;
         } catch (err) {
             console.error(err);
-            throw err; // Let react-query handle error
+            throw err; 
         }
     };
 

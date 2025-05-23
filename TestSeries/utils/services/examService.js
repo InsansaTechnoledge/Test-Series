@@ -20,9 +20,14 @@ export const fetchExamsByOrganization = async () => {
     }
   };
   
-  
-
 export const goLiveExam = async (examId) => {
     const response = await api.put(`/v1/exam/${examId}/go-live`);
     return response.data;
   };
+
+  export const fetchUpcomingExams = async () => {
+    const response = await api.get(`/v1/exam`);
+    return response.data.data;
+  };
+  
+  

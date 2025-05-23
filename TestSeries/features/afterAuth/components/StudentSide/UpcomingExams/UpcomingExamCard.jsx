@@ -42,7 +42,7 @@ const UpcomingExamCard = ({ data }) => {
                         <Clock />
                     </div>
                     <span>
-                        {data.duration} Hours
+                        {data.duration} Mins
                     </span>
                 </div>
             </div>
