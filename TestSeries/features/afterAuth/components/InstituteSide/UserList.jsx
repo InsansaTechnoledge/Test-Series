@@ -18,17 +18,18 @@ const UserList = () => {
     const [selectedBatch, setSelectedBatch] = useState('');
     const queryClient = useQueryClient();
 
+
     const refreshFunction = () => {
         queryClient.invalidateQueries(['Users', user._id]);
         queryClient.invalidateQueries(['roleGroups', user._id]);
         queryClient.invalidateQueries(['batches', user._id]);
     }
 
-    // useEffect(()=>{
-    //     if(users){
-    //         setFilteredUsers(users);
-    //     }
-    // },[users])
+    useEffect(()=>{
+        if(users){
+            setFilteredUsers(users);
+        }
+    },[users])
 
     useEffect(() => {
         if (selectedBatch) {

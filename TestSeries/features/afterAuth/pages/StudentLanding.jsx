@@ -23,7 +23,7 @@ const StudentLanding = () => {
                 {/* <AiWorkingSteps /> */}
                 {/* <div className="w-16 h-1 bg-blue-800 mx-auto mb-4 rounded"></div> */}
                 <FacultySection />
-                <SubjectCards />
+                {/* <SubjectCards /> */}
                 <ExamStatsDashboard/>
         </>
     )
