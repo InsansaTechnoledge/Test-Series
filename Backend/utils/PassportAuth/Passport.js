@@ -78,7 +78,6 @@ passport.use('org-local',
 
 
 passport.serializeUser((user, done) => {
-      console.log("🚀 ~ file: passport.js:70 ~ passport.serializeUser ~ user:", user)
     // done(null,{id:user._id,role:user.roleId} );
     done(null, { id: user._id, role: user.role });
   

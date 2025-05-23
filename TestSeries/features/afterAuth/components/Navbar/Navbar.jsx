@@ -5,8 +5,6 @@ import LogoutModal from '../../../../components/Logout/LogoutModal';
 
 const Navbar = () => {
   const { user } = useUser();
-  console.log(user)
-
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const User = user?.user || user;

@@ -7,9 +7,11 @@ import { useCachedBatches } from '../../../../hooks/useCachedBatches'
 import { RefreshCcw, Upload, Download, Plus, Trash2, Eye, EyeOff, Users, FileSpreadsheet, CheckCircle } from 'lucide-react'
 import NeedHelpComponent from './components/NeedHelpComponent'
 import { QueryClient } from '@tanstack/react-query'
+import { useUser } from '../../../../contexts/currentUserContext'
 
 
 const AddStudent = () => {
+  const {user} = useUser();
   const [batch, setBatch] = useState('')
   const [students, setStudents] = useState([getEmptyStudent()])
   const [showPassword, setShowPassword] = useState({})
@@ -200,7 +202,7 @@ const AddStudent = () => {
         console.log(res);
         setStudents([getEmptyStudent()]); 
         setErrors('')
-        queryClient.invalidateQueries(['Students']) // Invalidate the students query to refresh the data
+        queryClient.invalidateQueries(['Students',user._id]) // Invalidate the students query to refresh the data
 
 
       // Reset the form after submission
