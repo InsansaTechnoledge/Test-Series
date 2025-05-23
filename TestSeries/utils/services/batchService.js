@@ -1,8 +1,9 @@
 import api from './api';
 
-export const fetchBatchList = async () => {
-    const response = await api.get(`/v1/batch/get-batch`);
-    return response.data;
+export const fetchBatchList = async (id) => {
+  const query = id ? `?id=${id}` : '';
+  const response = await api.get(`/v1/batch/get-batch/${query}`);
+  return response.data;
 };
 
 export const createBatch = async (batchData) => {

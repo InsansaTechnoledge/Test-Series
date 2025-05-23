@@ -71,8 +71,7 @@ export const getOrganizationById = async (req, res) => {
 
     try{
 
-        const {id} = req.params
-        
+        const {id} = req.params        
         const org = await Organization.findById(id)
         if (!org) {
             return new APIError(404, ['org not found']).send(res);
@@ -80,7 +79,7 @@ export const getOrganizationById = async (req, res) => {
 
         return new APIResponse(200, org, 'org fetched').send(res);
 
-    } catch(e) {
+    } catch(err) {
        new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while fetching organization Data", err.message || ""]).send(res);
        
 

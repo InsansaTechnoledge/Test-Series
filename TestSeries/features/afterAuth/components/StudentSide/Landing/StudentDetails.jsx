@@ -10,19 +10,27 @@ import {
   Phone, 
   UsersRound 
 } from 'lucide-react';
+import { useUser } from '../../../../../contexts/currentUserContext';
+import { useState } from 'react';
+import { useCachedBatches } from '../../../../../hooks/useCachedBatches';
 
-const student = {
-  name: "Jay Fanse",
-  email: "jayf29112003@gmail.com",
-  phone: "+91 9726535193",
-  profilePhoto: `https://ui-avatars.com/api/?name=Jay%20Fanse&background=random`,
-//   certifications: ['Table-Topper', 'Early-Bird', 'All-Nighter', 'Finisher', 'Early-Bird', 'All-Nighter', 'Finisher']
-certifications:[]
-};
+// const student = {
+//   name: "Jay Fanse",
+//   email: "jayf29112003@gmail.com",
+//   phone: "+91 9726535193",
+//   profilePhoto: `https://ui-avatars.com/api/?name=Jay%20Fanse&background=random`,
+// //   certifications: ['Table-Topper', 'Early-Bird', 'All-Nighter', 'Finisher', 'Early-Bird', 'All-Nighter', 'Finisher']
+// certifications:[]
+// };
 
 const subjects = ["Physics", "Chemistry", "Maths", "English", "Computer science"];
 
 export default function StudentDetails() {
+    const {user}=useUser();
+    const [student,setStudent]=useState(user);
+    const {batchMap}=useCachedBatches();
+    const studentBatch=batchMap[user?.batchId];
+
   return (
     <div className="w-full max-w-7xl mx-auto bg-white rounded-xl  overflow-hidden">
 
@@ -96,19 +104,19 @@ export default function StudentDetails() {
         {/* Batch Details Section */}
         <div className="space-y-3 sm:space-y-4 text-center sm:text-left">
           <div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-blue-900">BE-4</h2>
-            <p className="text-base sm:text-lg font-medium text-blue-700">2025</p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-blue-900">{studentBatch?.name}</h2>
+            <p className="text-base sm:text-lg font-medium text-blue-700">{studentBatch?.year}</p>
           </div>
           
           <div className="space-y-2 sm:space-y-3 text-gray-700">
             <div className="flex  sm:flex-row items-center sm:items-center gap-3 sm:gap-3">
               <UsersRound size={18} className="text-blue-600" />
-              <span className="text-sm sm:text-base">30 Students</span>
+              <span className="text-sm sm:text-base">30 Students //this is hardcoded</span>
             </div>
             
             <div className="flex  sm:flex-row items-center sm:items-center gap-3 sm:gap-3">
               <BookOpenCheck size={18} className="text-blue-600" />
-              <span className="text-sm sm:text-base">5 Tests taken</span>
+              <span className="text-sm sm:text-base">5 Tests taken // this is hardcodes</span>
             </div>
             
             <div className="flex  sm:flex-row items-center sm:items-start gap-3 sm:gap-3">
@@ -119,7 +127,7 @@ export default function StudentDetails() {
                     key={idx}
                     className="text-xs font-medium bg-blue-100 text-blue-800 px-2 sm:px-3 py-3 rounded-full"
                   >
-                    {subject}
+                    //have to add the subject in the batch table
                   </span>
                 ))}
               </div>
@@ -127,8 +135,13 @@ export default function StudentDetails() {
             
             <div className="flex sm:flex-row items-center sm:items-center gap-1 sm:gap-3 pt-1">
               <NotepadText size={18} className="text-blue-600" />
-              <button className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-blue-700 border border-blue-300 rounded-lg hover:bg-blue-800 hover:text-white transition-colors">
-                View syllabus
+              <button className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-blue-700 border border-blue-300 rounded-lg hover:bg-blue-800 hover:text-white transition-colors"
+              onClick={() => {
+                // Add your logic to view syllabus here
+                console.log("View Syllabus clicked");
+              }}>
+                {studentBatch?.syllabus ? "View Syllabus" : "Syllabus not added yet"}
+
               </button>
             </div>
           </div>

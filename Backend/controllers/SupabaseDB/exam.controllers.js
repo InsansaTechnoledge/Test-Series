@@ -1,4 +1,4 @@
-import { createExam, deleteExam, fetchSelective, updateExam , setExamLive, getExamOrganization } from '../../utils/SqlQueries/exam.queries.js';
+import { createExam, deleteExam, fetchSelective, updateExam , setExamLive, getExamOrganization , fetchNonLiveExams } from '../../utils/SqlQueries/exam.queries.js';
 import {APIError} from '../../utils/ResponseAndError/ApiError.utils.js'
 import {APIResponse} from '../../utils/ResponseAndError/ApiResponse.utils.js'
 
@@ -108,6 +108,26 @@ export const goLiveExamById = async (req, res) => {
       return new APIError(
         err?.status || 500,
         ["Something went wrong while going live", err?.message]
+      ).send(res);
+    }
+  };
+
+  export const getUpcomingExams = async (req, res) => {
+    try {
+      const orgId = req.user?.organizationId || req.user?.orgId || req.user?._id;
+  
+      if (!orgId) {
+        return new APIError(400, ['Missing organization ID']).send(res);
+      }
+  
+      const exams = await fetchNonLiveExams(orgId);
+  
+      return new APIResponse(200, exams, "Upcoming exams fetched successfully").send(res);
+    } catch (err) {
+      console.error("❌ Error fetching upcoming exams:", err);
+      return new APIError(
+        err?.status || 500,
+        ["Something went wrong while fetching upcoming exams", err?.message]
       ).send(res);
     }
   };

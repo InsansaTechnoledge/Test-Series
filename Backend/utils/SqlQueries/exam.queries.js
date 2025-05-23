@@ -85,3 +85,19 @@ export const setExamLive = async (examId) => {
     if (error) throw error;
     return data;
   };
+
+  export const fetchNonLiveExams = async (organization_id) => {
+    const { data, error } = await supabase
+      .from("batch_exam")
+      .select(`*,
+        batch_id (
+          name,
+          year
+        )
+      `)
+      .eq("go_live", false)
+      .eq("organization_id", organization_id);
+  
+    if (error) throw error;
+    return data;
+  };

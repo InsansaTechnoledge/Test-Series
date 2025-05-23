@@ -15,6 +15,7 @@ export const useCachedUser = () => {
             return response.data;
         } catch (err) {
             console.log(err);
+            return [];
             // setbatchError(
         }
     }
