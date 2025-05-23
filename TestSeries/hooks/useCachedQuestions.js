@@ -1,7 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchQuestionsbyExam } from "../utils/services/examService";
+import { useUser } from "../contexts/currentUserContext";
 
 export const useCachedQuestions = (examId) => {
+    const { user } = useUser();
 
     const fetchExamQuestions = async () => {
         try {
@@ -10,15 +12,18 @@ export const useCachedQuestions = (examId) => {
                 throw new Error("Network response was not ok");
             }
             return response.data;
+        } catch (err) {
+            console.error(err);
+            throw err; // Let react-query handle error
         }
-        catch (err) {
-            console.log(err);
-        }
+    };
 
-    }
-        const { data: questions = [], isLoading, isError } = useQuery({
-        queryKey: ['questions',examId],
+    const enabled = !!user && !!examId;
+
+    const { data: questions = [], isLoading, isError } = useQuery({
+        queryKey: ['questions', examId, user?.organizationId],
         queryFn: fetchExamQuestions,
+        enabled,
         refetchOnWindowFocus: false,
         refetchOnMount: false,
         staleTime: Infinity,
@@ -26,9 +31,5 @@ export const useCachedQuestions = (examId) => {
         retry: 0,
     });
 
-    return {
-        questions,
-        isLoading,
-        isError
-    }
-}
+    return { questions, isLoading, isError };
+};

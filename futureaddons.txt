@@ -6,6 +6,7 @@
 -single select6ed oprion is not visible in the students list page
 - on the add user form the data clearation after the submission of form have to be complete
 -have to remove indexing on the mobile number in students
+-Research on useQuery for the caching of data and error handling
 -validation in the forms 
 -on logout session expired page 
 -add the email and phone direct contact on the student landing page

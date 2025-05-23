@@ -40,5 +40,10 @@ export const controls = [
         name: "Create Exams",
         path: "create-exam",
         icon: User
+    },
+    {
+        name: "Exam List Page",
+        path: "exam-list",
+        icon: User
     }
 ]

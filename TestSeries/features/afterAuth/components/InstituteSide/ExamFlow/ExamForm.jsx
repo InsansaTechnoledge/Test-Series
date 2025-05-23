@@ -25,7 +25,8 @@ const ExamForm = ({ onSubmit }) => {
 
     const payload = {
       ...form,
-      organization_id: user?.user?._id  // ✅ Inject orgId here reliably
+      organization_id: user?._id  // ✅ Inject orgId here reliably
+      // organization_id: user?.user?._id   // ✅ Inject orgId here reliably
     };
 
     if (!payload.organization_id) {
