@@ -178,21 +178,21 @@ export const deleteUser = async (req, res) => {
 export const getUser = async (req, res) => {
     const { userId } = req.query;
     try {
-        console.log("userId", req.user);
+
         const orgId = req.user.role === "organization" ? req.user._id : req.user.organizationId;
         let user;
         if (userId)
             user = await User.findOne({ _id: userId }).lean();
         else {
             if (req.user.role === 'student') {
-                console.log("req.user.batchId", req.user.batchId);
+
                 user = await User.find({
                     organizationId: orgId,
                     batch: { $in: Array.isArray(req.user.batchId) ? req.user.batchId : [req.user.batchId] }
                 }).lean();
-                console.log("user", user);
+
             } else{
-                console.log("orgId", orgId);
+
                 user = await User.find({ organizationId: orgId }).lean();
                 console.log("user", user);
             }
