@@ -85,10 +85,7 @@ export const organizationLogin = async (req, res) => {
             { new: true }
         );
 
-        console.log({
-            ...organization,
-            role: "organization"
-        });
+        
         return new APIResponse(200, {user:{...organization.toObject(), role:"organization"}}, "Organization logged in successfully!!" ).send(res);
 
     } catch (err) {

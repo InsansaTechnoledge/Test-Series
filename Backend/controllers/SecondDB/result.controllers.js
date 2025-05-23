@@ -1,3 +1,4 @@
+import { calculateResult } from "../../../TestSeries/features/Test/utils/resultCalculator.js";
 import Result from "../../models/SecondDB/result.model.js";
 import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
 import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
@@ -8,6 +9,7 @@ export const addResult = async (req, res) => {
         console.log(resultData);
         const result = await Result.create(resultData);
 
+        await updateRanksForExam(resultData.examId);
         return new APIResponse(200, result, "Result added successfully!").send(res);
     }
     catch (err) {
@@ -42,7 +44,7 @@ export const fetchStudentResults = async (req, res) => {
         { studentId },
         { examId: 1, marks: 1, rank: 1, status: 1, createdAt: 1, updatedAt: 1, resultDate: 1 }
       );
-  
+      
       if (!studentResults || studentResults.length === 0) {
         return new APIResponse(400, ["No results yet"]).send(res);
       }
