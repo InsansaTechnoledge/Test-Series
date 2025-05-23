@@ -50,6 +50,7 @@ export const updateExamById = async (req,res) => {
 export const fetchExamBasedOnCondition = async (req,res) => {
     try{
         const query = req.query;
+        query.organization_id=req.user.role==='organization'?req.user._id:req.user.organizationId;
         const exams = await fetchSelective(query);
 
         return new APIResponse(200, exams, "Exams fetched successfully!").send(res);
