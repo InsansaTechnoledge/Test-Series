@@ -29,8 +29,12 @@ import ExamListPage from '../../features/afterAuth/components/InstituteSide/Exam
 import ResultsPage from '../../features/afterAuth/components/StudentSide/CompletedExams/ResultsPage';
 import TestWindow from '../../features/Test/TestWindow';
 import ResultDetailPage from '../../features/afterAuth/components/StudentSide/CompletedExams/DetailedResultPage';
+import StudentRoutes from '../../routes/StudentRoutes';
+import InstituteRoutes from '../../routes/InstituteRoutes';
+import LandingRoutes from '../../routes/LandingRoutes';
 const PageLinks = () => {
   const { user, setUser } = useUser();
+  // const navigate = useNavigate();
   const fetchUser = async () => {
     try {
       const response = await checkAuth();
@@ -55,42 +59,46 @@ const PageLinks = () => {
   return (
     <Router>
       <Routes>
-        {/* Routes with BeforeAuthLayout */}
-        <Route element={<BeforeAuthLayout />}>
-          <Route path="/" element={<BeforeAuthLanding />} />
-        </Route>
-      </Routes>
-      <Routes>
+        
+      {/* </Routes>
+      <Routes> */}
         <Route element={<AuthLayout />}>
           <Route path='/institute-registration' element={<InstituteRegistrationPage />} />
           <Route path='/login' element={<LoginMainPage />} />
         </Route>
         {/* <AuthRoutes> */}
 
-        <Route element={<AuthRoutes/>}>
+        <Route element={<AuthRoutes />}>
           <Route element={<AfterAuthLayout />}>
-            <Route path='/institute' element={<OrganizationLayout />}>
-              <Route path='batch-list' element={<BatchList />} />
-              <Route path='user-list' element={<UserList />} />
-              <Route path='create-user' element={<CreateUser />} />
-              <Route path='create-batch' element={<CreateBatch />} />
-              <Route path='add-student' element={<CreateStudent />} />
-              <Route path='student-list' element={<StudentListPage />} />
-              <Route path='create-role-group' element={<FeatureBasedRoleGroups />} />
-              <Route path='add-student' element={<CreateStudent />} />
-              <Route path='create-exam' element={<CreateExam />} />
-              <Route path='exam-list' element={<ExamListPage />} />
-              <Route path='institute-landing' element={<InstituteLandingPage />} />
-              <Route path='*' element={<div>Invalid path</div>} />
+            <Route element={<InstituteRoutes />}>
+              <Route path='/institute' element={<OrganizationLayout />}>
+                <Route path='batch-list' element={<BatchList />} />
+                <Route path='user-list' element={<UserList />} />
+                <Route path='create-user' element={<CreateUser />} />
+                <Route path='create-batch' element={<CreateBatch />} />
+                <Route path='add-student' element={<CreateStudent />} />
+                <Route path='student-list' element={<StudentListPage />} />
+                <Route path='create-role-group' element={<FeatureBasedRoleGroups />} />
+                <Route path='add-student' element={<CreateStudent />} />
+                <Route path='create-exam' element={<CreateExam />} />
+                <Route path='exam-list' element={<ExamListPage />} />
+                <Route path='institute-landing' element={<InstituteLandingPage />} />
+                <Route path='*' element={<div>Invalid path</div>} />
+              </Route>
             </Route>
-
-            <Route path='/student' element={<StudentLayout />}>
-              <Route path='student-landing' element={<StudentLanding />} />
-              <Route path='upcoming-exams' element={<UpcomingExam />} />
-              <Route path='completed-exams' element={<ResultsPage />} />
+            <Route element={<StudentRoutes />}>
+              <Route path='/student' element={<StudentLayout />}>
+                <Route path='student-landing' element={<StudentLanding />} />
+                <Route path='upcoming-exams' element={<UpcomingExam />} />
+                <Route path='completed-exams' element={<ResultsPage />} />
               <Route path='result/:examId' element={<ResultDetailPage />} />
+              </Route>
             </Route>
           </Route>
+        </Route>
+        {/* Routes with BeforeAuthLayout */}
+        <Route element={<BeforeAuthLayout />}>
+          <Route path="/" element={<LandingRoutes />} />
         </Route>
 
         <Route path='test' element={<TestWindow />} />

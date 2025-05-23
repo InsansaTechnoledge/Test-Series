@@ -5,11 +5,15 @@ import { MapPin, Mail, Phone, Globe } from 'lucide-react'
 
 const InstituteLandingPage = () => {
   const { user } = useUser();
-  console.log("@@",user);
+  console.log("YYYY",user);
 
-  const orgInfo = user || {};
-  const address = orgInfo.address || {};
-
+  if(!user){
+    return (
+      <div>
+        Loading...
+      </div>
+    )
+  }
   return (
     <div className="h-[600px] flex flex-col">
       <div className="relative flex items-center justify-center h-full bg-gradient-to-r from-blue-900 to-indigo-900 overflow-hidden">
@@ -21,44 +25,44 @@ const InstituteLandingPage = () => {
         {/* Content Container */}
         <div className="relative z-10 text-center px-6 md:px-12 max-w-5xl mx-auto">
           {/* Organization Logo */}
-          {orgInfo.logoUrl && (
+          {user.logoUrl && (
             <div className="flex justify-center mb-6">
               <img 
-                src={orgInfo.logoUrl} 
-                alt={`${orgInfo.name} Logo`} 
+                src={user.logoUrl} 
+                alt={`${user.name} Logo`} 
                 className="w-20 h-20 rounded-full border-4 border-white shadow-lg"
               />
             </div>
           )}
           
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
-            {orgInfo.name || 'Welcome'}
+            {user.name || 'Welcome'}
           </h1>
           
           {/* Contact Information */}
           <div className="flex flex-wrap justify-center gap-4 mb-8 text-gray-200">
-            {address.city && address.state && (
+            {user.address.city && user.address.state && (
               <div className="flex items-center">
                 <MapPin className="w-5 h-5 mr-2" />
-                <span>{address.city}, {address.state}</span>
+                <span>{user.address.city}, {user.address.state}</span>
               </div>
             )}
-            {orgInfo.email && (
+            {user.email && (
               <div className="flex items-center">
                 <Mail className="w-5 h-5 mr-2" />
-                <span>{orgInfo.email}</span>
+                <span>{user.email}</span>
               </div>
             )}
-            {orgInfo.phone && (
+            {user.phone && (
               <div className="flex items-center">
                 <Phone className="w-5 h-5 mr-2" />
-                <span>{orgInfo.phone}</span>
+                <span>{user.phone}</span>
               </div>
             )}
-            {orgInfo.website && (
+            {user.website && (
               <div className="flex items-center">
                 <Globe className="w-5 h-5 mr-2" />
-                <span>{orgInfo.website}</span>
+                <span>{user.website}</span>
               </div>
             )}
           </div>
