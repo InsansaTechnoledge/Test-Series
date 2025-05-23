@@ -1,37 +1,58 @@
-import React from 'react'
+import React, {useState , useEffect} from 'react'
 import HeadingUtil from '../../../utility/HeadingUtil'
 import NeedHelpComponent from '../../InstituteSide/components/NeedHelpComponent'
 import { Eye, Search } from 'lucide-react'
 import dateFormatter from '../../../../../utils/dateFormatter'
-
+import { getStudentResults } from '../../../../../utils/services/resultPage'
 const ResultsPage = () => {
 
-    const question = "How To assign role groups to users ?"
-    const answer = "Use the created role groups to assign permissions to users in your add user section."
+    const [results, setResults] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [selectedResult, setSelectedResult] = useState(null);
 
-    const results = [
-        {
-            name: "Exam name",
-            marks: 50,
-            status: "Attempted",
-            total_marks: 100,
-            date: new Date
-        },
-        {
-            name: "Exam name",
-            marks: 50,
-            status: "Unattempted",
-            total_marks: 100,
-            date: new Date
-        },
-        {
-            name: "Exam name",
-            marks: 50,
-            status: "Disqualified",
-            total_marks: 100,
-            date: new Date
-        },
-    ]
+    useEffect(() => {
+        const fetchData = async () => {
+          try {
+            const res = await getStudentResults();
+            setResults(res);
+          } catch (err) {
+            console.error("Failed to fetch results", err);
+          } finally {
+            setLoading(false);
+          }
+        };
+      
+        fetchData();
+      }, []);
+      
+      console.log("r", results)
+
+    const question = ""
+    const answer = ""
+
+    // const results = [
+    //     {
+    //         name: "Exam name",
+    //         marks: 50,
+    //         status: "Attempted",
+    //         total_marks: 100,
+    //         date: new Date
+    //     },
+    //     {
+    //         name: "Exam name",
+    //         marks: 50,
+    //         status: "Unattempted",
+    //         total_marks: 100,
+    //         date: new Date
+    //     },
+    //     {
+    //         name: "Exam name",
+    //         marks: 50,
+    //         status: "Disqualified",
+    //         total_marks: 100,
+    //         date: new Date
+    //     },
+    // ]
 
 
     return (
@@ -89,7 +110,7 @@ const ResultsPage = () => {
                                     <tbody key={idx}>
                                         <tr className=" bg-white border-b border-gray-200 hover:bg-gray-50 text-blue-600 text-lg">
                                             <th scope="row" className="px-6 py-4 font-medium text-blue-600 whitespace-nowrap ">
-                                                {result.name}
+                                                {result.examName}
                                             </th>
                                             <td className="px-4 text-sm py-2 justify-center">
                                                 <div className={`px-4 mx-auto py-2 rounded-full ${result.status==="Attempted" ? 'bg-green-100 text-green-800' : result.status==="Unattempted" ? "bg-yellow-100 text-yellow-800" : "bg-red-100 text-red-800"} w-fit`}>
@@ -98,9 +119,9 @@ const ResultsPage = () => {
                                             </td>
                                             <td className="px-6 py-4 text-center">
                                                 {
-                                                    result.status==="Attempted"
+                                                    result.status==="attempted"
                                                     ?
-                                                    `${result.marks}/${result.total_marks}`
+                                                    `${result.marks}`
                                                     :
                                                     "-"
                                                 }

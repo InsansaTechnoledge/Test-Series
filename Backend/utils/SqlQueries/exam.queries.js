@@ -47,6 +47,17 @@ export const fetchSelective = async (conditions) => {
     return data;
   };
   
+  export const fetchExamNameById = async (examId) => {
+    const { data, error } = await supabase
+      .from("batch_exam")
+      .select("name")
+      .eq("id", examId)
+      .single();
+  
+    if (error) throw error;
+    return data.name;
+  };
+  
 
 export const deleteExam = async (id) => {
     const { data, error } = await supabase

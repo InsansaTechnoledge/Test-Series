@@ -1,7 +1,7 @@
 import Result from "../../models/SecondDB/result.model.js";
 import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
 import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
-
+import { fetchExamNameById } from "../../utils/SqlQueries/exam.queries.js";
 export const addResult = async (req, res) => {
     try {
         const resultData = req.body;
@@ -32,25 +32,48 @@ export const updateResult = async (req, res) => {
 
 export const fetchStudentResults = async (req, res) => {
     try {
-        // from session
-        const studentId = "";
-        if (!studentId) {
-            return new APIError(400, ["Invalid student ID or session expired"]).send(res);
-        }
-
-        const studentResults = await Result.find({ studentId }, { marks: 1, rank: 1, status: 1, createdAt: 1, updatedAt: 1 });
-        if (!studentResults || studentResults.length == 0) {
-            return new APIResponse(400, ["No results yet"]).send(res);
-        }
-
-        return new APIResponse(200, studentResults, "Results fetched").send(res);
-
+      const studentId = req.user._id;
+  
+      if (!studentId) {
+        return new APIError(400, ["Invalid student ID or session expired"]).send(res);
+      }
+  
+      let studentResults = await Result.find(
+        { studentId },
+        { examId: 1, marks: 1, rank: 1, status: 1, createdAt: 1, updatedAt: 1 }
+      );
+  
+      if (!studentResults || studentResults.length === 0) {
+        return new APIResponse(400, ["No results yet"]).send(res);
+      }
+  
+      const completeResults = await Promise.all(
+        studentResults.map(async (result) => {
+          try {
+            const examName = await fetchExamNameById(result.examId);
+            return {
+              ...result._doc, 
+              examName,
+            };
+          } catch (e) {
+            return {
+              ...result._doc,
+              examName: "Unknown Exam",
+            };
+          }
+        })
+      );
+  
+      return new APIResponse(200, completeResults, "Results fetched").send(res);
+  
+    } catch (err) {
+      console.log(err);
+      return new APIError(
+        err?.response?.status || 500,
+        ["Something went wrong while fetching student result", err.message]
+      ).send(res);
     }
-    catch (err) {
-        console.log(err);
-        return new APIError(err?.response?.status || 500, ["Something went wrong while fetching student result", err.message]).send(res);
-    }
-}
+  };
 
 export const fetchDetailedResultById = async (req, res) => {
     try {
