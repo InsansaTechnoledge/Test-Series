@@ -1,35 +1,24 @@
-import React from 'react';
 import { 
-  Award, 
-  BookOpen, 
-  BookOpenCheck, 
-  Hexagon, 
+  BookOpen,  
   Mail, 
-  Medal, 
   NotepadText, 
   Phone, 
-  UsersRound 
 } from 'lucide-react';
 import { useUser } from '../../../../../contexts/currentUserContext';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useCachedBatches } from '../../../../../hooks/useCachedBatches';
-
-// const student = {
-//   name: "Jay Fanse",
-//   email: "jayf29112003@gmail.com",
-//   phone: "+91 9726535193",
-//   profilePhoto: `https://ui-avatars.com/api/?name=Jay%20Fanse&background=random`,
-// //   certifications: ['Table-Topper', 'Early-Bird', 'All-Nighter', 'Finisher', 'Early-Bird', 'All-Nighter', 'Finisher']
-// certifications:[]
-// };
-
-const subjects = ["Physics", "Chemistry", "Maths", "English", "Computer science"];
 
 export default function StudentDetails() {
     const {user}=useUser();
     const [student,setStudent]=useState(user);
     const {batchMap}=useCachedBatches();
     const studentBatch=batchMap[user?.batchId];
+
+    useEffect(() => {
+        if (user) {
+            setStudent(user);
+        }
+    },[user])
 
   return (
     <div className="w-full max-w-7xl mx-auto bg-white rounded-xl  overflow-hidden">
@@ -83,17 +72,6 @@ export default function StudentDetails() {
                 )
 
                 }
-
-                            
-              
-              {/* <div className="flex flex-col sm:flex-row items-center sm:items-center gap-1 sm:gap-3">
-                <Award size={18} className="text-blue-600" />
-                <div className="flex gap-1">
-                  {[1, 2, 3, 4].map((_, idx) => (
-                    <Hexagon key={idx} size={18} className="text-red-500 fill-red-100" />
-                  ))}
-                </div>
-              </div> */}
             </div>
           </div>
         </div>
@@ -109,25 +87,15 @@ export default function StudentDetails() {
           </div>
           
           <div className="space-y-2 sm:space-y-3 text-gray-700">
-            <div className="flex  sm:flex-row items-center sm:items-center gap-3 sm:gap-3">
-              <UsersRound size={18} className="text-blue-600" />
-              <span className="text-sm sm:text-base">30 Students //this is hardcoded</span>
-            </div>
-            
-            <div className="flex  sm:flex-row items-center sm:items-center gap-3 sm:gap-3">
-              <BookOpenCheck size={18} className="text-blue-600" />
-              <span className="text-sm sm:text-base">5 Tests taken // this is hardcodes</span>
-            </div>
-            
             <div className="flex  sm:flex-row items-center sm:items-start gap-3 sm:gap-3">
               <BookOpen size={18} className="text-blue-600 sm:mt-2" />
               <div className="flex flex-wrap justify-center sm:justify-start gap-2">
-                {subjects.map((subject, idx) => (
+                {studentBatch?.subjects.map((subject, idx) => (
                   <span
                     key={idx}
                     className="text-xs font-medium bg-blue-100 text-blue-800 px-2 sm:px-3 py-3 rounded-full"
                   >
-                    //have to add the subject in the batch table
+                    {subject}
                   </span>
                 ))}
               </div>

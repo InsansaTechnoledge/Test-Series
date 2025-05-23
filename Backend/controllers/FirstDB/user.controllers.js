@@ -22,6 +22,7 @@ export const registerUser = async (req, res) => {
             id: req.user._id || req.user.id,
             model: req.user.role === "organization" ? "Organization" : "User"
         };
+        userData.organizationId = req.user.role === "organization" ? req.user._id : req.user.organizationId;
 
         const user = await User.create(userData);
 
@@ -177,20 +178,24 @@ export const deleteUser = async (req, res) => {
 export const getUser = async (req, res) => {
     const { userId } = req.query;
     try {
+
         const orgId = req.user.role === "organization" ? req.user._id : req.user.organizationId;
         let user;
         if (userId)
             user = await User.findOne({ _id: userId }).lean();
         else {
             if (req.user.role === 'student') {
+
                 user = await User.find({
                     organizationId: orgId,
                     batch: { $in: Array.isArray(req.user.batchId) ? req.user.batchId : [req.user.batchId] }
                 }).lean();
-            } else {
-                user = await User.find({ organizationId: orgId }).lean();
-            }
 
+            } else{
+
+                user = await User.find({ organizationId: orgId }).lean();
+                console.log("user", user);
+            }
         }
 
         if (!user) {

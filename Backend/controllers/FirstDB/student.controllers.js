@@ -8,6 +8,7 @@ import { APIResponse } from '../../utils/ResponseAndError/ApiResponse.utils.js';
 export const createOneStudent = async (req, res) => {
     try{
         const data = req.body 
+        data.organizationId = req.user.role === "organization" ? req.user._id : req.user.organizationId;
 
         if(!data.name || !data.email || !data.password || !data.gender) return new APIError(401 , 'required data is missing from student').send(res)
 
@@ -23,7 +24,7 @@ export const createOneStudent = async (req, res) => {
 export const bulkCreateStudents = async (req, res) => {
     try {
       const students = req.body;
-  
+      const orgId = req.user.role === "organization" ? req.user._id : req.user.organizationId;
       if (!Array.isArray(students) || students.length === 0) {
         return new APIError(400, 'No student data provided or invalid format').send(res);
       }
@@ -37,8 +38,11 @@ export const bulkCreateStudents = async (req, res) => {
           const hashedPassword = await bcrypt.hash(student.password, 12);
           return {
             ...student,
-            password: hashedPassword
+            password: hashedPassword,
+            organizationId: orgId
           };
+
+          
         })
       );
   
