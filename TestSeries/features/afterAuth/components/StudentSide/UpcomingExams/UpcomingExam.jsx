@@ -21,27 +21,27 @@ const UpcomingExam = () => {
     const getExams = async () => {
       try {
         const exams = await fetchUpcomingExams();
-        
+
         const upcoming = exams.filter(exam => exam.go_live === false || exam.go_live === "FALSE");
         setUpcomingExams(upcoming);
 
-        const live = exams.filter(exam => exam.go_live === true || exam.go_live === "TRUE" )
+        const live = exams.filter(exam => exam.go_live === true || exam.go_live === "TRUE")
         setLiveExams(live)
       } catch (error) {
         console.error("❌ Error fetching upcoming exams:", error);
       }
     };
-  
+
     getExams();
   }, []);
 
   const handleStartTest = (examId) => {
     // Replace with real userId or eventId if available
     const UserId = user?._id;
-    
+
     navigate(`/test?examId=${examId}`);
   };
-  
+
   return (
     <div>
       <HeadingUtil heading="Upcoming Exams" description="You can appear for the upcoming exams from here" />
@@ -51,16 +51,33 @@ const UpcomingExam = () => {
 
       <h1 className='mt-20 text-3xl text-indigo-900 font-bold mb-2'>Live Exam:</h1>
       <div className='flex flex-col'>
-        {liveExams.map((exam, idx) => (
-            <LiveExamCard key={idx} data={exam} onStartTest={handleStartTest} />
-        ))}
+        {
+          liveExams && liveExams.length > 0
+            ?
+            liveExams.map((exam, idx) => (
+              <LiveExamCard key={idx} data={exam} onStartTest={handleStartTest} />
+            ))
+            :
+            <div>
+              No live exams yet :)
+            </div>
+        }
       </div>
 
       <h1 className='mt-20 text-3xl text-indigo-900 font-bold mb-2'>Upcoming Exams:</h1>
       <div className='mt-12 grid lg:grid-cols-2 gap-10 xl:grid-cols-3'>
-        {upcomingExams.map((exam, idx) => (
-          <UpcomingExamCard key={idx} data={exam} />
-        ))}
+        {
+          upcomingExams && upcomingExams.length > 0
+            ?
+            upcomingExams.map((exam, idx) => (
+              <UpcomingExamCard key={idx} data={exam} />
+            ))
+            :
+            <div>
+              No upcoming exams yet :)
+            </div>
+
+        }
       </div>
     </div>
   );

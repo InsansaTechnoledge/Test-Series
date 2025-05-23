@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 const MatchingQuestion = ({ selectedQuestion, option, setOption }) => {
     const [isLoading, setIsLoading] = useState(true);
+    const shuffledRightItems = [...selectedQuestion.right_items].sort(()=> Math.random() - 0.5);
 
     useEffect(() => {
         if (selectedQuestion) {
@@ -48,7 +49,7 @@ const MatchingQuestion = ({ selectedQuestion, option, setOption }) => {
                             onChange={(e) => handleSelectChange(leftItem, e.target.value)}
                         >
                             <option value='' disabled>Select match</option>
-                            {selectedQuestion.right_items.map((rightItem, rIdx) => (
+                            {shuffledRightItems.map((rightItem, rIdx) => (
                                 <option key={rIdx} value={rightItem}>
                                     {rightItem}
                                 </option>

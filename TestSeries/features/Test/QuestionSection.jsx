@@ -33,7 +33,7 @@ const QuestionSection = ({ setSelectedQuestion, selectedQuestion, selectedSubjec
                 return typeof option === 'boolean';
 
             case 'numerical': // option is number
-                return typeof option === 'string' && !isNaN(option);
+                return typeof option === 'string' && option.trim()!=='' && !isNaN(option);
 
             case 'match': // option is object with keys matching left_items
                 return (
@@ -54,7 +54,7 @@ const QuestionSection = ({ setSelectedQuestion, selectedQuestion, selectedSubjec
                         if (subQ.question_type === 'msq') return Array.isArray(subOption) && subOption.length > 0;
                         if (subQ.question_type === 'fill') return typeof subOption === 'string' && subOption.trim() !== '';
                         if (subQ.question_type === 'tf') return typeof subOption === 'boolean';
-                        if (subQ.question_type === 'numerical') return typeof subOption === 'number' && !isNaN(subOption);
+                        if (subQ.question_type === 'numerical') return typeof subOption === 'string' && subOption.trim()=='' && !isNaN(subOption);
                         return false;
                     })
                 );

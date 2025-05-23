@@ -14,7 +14,7 @@ export const useCachedQuestions = (examId) => {
             return response.data;
         } catch (err) {
             console.error(err);
-            throw err; 
+            throw err;
         }
     };
 
@@ -30,6 +30,10 @@ export const useCachedQuestions = (examId) => {
         cacheTime: 24 * 60 * 60 * 1000,
         retry: 0,
     });
+
+    if (questions.length === 0) {
+        return { questions, isLoading, isError: true };
+    }
 
     return { questions, isLoading, isError };
 };
