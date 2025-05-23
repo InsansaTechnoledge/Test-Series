@@ -22,7 +22,7 @@ const TestWindow = () => {
   const [countdown, setCountdown] = useState(null);
   const [allWarnings, setAllWarnings] = useState([]);
   const [showFinalPopup, setShowFinalPopup] = useState(false);
-  const {user} = useUser();
+  const { user } = useUser();
   const secretKey = 'secret-key-for-encryption';
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -72,7 +72,7 @@ const TestWindow = () => {
 
 
   useEffect(() => {
-    if (!isExamLoading && !isQuestionLoading && questions && questions.length > 0) {
+    if (!isExamLoading && !isQuestionLoading && questions) {
 
 
       const subjectSet = new Set(questions.map(q => q.subject));
@@ -87,8 +87,6 @@ const TestWindow = () => {
     }
   }, [questions, isQuestionLoading, isExamLoading]);
 
-
-  console.log(exam);
 
   // const dummyQuestions = [
   //   {
@@ -362,7 +360,7 @@ const TestWindow = () => {
   }
 
 
-  
+
 
   const handleSubmitTest = async () => {
     try {
@@ -401,13 +399,13 @@ const TestWindow = () => {
         wrongAnswers: result.wrongAnswers,
         unattempted: result.unattempted,
         marks: result.totalMarks,
-    
+
       }
 
       console.log(payload);
 
       const response = await submitResult(payload);
-      if(response.status==200){
+      if (response.status == 200) {
         console.log("Result submitted");
       }
 
@@ -419,7 +417,18 @@ const TestWindow = () => {
     if (window?.electronAPI?.closeWindow) window.electronAPI.closeWindow();
   };
 
+
+
   if (!eventDetails) return <div>Loading test...</div>;
+
+  if (questions && questions.length === 0) {
+    return <div className='font-bold flex flex-col gap-8 mt-20 text-center'>
+      <span className='text-indigo-900 text-4xl'>
+        Questions not available for this exam!
+        </span>
+      <span className='text-indigo-900 text-xl'>Try contacting your institute for more info</span>
+    </div>
+  }
 
   if (isExamLoading || isQuestionLoading) {
     return <div>Loading...</div>
