@@ -31,6 +31,7 @@ const FillInTheBlankQuestion = ({ selectedQuestion, option, setOption }) => {
             <div className='mt-10'>
                 <input
                     type='text'
+                    id={`fill-${selectedQuestion.id}`}
                     value={option || ''}
                     onChange={handleChange}
                     placeholder='Type your answer here'

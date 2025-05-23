@@ -41,16 +41,17 @@ const MatchingQuestion = ({ selectedQuestion, option, setOption }) => {
 
             <div className='mt-10 space-y-6'>
                 {selectedQuestion.left_items.map((leftItem, idx) => (
-                    <div key={idx} className='flex items-center space-x-4 text-xl'>
+                    <div key={idx+selectedQuestion.id} className='flex items-center space-x-4 text-xl'>
                         <span className='w-1/3 font-semibold'>{leftItem}</span>
                         <select
+                            id={`match-${idx}-${selectedQuestion.id}`}
                             className='w-2/3 border border-gray-300 px-4 py-2 rounded'
                             value={option?.[leftItem] || ''}
                             onChange={(e) => handleSelectChange(leftItem, e.target.value)}
                         >
                             <option value='' disabled>Select match</option>
                             {shuffledRightItems.map((rightItem, rIdx) => (
-                                <option key={rIdx} value={rightItem}>
+                                <option key={rIdx+selectedQuestion.id} value={rightItem}>
                                     {rightItem}
                                 </option>
                             ))}

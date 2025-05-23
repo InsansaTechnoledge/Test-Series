@@ -30,12 +30,12 @@ const NumericalQuestion = ({ selectedQuestion, option, setOption }) => {
             )}
 
             <div className='mt-10'>
-                <label htmlFor='numerical-answer' className='text-2xl mr-4'>
+                <label htmlFor={`numerical-answer-${selectedQuestion.id}`} className='text-2xl mr-4'>
                     Enter your answer:
                 </label>
                 <input
                     type='number'
-                    id='numerical-answer'
+                    id={`numerical-answer-${selectedQuestion.id}`}
                     value={option || ''}
                     onChange={handleChange}
                     className='border-2 border-gray-300 rounded-md px-4 py-2 text-xl'
