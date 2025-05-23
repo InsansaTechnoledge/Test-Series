@@ -1,7 +1,7 @@
 import StudentHero from '../components/StudentSide/Landing/StudentHero'
 import StudentDetails from '../components/StudentSide/Landing/StudentDetails'
 import FacultySection from '../components/StudentSide/Landing/FacultySection'
-import SubjectCards from '../components/StudentSide/Landing/SubjectCards'
+// import SubjectCards from '../components/StudentSide/Landing/SubjectCards'
 import ExamLinksComponent from '../components/StudentSide/Landing/ExamLinksComponent'
 import { cards } from '../data/DisplayComponentData'
 import ExamStatsDashboard from '../components/StudentSide/Landing/ExamStatsDashboard'
@@ -23,7 +23,7 @@ const StudentLanding = () => {
                 {/* <AiWorkingSteps /> */}
                 {/* <div className="w-16 h-1 bg-blue-800 mx-auto mb-4 rounded"></div> */}
                 <FacultySection />
-                <SubjectCards />
+                {/* <SubjectCards /> */}
                 <ExamStatsDashboard/>
         </>
     )

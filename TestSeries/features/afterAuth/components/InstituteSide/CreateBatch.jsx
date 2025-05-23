@@ -10,13 +10,13 @@ import { createBatch } from '../../../../utils/services/batchService';
 const CreateBatch = () => {
   const [formData, setFormData] = useState({batchMode:'only-subjects'});
   const [selectedFaculties, setSelectedFaculties] = useState([]);
-  const [user, setUser] = useState([])
+  const [faculty, setFaculty] = useState([])
   const {users,isLoading} = useCachedUser();
   const {roleMap}=useCachedRoleGroup();
   
   useEffect(() => {
     if (users) {
-      setUser(users);
+      setFaculty(users);
     }
   }, [users]);
 
@@ -71,12 +71,12 @@ const CreateBatch = () => {
   const handleFacultySelect = (e) => {
     const selectedId = e.target.value;
     if (!selectedId) return;
-    const selectedUser = user.find((user) => user._id === selectedId);
+    const selectedUser = faculty.find((faculty) => faculty._id === selectedId);
     if (!selectedUser) return;
 
     setSelectedFaculties((prev) => [...prev, selectedUser]);
 
-    setUser((prev) => prev.filter((user) => user._id !== selectedId));
+    setFaculty((prev) => prev.filter((faculty) => faculty._id !== selectedId));
     e.target.value = '';
   };
 
@@ -85,7 +85,7 @@ const CreateBatch = () => {
     if (!facultyToRemove) return;
 
     setSelectedFaculties((prev) => prev.filter((f) => f._id !== facultyId));
-    setUser((prev) => [...prev, facultyToRemove]);
+    setFaculty((prev) => [...prev, facultyToRemove]);
   };
 
   const handleSubmit = async() => {
@@ -119,7 +119,7 @@ const CreateBatch = () => {
       name: formData.name,
       year: formData.year,
       // batchMode: formData.batchMode,
-      // subjects: formData.subjects,
+      subjects: formData.subjects,
       faculties: selectedFaculties.map(f => f._id),
       syllabus: processedSyllabus,
     };
@@ -130,7 +130,7 @@ const CreateBatch = () => {
       alert('Batch created successfully!');
       setFormData({"batchMode": "only-subjects"});
       setSelectedFaculties([]);
-      setUser(prev => ([...prev,...selectedFaculties]));
+      setFaculty(prev => ([...prev,...selectedFaculties]));
     }else{
       alert('Failed to create batch. Please try again.');
       console.error('Error creating batch:', response);
@@ -364,7 +364,7 @@ const CreateBatch = () => {
                     onChange={handleFacultySelect}
                   >
                     <option value="">Select faculty member</option>
-                    {user.map((user, idx) => (
+                    {faculty.map((user, idx) => (
                       <option key={idx} value={user._id}>{user.name}- {roleMap[user.roleId]?.name || 'Unknown Role'}</option>
                     ))}
                   </select>
