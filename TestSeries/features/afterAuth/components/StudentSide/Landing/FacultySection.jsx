@@ -11,7 +11,9 @@ const FacultySection = () => {
   const [facultyData, setFacultyData] = useState([users]);
 
   useEffect(() => {
-    setFacultyData(users);
+    if(users){
+      setFacultyData(users);
+    }
   }, [users]);
 
   return (
