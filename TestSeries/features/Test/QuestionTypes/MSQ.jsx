@@ -39,14 +39,14 @@ const MSQ = ({ selectedQuestion, option, setOption}) => {
 
             <div className='mt-10 space-y-10'>
                 {selectedQuestion.options.map((optionText, index) => (
-                    <div key={index} className='flex text-2xl space-x-2'>
+                    <div key={index+selectedQuestion.id} className='flex text-2xl space-x-2'>
                         <input
                             type='checkbox'
-                            id={`option-${index}`}
+                            id={`option-${index}-${selectedQuestion.id}`}
                             checked={Array.isArray(option) && option.includes(index)}
                             onChange={() => handleToggleOption(index)}
                         />
-                        <label htmlFor={`option-${index}`}>{optionText}</label>
+                        <label htmlFor={`option-${index}-${selectedQuestion.id}`}>{optionText}</label>
                     </div>
                 ))}
             </div>

@@ -23,7 +23,7 @@ export const UserLogin = async (req, res) => {
             { new: true }
         );
 
-        return new APIResponse(200, {user:user}, "User logged in successfully!!").send(res);
+        return new APIResponse(200, {user:{...user.toObject(), role: 'user'}}, "User logged in successfully!!").send(res);
 
     } catch (err) {
         console.log(err);
@@ -85,8 +85,8 @@ export const organizationLogin = async (req, res) => {
             { new: true }
         );
 
-
-        return new APIResponse(200, {user:organization}, "Organization logged in successfully!!" ).send(res);
+        
+        return new APIResponse(200, {user:{...organization.toObject(), role:"organization"}}, "Organization logged in successfully!!" ).send(res);
 
     } catch (err) {
         console.log(err);
@@ -114,7 +114,7 @@ export const studentLogin = async (req, res) => {
         );
 
 
-        return new APIResponse(200, {user:student}, "Student logged in successfully!!").send(res);
+        return new APIResponse(200, {user:{...student.toObject(), role: "student"}}, "Student logged in successfully!!").send(res);
 
     } catch (err) {
         console.log(err);

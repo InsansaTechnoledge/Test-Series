@@ -33,7 +33,7 @@ const TestWindow = () => {
 
 
   // const examId = "aa632eab-74ad-4a6b-a675-60c571257c00";
-  const { questions, isLoading: isQuestionLoading } = useCachedQuestions(examId);
+  const { questions,isError: isExamError, isLoading: isQuestionLoading } = useCachedQuestions(examId);
   const { exam, isLoading: isExamLoading } = useCachedExam(examId);
 
   // const dummyExam = {
@@ -72,7 +72,7 @@ const TestWindow = () => {
 
 
   useEffect(() => {
-    if (!isExamLoading && !isQuestionLoading && questions) {
+    if (!isExamLoading && !isQuestionLoading && questions && questions.length>0) {
 
 
       const subjectSet = new Set(questions.map(q => q.subject));
@@ -87,217 +87,6 @@ const TestWindow = () => {
     }
   }, [questions, isQuestionLoading, isExamLoading]);
 
-
-  // const dummyQuestions = [
-  //   {
-  //     id: 'q1',
-  //     exam_id: 'exam1',
-  //     organization_id: 'org1',
-  //     subject: 'Math',
-  //     chapter: 'Algebra',
-  //     question_type: 'mcq',
-  //     difficulty: 'medium',
-  //     positive_marks: 1,
-  //     negative_marks: 0.25,
-  //     question_text: 'What is the value of x in the equation 2x + 3 = 7?',
-  //     options: ['1', '2', '3', '4'],
-  //     correct_option: 'B',
-  //     explanation: '2x + 3 = 7 => 2x = 4 => x = 2'
-  //   },
-  //   {
-  //     id: 'q2',
-  //     organization_id: 'org1',
-  //     subject: 'Science',
-  //     chapter: 'Physics',
-  //     question_type: 'msq',
-  //     difficulty: 'easy',
-  //     positive_marks: 2,
-  //     negative_marks: 0.5,
-  //     question_text: 'Which of the following are SI units?',
-  //     options: ['Meter', 'Second', 'Inch', 'Foot'],
-  //     correct_options: [0, 1]
-  //   },
-  //   {
-  //     id: 'q3',
-  //     organization_id: 'org1',
-  //     subject: 'English',
-  //     chapter: 'Grammar',
-  //     question_type: 'fill',
-  //     difficulty: 'easy',
-  //     positive_marks: 1,
-  //     negative_marks: 0,
-  //     question_text: 'The sun ___ in the east.',
-  //     correct_answer: 'rises'
-  //   },
-  //   {
-  //     id: 'q4',
-  //     organization_id: 'org1',
-  //     subject: 'GK',
-  //     chapter: 'History',
-  //     question_type: 'tf',
-  //     difficulty: 'easy',
-  //     positive_marks: 1,
-  //     negative_marks: 0.25,
-  //     statement: 'The Taj Mahal is located in Delhi.',
-  //     is_true: false
-  //   },
-  //   {
-  //     id: 'q5',
-  //     organization_id: 'org1',
-  //     subject: 'Geography',
-  //     chapter: 'Maps',
-  //     question_type: 'match',
-  //     difficulty: 'medium',
-  //     positive_marks: 2,
-  //     negative_marks: 0.5,
-  //     left_items: ['India', 'USA', 'UK'],
-  //     right_items: ['Washington D.C.', 'London', 'New Delhi'],
-  //     correct_pairs: {
-  //       India: 'New Delhi',
-  //       USA: 'Washington D.C.',
-  //       UK: 'London'
-  //     }
-  //   },
-  //   {
-  //     id: 'q6',
-  //     organization_id: 'org1',
-  //     subject: 'Reading',
-  //     chapter: 'Comprehension',
-  //     question_type: 'comprehension',
-  //     difficulty: 'medium',
-  //     positive_marks: 4,
-  //     negative_marks: 0,
-  //     passage: 'Climate change refers to long-term shifts in temperatures and weather patterns...',
-  //     sub_questions: [
-  //       {
-  //         id: 'q6_1',
-  //         index: 1,
-  //         question_type: 'mcq',
-  //         positive_marks: 1,
-  //         negative_marks: 0.25,
-  //         question_text: 'What is climate change?',
-  //         options: ['Short-term weather shifts', 'Seasonal changes', 'Long-term shifts', 'Daily temperature changes'],
-  //         correct_option: 'C'
-  //       },
-  //       {
-  //         id: 'q6_2',
-  //         index: 2,
-  //         question_type: 'tf',
-  //         positive_marks: 1,
-  //         negative_marks: 0.25,
-  //         statement: 'Climate change occurs over decades.',
-  //         is_true: true
-  //       }
-  //     ]
-  //   },
-  //   {
-  //     id: 'q7',
-  //     organization_id: 'org1',
-  //     subject: 'Math',
-  //     chapter: 'Numbers',
-  //     question_type: 'numerical',
-  //     difficulty: 'medium',
-  //     positive_marks: 2,
-  //     negative_marks: 0.5,
-  //     question_text: 'Calculate the square root of 49.',
-  //     correct_answer: 7
-  //   }
-  // ];
-
-
-  // useEffect(() => {
-  //   setEventDetails(dummyExam);
-  // }, [])
-
-
-  // useEffect(() => {
-  //   const handleProctorWarning = (data) => {
-  //     if (!proctorRunning) {
-  //       setProctorRunning(true);
-  //       setWarning(data.details);
-  //       setAllWarnings((prev) => [...prev, data.details]);
-
-  //       if (data.details === 'No face detected') {
-  //         let remaining = 5;
-  //         setCountdown(remaining);
-  //         const interval = setInterval(() => {
-  //           remaining--;
-  //           setCountdown(remaining);
-  //           if (remaining <= 0) {
-  //             clearInterval(interval);
-  //             setCountdown(null);
-  //           }
-  //         }, 1000);
-  //       }
-
-  //       setWarningCount((prev) => {
-  //         const newCount = prev + 1;
-  //         if (newCount >= 5 && !submitted) {
-  //           setShowFinalPopup(true); // Wait for user to confirm
-  //         }
-  //         return newCount;
-  //       });
-
-  //       setTimeout(() => {
-  //         setWarning(null);
-  //         setProctorRunning(false);
-  //       }, 5000);
-  //     }
-  //   };
-
-  //   if (window?.electronAPI?.onProctorWarning) {
-  //     window.electronAPI.onProctorWarning(handleProctorWarning);
-  //   }
-
-  //   return () => {
-  //     window?.electronAPI?.removeProctorWarningListener?.();
-  //   };
-  // }, [submitted, proctorRunning]);
-
-  // useEffect(() => {
-  //   const handleProctorEvent = (data) => {
-  //     console.log("📦 Proctor Event received:", data);  // Already there ✅
-
-  //     if (data?.eventType === 'session_start') {
-  //       console.log("🚀 Received SESSION START in TestWindow!");
-  //       setProctorStatus('Proctoring Started ✅');
-  //     }
-  //     else if (data?.eventType === 'session_end') {
-  //       console.log("🛑 Received SESSION END in TestWindow!");
-  //       handleSubmitTest();
-  //     }
-  //     else if (data?.eventType === 'info') {
-  //       console.log("ℹ️ Info Event:", data.details);
-  //     }
-  //   };
-
-  //   if (window?.electronAPI?.onProctorEvent) {
-  //     window.electronAPI.onProctorEvent(handleProctorEvent);
-  //   }
-
-  //   return () => {
-  //     window?.electronAPI?.removeProctorEventListener?.();
-  //   };
-  // }, []);
-
-
-  // FETCHING THE EVENT DETAILS ----->
-
-  // useEffect(() => {
-  //   const fetchEventDetails = async () => {
-  //     try {
-  //       const response = await getFullEventDetails(eventId);
-  //       if (response.status === 200) {
-  //         setEventDetails(response.data);
-  //         console.log("eve", response.data);
-  //       }
-  //     } catch (err) {
-  //       console.log(err.response?.data?.errors?.[0] || err.message);
-  //     }
-  //   };
-
-  //   fetchEventDetails();
-  // }, []);
 
   useEffect(() => {
     if (subjectSpecificQuestions) {
@@ -421,7 +210,7 @@ const TestWindow = () => {
 
   if (!eventDetails) return <div>Loading test...</div>;
 
-  if (questions && questions.length === 0) {
+  if (isExamError) {
     return <div className='font-bold flex flex-col gap-8 mt-20 text-center'>
       <span className='text-indigo-900 text-4xl'>
         Questions not available for this exam!

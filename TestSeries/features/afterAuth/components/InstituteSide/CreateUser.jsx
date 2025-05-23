@@ -16,7 +16,12 @@ const CreateUser = () => {
     const [profile, setProfile] = useState(null);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [showBatches,setShowBatches]=useState(batches);
     const [error, setError] = useState({});
+
+    useEffect(()=>{
+        setShowBatches(batches);
+    },[batches]);
 
     const validateField = (name, value) => {
         switch (name) {
@@ -335,7 +340,7 @@ const CreateUser = () => {
                                 ?
                                 <div className='flex gap-2 flex-wrap'>
                                     {
-                                        batches.map((batch, idx) => (
+                                        showBatches.map((batch, idx) => (
                                             <div
                                                 onClick={() => toggleBatch(batch)}
                                                 key={idx}

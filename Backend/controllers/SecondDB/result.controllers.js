@@ -1,6 +1,9 @@
+import { calculateResult } from "../../../TestSeries/features/Test/utils/resultCalculator.js";
 import Result from "../../models/SecondDB/result.model.js";
 import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
 import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
+import { fetchExamNameById } from "../../utils/SqlQueries/exam.queries.js";
+import { fetchQuestionsSelectively } from "../../utils/SqlQueries/questions.queries.js";
 
 export const addResult = async (req, res) => {
     try {
@@ -8,6 +11,7 @@ export const addResult = async (req, res) => {
         console.log(resultData);
         const result = await Result.create(resultData);
 
+        await updateRanksForExam(resultData.examId);
         return new APIResponse(200, result, "Result added successfully!").send(res);
     }
     catch (err) {
@@ -32,25 +36,48 @@ export const updateResult = async (req, res) => {
 
 export const fetchStudentResults = async (req, res) => {
     try {
-        // from session
-        const studentId = "";
-        if (!studentId) {
-            return new APIError(400, ["Invalid student ID or session expired"]).send(res);
-        }
-
-        const studentResults = await Result.find({ studentId }, { marks: 1, rank: 1, status: 1, createdAt: 1, updatedAt: 1 });
-        if (!studentResults || studentResults.length == 0) {
-            return new APIResponse(400, ["No results yet"]).send(res);
-        }
-
-        return new APIResponse(200, studentResults, "Results fetched").send(res);
-
+      const studentId = req.user._id;
+  
+      if (!studentId) {
+        return new APIError(400, ["Invalid student ID or session expired"]).send(res);
+      }
+  
+      let studentResults = await Result.find(
+        { studentId },
+        { examId: 1, marks: 1, rank: 1, status: 1, createdAt: 1, updatedAt: 1, resultDate: 1 }
+      );
+      
+      if (!studentResults || studentResults.length === 0) {
+        return new APIResponse(400, ["No results yet"]).send(res);
+      }
+  
+      const completeResults = await Promise.all(
+        studentResults.map(async (result) => {
+          try {
+            const examName = await fetchExamNameById(result.examId);
+            return {
+              ...result._doc, 
+              examName,
+            };
+          } catch (e) {
+            return {
+              ...result._doc,
+              examName: "Unknown Exam",
+            };
+          }
+        })
+      );
+  
+      return new APIResponse(200, completeResults, "Results fetched").send(res);
+  
+    } catch (err) {
+      console.log(err);
+      return new APIError(
+        err?.response?.status || 500,
+        ["Something went wrong while fetching student result", err.message]
+      ).send(res);
     }
-    catch (err) {
-        console.log(err);
-        return new APIError(err?.response?.status || 500, ["Something went wrong while fetching student result", err.message]).send(res);
-    }
-}
+  };
 
 export const fetchDetailedResultById = async (req, res) => {
     try {
@@ -73,30 +100,63 @@ export const fetchDetailedResultById = async (req, res) => {
     }
 }
 
+// export const fetchAllResultsForExam = async (req, res) => {
+//     try{
+
+//         const { id } = req.params;
+//         if (!id) {
+//             return new APIError(400, ["Invalid exam id for fetching result"]).send(res);
+//         }
+
+//         const results = await Result.find({examId: id})
+//         .select("marks rank status studentId")
+//         .populate('studentId', 'name studentId');
+
+//         if(!results || results.length==0){
+//             return new APIResponse(404, ["Results for exam not found"]).send(res);
+//         }
+
+//         return new APIResponse(200, "Results fetched successfully!").send(res);
+//     }
+//     catch(err){
+//         console.log(err);
+//         return new APIError(err?.response?.status || 500, ["Something went wrong while fetching result", err.message]).send(res);
+//     }
+
+// }
+
 export const fetchAllResultsForExam = async (req, res) => {
-    try{
-
-        const { id } = req.params;
-        if (!id) {
-            return new APIError(400, ["Invalid exam id for fetching result"]).send(res);
-        }
-
-        const results = await Result.find({examId: id})
-        .select("marks rank status studentId")
-        .populate('studentId', 'name studentId');
-
-        if(!results || results.length==0){
-            return new APIResponse(404, ["Results for exam not found"]).send(res);
-        }
-
-        return new APIResponse(200, "Results fetched successfully!").send(res);
+    try {
+      const studentId = req.user._id;
+      const { examId } = req.params;
+  
+      const result = await Result.findOne({ studentId, examId });
+  
+      if (!result) {
+        return new APIError(404, ["Result not found"]).send(res);
+      }
+  
+      // ✅ Fetch questions from Supabase
+      const questions = await fetchQuestionsSelectively({ exam_id: examId });
+  
+      // ✅ Fetch exam name
+      const { name: examName } = await fetchExamNameById(examId);
+  
+      // ✅ Return result + questions + exam name
+      return new APIResponse(
+        200,
+        {
+          ...result._doc,
+          examName,
+          questions,
+        },
+        "Result and questions fetched"
+      ).send(res);
+    } catch (err) {
+      console.error("Error in fetchAllResultsForExam:", err);
+      return new APIError(500, ["Failed to fetch result and questions", err.message]).send(res);
     }
-    catch(err){
-        console.log(err);
-        return new APIError(err?.response?.status || 500, ["Something went wrong while fetching result", err.message]).send(res);
-    }
-
-}
+  };
 
 export const deleteResult = async (req,res) => {
     try{

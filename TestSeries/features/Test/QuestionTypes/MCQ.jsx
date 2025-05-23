@@ -11,7 +11,6 @@ const MCQ = ({ selectedQuestion, option, setOption }) => {
 
     const handleChangeOption = (option) => {
         setOption(option);
-
     }
 
 
@@ -33,32 +32,32 @@ const MCQ = ({ selectedQuestion, option, setOption }) => {
             }
             <div className='mt-10 space-y-10'>
                 <div className='flex text-2xl space-x-2'>
-                    <input type='radio' id='A'
+                    <input type='radio' id={`A-${selectedQuestion.id}`}
                         checked={option === 0}
                         onChange={(e) => handleChangeOption(0)}
-                        name='option' value={selectedQuestion.options[0]} />
-                    <label htmlFor='A'>{selectedQuestion.options[0]}</label>
+                        name={`option-${selectedQuestion.id}`} value={selectedQuestion.options[0]} />
+                    <label htmlFor={`A-${selectedQuestion.id}`}>{selectedQuestion.options[0]}</label>
                 </div>
                 <div className='flex text-2xl space-x-2'>
-                    <input type='radio' id='B'
+                    <input type='radio' id={`B-${selectedQuestion.id}`}
                         checked={option === 1}
                         onChange={(e) => handleChangeOption(1)}
-                        name='option' value={selectedQuestion.options[1]} />
-                    <label htmlFor='B'>{selectedQuestion.options[1]}</label>
+                        name={`option-${selectedQuestion.id}`} value={selectedQuestion.options[1]} />
+                    <label htmlFor={`B-${selectedQuestion.id}`}>{selectedQuestion.options[1]}</label>
                 </div>
                 <div className='flex text-2xl space-x-2'>
-                    <input type='radio' id='C'
+                    <input type='radio' id={`C-${selectedQuestion.id}`}
                         checked={option === 2}
                         onChange={(e) => handleChangeOption(2)}
-                        name='option' value={selectedQuestion.options[2]} />
-                    <label htmlFor='C'>{selectedQuestion.options[2]}</label>
+                        name={`option-${selectedQuestion.id}`} value={selectedQuestion.options[2]} />
+                    <label htmlFor={`C-${selectedQuestion.id}`}>{selectedQuestion.options[2]}</label>
                 </div>
                 <div className='flex text-2xl space-x-2'>
-                    <input type='radio' id='D'
+                    <input type='radio' id={`D-${selectedQuestion.id}`}
                         checked={option === 3}
                         onChange={(e) => handleChangeOption(3)}
-                        name='option' value={selectedQuestion.options[3]} />
-                    <label htmlFor='D'>{selectedQuestion.options[3]}</label>
+                        name={`option-${selectedQuestion.id}`} value={selectedQuestion.options[3]} />
+                    <label htmlFor={`D-${selectedQuestion.id}`}>{selectedQuestion.options[3]}</label>
                 </div>
             </div>
         </div>

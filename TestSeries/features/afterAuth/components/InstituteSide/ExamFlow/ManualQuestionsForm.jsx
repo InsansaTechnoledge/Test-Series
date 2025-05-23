@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 const ManualQuestionForm = ({ setQuestions }) => {
+
+
     const initialFormState = {
         type: 'mcq',
         question_text: '',
@@ -53,6 +55,7 @@ const ManualQuestionForm = ({ setQuestions }) => {
       updatedOptions[index] = value;
       setForm(prev => ({ ...prev, options: updatedOptions }));
     };
+    
   
     const handleAdd = () => {
       // Basic validation
@@ -227,7 +230,14 @@ const ManualQuestionForm = ({ setQuestions }) => {
 
         {form.type === 'match' && (
         <>
+        <p className="text-sm text-gray-600 mt-1">
+        For able to auto-generate the required answer , 
+        Please enter matching <strong>Left</strong> and <strong>Right</strong> items in the same order. 
+        For example, if "India" matches with "New Delhi", make sure they are at the same index in both lists.
+        
+        </p>
             <div className="grid grid-cols-2 gap-4">
+                
             <div>
                 <label className="text-sm font-semibold">Left Items</label>
                 {form.left_items.map((item, i) => (
@@ -265,10 +275,31 @@ const ManualQuestionForm = ({ setQuestions }) => {
 
             <input
             className="input w-full p-2 border rounded"
-            placeholder='Correct Pairs (e.g., {"1":"C","2":"B"})'
+            placeholder='Correct Pairs (e.g., {"India":"New Delhi"})'
             value={form.correct_pairs_input}
             onChange={(e) => setForm(prev => ({ ...prev, correct_pairs_input: e.target.value }))}
             />
+
+            <button
+            type="button"
+            className="mt-2 px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+            onClick={() => {
+                const pairs = {};
+                form.left_items.forEach((left, i) => {
+                const right = form.right_items[i];
+                if (left && right) {
+                    pairs[left] = right;
+                }
+                });
+                setForm(prev => ({
+                ...prev,
+                correct_pairs_input: JSON.stringify(pairs, null, 2)
+                }));
+            }}
+            >
+            Auto-generate correct pairs (value → value)
+            </button>
+
         </>
         )}
 

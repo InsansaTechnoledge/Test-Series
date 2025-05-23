@@ -33,22 +33,22 @@ const TrueFalseQuestion = ({ selectedQuestion, option, setOption }) => {
                 <div className='flex items-center space-x-2'>
                     <input
                         type='radio'
-                        id='true'
+                        id={`true-${selectedQuestion.id}`}
                         name='tf'
                         checked={option === true}
                         onChange={() => handleChange(true)}
                     />
-                    <label htmlFor='true'>True</label>
+                    <label htmlFor={`true-${selectedQuestion.id}`}>True</label>
                 </div>
                 <div className='flex items-center space-x-2'>
                     <input
                         type='radio'
-                        id='false'
+                        id={`false-${selectedQuestion.id}`}
                         name='tf'
                         checked={option === false}
                         onChange={() => handleChange(false)}
                     />
-                    <label htmlFor='false'>False</label>
+                    <label htmlFor={`false-${selectedQuestion.id}`}>False</label>
                 </div>
             </div>
         </div>
