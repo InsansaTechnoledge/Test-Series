@@ -1,6 +1,10 @@
-const dateFormatter = (date) => {
+const dateFormatter = (inputDate) => {
+  const date = new Date(inputDate);  // ✅ Convert to Date object
+
+  if (isNaN(date)) return "Invalid Date";
+
   const dd = String(date.getDate()).padStart(2, '0');
-  const mm = String(date.getMonth() + 1).padStart(2, '0'); // January is 0
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
   const yyyy = date.getFullYear();
   const weekday = date.toLocaleDateString('en-US', { weekday: 'long' });
 
@@ -12,6 +16,6 @@ const dateFormatter = (date) => {
   const time = `${formattedHour}:${minutes} ${ampm}`;
 
   return `${dd}-${mm}-${yyyy} - ${weekday}, ${time}`;
-}
+};
 
 export default dateFormatter;

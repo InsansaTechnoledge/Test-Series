@@ -3,8 +3,9 @@ import React from 'react'
 import dateFormatter from '../../../../../utils/dateFormatter'
 import dottedLine from '../../../../../assests/StudentLanding/UpcomingExams/line.svg'
 
-const LiveExamCard = ({ data }) => {
+const LiveExamCard = ({ data, onStartTest }) => {
 
+   
     return (
         <div className='hover:scale-[103%] duration-200 transition-all flex flex-col gap-2 shadow-md p-6 rounded-xl'>
             <div className='flex justify-between'>
@@ -53,7 +54,7 @@ const LiveExamCard = ({ data }) => {
                         <Clock />
                     </div>
                     <span>
-                        {data.duration} Hours
+                        {data.duration} Mins
                     </span>
                 </div>
                 
@@ -68,9 +69,12 @@ const LiveExamCard = ({ data }) => {
                     </button>
                 </div>
 
-                <button className='w-fit hover:cursor-pointer bg-blue-950 text-white px-4 py-2 rounded-lg'>
-                    Start Test
-                </button>
+                <button
+                onClick={() => onStartTest(data.id)} 
+                className='bg-blue-950 text-white px-4 py-2 rounded-lg'
+                >
+          Start Test
+        </button>
             </div>
         </div>
     )
