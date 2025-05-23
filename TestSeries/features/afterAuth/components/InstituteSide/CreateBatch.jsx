@@ -6,6 +6,8 @@ import HeadingUtil from '../../utility/HeadingUtil';
 import { useCachedUser } from '../../../../hooks/useCachedUser';
 import { useCachedRoleGroup } from '../../../../hooks/useCachedRoleGroup';
 import { createBatch } from '../../../../utils/services/batchService';
+import { QueryClient, useQueryClient } from '@tanstack/react-query';
+import { useUser } from '../../../../contexts/currentUserContext';
 
 const CreateBatch = () => {
   const [formData, setFormData] = useState({batchMode:'only-subjects'});
@@ -13,7 +15,9 @@ const CreateBatch = () => {
   const [faculty, setFaculty] = useState([])
   const {users,isLoading} = useCachedUser();
   const {roleMap}=useCachedRoleGroup();
-  
+  const queryClient = useQueryClient();
+  const {user} = useUser();
+
   useEffect(() => {
     if (users) {
       setFaculty(users);
@@ -131,6 +135,9 @@ const CreateBatch = () => {
       setFormData({"batchMode": "only-subjects"});
       setSelectedFaculties([]);
       setFaculty(prev => ([...prev,...selectedFaculties]));
+  
+      queryClient.invalidateQueries(['batches', user._id]);
+
     }else{
       alert('Failed to create batch. Please try again.');
       console.error('Error creating batch:', response);

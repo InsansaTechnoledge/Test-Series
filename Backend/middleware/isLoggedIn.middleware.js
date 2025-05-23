@@ -61,6 +61,7 @@ export const isOrgAndUserAndStudentAuthenticated = async (req, res, next) => {
 };
 
 export const isUserAndOrgAuthenticated = async (req, res, next) => {
+  console.log(req.user);
   if (req.isAuthenticated() && (req.user?.role === 'user' || req.user?.role === 'organization')) return next();
 
   return new APIError(401, ['Not authorized as user or organization']).send(res);

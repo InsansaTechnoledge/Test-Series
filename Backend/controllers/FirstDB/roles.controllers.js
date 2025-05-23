@@ -133,7 +133,7 @@ export const updateRole = async (req, res) => {
 export const fetchRolesForOrganization = async (req,res) => {
     try{
 
-        const id = req.user.id || req.user._id;
+        const id = req.user.role==='organization'?req.user._id:req.user.organizationId;
         const OrgRoles = await Role.find({organizationId: id}).populate('features')
         if(!OrgRoles || OrgRoles.length===0){
             return new APIError(404, ["Roles for organization not found"]).send(res);
