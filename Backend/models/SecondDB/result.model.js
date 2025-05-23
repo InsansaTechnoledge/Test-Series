@@ -46,6 +46,10 @@ const resultSchema = new Schema({
     rank: {
         type: Number,
         min: [1, `Rank can't be negative`]
+    },
+    resultData: {
+        type: Date,
+        default: Date.now()
     }
 },{
     timestamps: true
