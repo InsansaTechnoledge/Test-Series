@@ -1,7 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchStudents } from "../utils/services/studentService";
+import { useUser } from "../contexts/currentUserContext";
 
 export const useCachedStudents = () => {
+    const {user}= useUser();
     const fetchStudentsFunction = async () => {
         try{
             const response = await fetchStudents();
@@ -21,7 +23,7 @@ export const useCachedStudents = () => {
 
     const { data: students = [], isLoading, isError }
         = useQuery({
-        queryKey: ["Students"],
+        queryKey: ["Students", user._id],
         queryFn:fetchStudentsFunction,
         refetchOnWindowFocus: false,
         refetchOnMount: false,

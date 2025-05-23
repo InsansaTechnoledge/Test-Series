@@ -1,7 +1,5 @@
-import React from 'react'
 import StudentHero from '../components/StudentSide/Landing/StudentHero'
 import StudentDetails from '../components/StudentSide/Landing/StudentDetails'
-import AiWorkingSteps from '../components/StudentSide/Landing/AiWorkingSteps'
 import FacultySection from '../components/StudentSide/Landing/FacultySection'
 import SubjectCards from '../components/StudentSide/Landing/SubjectCards'
 import ExamLinksComponent from '../components/StudentSide/Landing/ExamLinksComponent'

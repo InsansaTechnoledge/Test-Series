@@ -8,3 +8,5 @@
 -have to remove indexing on the mobile number in students
 -Research on useQuery for the caching of data and error handling
 -validation in the forms 
+-on logout session expired page 
+-add the email and phone direct contact on the student landing page

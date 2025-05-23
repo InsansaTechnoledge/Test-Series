@@ -109,11 +109,15 @@ const CreateUser = () => {
 
         const payload = new FormData();
         payload.append("name", `${formData.firstName} ${formData.lastName}`);
-        payload.append('batch', selectedBatches.map(batch => batch.id));
+        selectedBatches.forEach(batch => {
+            payload.append('batch[]', batch.id);
+        });
+
         for (let key in formData) {
-            if (key !== ("profilePhoto" && "firstName" && "lastName")) {
+            if (!["profilePhoto", "firstName", "lastName", "batches"].includes(key)) {
                 payload.append(key, formData[key]);
             }
+
         }
         if (profile) {
             payload.append('profilePhoto', profile);
@@ -134,6 +138,7 @@ const CreateUser = () => {
                 ...error,
                 form: error.response.data.errors[1] || error.message
             });
+            setFormData({});
         }
 
     };

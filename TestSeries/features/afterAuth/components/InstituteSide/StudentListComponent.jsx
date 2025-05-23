@@ -5,9 +5,10 @@ import { deleteStudentById } from '../../../../utils/services/studentService';
 import { useCachedBatches } from '../../../../hooks/useCachedBatches';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
+import { useUser } from '../../../../contexts/currentUserContext';
 
-const SimplifiedStudentManagement = () => {
-
+const  StudentListPage= () => {
+  const {user} = useUser();
   const {students, isLoading, isError} = useCachedStudents();
   const [showStudents, setShowStudents] = useState([]);
   const{batches,batchMap}=useCachedBatches();
@@ -103,7 +104,7 @@ useEffect(() => {
         const response=await deleteStudentById(studentsToDelete);
         if (response.status === 200) {
           console.log("Students deleted successfully:", response.data);
-          queryClient.invalidateQueries(["Students"]);
+          queryClient.invalidateQueries(["Students",user._id]);
         }
 
     }catch(error){
@@ -377,4 +378,4 @@ useEffect(() => {
   )
 }
 
-export default SimplifiedStudentManagement
+export default StudentListPage

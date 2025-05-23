@@ -31,36 +31,36 @@ export const isUserAuthenticated = async (req, res, next) => {
 export const isOrgAndUserAndStudentAuthenticated = async (req, res, next) => {
 
   req.mergedQuery = { ...req.query };
-  if (req.isAuthenticated() && (req.user?.role === 'user' || req.user?.role === 'student')) {
 
+  if (req.isAuthenticated() && (req.user?.role === 'user' || req.user?.role === 'student')) {
     if (req.user?.role === 'user') {
-      if (!req.mergedQuery.id && req.user?.batch) {
+      if (!req.query.id && req.user?.batch) {
         req.mergedQuery.id = Array.isArray(req.user.batch) ? req.user.batch : [req.user.batch];
       }
-    }
-    else{
-      if (!req.mergedQuery.id && req.user?.batchId) {
-        req.mergedQuery.id = Array.isArray(req.user.batchId) ? req.user.batchId : [req.user.batchId];
+    } else{
+      if (!req.query.id && req.user?.batchId) {
+        req.mergedQuery.id = Array.isArray(req.user?.batchId)
+          ? req.user.batchId
+          : [req.user.batchId];
       }
     }
 
-
-    if (!req.mergedQuery.organization_id && req.user?.organization_id) {
-      req.mergedQuery.organization_id = req.user.organization_id;
+    if (!req.mergedQuery.organization_id && req.user?.organizationId) {
+      req.mergedQuery.organization_id = req.user.organizationId;
     }
 
-    return next()
-  };
+    return next();
+  }
 
-  if (req.isAuthenticated() && (req.user?.role === 'organization')) {
+  if (req.isAuthenticated() && req.user?.role === 'organization') {
     req.mergedQuery.organization_id = req.user?._id;
-    return next()
+    return next();
   }
 
   return new APIError(401, ['Not authorized as user or organization']).send(res);
-}
+};
 
-export const isUserAndOrgAuthenticated=async (req, res, next) => {
+export const isUserAndOrgAuthenticated = async (req, res, next) => {
   if (req.isAuthenticated() && (req.user?.role === 'user' || req.user?.role === 'organization')) return next();
 
   return new APIError(401, ['Not authorized as user or organization']).send(res);
