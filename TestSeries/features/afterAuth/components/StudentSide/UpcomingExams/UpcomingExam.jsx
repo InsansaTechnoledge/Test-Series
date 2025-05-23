@@ -39,7 +39,7 @@ const UpcomingExam = () => {
     // Replace with real userId or eventId if available
     const UserId = user?._id;
     
-    navigate(`/test?examId=${examId}&userId=${UserId}`);
+    navigate(`/test?examId=${examId}`);
   };
   
   return (

@@ -27,12 +27,12 @@ const TestWindow = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   // const userId = searchParams.get('userId');
-  // const examId = searchParams.get('examId');
+  const examId = searchParams.get('examId');
   // const eventId = searchParams.get('eventId');
   // const [proctorStatus, setProctorStatus] = useState('Initializing...');
 
 
-  const examId = "aa632eab-74ad-4a6b-a675-60c571257c00";
+  // const examId = "aa632eab-74ad-4a6b-a675-60c571257c00";
   const { questions, isLoading: isQuestionLoading } = useCachedQuestions(examId);
   const { exam, isLoading: isExamLoading } = useCachedExam(examId);
 
