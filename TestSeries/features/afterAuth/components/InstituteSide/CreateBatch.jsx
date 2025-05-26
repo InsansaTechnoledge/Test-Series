@@ -10,13 +10,13 @@ import { QueryClient, useQueryClient } from '@tanstack/react-query';
 import { useUser } from '../../../../contexts/currentUserContext';
 
 const CreateBatch = () => {
-  const [formData, setFormData] = useState({batchMode:'only-subjects'});
+  const [formData, setFormData] = useState({ batchMode: 'only-subjects' });
   const [selectedFaculties, setSelectedFaculties] = useState([]);
   const [faculty, setFaculty] = useState([])
-  const {users,isLoading} = useCachedUser();
-  const {roleMap}=useCachedRoleGroup();
+  const { users, isLoading } = useCachedUser();
+  const { roleMap } = useCachedRoleGroup();
   const queryClient = useQueryClient();
-  const {user} = useUser();
+  const { user } = useUser();
 
   useEffect(() => {
     if (users) {
@@ -31,11 +31,11 @@ const CreateBatch = () => {
     }));
   };
 
-  useEffect(()=>{
-    if(formData){
+  useEffect(() => {
+    if (formData) {
       console.log(formData);
     }
-  },[formData])
+  }, [formData])
 
   const deleteSubject = (indexToDelete) => {
     setFormData((prev) => ({
@@ -92,24 +92,24 @@ const CreateBatch = () => {
     setFaculty((prev) => [...prev, facultyToRemove]);
   };
 
-  const handleSubmit = async() => {
+  const handleSubmit = async () => {
     if (!formData.name || !formData.year || !formData.subjects?.length || !formData.batchMode) {
       alert('Please fill all required fields.');
       return;
     }
-  
+
     if (formData.batchMode === 'subjects-chapters' && !formData.syllabus?.content) {
       alert('Please upload syllabus Excel file.');
       return;
     }
-  
+
     let processedSyllabus = null;
-  
+
     // Convert Excel JSON to { subject: [chapters] }
     if (formData.batchMode === 'subjects-chapters') {
       processedSyllabus = {};
       const raw = formData.syllabus.content;
-  
+
       for (const subject in raw) {
         const chaptersArray = raw[subject]
           .map(row => row['Chapter Name']?.trim())  // Clean whitespace
@@ -118,7 +118,7 @@ const CreateBatch = () => {
       }
     }
     console.log("📊 Processed Syllabus:", processedSyllabus);
-  
+
     const payload = {
       name: formData.name,
       year: formData.year,
@@ -127,18 +127,18 @@ const CreateBatch = () => {
       faculties: selectedFaculties.map(f => f._id),
       syllabus: processedSyllabus,
     };
-  
+
     console.log("✅ Final JSON payload to submit:", payload);
-    const response=await createBatch(payload);
-    if (response.status===200) {
+    const response = await createBatch(payload);
+    if (response.status === 200) {
       alert('Batch created successfully!');
-      setFormData({"batchMode": "only-subjects"});
+      setFormData({ "batchMode": "only-subjects" });
       setSelectedFaculties([]);
-      setFaculty(prev => ([...prev,...selectedFaculties]));
-  
+      setFaculty(prev => ([...prev, ...selectedFaculties]));
+
       queryClient.invalidateQueries(['batches', user._id]);
 
-    }else{
+    } else {
       alert('Failed to create batch. Please try again.');
       console.error('Error creating batch:', response);
     }
@@ -148,12 +148,12 @@ const CreateBatch = () => {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      <HeadingUtil 
-        heading="Create New Batch" 
-        description="Set up a new batch with subjects, faculties, and syllabus information for your institute" 
+      <HeadingUtil
+        heading="Create New Batch"
+        description="Set up a new batch with subjects, faculties, and syllabus information for your institute"
       />
 
-      <NeedHelpComponent heading="Creating Batch ?" question="Want to create new Batch" answer="Batches can be created with subjects and with subjects plus chapters , choose as per your requirement"/>
+      <NeedHelpComponent heading="Creating Batch ?" question="Want to create new Batch" answer="Batches can be created with subjects and with subjects plus chapters , choose as per your requirement" />
 
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         {/* Batch Type Selection */}
@@ -255,11 +255,10 @@ const CreateBatch = () => {
                     Syllabus File <span className="text-red-500">*</span>
                   </label>
                   <div className="w-full">
-                    <label 
+                    <label
                       htmlFor="dropzone-file"
-                      className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-all ${
-                        formData.syllabus?.name ? 'bg-green-50 border-green-300' : 'bg-gray-50 border-gray-300 hover:bg-gray-100'
-                      }`}
+                      className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-all ${formData.syllabus?.name ? 'bg-green-50 border-green-300' : 'bg-gray-50 border-gray-300 hover:bg-gray-100'
+                        }`}
                     >
                       <div className="flex flex-col items-center justify-center pt-5 pb-6">
                         {formData.syllabus?.name ? (
@@ -281,7 +280,6 @@ const CreateBatch = () => {
                       <input
                         id="dropzone-file"
                         type="file"
-                        value={formData.syllabus || ''}
                         className="hidden"
                         accept=".xlsx"
                         onChange={(e) => {
@@ -304,6 +302,7 @@ const CreateBatch = () => {
                           reader.readAsArrayBuffer(file);
                         }}
                       />
+
                     </label>
                   </div>
                 </div>
@@ -333,7 +332,7 @@ const CreateBatch = () => {
                     <span>Add</span>
                   </button>
                 </div>
-                
+
                 {/* Subject Tags */}
                 {formData.subjects?.length > 0 && (
                   <div className="mt-4">
@@ -342,7 +341,7 @@ const CreateBatch = () => {
                       {formData.subjects.map((subject, idx) => (
                         <div key={idx} className="flex items-center gap-2 bg-blue-100 text-blue-800 rounded-full px-4 py-2 transition-all hover:bg-blue-200">
                           <span>{subject}</span>
-                          <button 
+                          <button
                             onClick={() => deleteSubject(idx)}
                             className="text-blue-700 hover:text-blue-900 transition-all"
                           >
@@ -385,9 +384,9 @@ const CreateBatch = () => {
                       {selectedFaculties.map((user, idx) => (
                         <div key={idx} className="flex items-center gap-2 bg-purple-100 text-purple-800 rounded-full px-4 py-2 transition-all hover:bg-purple-200">
                           <span>{user.name}- <>
-                          <span key={user._id} className="text-sm text-gray-600">
-                             {roleMap[user.roleId]?.name || 'Unknown Role'} - {roleMap[user.roleId]?.description || ''}</span></></span>
-                          <button 
+                            <span key={user._id} className="text-sm text-gray-600">
+                              {roleMap[user.roleId]?.name || 'Unknown Role'} - {roleMap[user.roleId]?.description || ''}</span></></span>
+                          <button
                             onClick={() => handleFacultyRemove(user._id)}
                             className="text-purple-700 hover:text-purple-900 transition-all"
                           >
@@ -420,16 +419,16 @@ const CreateBatch = () => {
 
 // Missing component definition for the Download icon
 const Download = ({ size, className }) => (
-  <svg 
-    xmlns="http://www.w3.org/2000/svg" 
-    width={size} 
-    height={size} 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth="2" 
-    strokeLinecap="round" 
-    strokeLinejoin="round" 
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
     className={className}
   >
     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>

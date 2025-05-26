@@ -14,7 +14,7 @@ const BatchViewPage = () => {
     const batch = batchMap[batchId];
     const {users, userMap } = useCachedUser();
     const queryClient = useQueryClient();
-    const {showFaculty,setShowFaculty} = useState(false);
+    const [hideFaculty,setHideFaculty] = useState(false);
 
 const [faculty, setFaculty] = useState(() =>
   users?.filter(user => Array.isArray(user.batch) && user.batch.includes(batchId)) || []
@@ -134,15 +134,22 @@ const [faculty, setFaculty] = useState(() =>
 
 <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
     <button className="bg-blue-500 text-white px-4 py-2 rounded-md mb-4"
-    onClick={() =>{ 
-            // setShowFaculty(!showFaculty);
+    onClick={() =>{ {}
+        // console.log("hide faculty", hideFaculty);
+            setHideFaculty(!hideFaculty);
             }}>
         <span className="flex items-center gap-2">
-            <span>View Assigned Faculties</span>
+            <span>
+                {
+                hideFaculty
+                    ? "Show Assigned Faculties"
+                    : "Hide Assigned Faculties" 
+                }
+                </span>
             <ArrowDownNarrowWideIcon className="w-4 h-4" />
         </span>    
     </button>
-    {/* {showFaculty && ( */}
+    {!hideFaculty && (
                         <table className="w-full text-sm text-left rtl:text-right text-blue-950">
                             <thead className="text-xs text-blue-950 text-center uppercase bg-gray-50">
                                 <tr>
@@ -186,7 +193,7 @@ const [faculty, setFaculty] = useState(() =>
                                 ))
                             }
                         </table>
-    {/* )} */}
+     )} 
                     </div>
 
 

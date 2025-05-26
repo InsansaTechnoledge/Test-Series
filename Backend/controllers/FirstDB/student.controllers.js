@@ -141,8 +141,10 @@ export const uploadStudentExcel = async (req, res) => {
 
 export const getAllStudents = async (req, res) => {
     try{
-
-        const data = await Student.find();
+        const orgId = req.user.role === "organization" ? req.user._id : req.user.organizationId;
+        const data = await Student.find({
+            organizationId: orgId
+        });
 
         if(data.length === 0) return new APIError(404, 'no students found').send(res)
 
