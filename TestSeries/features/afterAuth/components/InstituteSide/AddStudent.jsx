@@ -1,25 +1,27 @@
-import  { useState } from 'react'
+import { useState } from 'react'
 import HeadingUtil from '../../utility/HeadingUtil'
 import { generatePassword } from '../../utility/GenerateRandomPassword'
 import * as XLSX from 'xlsx'
-import { addSingleStudent , uploadStudentExcel } from '../../../../utils/services/studentService'
+import { addSingleStudent, fetchStudents, uploadStudentExcel } from '../../../../utils/services/studentService'
 import { useCachedBatches } from '../../../../hooks/useCachedBatches'
-import { RefreshCcw, Upload, Download, Plus, Trash2, Eye, EyeOff, Users, FileSpreadsheet, CheckCircle } from 'lucide-react'
+import { RefreshCcw, Upload, Download, Plus, Trash2, Eye, EyeOff, Users, FileSpreadsheet, CheckCircle, FileDown } from 'lucide-react'
 import NeedHelpComponent from './components/NeedHelpComponent'
 import { QueryClient } from '@tanstack/react-query'
 import { useUser } from '../../../../contexts/currentUserContext'
 
 
 const AddStudent = () => {
-  const {user} = useUser();
+  const { user } = useUser();
   const [batch, setBatch] = useState('')
   const [students, setStudents] = useState([getEmptyStudent()])
   const [showPassword, setShowPassword] = useState({})
   const [excelData, setExcelData] = useState([])
   const [activeTab, setActiveTab] = useState('manual') // 'manual' or 'bulk'
-  const {batches,isLoading}=useCachedBatches();
+  const { batches, isLoading } = useCachedBatches();
   const [errors, setErrors] = useState([]);
   const queryClient = new QueryClient();
+  const [importBatch, setImportBatch] = useState('');
+  const [importedStudents, setImportedStudents] = useState([]);
 
   // Generate empty student object
   function getEmptyStudent() {
@@ -28,15 +30,15 @@ const AddStudent = () => {
       lname: '',
       number: '',
       email: '',
-      password:'',
-      cpassword:'',
+      password: '',
+      cpassword: '',
       pnumber: '',
       pemail: '',
       gender: ''
     }
   }
 
-  const validateField = (name, value,index) => {
+  const validateField = (name, value, index) => {
     switch (name) {
       case 'fname':
       case 'lname':
@@ -55,13 +57,13 @@ const AddStudent = () => {
         if (!isLongEnough || !hasUpperCase || !hasLowerCase || !hasNumbers || !hasSpecialChar) {
           return 'Password must be at least 8 characters with uppercase, lowercase, number, and special character';
         }
-        if(cpassworrd && value !== students[index]?.cpassword){
+        if (cpassworrd && value !== students[index]?.cpassword) {
           return 'Passwords do not match';
         }
         return '';
       case 'cpassword':
         return value === students[index]?.password ? '' : 'Passwords do not match';
-      case 'number' :
+      case 'number':
       case 'pnumber':
         return /^(\+\d{1,3}[- ]?)?\d{10}$/.test(value) ? '' : 'Please enter a valid phone number';
       case 'gender':
@@ -74,18 +76,27 @@ const AddStudent = () => {
 
 
   const handleStudentChange = (index, field, value) => {
-  const updatedStudents = [...students];
-  updatedStudents[index] = { ...updatedStudents[index], [field]: value };
-  setStudents(updatedStudents);
+    const updatedStudents = [...students];
+    updatedStudents[index] = { ...updatedStudents[index], [field]: value };
+    setStudents(updatedStudents);
 
-  const errorMessage = validateField(field, value,index);
-  const updatedErrors = [...errors];
-  updatedErrors[index] = {
-    ...updatedErrors[index],
-    [field]: errorMessage
+    const errorMessage = validateField(field, value, index);
+    const updatedErrors = [...errors];
+    updatedErrors[index] = {
+      ...updatedErrors[index],
+      [field]: errorMessage
+    };
+    setErrors(updatedErrors);
   };
-  setErrors(updatedErrors);
-};
+
+  const handleImportedStudents = async () => {
+    const response = await fetchStudents(importBatch);
+    console.log(response);
+    if (response.status === 200) {
+      console.log(response.data);
+      setImportedStudents(response.data);
+    }
+  }
 
   // Add a new student form
   const addStudentForm = () => {
@@ -112,10 +123,10 @@ const AddStudent = () => {
   const generateRandomPasswordForStudent = (index) => {
     const password = generatePassword()
     const updatedStudents = [...students]
-    updatedStudents[index] = { 
-      ...updatedStudents[index], 
-      password, 
-      cpassword: password 
+    updatedStudents[index] = {
+      ...updatedStudents[index],
+      password,
+      cpassword: password
     }
     setStudents(updatedStudents)
   }
@@ -132,7 +143,7 @@ const AddStudent = () => {
         const sheetName = workbook.SheetNames[0]
         const worksheet = workbook.Sheets[sheetName]
         const data = XLSX.utils.sheet_to_json(worksheet)
-        
+
         // Process the data to match student structure
         const processedData = data.map(item => ({
           fname: item.FirstName || '',
@@ -145,7 +156,7 @@ const AddStudent = () => {
           pemail: item.ParentEmail || '',
           gender: item.Gender || ''
         }))
-        
+
         setExcelData(processedData)
       } catch (error) {
         console.error('Error parsing Excel file:', error)
@@ -169,7 +180,7 @@ const AddStudent = () => {
         Gender: 'Male'
       }
     ]
-    
+
     const worksheet = XLSX.utils.json_to_sheet(template)
     const workbook = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Students')
@@ -189,37 +200,43 @@ const AddStudent = () => {
           email: s.email,
           password: s.password,
           phone: s.number,
-          gender: s.gender || 'Male', 
-          batchId: batch, 
+          gender: s.gender || 'Male',
+          batchId: batch,
           parentEmail: s.pemail,
           parentPhone: s.pnumber
         }));
 
 
-  
+
         const res = await addSingleStudent(preparedStudents);
         alert('Students added successfully!');
         console.log(res);
-        setStudents([getEmptyStudent()]); 
+        setStudents([getEmptyStudent()]);
         setErrors('')
-        queryClient.invalidateQueries(['Students',user._id]) // Invalidate the students query to refresh the data
+        queryClient.Queries(['Students', user._id]) // Invalidate the students query to refresh the data
 
 
-      // Reset the form after submission
+        // Reset the form after submission
       }
-  
+
       if (activeTab === 'bulk') {
         if (!excelData.length) return alert('No Excel data to upload');
-  
+
         // You'll need to keep track of the uploaded file
         const fileInput = document.getElementById('excel-upload');
         if (!fileInput.files[0]) return alert('No file selected');
-  
+
         const res = await uploadStudentExcel(fileInput.files[0]);
         alert('Excel uploaded successfully!');
         console.log(res);
 
       }
+
+      if (activeTab === 'import') {
+        if(!importedStudents.length) return alert('No students to import from the selected batch');
+
+        // const preparedStudents = importedStudents.
+      };
     } catch (error) {
       console.error('Submission failed:', error);
       alert('Something went wrong during submission');
@@ -234,15 +251,15 @@ const AddStudent = () => {
     <div className="min-h-screenp-4 md:p-6">
       {/* Header Section */}
 
-      <HeadingUtil heading="Add students" description="In add student section , you can create students and assign them to batches"/>
+      <HeadingUtil heading="Add students" description="In add student section , you can create students and assign them to batches" />
       <div className="max-w-6xl mx-auto">
-        <NeedHelpComponent heading="Adding Students ?" about="create students in one/many/bulk" question={question} answer={answer}/>
+        <NeedHelpComponent heading="Adding Students ?" about="create students in one/many/bulk" question={question} answer={answer} />
 
         {/* Batch Selection */}
         <div className="bg-white rounded-xl shadow-md p-6 mb-6">
           <div className="flex flex-col md:flex-row md:items-center gap-4">
             <span className="text-gray-700 font-medium whitespace-nowrap">Select Batch</span>
-            <select 
+            <select
               onChange={(e) => setBatch(e.target.value)}
               className="flex-grow bg-white border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
             >
@@ -253,23 +270,30 @@ const AddStudent = () => {
             </select>
           </div>
         </div>
-        
+
         {/* Tab Selection */}
         <div className="bg-white rounded-xl shadow-md overflow-hidden mb-6">
-          <div className="grid grid-cols-2 border-b">
-            <button 
+          <div className="grid grid-cols-3 border-b">
+            <button
               className={`flex items-center justify-center gap-2 py-4 font-medium ${activeTab === 'manual' ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' : 'text-gray-500 hover:bg-gray-50'}`}
               onClick={() => setActiveTab('manual')}
             >
               <Users size={20} />
               <span>Manual Entry</span>
             </button>
-            <button 
+            <button
               className={`flex items-center justify-center gap-2 py-4 font-medium ${activeTab === 'bulk' ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' : 'text-gray-500 hover:bg-gray-50'}`}
               onClick={() => setActiveTab('bulk')}
             >
               <FileSpreadsheet size={20} />
               <span>Bulk Upload</span>
+            </button>
+            <button
+              className={`flex items-center justify-center gap-2 py-4 font-medium ${activeTab === 'import' ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' : 'text-gray-500 hover:bg-gray-50'}`}
+              onClick={() => setActiveTab('import')}
+            >
+              <FileDown size={20} />
+              <span>Import from another Batch</span>
             </button>
           </div>
 
@@ -286,7 +310,7 @@ const AddStudent = () => {
                       <h3 className="text-lg font-semibold text-gray-800">Student Details</h3>
                     </div>
                     {students.length > 1 && (
-                      <button 
+                      <button
                         onClick={() => removeStudentForm(index)}
                         className="text-red-500 hover:text-red-700 flex items-center gap-1.5 text-sm font-medium"
                       >
@@ -295,14 +319,14 @@ const AddStudent = () => {
                       </button>
                     )}
                   </div>
-                  
+
                   {/* Personal Info */}
                   <div className="mb-6">
                     <h4 className="text-sm text-gray-500 uppercase tracking-wider mb-3">Personal Information</h4>
                     <div className="grid md:grid-cols-2 gap-6">
                       <div className="flex flex-col gap-2">
                         <label className="text-sm font-medium text-gray-700">First Name<span className="text-red-600">*</span></label>
-                        <input 
+                        <input
                           type="text"
                           value={student.fname}
                           onChange={(e) => handleStudentChange(index, 'fname', e.target.value)}
@@ -315,19 +339,19 @@ const AddStudent = () => {
 
                       <div className="flex flex-col gap-2">
                         <label className="text-sm font-medium text-gray-700">Last Name<span className="text-red-600">*</span></label>
-                        <input 
+                        <input
                           type="text"
                           value={student.lname}
                           onChange={(e) => handleStudentChange(index, 'lname', e.target.value)}
                           className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           placeholder="Enter last name"
                         />
-                             {errors[index]?.lname && <p className="text-red-500">{errors[index].lname}</p>}
+                        {errors[index]?.lname && <p className="text-red-500">{errors[index].lname}</p>}
                       </div>
 
                       <div className="flex flex-col gap-2">
                         <label className="text-sm font-medium text-gray-700">Gender<span className="text-red-600">*</span></label>
-                        <select 
+                        <select
                           value={student.gender}
                           onChange={(e) => handleStudentChange(index, 'gender', e.target.value)}
                           className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -337,7 +361,7 @@ const AddStudent = () => {
                           <option value="Female">Female</option>
                           <option value="Other">Other</option>
                         </select>
-                             {errors[index]?.gender && <p className="text-red-500">{errors[index].gender}</p>}
+                        {errors[index]?.gender && <p className="text-red-500">{errors[index].gender}</p>}
                       </div>
                     </div>
                   </div>
@@ -348,26 +372,26 @@ const AddStudent = () => {
                     <div className="grid md:grid-cols-2 gap-6">
                       <div className="flex flex-col gap-2">
                         <label className="text-sm font-medium text-gray-700">Phone Number<span className="text-red-600">*</span></label>
-                        <input 
+                        <input
                           type="tel"
                           value={student.number}
                           onChange={(e) => handleStudentChange(index, 'number', e.target.value)}
                           className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           placeholder="Enter phone number"
                         />
-                             {errors[index]?.number && <p className="text-red-500">{errors[index].number}</p>}
+                        {errors[index]?.number && <p className="text-red-500">{errors[index].number}</p>}
                       </div>
 
                       <div className="flex flex-col gap-2">
                         <label className="text-sm font-medium text-gray-700">Email<span className="text-red-600">*</span></label>
-                        <input 
+                        <input
                           type="email"
                           value={student.email}
                           onChange={(e) => handleStudentChange(index, 'email', e.target.value)}
                           className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           placeholder="Enter email"
                         />
-                             {errors[index]?.email && <p className="text-red-500">{errors[index].email}</p>}
+                        {errors[index]?.email && <p className="text-red-500">{errors[index].email}</p>}
                       </div>
                     </div>
                   </div>
@@ -387,7 +411,7 @@ const AddStudent = () => {
                               className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full pr-10"
                               placeholder="Enter password"
                             />
-                                 {errors[index]?.password && <p className="text-red-500">{errors[index].password}</p>}
+                            {errors[index]?.password && <p className="text-red-500">{errors[index].password}</p>}
                             <div
                               className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400 hover:text-gray-600"
                               onClick={() => togglePasswordVisibility(index, 'password')}
@@ -415,7 +439,7 @@ const AddStudent = () => {
                             className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full pr-10"
                             placeholder="Confirm password"
                           />
-                               {errors[index]?.cpassword && <p className="text-red-500">{errors[index].cpassword}</p>}
+                          {errors[index]?.cpassword && <p className="text-red-500">{errors[index].cpassword}</p>}
                           <div
                             className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400 hover:text-gray-600"
                             onClick={() => togglePasswordVisibility(index, 'cpassword')}
@@ -423,7 +447,7 @@ const AddStudent = () => {
                             {showPassword[`${index}-cpassword`] ? <EyeOff size={20} /> : <Eye size={20} />}
                           </div>
                         </div>
-                        
+
                       </div>
                     </div>
                   </div>
@@ -434,35 +458,35 @@ const AddStudent = () => {
                     <div className="grid md:grid-cols-2 gap-6">
                       <div className="flex flex-col gap-2">
                         <label className="text-sm font-medium text-gray-700">Parent's Phone Number<span className="text-red-600">*</span></label>
-                        <input 
+                        <input
                           type="tel"
                           value={student.pnumber}
                           onChange={(e) => handleStudentChange(index, 'pnumber', e.target.value)}
                           className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           placeholder="Enter parent's phone number"
                         />
-                         {errors[index]?.pnumber && <p className="text-red-500">{errors[index].pnumber}</p>}
+                        {errors[index]?.pnumber && <p className="text-red-500">{errors[index].pnumber}</p>}
                       </div>
 
                       <div className="flex flex-col gap-2">
                         <label className="text-sm font-medium text-gray-700">Parent's Email<span className="text-red-600">*</span></label>
-                        <input 
+                        <input
                           type="email"
                           value={student.pemail}
                           onChange={(e) => handleStudentChange(index, 'pemail', e.target.value)}
                           className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           placeholder="Enter parent's email"
                         />
-                         {errors[index]?.pemail && <p className="text-red-500">{errors[index].pemail}</p>}
+                        {errors[index]?.pemail && <p className="text-red-500">{errors[index].pemail}</p>}
                       </div>
                     </div>
                   </div>
                 </div>
               ))}
-              
+
               {/* Add Another Button */}
               <div className="flex justify-center mt-6">
-                <button 
+                <button
                   onClick={addStudentForm}
                   className="bg-white border border-blue-600 text-blue-600 hover:bg-blue-50 rounded-lg py-2.5 px-4 flex items-center gap-2 transition font-medium"
                 >
@@ -480,17 +504,17 @@ const AddStudent = () => {
                 {/* Template Download */}
                 <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                    <button 
+                    <button
                       onClick={downloadExcelTemplate}
                       className="bg-blue-600 hover:bg-blue-700 text-white py-2.5 px-4 rounded-lg flex items-center gap-2 whitespace-nowrap transition"
                     >
-                      <Download size={18} /> 
+                      <Download size={18} />
                       Download Template
                     </button>
                     <p className="text-gray-700">Download and fill out this template for bulk student uploads</p>
                   </div>
                 </div>
-                
+
                 {/* File Upload Area */}
                 <div className="bg-white border border-gray-200 rounded-lg p-6">
                   <div className="max-w-xl mx-auto">
@@ -503,8 +527,8 @@ const AddStudent = () => {
                         className="hidden"
                         id="excel-upload"
                       />
-                      <label 
-                        htmlFor="excel-upload" 
+                      <label
+                        htmlFor="excel-upload"
                         className="flex flex-col items-center gap-3 cursor-pointer"
                       >
                         <div className="bg-blue-100 rounded-full p-3">
@@ -519,7 +543,7 @@ const AddStudent = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Preview Section */}
                 {excelData.length > 0 && (
                   <div className="bg-white border border-gray-200 rounded-lg p-6">
@@ -558,16 +582,79 @@ const AddStudent = () => {
               </div>
             </div>
           )}
+
+          {/* Import from another Batch */}
+          {
+            activeTab === 'import' && (
+              <div className="p-6">
+                <h3 className="text-lg font-medium text-gray-800 mb-4">Import Students from Another Batch</h3>
+                <div className='flex gap-4'>
+                  <span className='my-auto text-gray-700 font-medium'>
+                    Select Batch to Import From:
+                  </span>
+                  <select
+                    className="flex-grow bg-white border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                    onChange={(e) => setImportBatch(e.target.value)}
+                  >
+                    <option value="">Select a batch</option>
+                    {batches.map((batch, idx) => (
+                      <option key={idx} value={batch.id}>{batch.name}</option>
+                    ))} 
+                  </select>
+                  <button 
+                  onClick={handleImportedStudents}
+                  className='bg-blue-500 px-4 py-2 rounded-lg text-white font-medium hover:bg-blue-600 transition hover:cursor-pointer'>
+                    Import students
+                  </button>
+                </div>
+
+                {/* Preview Section */}
+                {importedStudents.length > 0 && (
+                  <div className="bg-white border border-gray-200 rounded-lg p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-medium text-gray-800">Preview</h3>
+                      <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-1 rounded-full">
+                        {importedStudents.length} students
+                      </span>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="bg-gray-50">
+                            <th className="px-4 py-3 text-left text-gray-700 font-medium">Full Name</th>
+                            <th className="px-4 py-3 text-left text-gray-700 font-medium">Email</th>
+                            <th className="px-4 py-3 text-left text-gray-700 font-medium">Phone</th>
+                            <th className="px-4 py-3 text-left text-gray-700 font-medium">Gender</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {importedStudents.map((student, idx) => (
+                            <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                              <td className="px-4 py-3 border-t border-gray-200">{student.name}</td>
+                              <td className="px-4 py-3 border-t border-gray-200">{student.email}</td>
+                              <td className="px-4 py-3 border-t border-gray-200">{student.phone}</td>
+                              <td className="px-4 py-3 border-t border-gray-200">{student.gender}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )
+          }
         </div>
 
         {/* Submit Button */}
         <div className="flex justify-center">
-          <button 
+          <button
             onClick={handleSubmit}
             disabled={
-              !batch || 
+              !batch ||
               (activeTab === 'manual' && students.some(s => !s.fname || !s.lname || !s.email)) ||
-              (activeTab === 'bulk' && excelData.length === 0)
+              (activeTab === 'bulk' && excelData.length === 0) ||
+              (activeTab === 'import' && importedStudents.length === 0)
             }
             className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white py-3 px-8 rounded-lg font-medium text-base shadow-sm transition min-w-[200px]"
           >

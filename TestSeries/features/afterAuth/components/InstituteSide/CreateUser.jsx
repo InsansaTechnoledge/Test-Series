@@ -6,6 +6,8 @@ import { generatePassword } from '../../utility/GenerateRandomPassword';
 import { createUser } from '../../../../utils/services/userService';
 import { useCachedBatches } from '../../../../hooks/useCachedBatches';
 import { useCachedRoleGroup } from '../../../../hooks/useCachedRoleGroup';
+import { useQueryClient } from '@tanstack/react-query';
+import { useUser } from '../../../../contexts/currentUserContext';
 
 const CreateUser = () => {
     const { batches, isLoading, isError } = useCachedBatches();
@@ -18,6 +20,8 @@ const CreateUser = () => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [showBatches,setShowBatches]=useState(batches);
     const [error, setError] = useState({});
+    const queryClient = useQueryClient();
+    const {user} = useUser();    
 
     useEffect(()=>{
         setShowBatches(batches);
@@ -134,6 +138,7 @@ const CreateUser = () => {
             if (response.status === 200) {
                 console.log("User created successfully");
                 alert("successful!!")
+                queryClient.invalidateQueries(['Users', user._id]);
             } else {
                 console.log("Error creating user");
             }
@@ -144,6 +149,7 @@ const CreateUser = () => {
                 form: error.response.data.errors[1] || error.message
             });
             setFormData({});
+            
         }
 
     };

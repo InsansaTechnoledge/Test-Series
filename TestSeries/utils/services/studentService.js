@@ -17,8 +17,9 @@ export const uploadStudentExcel = async (file) => {
     return response.data;
 };
 
-export const fetchStudents = async () => {
-    const response = await api.get('/v1/student/all-student'); 
+export const fetchStudents = async (batchId) => {
+  const queryParams = batchId ? `?batchId=${batchId}` : '';
+    const response = await api.get('/v1/student/all-student' + queryParams); 
     return response.data;
 };
   

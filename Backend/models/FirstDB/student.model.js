@@ -3,6 +3,18 @@ import { connOne } from "../../database/MongoDB.js";
 import bcrypt from 'bcrypt';
 import validator from 'validator';
 
+const batchSchema = new Schema({
+    previousBatch: {
+        type:[String],
+        default: []
+    },
+    currentBatch: {
+        type: String,
+        required: [true, 'current batch is required'],
+        trim: true
+    },
+});
+
 const studentSchema = new Schema({
     name: {
         type: String,
@@ -93,9 +105,8 @@ const studentSchema = new Schema({
             message: 'Please enter a valid email address',
         },
     },
-    batchId: {
-        type: String,
-        // required: [true, 'batchId is required'],
+    batch: {
+        type: batchSchema,
     },
     // StudentId: {
     //     type: String,
