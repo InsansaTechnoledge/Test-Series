@@ -73,6 +73,10 @@ export const uploadStudentExcel = async (req, res) => {
       return new APIError(400, 'No file uploaded').send(res);
     }
 
+    // console.log(req.body.batchId);
+    const orgId = req.user.role === "organization" ? req.user._id : req.user.organizationId;
+
+
     const workbook = xlsx.readFile(req.file.path);
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
@@ -111,6 +115,8 @@ export const uploadStudentExcel = async (req, res) => {
           phone,
           parentPhone,
           parentEmail,
+          batchId: req.body.batchId,
+          organizationId: orgId,
           password: await bcrypt.hash(password, 10)
         };
       })

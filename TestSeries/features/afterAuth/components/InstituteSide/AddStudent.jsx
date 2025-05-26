@@ -225,8 +225,8 @@ const AddStudent = () => {
         // You'll need to keep track of the uploaded file
         const fileInput = document.getElementById('excel-upload');
         if (!fileInput.files[0]) return alert('No file selected');
-
-        const res = await uploadStudentExcel(fileInput.files[0]);
+  
+        const res = await uploadStudentExcel(fileInput.files[0], batch);
         alert('Excel uploaded successfully!');
         console.log(res);
 

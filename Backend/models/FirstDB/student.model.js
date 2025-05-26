@@ -71,7 +71,7 @@ const studentSchema = new Schema({
     organizationId: {
         type: Types.ObjectId,
         ref: "Organization",
-        // required: [true, 'Student should belong to any organization']
+        required: [true, 'Student should belong to any organization']
     },
     phone: {
         type: Number,
@@ -115,7 +115,7 @@ const studentSchema = new Schema({
     // },
     gender:{
         type:String,
-        enum:['Male', 'Female' , 'Others'],
+        enum:['Male', 'Female' , 'Other'],
         required: true
     } 
 }, {

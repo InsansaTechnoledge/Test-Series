@@ -6,9 +6,10 @@ export const addSingleStudent = async (data) => {
   return response.data;
 };
 
-export const uploadStudentExcel = async (file) => {
+export const uploadStudentExcel = async (file, batch) => {
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('batchId', batch);
   
     const response = await api.post('/v1/student/upload-excel', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
