@@ -135,14 +135,14 @@ const [faculty, setFaculty] = useState(() =>
 <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
     <button className="bg-blue-500 text-white px-4 py-2 rounded-md mb-4"
     onClick={() =>{ 
-            setShowFaculty(!showFaculty);
+            // setShowFaculty(!showFaculty);
             }}>
         <span className="flex items-center gap-2">
             <span>View Assigned Faculties</span>
             <ArrowDownNarrowWideIcon className="w-4 h-4" />
         </span>    
     </button>
-    {showFaculty && (
+    {/* {showFaculty && ( */}
                         <table className="w-full text-sm text-left rtl:text-right text-blue-950">
                             <thead className="text-xs text-blue-950 text-center uppercase bg-gray-50">
                                 <tr>
@@ -186,7 +186,7 @@ const [faculty, setFaculty] = useState(() =>
                                 ))
                             }
                         </table>
-    )}
+    {/* )} */}
                     </div>
 
 
