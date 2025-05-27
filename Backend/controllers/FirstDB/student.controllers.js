@@ -115,7 +115,9 @@ export const uploadStudentExcel = async (req, res) => {
           phone,
           parentPhone,
           parentEmail,
-          batchId: req.body.batchId,
+          batch: {
+            currentBatch: req.body.batchId,
+          },
           organizationId: orgId,
           password: await bcrypt.hash(password, 10)
         };
@@ -162,11 +164,13 @@ export const getAllStudents = async (req, res) => {
     const orgId = req.user.role === "organization" ? req.user._id : req.user.organizationId;
     const { batchId } = req.query;
 
-    const data = await Student.find({
-      organizationId: orgId,
-      ...(batchId ? { batchId } : {})
+        const data = await Student.find({
+          organizationId: orgId,
+          ...(batchId ? { "batch.currentBatch": batchId } : {})
 
-    });
+        });
+
+        console.log(data);
 
     if (data.length === 0) return new APIError(404, 'no students found').send(res)
 
@@ -197,6 +201,32 @@ export const uploadProfileImage = async (req, res) => {
 
   }
 }
+
+export const updateStudentBatch = async (req, res) => {
+  try {
+    const studentIds = req.body.studentIds;
+    const currentBatchId = req.body.currentBatchId;
+    const previousBatchId = req.body.previousBatchId;
+
+    const newData = await Student.updateMany(
+      { _id: { $in: studentIds } },
+      {
+        $push: { "batch.previousBatch": previousBatchId },
+        $set: { "batch.currentBatch": currentBatchId }
+      },
+      {
+        new: true,
+      }
+    );
+    return new APIResponse(200, newData, 'Student batch updated successfully').send(res);
+
+
+  }
+  catch (err) {
+    return new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while updating the student batch", err.message || ""]).send(res);
+  }
+
+};
 
 export const updateStudent = async (req, res) => {
   try {

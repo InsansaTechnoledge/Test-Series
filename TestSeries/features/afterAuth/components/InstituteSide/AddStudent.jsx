@@ -2,7 +2,7 @@ import { useState } from 'react'
 import HeadingUtil from '../../utility/HeadingUtil'
 import { generatePassword } from '../../utility/GenerateRandomPassword'
 import * as XLSX from 'xlsx'
-import { addSingleStudent, fetchStudents, uploadStudentExcel } from '../../../../utils/services/studentService'
+import { addSingleStudent, fetchStudents, updateStudentsBatch, uploadStudentExcel } from '../../../../utils/services/studentService'
 import { useCachedBatches } from '../../../../hooks/useCachedBatches'
 import { RefreshCcw, Upload, Download, Plus, Trash2, Eye, EyeOff, Users, FileSpreadsheet, CheckCircle, FileDown } from 'lucide-react'
 import NeedHelpComponent from './components/NeedHelpComponent'
@@ -235,7 +235,21 @@ const AddStudent = () => {
       if (activeTab === 'import') {
         if(!importedStudents.length) return alert('No students to import from the selected batch');
 
-        // const preparedStudents = importedStudents.
+        const preparedStudents = importedStudents.map(s=>s._id);
+        const currentBatchId = batch;
+        const previousBatchId = importBatch;
+        const response = await updateStudentsBatch({
+          studentIds: preparedStudents,
+          currentBatchId,
+          previousBatchId
+        })
+        console.log(response);
+        if(response.status === 200) {
+          alert('Students imported successfully!');
+          setImportedStudents([]);
+          setImportBatch('');
+        };
+        queryClient.invalidateQueries(['Students', user._id]); // Invalidate the students query to refresh the data
       };
     } catch (error) {
       console.error('Submission failed:', error);

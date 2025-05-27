@@ -23,6 +23,11 @@ export const fetchStudents = async (batchId) => {
     const response = await api.get('/v1/student/all-student' + queryParams); 
     return response.data;
 };
+
+export const updateStudentsBatch=async(data)=>{
+  const response= await api.patch('/v1/student/update-batch', data);
+  return response.data;
+}
   
 export const deleteStudentById = async (ids) => {
     const response = await api.delete(`/v1/student/delete/${ids}`);

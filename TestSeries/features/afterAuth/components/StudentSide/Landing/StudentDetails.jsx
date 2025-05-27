@@ -12,7 +12,7 @@ export default function StudentDetails() {
     const {user}=useUser();
     const [student,setStudent]=useState(user);
     const {batchMap}=useCachedBatches();
-    const studentBatch=batchMap[user?.batchId];
+    const studentBatch=batchMap[user?.batch?.currentBatch];
 
     useEffect(() => {
         if (user) {

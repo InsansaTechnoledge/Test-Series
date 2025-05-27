@@ -37,7 +37,7 @@ useEffect(() => {
       student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       `${student.phone}`.includes(searchTerm);
 
-    const matchesBatch = selectedBatch ? student.batchId === selectedBatch : true;
+    const matchesBatch = selectedBatch ? student.batch?.currentBatch === selectedBatch : true;
 
     return matchesSearch && matchesBatch;
   });
@@ -275,7 +275,7 @@ useEffect(() => {
                       </td>
                       <td className="px-6 py-4">
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                          {batchMap[student.batchId]?.name || 'N/A'}
+                          {batchMap[student.batch?.currentBatch]?.name || 'N/A'}
                         </span>
                       </td>
 
