@@ -371,7 +371,7 @@ const CreateBatch = () => {
                   >
                     <option value="">Select faculty member</option>
                     {faculty.map((user, idx) => (
-                      <option key={idx} value={user._id}>{user.name}- {roleMap[user.roleId]?.name || 'Unknown Role'}</option>
+                      <option key={idx} value={user._id}>{user.name} - {roleMap[user.roleId]?.name || 'Unknown Role'}</option>
                     ))}
                   </select>
                 </div>
@@ -382,10 +382,10 @@ const CreateBatch = () => {
                     <div className="text-sm text-gray-600 mb-2">Selected faculty members:</div>
                     <div className="flex flex-wrap gap-2">
                       {selectedFaculties.map((user, idx) => (
-                        <div key={idx} className="flex items-center gap-2 bg-purple-100 text-purple-800 rounded-full px-4 py-2 transition-all hover:bg-purple-200">
-                          <span>{user.name}- <>
+                        <div key={idx} className="flex items-center gap-2 bg-purple-100 text-purple-800 rounded-full px-4 py-2 transition-all hover:bg-purple-200 w-full">
+                          <span>{user.name}- {user.email}- <>
                             <span key={user._id} className="text-sm text-gray-600">
-                              {roleMap[user.roleId]?.name || 'Unknown Role'} - {roleMap[user.roleId]?.description || ''}</span></></span>
+                              {roleMap[user.roleId]?.name || 'Unknown Role'}- {roleMap[user.roleId]?.description || ''}</span></></span>
                           <button
                             onClick={() => handleFacultyRemove(user._id)}
                             className="text-purple-700 hover:text-purple-900 transition-all"
