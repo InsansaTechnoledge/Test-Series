@@ -8,6 +8,7 @@ import { RefreshCcw, Upload, Download, Plus, Trash2, Eye, EyeOff, Users, FileSpr
 import NeedHelpComponent from './components/NeedHelpComponent'
 import { QueryClient } from '@tanstack/react-query'
 import { useUser } from '../../../../contexts/currentUserContext'
+import { useEffect } from 'react'
 
 
 const AddStudent = () => {
@@ -37,6 +38,12 @@ const AddStudent = () => {
       gender: ''
     }
   }
+
+  useEffect(() => {
+
+    setImportedStudents([]);
+    // Reset students and errors when batch changes
+  },[importBatch]);
 
   const validateField = (name, value, index) => {
     switch (name) {
@@ -90,12 +97,22 @@ const AddStudent = () => {
   };
 
   const handleImportedStudents = async () => {
+    try{
     const response = await fetchStudents(importBatch);
     console.log(response);
     if (response.status === 200) {
       console.log(response.data);
       setImportedStudents(response.data);
     }
+  }catch(error){
+      if(error.response && error.response.status === 404) {
+        alert('Student not found');
+      }
+      else{
+        console.error('Error fetching students:', error);
+        alert('Something went wrong while fetching students');
+      }
+  }
   }
 
   // Add a new student form
