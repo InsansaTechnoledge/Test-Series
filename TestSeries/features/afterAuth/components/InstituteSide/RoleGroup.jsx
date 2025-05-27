@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, X, Save, Edit, UserPlus, Users, Shield, Check } from 'lucide-react';
+import { Plus, X, Save, Edit, UserPlus, Users, Shield, Check, Trash } from 'lucide-react';
 import HeadingUtil from '../../utility/HeadingUtil';
 import { postRoleGroup ,  deleteRoleGroup, updateRoleGroup } from '../../../../utils/services/RoleGroupService';
 import { useQueryClient } from '@tanstack/react-query';
@@ -9,10 +9,14 @@ import NeedHelpComponent from './components/NeedHelpComponent';
 import RefreshButton from '../../utility/RefreshButton';
 import { useUser } from '../../../../contexts/currentUserContext';
 import { useCachedFeatures } from '../../../../hooks/useCachedFeatures';
+import DeleteRoleGroupModal from '../../../../components/roleGroup/deleteRolegroupModal';
+
 
 export default function FeatureBasedRoleGroups() {
   const {user} = useUser();
   const {featuresData, isLoading} = useCachedFeatures();
+  const [showDeleteRoleGroupModal,setShowDeleteRoleGroupModal]=useState(false);
+  const [roleGroupToDelete,setRoleGroupToDelete]=useState();
 
   const queryClient = useQueryClient();
 
@@ -54,9 +58,9 @@ export default function FeatureBasedRoleGroups() {
     }
   };
 
-  const refreshFunction = () => {
-    invalidateQueries(['roleGroups', user._id]);
-    invalidateQueries(['features', user._id]);
+  const refreshFunction = async() => {
+    await queryClient.invalidateQueries(['roleGroups', user._id]);
+    await queryClient.invalidateQueries(['features', user._id]);
   }
   
   const handleEditGroup = (group) => {
@@ -87,14 +91,17 @@ export default function FeatureBasedRoleGroups() {
     }
   };
   
-  const handleDeleteGroup = async (groupId) => {
-    try {
-      await deleteRoleGroup(groupId);
-      await queryClient.invalidateQueries(['roleGroups', user._id]);
-    } catch (error) {
-      console.error("Error deleting role group:", error);
-    }
-  };
+  // const handleDeleteGroup = async (group) => {
+  //   try {
+  //     // await deleteRoleGroup(groupId);
+
+  //     // 
+
+  //     setDeleteRoleGroupModal(true);
+  //   } catch (error) {
+  //     console.error("Error deleting role group:", error);
+  //   }
+  // };
   
   const toggleFeatureInGroup = (featureId) => {
     const updatedFeatures = newGroup.features.includes(featureId)
@@ -339,6 +346,15 @@ export default function FeatureBasedRoleGroups() {
   };
 
   return (
+    <>
+    {
+      showDeleteRoleGroupModal
+      ?
+      <DeleteRoleGroupModal setShowDeleteRoleGroupModal={setShowDeleteRoleGroupModal} role={roleGroupToDelete}/>
+      :
+      null
+
+    }
     <div className="w-full p-6 bg-white rounded-lg">
       <HeadingUtil heading="Role Group" description="you can assing all the required roles into a single group"/>
 
@@ -388,10 +404,13 @@ export default function FeatureBasedRoleGroups() {
                           <Edit size={18} />
                         </button>
                         <button 
-                          className="p-1 text-gray-500 hover:text-red-600"
-                          onClick={() => handleDeleteGroup(group._id || group.id)}
+                          className="p-1 text-gray-500 hover:text-red-600 flex items-center gap-1"
+                          onClick={() =>{
+                            setRoleGroupToDelete(group);
+                            setShowDeleteRoleGroupModal(true);
+                          }}
                         >
-                          <X size={18} />
+                          <Trash size={18}/>
                         </button>
                       </div>
                     </div>
@@ -596,5 +615,6 @@ export default function FeatureBasedRoleGroups() {
       
      
     </div>
+    </>
   );
 }

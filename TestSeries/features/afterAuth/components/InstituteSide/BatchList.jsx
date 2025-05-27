@@ -17,8 +17,8 @@ const BatchList = () => {
     const [selectedYear, setSelectedYear] = useState('');
     const queryClient = useQueryClient();
 
-    const refreshFunction = () => {
-        queryClient.invalidateQueries(['batches', user._id]);
+    const refreshFunction =async () => {
+       await queryClient.invalidateQueries(['batches', user._id]);
     }
 
     const uniqueYears = [...new Set(batches.map(batch => batch.year))];

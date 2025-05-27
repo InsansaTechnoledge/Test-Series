@@ -12,7 +12,11 @@ export const useCachedRoleGroup = () => {
             }
             return response.data;
         } catch (err) {
+            if(err.response.status || err.status === 404)
+                return [];
+            else
             console.log(err);
+            return [];
         }
     };
 

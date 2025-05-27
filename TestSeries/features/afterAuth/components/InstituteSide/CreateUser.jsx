@@ -138,7 +138,7 @@ const CreateUser = () => {
             if (response.status === 200) {
                 console.log("User created successfully");
                 alert("successful!!")
-                queryClient.invalidateQueries(['Users', user._id]);
+                await queryClient.invalidateQueries(['Users', user._id]);
             } else {
                 console.log("Error creating user");
             }

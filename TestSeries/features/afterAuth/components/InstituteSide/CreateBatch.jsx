@@ -6,7 +6,7 @@ import HeadingUtil from '../../utility/HeadingUtil';
 import { useCachedUser } from '../../../../hooks/useCachedUser';
 import { useCachedRoleGroup } from '../../../../hooks/useCachedRoleGroup';
 import { createBatch } from '../../../../utils/services/batchService';
-import { QueryClient, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useUser } from '../../../../contexts/currentUserContext';
 
 const CreateBatch = () => {
@@ -21,6 +21,7 @@ const CreateBatch = () => {
   useEffect(() => {
     if (users) {
       setFaculty(users);
+      setSelectedFaculties([]);
     }
   }, [users]);
 
@@ -136,7 +137,7 @@ const CreateBatch = () => {
       setSelectedFaculties([]);
       setFaculty(prev => ([...prev, ...selectedFaculties]));
 
-      queryClient.invalidateQueries(['batches', user._id]);
+      await queryClient.invalidateQueries(['batches', user._id]);
 
     } else {
       alert('Failed to create batch. Please try again.');

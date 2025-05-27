@@ -104,7 +104,7 @@ useEffect(() => {
         const response=await deleteStudentById(studentsToDelete);
         if (response.status === 200) {
           console.log("Students deleted successfully:", response.data);
-          queryClient.invalidateQueries(["Students",user._id]);
+          await queryClient.invalidateQueries(["Students",user._id]);
         }
 
     }catch(error){

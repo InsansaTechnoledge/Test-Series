@@ -10,26 +10,26 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useUser } from '../../../../contexts/currentUserContext'
 
 const UserList = () => {
-    const {user} = useUser();
+    const { user } = useUser();
     const { users, isLoading, isError } = useCachedUser();
-    const { batches,batchMap } = useCachedBatches();
-    const { roleMap} = useCachedRoleGroup();
+    const { batches, batchMap } = useCachedBatches();
+    const { roleMap } = useCachedRoleGroup();
     const [filteredUsers, setFilteredUsers] = useState(users);
     const [selectedBatch, setSelectedBatch] = useState('');
     const queryClient = useQueryClient();
 
 
-    const refreshFunction = () => {
-        queryClient.invalidateQueries(['Users', user._id]);
-        queryClient.invalidateQueries(['roleGroups', user._id]);
-        queryClient.invalidateQueries(['batches', user._id]);
+    const refreshFunction =async  () => {
+        await queryClient.invalidateQueries(['Users', user._id]);
+        await queryClient.invalidateQueries(['roleGroups', user._id]);
+        await queryClient.invalidateQueries(['batches', user._id]);
     }
 
-    useEffect(()=>{
-        if(users){
+    useEffect(() => {
+        if (users) {
             setFilteredUsers(users);
         }
-    },[users])
+    }, [users])
 
     useEffect(() => {
         if (selectedBatch) {
@@ -62,7 +62,7 @@ const UserList = () => {
                             <h2 className='font-bold text-lg text-blue-900'>Total Users: {filteredUsers.length}</h2>
                         </div>
                         <div className='flex flex-col md:flex-row gap-4'>
-                            <RefreshButton refreshFunction={refreshFunction}/>
+                            <RefreshButton refreshFunction={refreshFunction} />
                             <button className='bg-blue-900 text-white py-2 px-4 rounded-md hover:cursor-pointer font-semibold hover:scale-105 flex space-x-2 transition-all duration-300'
                                 onClick={() => {
                                     navigate('/institute/create-user')
@@ -172,7 +172,11 @@ const UserList = () => {
                                             </td>
                                             <td className="px-6 py-4 ">
                                                 <div className='mx-auto py-1 px-4 rounded-full bg-blue-50 w-fit'>
-                                                    {roleMap[user.roleId]?.name}
+                                                    {
+                                                        roleMap[user?.roleId]
+                                                            ? roleMap[user.roleId].name
+                                                            : <span className='text-red-500'>No role assigned yet!</span>
+                                                    }
                                                 </div>
                                             </td>
                                             <td className="flex justify-center mx-auto w-fit px-6 py-4 gap-8">

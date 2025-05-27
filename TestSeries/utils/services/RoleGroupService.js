@@ -15,8 +15,8 @@ export const fetchAllRoleGroups = async () => {
     return response.data; 
 };
   
-export const deleteRoleGroup = async (groupId) => {
-  const response = await api.delete(`/v1/role/${groupId}`);
+export const deleteRoleGroup = async (groupId,deleteUsers) => {
+  const response = await api.delete(`/v1/role/${groupId}?deleteUsers=${deleteUsers}`);
   return response.data;
 };
 

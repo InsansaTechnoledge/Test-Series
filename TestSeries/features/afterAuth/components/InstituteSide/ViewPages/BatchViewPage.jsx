@@ -35,8 +35,8 @@ const [faculty, setFaculty] = useState(() =>
         return <div>Loading...</div>;
     }
 
-    const refreshFunction = () => {
-        queryClient.invalidateQueries(['batches', user._id]);
+    const refreshFunction = async () => {
+        await queryClient.invalidateQueries(['batches', user._id]);
     }
 
     const faculty1 = [

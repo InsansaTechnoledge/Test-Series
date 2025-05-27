@@ -266,7 +266,7 @@ const AddStudent = () => {
           setImportedStudents([]);
           setImportBatch('');
         };
-        queryClient.invalidateQueries(['Students', user._id]); // Invalidate the students query to refresh the data
+        await queryClient.invalidateQueries(['Students', user._id]); // Invalidate the students query to refresh the data
       };
     } catch (error) {
       console.error('Submission failed:', error);
