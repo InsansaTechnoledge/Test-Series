@@ -8,7 +8,9 @@ export const CreateOrganizationBatch = async (batchData) => {
     .insert(batchData)
     .select()
 
-  if (error) throw error;
+  if (error) {
+    throw error;
+  }
   return data;
 }
 

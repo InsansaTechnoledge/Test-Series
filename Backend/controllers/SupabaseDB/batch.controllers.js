@@ -38,11 +38,16 @@ export const createOrgBatch = async (req, res) => {
 
     return new APIResponse(200, batch, 'Batch created successfully').send(res);
   } catch (err) {
+    if( err.code === '23505') {
+      return new APIError(400, ["Batch with this name already exists"]).send(res);
+    }
+    else{
     console.log(err);
     new APIError(err?.response?.status || err?.status || 500,
       ["Something went wrong while creating the batch", err.message || ""]
     ).send(res);
   }
+}
 };
 
   

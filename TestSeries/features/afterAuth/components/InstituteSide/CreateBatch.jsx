@@ -46,7 +46,7 @@ const CreateBatch = () => {
   };
 
   const addSubject = () => {
-    const newSubject = document.getElementById('subjects').value.trim();
+    const newSubject = document.getElementById('subjects').value.trim().toLowerCase();
     if (!newSubject) return;
     setFormData((prev) => ({
       ...prev,
@@ -130,6 +130,7 @@ const CreateBatch = () => {
     };
 
     console.log("✅ Final JSON payload to submit:", payload);
+    try{
     const response = await createBatch(payload);
     if (response.status === 200) {
       alert('Batch created successfully!');
@@ -139,12 +140,23 @@ const CreateBatch = () => {
 
       await queryClient.invalidateQueries(['batches', user._id]);
 
-    } else {
+    }
+   }catch (error) {
+
+      if (error.response?.status === 400) {
+        alert('Batch with this name already exists. Please choose a different name.');
+        return;
+      }else{
       alert('Failed to create batch. Please try again.');
-      console.error('Error creating batch:', response);
+      console.error('Error creating batch:',error.response);}
     }
 
 
+  };
+
+  const getYearOptions = (past = 5, future = 6) => {
+    const currentYear = new Date().getFullYear();
+    return Array.from({ length: past + future + 1 }, (_, i) => currentYear - past + i);
   };
 
   return (
@@ -223,7 +235,7 @@ const CreateBatch = () => {
                   type="text"
                   id="name"
                   name="name"
-                  value={formData.name || ''}
+                  value={formData.name?.toLowerCase() || ''}
                   onChange={(e) => onChangeHandler('name', e.target.value)}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                   placeholder="Enter batch name"
@@ -243,8 +255,9 @@ const CreateBatch = () => {
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                 >
                   <option value="">Select academic year</option>
-                  {[2024, 2025, 2026, 2027, 2028].map((year) => (
-                    <option key={year} value={year}>{year}</option>
+                  {getYearOptions().map((year) => (
+                    <option key={year} value={year}>
+                      {year}</option>
                   ))}
                 </select>
               </div>
