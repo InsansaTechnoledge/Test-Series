@@ -239,7 +239,7 @@ const AddStudent = () => {
         console.log(res);
         setStudents([getEmptyStudent()]);
         setErrors('')
-        queryClient.Queries(['Students', user._id]) // Invalidate the students query to refresh the data
+        queryClient.invalidateQueries(['Students', user._id]) // Invalidate the students query to refresh the data
 
 
         // Reset the form after submission

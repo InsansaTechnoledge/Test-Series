@@ -84,7 +84,7 @@ useEffect(() => {
   // Handle select all
   useEffect(() => {
     if (selectAll) {
-      setSelectedStudents(sortedStudents.map(student => student.id))
+      setSelectedStudents(sortedStudents.map(student => student._id))
     } else {
       setSelectedStudents([])
     }
@@ -261,7 +261,7 @@ useEffect(() => {
                         <div className="flex items-center gap-3">
                           <input
                             type="checkbox"
-                            checked={selectedStudents.includes(student.id)}
+                            checked={selectedStudents.includes(student._id)}
                             onChange={() => toggleStudentSelection(student._id)}
                             className="w-4 h-4 rounded text-blue-600"
                           />
