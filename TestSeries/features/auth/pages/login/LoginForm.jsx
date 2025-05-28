@@ -1,29 +1,34 @@
-import { KeyRound, LogIn, Mail } from 'lucide-react';
-import React, { useState  } from 'react';
+import { Eye, EyeOff, KeyRound, LogIn, Mail } from 'lucide-react';
+import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { orgLogin,studentLogin } from '../../../../utils/services/authService';
+import { orgLogin, studentLogin } from '../../../../utils/services/authService';
 import { useUser } from '../../../../contexts/currentUserContext';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 
 const LoginForm = () => {
-  const {user,setUser} = useUser();
-        const [searchParams] = useSearchParams();
-        const role = searchParams.get('role');
+  const { user, setUser } = useUser();
+  const [searchParams] = useSearchParams();
+  const role = searchParams.get('role');
+  const [showPassword, setShowPassword] = useState();
 
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
 
-  useEffect(()=>{
-    if(user && role === 'Institute') {
-      console.log("loginForm",user);
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  }
+
+  useEffect(() => {
+    if (user && role === 'Institute') {
+      console.log("loginForm", user);
       navigate('/institute/institute-landing');
-    } else if(user && role === 'Student') {
+    } else if (user && role === 'Student') {
       navigate('/student/student-landing');
     }
-  },[user])
+  }, [user])
 
   const [errors, setErrors] = useState({});
   const navigate = useNavigate()
@@ -65,7 +70,7 @@ const LoginForm = () => {
     setErrors((prev) => ({ ...prev, [field]: error }));
   };
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const newErrors = {};
@@ -82,27 +87,26 @@ const LoginForm = () => {
     // Proceed with login logic here (e.g. API call)
     console.log('Logging in with:', formData);
 
-    if(role === 'Institute') {
+    if (role === 'Institute') {
       // Call the API for Institute login
       console.log('Logging in as Institute');
-      try{      
-        const response=await orgLogin(formData);
+      try {
+        const response = await orgLogin(formData);
         console.log(response);
-        if(response.status===200)
-        {
-          
+        if (response.status === 200) {
+
           console.log("institute logged in successfully!!")
           setFormData({
-            email:'',
-            password:''
+            email: '',
+            password: ''
           });
 
-            console.log("😏",response.data.user);
-         setUser(response.data.user);
-          
+          console.log("😏", response.data.user);
+          setUser(response.data.user);
+
         }
-        
-      }catch(err){
+
+      } catch (err) {
         console.log(err);
         setErrors(err.response.data.errors || "Something went wrong");
         alert(err.response.data.errors || "Something went wrong")
@@ -110,29 +114,28 @@ const LoginForm = () => {
 
 
     }
-    else if(role === 'Student') {
+    else if (role === 'Student') {
       // Call the API for Student login
       console.log('Logging in as Student');
-      try{
-        const response=await studentLogin(formData);
-      if(response.status===200)
-      {
-      setFormData({
-        email:'',
-        password:''
-      });
+      try {
+        const response = await studentLogin(formData);
+        if (response.status === 200) {
+          setFormData({
+            email: '',
+            password: ''
+          });
 
-      
-      console.log("student logged in successfully!!")
-      setErrors({});
-    }
-    console.log("😏",response);
-    setUser(response.data.user);
-    }catch(err){
-      console.log(err);
+
+          console.log("student logged in successfully!!")
+          setErrors({});
+        }
+        console.log("😏", response);
+        setUser(response.data.user);
+      } catch (err) {
+        console.log(err);
         setErrors(err.response.data.errors || "Something went wrong");
-        alert(err.response.data.errors || "Something went wrong") 
-    }
+        alert(err.response.data.errors || "Something went wrong")
+      }
     }
   };
 
@@ -154,9 +157,8 @@ const LoginForm = () => {
             <div className="relative">
               <input
                 type="email"
-                className={`w-full pl-10 pr-4 py-3 border ${
-                  errors.email ? 'border-red-500' : 'border-blue-200'
-                } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all`}
+                className={`w-full pl-10 pr-4 py-3 border ${errors.email ? 'border-red-500' : 'border-blue-200'
+                  } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all`}
                 value={formData.email}
                 onChange={(e) => handleChange(e, 'email')}
                 placeholder="Enter your registered e-mail"
@@ -174,12 +176,11 @@ const LoginForm = () => {
             <label className="block text-gray-700 text-sm font-medium mb-1">
               Password
             </label>
-            <div className="relative">
+            <div className="relative flex-grow">
               <input
-                type="password"
-                className={`w-full pl-10 pr-4 py-3 border ${
-                  errors.password ? 'border-red-500' : 'border-blue-200'
-                } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all`}
+                type={showPassword ? 'text' : "password"}
+                className={`w-full pl-10 pr-4 py-3 border ${errors.password ? 'border-red-500' : 'border-blue-200'
+                  } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all`}
                 value={formData.password}
                 onChange={(e) => handleChange(e, 'password')}
                 placeholder="Enter your password"
@@ -188,6 +189,12 @@ const LoginForm = () => {
                 className="absolute left-3 top-3.5 text-blue-500"
                 size={18}
               />
+              <div
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400 hover:text-gray-600"
+                onClick={togglePasswordVisibility}
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </div>
             </div>
             {errors.password && (
               <p className="text-red-500 text-sm mt-1">{errors.password}</p>
