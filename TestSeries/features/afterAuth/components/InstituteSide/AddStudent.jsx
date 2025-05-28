@@ -45,7 +45,7 @@ const AddStudent = () => {
     // Reset students and errors when batch changes
   },[importBatch]);
 
-  const validateField = (name, value, index) => {
+  const validateField = (name, value, index, updatedErrors) => {
     switch (name) {
       case 'fname':
       case 'lname':
@@ -64,12 +64,21 @@ const AddStudent = () => {
         if (!isLongEnough || !hasUpperCase || !hasLowerCase || !hasNumbers || !hasSpecialChar) {
           return 'Password must be at least 8 characters with uppercase, lowercase, number, and special character';
         }
-        if (cpassworrd && value !== students[index]?.cpassword) {
+        if (students[index]?.cpassword && value !== students[index]?.cpassword) {
           return 'Passwords do not match';
         }
+        // delete errors[index].password;
+        updatedErrors[index].cpassword='';
         return '';
       case 'cpassword':
-        return value === students[index]?.password ? '' : 'Passwords do not match';
+        if(value===students[index]?.password){
+          updatedErrors[index].password='';
+          return '';
+        }
+        else{
+          return 'Passwords do not match';
+        }
+        
       case 'number':
       case 'pnumber':
         return /^(\+\d{1,3}[- ]?)?\d{10}$/.test(value) ? '' : 'Please enter a valid phone number';
@@ -87,8 +96,8 @@ const AddStudent = () => {
     updatedStudents[index] = { ...updatedStudents[index], [field]: value };
     setStudents(updatedStudents);
 
-    const errorMessage = validateField(field, value, index);
     const updatedErrors = [...errors];
+    const errorMessage = validateField(field, value, index, updatedErrors);
     updatedErrors[index] = {
       ...updatedErrors[index],
       [field]: errorMessage
@@ -442,7 +451,7 @@ const AddStudent = () => {
                               className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full pr-10"
                               placeholder="Enter password"
                             />
-                            {errors[index]?.password && <p className="text-red-500">{errors[index].password}</p>}
+                            
                             <div
                               className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400 hover:text-gray-600"
                               onClick={() => togglePasswordVisibility(index, 'password')}
@@ -450,6 +459,7 @@ const AddStudent = () => {
                               {showPassword[`${index}-password`] ? <EyeOff size={20} /> : <Eye size={20} />}
                             </div>
                           </div>
+                          
 
                           <button
                             onClick={() => generateRandomPasswordForStudent(index)}
@@ -459,6 +469,7 @@ const AddStudent = () => {
                             <RefreshCcw size={18} />
                           </button>
                         </div>
+                        {errors[index]?.password && <p className="text-red-500">{errors[index].password}</p>}
                       </div>
                       <div className="flex flex-col gap-2">
                         <label className="text-sm font-medium text-gray-700">Confirm Password<span className="text-red-600">*</span></label>
@@ -470,7 +481,7 @@ const AddStudent = () => {
                             className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full pr-10"
                             placeholder="Confirm password"
                           />
-                          {errors[index]?.cpassword && <p className="text-red-500">{errors[index].cpassword}</p>}
+                          
                           <div
                             className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400 hover:text-gray-600"
                             onClick={() => togglePasswordVisibility(index, 'cpassword')}
@@ -478,6 +489,7 @@ const AddStudent = () => {
                             {showPassword[`${index}-cpassword`] ? <EyeOff size={20} /> : <Eye size={20} />}
                           </div>
                         </div>
+                        {errors[index]?.cpassword && <p className="text-red-500">{errors[index].cpassword}</p>}
 
                       </div>
                     </div>
