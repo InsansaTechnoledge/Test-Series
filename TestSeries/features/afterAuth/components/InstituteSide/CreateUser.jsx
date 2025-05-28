@@ -18,16 +18,16 @@ const CreateUser = () => {
     const [profile, setProfile] = useState(null);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [showBatches,setShowBatches]=useState(batches);
+    const [showBatches, setShowBatches] = useState(batches);
     const [error, setError] = useState({});
     const queryClient = useQueryClient();
-    const {user} = useUser();    
+    const { user } = useUser();
 
-    useEffect(()=>{
+    useEffect(() => {
         setShowBatches(batches);
-    },[batches]);
+    }, [batches]);
 
-    const validateField = (name, value) => {
+    const validateField = (name, value, error) => {
         switch (name) {
             case 'firstName':
                 return value.length >= 3 && value.length <= 32 ? '' : 'Name must be between 3-32 characters';
@@ -46,9 +46,20 @@ const CreateUser = () => {
                 if (!isLongEnough || !hasUpperCase || !hasLowerCase || !hasNumbers || !hasSpecialChar) {
                     return 'Password must be at least 8 characters with uppercase, lowercase, number, and special character';
                 }
+                if(formData?.confirm_password && formData?.confirm_password !== value){
+                    return 'Passwords do not match';
+                }
+
+                error.confirm_password='';
                 return '';
             case 'confirm_password':
-                return value === formData?.password ? '' : 'Passwords do not match';
+                if(value===formData?.password){
+                    error.password=''
+                    return ''
+                }
+                else{
+                    return 'Passwords do not match';
+                }
             case 'userId':
                 return value === '' ? 'userId of institute is required' : '';
             case 'gender':
@@ -60,7 +71,7 @@ const CreateUser = () => {
 
     const onChangeHandler = (e) => {
         const { name, value } = e.target;
-        const error = validateField(name, value);
+        const error2 = validateField(name, value, error);
 
         setFormData((prev) => ({
             ...prev,
@@ -69,7 +80,7 @@ const CreateUser = () => {
 
         setError((prev) => ({
             ...prev,
-            [name]: error
+            [name]: error2
         }));
     }
 
@@ -138,6 +149,9 @@ const CreateUser = () => {
             if (response.status === 200) {
                 console.log("User created successfully");
                 alert("successful!!")
+                setSelectedBatches([]);
+                setFormData({});
+                setError({});
                 await queryClient.invalidateQueries(['Users', user._id]);
             } else {
                 console.log("Error creating user");
@@ -148,8 +162,7 @@ const CreateUser = () => {
                 ...error,
                 form: error.response.data.errors[1] || error.message
             });
-            setFormData({});
-            
+
         }
 
     };
@@ -209,6 +222,7 @@ const CreateUser = () => {
                         <input type='text'
                             id='firstName'
                             name='firstName'
+                            value={formData.firstName || ''}
                             onChange={(e) => onChangeHandler(e)}
                             className='p-2 bg-white rounded-md'
                             placeholder='Enter first name'
@@ -221,6 +235,7 @@ const CreateUser = () => {
                         <input type='text'
                             id='lastName'
                             name='lastName'
+                            value={formData.lastName || ''}
                             onChange={(e) => onChangeHandler(e)}
                             className='p-2 bg-white rounded-md'
                             placeholder='Enter last name'
@@ -232,6 +247,7 @@ const CreateUser = () => {
                         <input type='email'
                             id='email'
                             name='email'
+                            value={formData.email || ''}
                             onChange={(e) => onChangeHandler(e)}
                             className='p-2 bg-white rounded-md'
                             placeholder='Enter email'
@@ -246,6 +262,7 @@ const CreateUser = () => {
                                     type={showPassword ? 'text' : 'password'}
                                     id='password'
                                     name='password'
+                                    value={formData.password || ''}
                                     onChange={(e) => onChangeHandler(e)}
                                     className='p-2 bg-white rounded-md w-full pr-10'
                                     placeholder='Enter password or Generate the password on click'
@@ -256,7 +273,6 @@ const CreateUser = () => {
                                 >
                                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                                 </div>
-                                {error.password && <p className='text-red-500 text-sm'>{error.password}</p>}
                             </div>
                             <button
                                 onClick={generateRandomPassword}
@@ -264,6 +280,7 @@ const CreateUser = () => {
                                 <RefreshCcw className='w-6 h-6' />
                             </button>
                         </div>
+                        {error.password && <p className='text-red-500 text-sm'>{error.password}</p>}
                     </div>
                     <div className='flex flex-col gap-2'>
                         <label htmlFor='confirm_password' className='text-lg font-semibold'>Confirm Password<span className='text-red-600'>*</span></label>
@@ -272,6 +289,7 @@ const CreateUser = () => {
                                 type={showConfirmPassword ? 'text' : 'password'}
                                 id='confirm_password'
                                 name='confirm_password'
+                                value={formData.confirm_password || ''}
                                 onChange={(e) => onChangeHandler(e)}
                                 className='p-2 bg-white rounded-md w-full pr-10'
                                 placeholder='Confirm password'
@@ -282,25 +300,26 @@ const CreateUser = () => {
                             >
                                 {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                             </div>
-                            {error.confirm_password && <p className='text-red-500 text-sm'>{error.confirm_password}</p>}
                         </div>
+                        {error.confirm_password && <p className='text-red-500 text-sm'>{error.confirm_password}</p>}
                     </div>
                     <div className='flex flex-col gap-2'>
                         <label htmlFor='userId' className='text-lg font-semibold'>User ID <span className='text-red-600'>*</span></label>
                         <input type='test'
                             id='userId'
                             name='userId'
+                            value={formData.userId || ''}
                             onChange={(e) => onChangeHandler(e)}
                             className='p-2 bg-white rounded-md'
                             placeholder='Enter User ID provided by institute'
                         />
-                        {error.confirm_password && <p className='text-red-500 text-sm'>{error.confirm_password}</p>}
                     </div>
                     <div className='flex flex-col gap-2'>
                         <label htmlFor='gender' className='text-lg font-semibold'>Gender<span className='text-red-600'>*</span></label>
                         <select
                             id='gender'
                             name='gender'
+                            value={formData.gender || ''}
                             className='p-2 bg-white rounded-md'
                             onChange={(e) => onChangeHandler(e)}
                         >
@@ -315,6 +334,7 @@ const CreateUser = () => {
                         <label htmlFor='roleId' className='text-lg font-semibold'>Role group<span className='text-red-600'>*</span></label>
                         <select
                             name='roleId'
+                            value={formData.roleId || ''}
                             onChange={(e) => onChangeHandler(e)}
                             id='roleId' className='p-2 bg-white rounded-md'>
                             <option value=''>--select role--</option>
