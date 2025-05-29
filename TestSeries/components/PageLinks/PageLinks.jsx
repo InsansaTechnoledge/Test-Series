@@ -32,6 +32,8 @@ import ResultDetailPage from '../../features/afterAuth/components/StudentSide/Co
 import StudentRoutes from '../../routes/StudentRoutes';
 import InstituteRoutes from '../../routes/InstituteRoutes';
 import LandingRoutes from '../../routes/LandingRoutes';
+import VideoDisplay from '../../features/Video/Pages/VideoDisplay';
+import UploadVideo from '../../features/Video/Pages/uploadVideo';
 const PageLinks = () => {
   const { user, setUser } = useUser();
   // const navigate = useNavigate();
@@ -104,6 +106,7 @@ const PageLinks = () => {
 
         <Route path='test' element={<TestWindow />} />
         <Route path='session-expired' element={<SessionExpireError />} />
+        <Route path='video' element={<UploadVideo />}/>
 
       </Routes>
     </Router>

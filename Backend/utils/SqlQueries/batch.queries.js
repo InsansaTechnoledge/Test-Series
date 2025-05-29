@@ -56,3 +56,13 @@ export const deleteOrganizationBatch = async (id) => {
   if (error) throw error;
   return data;
 };
+
+export const addVideoIdToBatch = async (batchId, videoId) => {
+  const { data, error } = await supabase.rpc('append_video_id', {
+    batch_id: batchId,
+    new_video_id: videoId,
+  });
+
+  if(error) throw error;
+  return data;
+}
