@@ -3,12 +3,13 @@ import QuestionListSection from './QuestionListSection';
 import QuestionSection from './QuestionSection';
 import CountdownTimer from './TestTimer/CountdownTimer';
 import CryptoJS from 'crypto-js';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useUser } from '../../contexts/currentUserContext';
 import { useCachedQuestions } from '../../hooks/useCachedQuestions';
 import { useCachedExam } from '../../hooks/useCachedExam';
 import { calculateResult } from './utils/resultCalculator';
 import { submitResult } from '../../utils/services/resultService';
+import SubmitModal from './utils/SubmitResultComponent';
 
 const TestWindow = () => {
   const [eventDetails, setEventDetails] = useState();
@@ -22,57 +23,22 @@ const TestWindow = () => {
   const [countdown, setCountdown] = useState(null);
   const [allWarnings, setAllWarnings] = useState([]);
   const [showFinalPopup, setShowFinalPopup] = useState(false);
+  const [showSubmitModal, setShowSubmitModal] = useState(false);
   const { user } = useUser();
   const secretKey = 'secret-key-for-encryption';
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
+  const navigate = useNavigate();
   // const userId = searchParams.get('userId');
   const examId = searchParams.get('examId');
   // const eventId = searchParams.get('eventId');
   // const [proctorStatus, setProctorStatus] = useState('Initializing...');
-
-
   // const examId = "aa632eab-74ad-4a6b-a675-60c571257c00";
-  const { questions,isError: isExamError, isLoading: isQuestionLoading } = useCachedQuestions(examId);
+  const { questions, isError: isExamError, isLoading: isQuestionLoading } = useCachedQuestions(examId);
   const { exam, isLoading: isExamLoading } = useCachedExam(examId);
 
-  // const dummyExam = {
-  //   id: "bd0c2f10-8d62-4c4b-97fc-fb289e28e72c",
-  //   name: "Midterm Mathematics Exam",
-  //   date: "2025-06-15",
-  //   batch: {
-  //     id: "a1b2c3d4-e5f6-7g8h-9i10-jk11lm12no13",
-  //     name: "Batch A - Second Semester"
-  //   },
-  //   organization: {
-  //     id: "org123",
-  //     name: "Excel Coaching Institute"
-  //   },
-  //   total_marks: 100,
-  //   duration: 90,
-  //   live_until: "2025-06-15T13:00:00+05:30",
-  //   description: "This is the midterm exam for 2nd semester.",
-  //   guidelines: "1. Do not switch tabs.\n2. Submit before time.",
-  //   status: "scheduled",
-  //   syllabus: {
-  //     Algebra: ["Linear Equations", "Quadratics"],
-  //     Geometry: ["Triangles", "Circles"]
-  //   },
-  //   created_at: "2025-05-22T10:00:00+05:30",
-  //   planner_type: "exam",
-  //   updated_at: "2025-05-22T10:00:00+05:30",
-  //   updated_by: "admin@excelinstitute.com",
-  // };
-
-  // useEffect(()=>{
-  //   if(!isExamLoading){
-  //     console.log("EXXXX", exam);
-  //   }
-  // },[isExamLoading]);
-
-
   useEffect(() => {
-    if (!isExamLoading && !isQuestionLoading && questions && questions.length>0) {
+    if (!isExamLoading && !isQuestionLoading && questions && questions.length > 0) {
 
 
       const subjectSet = new Set(questions.map(q => q.subject));
@@ -155,7 +121,6 @@ const TestWindow = () => {
     try {
       localStorage.removeItem('testQuestions');
       localStorage.removeItem('encryptedTimeLeft');
-      setSubmitted(true);
 
       const answers = Object.entries(subjectSpecificQuestions).reduce((acc, [, value]) => {
         const objs = value.map((val) => ({
@@ -193,9 +158,11 @@ const TestWindow = () => {
 
       console.log(payload);
 
+
       const response = await submitResult(payload);
       if (response.status == 200) {
         console.log("Result submitted");
+        navigate('/student/completed-exams');
       }
 
     } catch (err) {
@@ -214,7 +181,7 @@ const TestWindow = () => {
     return <div className='font-bold flex flex-col gap-8 mt-20 text-center'>
       <span className='text-indigo-900 text-4xl'>
         Questions not available for this exam!
-        </span>
+      </span>
       <span className='text-indigo-900 text-xl'>Try contacting your institute for more info</span>
     </div>
   }
@@ -325,11 +292,29 @@ const TestWindow = () => {
               </div>
 
               <button
-                onClick={handleSubmitTest}
+                onClick={() => setShowSubmitModal(true)}
                 className='mx-auto mt-10 rounded-md text-lg font-semibold bg-blue-900 px-4 py-2 w-fit text-white'
               >
                 Submit Test
               </button>
+
+              {
+                submitted && (
+                  <>
+                    <p className="mt-4 text-green-700 font-semibold">
+                      ✅ Your form has been submitted successfully!
+                    </p>
+                    {handleSubmitTest()}
+                  </>
+                )
+              }
+
+              {showSubmitModal && (
+                <SubmitModal
+                  setShowSubmitModal={setShowSubmitModal}
+                  setSubmitted={setSubmitted}
+                />
+              )}
             </div>
           </>
         )

@@ -71,7 +71,7 @@ export const deleteExam = async (id) => {
     return data;
 };
 
-export const setExamLive = async (examId) => {
+export const setExamLive = async (examId,orgId) => {
     const { data, error } = await supabase
       .from('batch_exam')
       .update({
@@ -79,6 +79,7 @@ export const setExamLive = async (examId) => {
         updated_at: new Date()
       })
       .eq('id', examId)
+      .eq('organization_id', orgId)
       .select()
       .single();
   

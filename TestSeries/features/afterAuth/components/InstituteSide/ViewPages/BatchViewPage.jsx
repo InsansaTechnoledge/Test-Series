@@ -7,6 +7,7 @@ import { ArrowDownNarrowWideIcon, Edit, Search } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import dateFormatter from "../../../../../utils/dateFormatter";
 import { useEffect, useState } from "react";
+import { useUser } from "../../../../../contexts/currentUserContext";
 
 const BatchViewPage = () => {
     const { batchId } = useParams();
@@ -15,6 +16,7 @@ const BatchViewPage = () => {
     const {users, userMap } = useCachedUser();
     const queryClient = useQueryClient();
     const [hideFaculty,setHideFaculty] = useState(false);
+    const {user}=useUser();
 
 const [faculty, setFaculty] = useState(() =>
   users?.filter(user => Array.isArray(user.batch) && user.batch.includes(batchId)) || []
@@ -37,19 +39,8 @@ const [faculty, setFaculty] = useState(() =>
 
     const refreshFunction = async () => {
         await queryClient.invalidateQueries(['batches', user._id]);
+        await queryClient.invalidateQueries(['Users', user._id]);
     }
-
-    const faculty1 = [
-        { name: "Jay Patel", subject: "Maths" },
-        { name: "Ronak", subject: "Science" },
-        { name: "Piyush", subject: "English" },
-        { name: "Dev", subject: "Computer" },
-        { name: "Ravi", subject: "Maths" },
-        { name: "Vishwas", subject: "English" },
-        { name: "Rushik", subject: "Science" },
-    ];
-
-    const students = faculty.map(({ name }) => ({ name })); // same as faculty names for demo
 
     return (
         <>

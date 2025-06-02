@@ -12,7 +12,9 @@ const ExamForm = ({ onSubmit }) => {
     date: '',
     total_marks: '',
     duration: '',
-    batch_id: ''
+    batch_id: '',
+    //have to add the live until logic here
+
   });
 
   const handleChange = (e) => {
@@ -25,7 +27,7 @@ const ExamForm = ({ onSubmit }) => {
 
     const payload = {
       ...form,
-      organization_id: user?._id  // ✅ Inject orgId here reliably
+      organization_id: user.role==='organization'?user._id :user.organizationId// ✅ Inject orgId here reliably
       // organization_id: user?.user?._id   // ✅ Inject orgId here reliably
     };
 
@@ -100,6 +102,20 @@ const ExamForm = ({ onSubmit }) => {
           </option>
         ))}
       </select>
+<label htmlFor="reapplicable" className="block text-gray-800 font-semibold mb-2">
+    Can students apply for this exam multiple times?
+  </label>
+  <div className="flex items-center space-x-2">
+    <input
+      id="reapplicable"
+      name="reapplicable"
+      type="checkbox"
+      className="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+      onChange={(e) => setForm(prev => ({ ...prev, reapplicable: e.target.checked }))}
+      checked={form.reapplicable || false}
+    />
+    <span className="text-gray-700">Allow reattempt</span>
+  </div>
 
       <button
         type="submit"

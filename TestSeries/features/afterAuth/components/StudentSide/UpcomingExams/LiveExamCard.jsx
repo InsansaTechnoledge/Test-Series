@@ -1,11 +1,25 @@
 import { BookOpen, CalendarDays, Clock, Goal, Radio } from 'lucide-react'
-import React from 'react'
-import dateFormatter from '../../../../../utils/dateFormatter'
-import dottedLine from '../../../../../assests/StudentLanding/UpcomingExams/line.svg'
+import { useNavigate } from 'react-router-dom';
 
 const LiveExamCard = ({ data, onStartTest }) => {
+    const navigate=useNavigate();
 
-   
+    const getButtonProps = () => {
+        if (data.reapplicable) {
+            if (data.hasAttempted) {
+                return { label: 'Start Test Again', onClick: () => onStartTest(data.id) };
+            }
+            return { label: 'Start Test', onClick: () => onStartTest(data.id) };
+        } else {
+            if (data.hasAttempted) {
+                return { label: 'View Result', onClick: () => navigate('/student/completed-exams') };
+            }
+            return { label: 'Start Test', onClick: () => onStartTest(data.id) };
+        }
+    };
+
+    const { label, onClick } = getButtonProps();
+
     return (
         <div className='hover:scale-[103%] duration-200 transition-all flex flex-col gap-2 shadow-md p-6 rounded-xl'>
             <div className='flex justify-between'>
@@ -19,7 +33,7 @@ const LiveExamCard = ({ data, onStartTest }) => {
                 </div>
                 <div className='text-red-700 bg-gray-100 px-4 py-2 rounded-lg flex gap-2 font-semibold text-lg'>
                     <div className='flex'>
-                        <Radio className='w-6 h-6 my-auto'/>
+                        <Radio className='w-6 h-6 my-auto' />
                     </div>
                     <span className='my-auto'>
                         Live now
@@ -46,7 +60,7 @@ const LiveExamCard = ({ data, onStartTest }) => {
                         {data.total_marks} Marks
                     </span>
                 </div>
-                
+
             </div>
             <div className='flex gap-4 justify-between text-gray-500'>
                 <div className='flex gap-2 text-gray-500'>
@@ -57,7 +71,7 @@ const LiveExamCard = ({ data, onStartTest }) => {
                         {data.duration} Mins
                     </span>
                 </div>
-                
+
             </div>
             <div className='mt-4 flex justify-between'>
                 <div className='flex gap-4'>
@@ -70,11 +84,11 @@ const LiveExamCard = ({ data, onStartTest }) => {
                 </div>
 
                 <button
-                onClick={() => onStartTest(data.id)} 
-                className='bg-blue-950 text-white px-4 py-2 rounded-lg'
+                    onClick={onClick}
+                    className='bg-blue-950 text-white px-4 py-2 rounded-lg'
                 >
-          Start Test
-        </button>
+                    {label}
+                </button>
             </div>
         </div>
     )

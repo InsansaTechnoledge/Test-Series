@@ -24,7 +24,8 @@ const resultSchema = new Schema({
     },
     examId: {
         type: String,
-        required: [true, "Exam id is required"]
+        required: [true, "Exam id is required"],
+        index: true
     },
     status: {
         type: String,

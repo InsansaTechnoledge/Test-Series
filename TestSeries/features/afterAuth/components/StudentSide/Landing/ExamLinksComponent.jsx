@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-export default function ExamLinksComponent({ Data , grid }) {
+export default function  ExamLinksComponent({ Data , grid }) {
   const navigate = useNavigate();
   console.log(grid)
   return (

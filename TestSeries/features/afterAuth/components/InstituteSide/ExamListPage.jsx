@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Clock, Users, CheckCircle, PlayCircle, Loader2, Calendar, BookOpen, Globe, Heading } from 'lucide-react';
-import { goLiveExam , fetchExamsByOrganization } from '../../../../utils/services/examService';
+import { goLiveExam , fetchUpcomingExams } from '../../../../utils/services/examService';
 import HeadingUtil from '../../utility/HeadingUtil';
 import NeedHelpComponent from './components/NeedHelpComponent';
 
@@ -12,8 +12,8 @@ const ExamListPage = () => {
   const getExams = async () => {
     try {
       setLoading(true);
-      const data = await fetchExamsByOrganization();
-      setExams(data);
+      const response = await fetchUpcomingExams();
+      setExams(response.data);
     } catch (err) {
       console.error('❌ Failed to fetch exams:', err);
     } finally {

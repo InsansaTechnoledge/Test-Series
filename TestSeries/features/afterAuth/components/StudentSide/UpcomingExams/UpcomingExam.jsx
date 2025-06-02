@@ -6,34 +6,44 @@ import LiveExamCard from './LiveExamCard';
 import { fetchUpcomingExams } from '../../../../../utils/services/examService';
 import { useUser } from '../../../../../contexts/currentUserContext'
 import { useNavigate } from 'react-router-dom'
+import useExams from './useExams';
 
 const UpcomingExam = () => {
   const [liveExams, setLiveExams] = useState([]);
   const [upcomingExams, setUpcomingExams] = useState([]);
   const user = useUser();
   const navigate = useNavigate();
+  const {exams}=useExams();
 
   const question = "How To assign role groups to users ?";
   const answer = "Use the created role groups to assign permissions to users in your add user section.";
 
 
-  useEffect(() => {
-    const getExams = async () => {
-      try {
-        const exams = await fetchUpcomingExams();
+  // useEffect(() => {
+  //   const getExams = async () => {
+  //     try {
+  //       const exams = await fetchUpcomingExams();
 
-        const upcoming = exams.filter(exam => exam.go_live === false || exam.go_live === "FALSE");
+  //       const upcoming = exams.filter(exam => exam.go_live === false || exam.go_live === "FALSE");
+  //       setUpcomingExams(upcoming);
+
+  //       const live = exams.filter(exam => exam.go_live === true || exam.go_live === "TRUE")
+  //       setLiveExams(live)
+  //     } catch (error) {
+  //       console.error("❌ Error fetching upcoming exams:", error);
+  //     }
+  //   };
+
+  //   getExams();
+  // }, []);
+useEffect(()=>{
+  const upcoming = exams?.filter(exam => exam.go_live === false || exam.go_live === "FALSE");
         setUpcomingExams(upcoming);
 
-        const live = exams.filter(exam => exam.go_live === true || exam.go_live === "TRUE")
+        const live = exams?.filter(exam => exam.go_live === true || exam.go_live === "TRUE")
         setLiveExams(live)
-      } catch (error) {
-        console.error("❌ Error fetching upcoming exams:", error);
-      }
-    };
+},[exams])
 
-    getExams();
-  }, []);
 
   const handleStartTest = (examId) => {
     // Replace with real userId or eventId if available

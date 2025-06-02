@@ -33,31 +33,6 @@ const ResultsPage = () => {
     const question = ""
     const answer = ""
 
-    // const results = [
-    //     {
-    //         name: "Exam name",
-    //         marks: 50,
-    //         status: "Attempted",
-    //         total_marks: 100,
-    //         date: new Date
-    //     },
-    //     {
-    //         name: "Exam name",
-    //         marks: 50,
-    //         status: "Unattempted",
-    //         total_marks: 100,
-    //         date: new Date
-    //     },
-    //     {
-    //         name: "Exam name",
-    //         marks: 50,
-    //         status: "Disqualified",
-    //         total_marks: 100,
-    //         date: new Date
-    //     },
-    // ]
-
-
     return (
         <div>
             <HeadingUtil heading="Completed Exams" description="You can check results for the completed exams from here" />
