@@ -1,9 +1,10 @@
 
 import React, { useState, useRef } from 'react';
-import { Building, Mail, Phone, Image, Globe, MapPin, Check, Loader, Lock, Upload, X } from 'lucide-react';
+import { Building, Mail, Phone, Image, Globe, MapPin, Check, Loader, Lock, Upload, X, RefreshCcw } from 'lucide-react';
 import { Country, State, City } from 'country-state-city';
 import { useEffect } from 'react';
 import { createOrganization } from '../../../utils/services/organizationService';
+import { generatePassword } from '../../afterAuth/utility/GenerateRandomPassword';
 
 const OrganizationRegistrationForm = () => {
   const [formData, setFormData] = useState({
@@ -85,6 +86,16 @@ const OrganizationRegistrationForm = () => {
         return '';
     }
   };
+
+    const generateRandomPasswordForOrg = () => {
+      const password = generatePassword();
+      setFormData((prev) => ({
+        ...prev,
+        password: password,
+        confirm_password: password
+      }));
+      
+    }
 
   const handleChange = (e, field, nested = null) => {
 
@@ -459,6 +470,13 @@ const OrganizationRegistrationForm = () => {
               >
                 {passwordVisible ? "Hide" : "Show"}
               </button>
+              <button
+                                          onClick={() => generateRandomPasswordForOrg()}
+                                          className="bg-gray-100 hover:bg-gray-200 p-3 rounded-lg flex items-center justify-center transition"
+                                          title="Generate random password"
+                                        >
+                                          <RefreshCcw size={18} />
+                                        </button>
             </div>
             {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
             <p className="text-xs text-gray-500 mt-1">Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.</p>
