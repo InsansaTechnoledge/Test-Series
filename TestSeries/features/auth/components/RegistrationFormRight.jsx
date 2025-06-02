@@ -6,7 +6,10 @@ import { useEffect } from 'react';
 import { createOrganization } from '../../../utils/services/organizationService';
 import { generatePassword } from '../../afterAuth/utility/GenerateRandomPassword';
 
+  import { useNavigate } from 'react-router-dom';
+
 const OrganizationRegistrationForm = () => {
+  const navigate=useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -297,6 +300,7 @@ const OrganizationRegistrationForm = () => {
           pincode: '',
         },
       });
+      navigate('/login?role=Institute');
       // Reset form or redirect
     } catch (err) {
       setMsg('❌ Error creating organization: ' + (err.message || 'Unknown error'));
