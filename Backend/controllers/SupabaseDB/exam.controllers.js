@@ -1,4 +1,4 @@
-import { createExam, deleteExam, fetchSelective, updateExam, setExamLive, getExamOrganization, fetchNonLiveExams } from '../../utils/SqlQueries/exam.queries.js';
+import { createExam, deleteExam, fetchSelective, updateExam, setExamLive, fetchNonLiveExams } from '../../utils/SqlQueries/exam.queries.js';
 import { APIError } from '../../utils/ResponseAndError/ApiError.utils.js'
 import { APIResponse } from '../../utils/ResponseAndError/ApiResponse.utils.js'
 import Result from '../../models/SecondDB/result.model.js';

@@ -59,6 +59,16 @@ export const fetchSelective = async (conditions) => {
   };
   
 
+  export const fetchExamNames=async(batch_id)=>{
+    const {data,error}=await supabase
+      .from("batch_exam")
+      .select("name, id")
+      .eq("batch_id", batch_id);
+
+    if (error) throw error;
+    return data
+  }
+
 export const deleteExam = async (id) => {
     const { data, error } = await supabase
         .from("batch_exam")
@@ -81,17 +91,6 @@ export const setExamLive = async (examId,orgId) => {
       .eq('id', examId)
       .eq('organization_id', orgId)
       .select()
-      .single();
-  
-    if (error) throw error;
-    return data;
-  };
-
-  export const getExamOrganization = async (id) => {
-    const { data, error } = await supabase
-      .from("batch_exam")
-      .select("organization_id")
-      .eq("id", id)
       .single();
   
     if (error) throw error;

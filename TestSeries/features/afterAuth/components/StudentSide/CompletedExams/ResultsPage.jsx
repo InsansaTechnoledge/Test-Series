@@ -5,30 +5,17 @@ import { Eye, Search } from 'lucide-react'
 import dateFormatter from '../../../../../utils/dateFormatter'
 import { getStudentResults } from '../../../../../utils/services/resultPage'
 import { useNavigate } from 'react-router-dom';
+import useStudentExamResults from './useExamResults'
+import { useUser } from '../../../../../contexts/currentUserContext'
 
 const ResultsPage = () => {
 
-    const [results, setResults] = useState([]);
+    // const [results, setResults] = useState([]);
+    const {user}=useUser();
+    const { results } = useStudentExamResults(user._id);
     const [loading, setLoading] = useState(true);
     const [selectedResult, setSelectedResult] = useState(null);
     const navigate = useNavigate();
-
-    useEffect(() => {
-        const fetchData = async () => {
-          try {
-            const res = await getStudentResults();
-            setResults(res);
-          } catch (err) {
-            console.error("Failed to fetch results", err);
-          } finally {
-            setLoading(false);
-          }
-        };
-      
-        fetchData();
-      }, []);
-      
-      console.log("r", results)
 
     const question = ""
     const answer = ""

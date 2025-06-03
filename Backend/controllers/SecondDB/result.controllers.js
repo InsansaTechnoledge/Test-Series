@@ -2,7 +2,7 @@ import { calculateResult } from "../../../TestSeries/features/Test/utils/resultC
 import Result from "../../models/SecondDB/result.model.js";
 import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
 import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
-import { fetchExamNameById } from "../../utils/SqlQueries/exam.queries.js";
+import { fetchExamNameById, fetchExamNames } from "../../utils/SqlQueries/exam.queries.js";
 import { fetchQuestionsSelectively } from "../../utils/SqlQueries/questions.queries.js";
 
 export const addResult = async (req, res) => {
@@ -50,24 +50,22 @@ export const fetchStudentResults = async (req, res) => {
       if (!studentResults || studentResults.length === 0) {
         return new APIResponse(400, ["No results yet"]).send(res);
       }
-  
-      const completeResults = await Promise.all(
-        studentResults.map(async (result) => {
-          try {
-            const examName = await fetchExamNameById(result.examId);
-            return {
-              ...result._doc, 
-              examName,
-            };
-          } catch (e) {
-            return {
-              ...result._doc,
-              examName: "Unknown Exam",
-            };
-          }
-        })
-      );
-  
+
+      const examData=await fetchExamNames(req.user.batch?.currentBatch);
+
+      const examMap={};
+      (examData || []).forEach(exam => {
+        examMap[exam.id] = exam.name;
+      });
+
+      const completeResults = studentResults.map(result => {
+        const examName = examMap[result.examId.toString()] || "Unknown Exam";
+        return {
+          ...result._doc,
+          examName,
+        };
+      });
+
       return new APIResponse(200, completeResults, "Results fetched").send(res);
   
     } catch (err) {
