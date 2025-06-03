@@ -1,6 +1,7 @@
 import { fetchQuestionsSelectively, updateQuestion ,deleteQuestion, deleteQuestionsBulk} from "../../utils/SqlQueries/questions.queries.js";
 import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
 import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
+import Result from "../../models/SecondDB/result.model.js";
 
 export const updateQuestionById = async (req, res) => {
     try {
@@ -24,6 +25,10 @@ export const getAllQuestionsSelectively = async (req, res) => {
     const condition = req.query;
 
     try {
+        const result=await Result.find({examId: condition.exam_id,studentId:req.user._id}).lean();
+        if(result.length>0){
+            return new APIError(400, ["You have already given this exam, you cannot access the questions again."]).send(res);
+        }
         const data = await fetchQuestionsSelectively(condition);
         return new APIResponse(200, data, "Questions fetched successfully!").send(res);
     } catch (err) {

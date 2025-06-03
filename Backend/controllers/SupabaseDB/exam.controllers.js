@@ -50,28 +50,52 @@ export const updateExamById = async (req, res) => {
 
 export const fetchExamBasedOnCondition = async (req, res) => {
   try {
-    const query = req.query;
-    query.organization_id = req.user.role === 'organization' ? req.user._id : req.user.organizationId;
-    const exams = await fetchSelective(query);
-    if (req.user.role === 'student') {
-      const results = await Result.find({ studentId: req.user._id }, {examId:1});
-      console.log("Results fetched for student:", results);
-      const attemptedExamIds = new Set(results.map(r => r.examId));
-      const examList = exams.map(exam => ({
-        ...exam,
-        hasAttempted: attemptedExamIds.has(exam.id.toString()),
-      }));
-      return new APIResponse(200, examList, "Exams fetched successfully!").send(res);
-    }
-    else {
-      return new APIResponse(200, exams, "Exams fetched successfully!").send(res);
-    }
-  }
-  catch (err) {
-    console.log(err);
-    return new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while fetching exam", err.message]).send(res);
+    // Construct the query object safely
+    const baseQuery = {
+      ...req.query,
+      organization_id: req.user.role === 'organization' ? req.user._id : req.user.organizationId,
+    };
+
+  if (req.user.role === 'student') {
+  const currentBatch = req.user.batch?.currentBatch;
+
+  if (!currentBatch) {
+   return new APIError(400, ['Current batch not found for student']).send(res);
+  } else {
+    baseQuery.batch_id = currentBatch;
   }
 }
+
+    const exams = await fetchSelective(baseQuery);
+
+    // If user is a student, mark attempted exams
+    if (req.user.role === 'student') {
+      const results = await Result.find(
+        { studentId: req.user._id },
+        { examId: 1 }
+      );
+
+      const attemptedExamIds = new Set(results.map(result => result.examId.toString()));
+
+      const examList = exams.map(exam => ({
+        ...exam,
+        hasAttempted: attemptedExamIds.has(exam.id?.toString() || exam._id?.toString()),
+      }));
+
+      return new APIResponse(200, examList, "Exams fetched successfully!").send(res);
+    }
+
+    // For non-student roles, return exams directly
+    return new APIResponse(200, exams, "Exams fetched successfully!").send(res);
+  } catch (err) {
+    console.error("Error fetching exams:", err);
+    return new APIError(
+      err?.response?.status || err?.status || 500,
+      ["Something went wrong while fetching exam", err.message]
+    ).send(res);
+  }
+};
+
 
 export const deleteExamById = async (req, res) => {
   try {
