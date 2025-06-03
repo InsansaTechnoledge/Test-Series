@@ -136,16 +136,14 @@ export const fetchAllResultsForExam = async (req, res) => {
   
       // ✅ Fetch questions from Supabase
       const questions = await fetchQuestionsSelectively({ exam_id: examId });
-  
-      // ✅ Fetch exam name
-      const { name: examName } = await fetchExamNameById(examId);
+
+      console.log("Questions fetched:", questions);
   
       // ✅ Return result + questions + exam name
       return new APIResponse(
         200,
         {
           ...result._doc,
-          examName,
           questions,
         },
         "Result and questions fetched"

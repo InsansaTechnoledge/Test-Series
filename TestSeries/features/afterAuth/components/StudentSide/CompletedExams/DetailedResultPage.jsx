@@ -22,6 +22,7 @@ const ResultPage = () => {
         const fetchResultData = async () => {
             try {
                 setLoading(true);
+                console.log('Fetching result data for examId:', examId);
                 const data = await getResultDetail(examId);
                 console.log(data);
                 setResultData(data);
@@ -314,7 +315,7 @@ const ResultPage = () => {
             <div className="mb-6">
                 <h1 className="text-2xl font-bold text-gray-800 mb-2">Exam Result for {examName}</h1>
                 <div className="text-sm text-gray-600">
-                    <span>Exam ID: {resultData.examId}</span>
+                    <span>Exam ID: {examId}</span>
                     <span className="mx-2">•</span>
                     <span>Status: {resultData.status}</span>
                     <span className="mx-2">•</span>

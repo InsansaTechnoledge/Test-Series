@@ -116,6 +116,8 @@ const BulkUpload = ({ setQuestions }) => {
               subject: row.subject || '',
               chapter: row.chapter || ''
             };
+         // not ideal for actual decimal data
+
       
             // Type-specific logic
             if (base.type === 'mcq' || base.type === 'msq') {
