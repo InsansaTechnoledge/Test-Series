@@ -12,8 +12,10 @@ const batchSchema = new Schema({
         type: String,
         required: [true, 'current batch is required'],
         trim: true
-    },
-});
+    }    
+},
+{_id: false }
+);
 
 const studentSchema = new Schema({
     name: {
