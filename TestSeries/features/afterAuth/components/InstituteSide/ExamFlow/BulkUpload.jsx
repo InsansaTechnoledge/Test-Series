@@ -110,12 +110,14 @@ const BulkUpload = ({ setQuestions }) => {
               type: row.type?.toLowerCase(),
               question_text: row.question_text || '',
               explanation: row.explanation || '',
-              difficulty: row.difficulty || 'easy',
+              difficulty: row.difficulty?.toLowerCase() || 'easy',
               positive_marks: Number(row.positive_marks) || 1,
               negative_marks: Number(row.negative_marks) || 0,
               subject: row.subject || '',
               chapter: row.chapter || ''
             };
+         // not ideal for actual decimal data
+
       
             // Type-specific logic
             if (base.type === 'mcq' || base.type === 'msq') {

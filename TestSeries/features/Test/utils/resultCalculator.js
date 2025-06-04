@@ -136,7 +136,10 @@ export const calculateResult = (responses) => {
 
     });
 
-    return { totalMarks, unattempted, wrongAnswers };
+    return { 
+        totalMarks:Number(totalMarks.toFixed(2)) ,
+        unattempted, 
+        wrongAnswers };
 }
 
 

@@ -88,6 +88,12 @@ const TestWindow = () => {
     }
   }, [selectedSubject]);
 
+  useEffect(() => {
+    if(submitted) {
+      handleSubmitTest();
+    }
+  },[submitted]);
+
   const getCorrectResponse = (question) => {
     switch (question.question_type) {
       case "mcq":
@@ -141,10 +147,7 @@ const TestWindow = () => {
       //   console.log('✅ Test submitted successfully.');
       // }
 
-      console.log(answers);
-
       const result = calculateResult(answers);
-      console.log(result)
 
       const payload = {
         studentId: user._id,
@@ -161,7 +164,7 @@ const TestWindow = () => {
 
       const response = await submitResult(payload);
       if (response.status == 200) {
-        console.log("Result submitted");
+
         navigate('/student/completed-exams');
       }
 
@@ -298,23 +301,22 @@ const TestWindow = () => {
                 Submit Test
               </button>
 
+                            {showSubmitModal && (
+                <SubmitModal
+                  setShowSubmitModal={setShowSubmitModal}
+                  setSubmitted={setSubmitted}
+                />
+              )}
+
               {
                 submitted && (
                   <>
                     <p className="mt-4 text-green-700 font-semibold">
                       ✅ Your form has been submitted successfully!
                     </p>
-                    {handleSubmitTest()}
                   </>
                 )
               }
-
-              {showSubmitModal && (
-                <SubmitModal
-                  setShowSubmitModal={setShowSubmitModal}
-                  setSubmitted={setSubmitted}
-                />
-              )}
             </div>
           </>
         )
