@@ -63,7 +63,7 @@ const ResultPage = () => {
                 sub_question_ids: q.sub_question_ids
             };
 
-            
+
             if (q.question_type === 'comprehension' && Array.isArray(q.sub_questions)) {
                 transformed.sub_questions = q.sub_questions.map(sub => ({
                     id: sub.id,
@@ -89,7 +89,7 @@ const ResultPage = () => {
 
     const transformUserAnswers = (wrongAnswers, questions) => {
         const userAnswers = {};
-        
+
         // Initialize all questions (including sub-questions) as null
         questions.forEach(q => {
             userAnswers[q.id] = null;
@@ -110,7 +110,7 @@ const ResultPage = () => {
             if (q.question_type === 'comprehension' && Array.isArray(q.sub_questions)) {
                 // Handle comprehension sub-questions
                 q.sub_questions.forEach(sub => {
-                    if (!wrongAnswers.find(w => w.questionId === sub.id) && 
+                    if (!wrongAnswers.find(w => w.questionId === sub.id) &&
                         (!resultData.unattempted || !resultData.unattempted.includes(sub.id))) {
                         // This sub-question was answered correctly
                         if (sub.question_type === 'mcq') {
@@ -122,11 +122,14 @@ const ResultPage = () => {
                         } else if (sub.question_type === 'fill' || sub.question_type === 'numerical') {
                             userAnswers[sub.id] = sub.correct_answer;
                         }
+                        else if (sub.question_type === 'match') {
+                            userAnswers[sub.id] = sub.correct_pairs;
+                        }
                     }
                 });
             } else {
                 // Handle regular questions
-                if (!wrongAnswers.find(w => w.questionId === q.id) && 
+                if (!wrongAnswers.find(w => w.questionId === q.id) &&
                     (!resultData.unattempted || !resultData.unattempted.includes(q.id))) {
                     // This question was answered correctly, set the correct answer
                     if (q.question_type === 'mcq') {
@@ -137,6 +140,9 @@ const ResultPage = () => {
                         userAnswers[q.id] = q.is_true;
                     } else if (q.question_type === 'fill' || q.question_type === 'numerical') {
                         userAnswers[q.id] = q.correct_answer;
+                    }
+                    else if (q.question_type === 'match') {
+                        userAnswers[q.id] = q.correct_pairs;
                     }
                 }
             }
@@ -177,13 +183,13 @@ const ResultPage = () => {
 
         // Regular question logic
         const userAnswer = userAnswers[question.id];
-        
+
         if (userAnswer === undefined || userAnswer === null || userAnswer === '') {
             return { status: 'unanswered', class: 'bg-gray-100 text-gray-800', label: 'Not Answered' };
         }
-        
+
         let isCorrect = false;
-        
+
         if (question.type === 'mcq') {
             isCorrect = userAnswer === question.correct_option;
         } else if (question.type === 'msq') {
@@ -193,7 +199,21 @@ const ResultPage = () => {
         } else if (question.type === 'fill' || question.type === 'numerical') {
             isCorrect = userAnswer?.toString().toLowerCase().trim() === question.correct_answer?.toString().toLowerCase().trim();
         }
-        
+        else if (question.type === 'match') {
+            const sortObject = (obj) => {
+                return Object.keys(obj || {})
+                    .sort()
+                    .reduce((res, key) => {
+                        res[key] = obj[key];
+                        return res;
+                    }, {});
+            };
+
+            const correct = JSON.stringify(sortObject(question.correct_pairs));
+            const answer = JSON.stringify(sortObject(userAnswer));
+            isCorrect = correct === answer;
+        }
+
         if (isCorrect) {
             return { status: 'correct', class: 'bg-green-100 text-green-800', label: 'Correct' };
         } else {
@@ -207,31 +227,31 @@ const ResultPage = () => {
             const text = q.question_text || q.passage || '';
             const subject = q.subject || '';
             const chapter = q.chapter || '';
-          
+
             let matchesSearch = text.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                               subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                               chapter.toLowerCase().includes(searchTerm.toLowerCase());
+                subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                chapter.toLowerCase().includes(searchTerm.toLowerCase());
 
             // Also search in sub-questions for comprehension
             if (q.type === 'comprehension' && Array.isArray(q.sub_questions)) {
-                matchesSearch = matchesSearch || q.sub_questions.some(sub => 
+                matchesSearch = matchesSearch || q.sub_questions.some(sub =>
                     (sub.question_text || '').toLowerCase().includes(searchTerm.toLowerCase())
                 );
             }
-          
+
             const matchesType = filterType === 'all' || q.type === filterType;
-            
+
             // Check result status
             const result = getQuestionResult(q, userAnswers);
-            const matchesResult = filterResult === 'all' || 
-                                (filterResult === 'correct' && result.status === 'correct') ||
-                                (filterResult === 'incorrect' && (result.status === 'incorrect' || result.status === 'partial')) ||
-                                (filterResult === 'unanswered' && result.status === 'unanswered');
-          
+            const matchesResult = filterResult === 'all' ||
+                (filterResult === 'correct' && result.status === 'correct') ||
+                (filterResult === 'incorrect' && (result.status === 'incorrect' || result.status === 'partial')) ||
+                (filterResult === 'unanswered' && result.status === 'unanswered');
+
             return matchesSearch && matchesType && matchesResult;
         });
     };
-    
+
     // Get the question type as a readable string
     const getQuestionTypeLabel = (type) => {
         const types = {
@@ -246,17 +266,17 @@ const ResultPage = () => {
         };
         return types[type] || type.toUpperCase();
     };
-    
+
     // Get the difficulty badge class
     const getDifficultyBadgeClass = (difficulty) => {
-        switch(difficulty) {
+        switch (difficulty) {
             case 'easy': return 'bg-green-100 text-green-800';
             case 'medium': return 'bg-yellow-100 text-yellow-800';
             case 'hard': return 'bg-red-100 text-red-800';
             default: return 'bg-gray-100 text-gray-800';
         }
     };
-    
+
     // Toggle expanded state for a question
     const toggleExpand = (id) => {
         if (expandedQuestion === id) {
@@ -336,7 +356,7 @@ const ResultPage = () => {
                 </div>
 
                 <div className="flex space-x-2 mb-4">
-                    <select 
+                    <select
                         className="border rounded px-3 py-1 text-sm"
                         value={filterType}
                         onChange={(e) => setFilterType(e.target.value)}
@@ -351,8 +371,8 @@ const ResultPage = () => {
                         <option value="comprehension">Comprehension</option>
                         <option value="code">Coding</option>
                     </select>
-                    
-                    <select 
+
+                    <select
                         className="border rounded px-3 py-1 text-sm"
                         value={filterResult}
                         onChange={(e) => setFilterResult(e.target.value)}
@@ -362,8 +382,8 @@ const ResultPage = () => {
                         <option value="incorrect">Incorrect</option>
                         <option value="unanswered">Not Answered</option>
                     </select>
-                    
-                    <input 
+
+                    <input
                         type="text"
                         placeholder="Search questions..."
                         className="border rounded px-3 py-1 text-sm"
@@ -371,15 +391,15 @@ const ResultPage = () => {
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
-                
+
                 <div className="space-y-4">
                     {filteredQuestions.length > 0 ? (
                         filteredQuestions.map((q, index) => {
                             const result = getQuestionResult(q, userAnswers);
-                            
+
                             return (
                                 <div key={q.id} className="border rounded-lg overflow-hidden bg-white">
-                                    <div 
+                                    <div
                                         className="p-4 bg-gray-50 border-b flex justify-between items-center cursor-pointer"
                                         onClick={() => toggleExpand(q.id)}
                                     >
@@ -396,7 +416,7 @@ const ResultPage = () => {
                                                     {result.label}
                                                 </span>
                                                 <span className="text-gray-500 text-sm">
-                                                    {q.type === 'comprehension' && Array.isArray(q.sub_questions) 
+                                                    {q.type === 'comprehension' && Array.isArray(q.sub_questions)
                                                         ? `+${q.sub_questions.reduce((sum, sub) => sum + (Number(sub.positive_marks) || 0), 0)} marks`
                                                         : `+${q.positive_marks} ${q.negative_marks > 0 ? `/ -${q.negative_marks}` : ''} ${q.positive_marks === 1 ? 'mark' : 'marks'}`
                                                     }
@@ -425,7 +445,7 @@ const ResultPage = () => {
                                             </button>
                                         </div>
                                     </div>
-                                    
+
                                     {expandedQuestion === q.id && (
                                         <div className="p-4">
                                             {/* Show passage for comprehension questions */}
@@ -443,11 +463,41 @@ const ResultPage = () => {
                                                 <>
                                                     <div className="mb-4">
                                                         <h3 className="font-medium text-gray-700 mb-2">Question:</h3>
-                                                        <div className="pl-2 border-l-4 border-gray-200 py-1">
-                                                            {q.question_text}
-                                                        </div>
+                                                        {
+                                                            q.type === 'match' && q.left_items && q.right_items ? (
+                                                                <div className="pl-2 border-l-4 border-gray-200 py-1">
+
+                                                                    <div className="font-medium text-gray-800 mb-2">Match the Following:</div>
+                                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                                        <div>
+                                                                            <h4 className="font-medium text-gray-700 mb-1">Left Items:</h4>
+                                                                            <ul className="list-disc pl-5">
+
+                                                                                {q.left_items.map((item, idx) => (
+                                                                                    <li key={idx} className="text-gray-600">{item}</li>
+                                                                                ))}
+                                                                            </ul>
+                                                                        </div>
+                                                                        <div>
+                                                                            <h4 className="font-medium text-gray-700 mb-1">Right Items:</h4>
+                                                                            <ul className="list-disc pl-5">
+                                                                                {q.right_items.map((item, idx) => (
+                                                                                    <li key={idx} className="text-gray-600">{item}</li>
+                                                                                ))}
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            ) :
+                                                                (
+                                                                    <div className="pl-2 border-l-4 border-gray-200 py-1">
+                                                                        {q.question_text}
+                                                                    </div>
+                                                                )
+                                                        }
+
                                                     </div>
-                                                    
+
                                                     {/* Show user's answer */}
                                                     <div className="mb-4">
                                                         <h3 className="font-medium text-gray-700 mb-2">Your Answer:</h3>
@@ -455,10 +505,21 @@ const ResultPage = () => {
                                                             {userAnswers[q.id] !== undefined && userAnswers[q.id] !== null && userAnswers[q.id] !== '' ? (
                                                                 <>
                                                                     {q.type === 'mcq' && q.options ? q.options[userAnswers[q.id]] : ''}
-                                                                    {q.type === 'msq' && q.options && Array.isArray(userAnswers[q.id]) ? 
+                                                                    {q.type === 'msq' && q.options && Array.isArray(userAnswers[q.id]) ?
                                                                         userAnswers[q.id].map(idx => q.options[idx]).join(', ') : ''}
                                                                     {q.type === 'tf' ? (userAnswers[q.id] ? 'True' : 'False') : ''}
                                                                     {(q.type === 'fill' || q.type === 'numerical') ? userAnswers[q.id] : ''}
+                                                                    {q.type === 'match' && userAnswers[q.id] && Object.entries(userAnswers[q.id]).length > 0 ? (
+                                                                        <div className="space-y-1">
+                                                                            {Object.entries(userAnswers[q.id]).map(([key, value]) => (
+                                                                                <div key={key} className="flex justify-between">
+                                                                                    <span className="text-gray-700">{key}</span>
+                                                                                    <span className="text-gray-700">{value}</span>
+                                                                                </div>
+                                                                            ))}
+                                                                        </div>
+                                                                    ) : ''}
+
                                                                 </>
                                                             ) : (
                                                                 <span className="text-gray-500 italic">Not answered</span>
@@ -491,7 +552,7 @@ const ResultPage = () => {
                                                                         </span>
                                                                     </div>
                                                                 </div>
-                                                                
+
                                                                 {/* Show options for MCQ/MSQ */}
                                                                 {(sub.type === 'mcq' || sub.type === 'msq') && sub.options && sub.options.length > 0 && (
                                                                     <div className="mb-3">
@@ -499,14 +560,13 @@ const ResultPage = () => {
                                                                             {sub.options.map((option, i) => {
                                                                                 const isCorrect = sub.type === 'mcq' ? sub.correct_option === i : sub.correct_options?.includes(i);
                                                                                 const isUserAnswer = sub.type === 'mcq' ? subUserAnswer === i : Array.isArray(subUserAnswer) && subUserAnswer.includes(i);
-                                                                                
+
                                                                                 return (
-                                                                                    <div 
-                                                                                        key={i} 
-                                                                                        className={`flex items-center p-2 rounded text-sm ${
-                                                                                            isCorrect ? 'bg-green-100 border border-green-200' : 
+                                                                                    <div
+                                                                                        key={i}
+                                                                                        className={`flex items-center p-2 rounded text-sm ${isCorrect ? 'bg-green-100 border border-green-200' :
                                                                                             (isUserAnswer && !isCorrect ? 'bg-red-100 border border-red-200' : 'bg-white')
-                                                                                        }`}
+                                                                                            }`}
                                                                                     >
                                                                                         <div className="w-5 h-5 flex items-center justify-center rounded-full bg-gray-200 text-gray-700 mr-2 flex-shrink-0 text-xs">
                                                                                             {String.fromCharCode(65 + i)}
@@ -551,7 +611,48 @@ const ResultPage = () => {
                                                                         </div>
                                                                     </div>
                                                                 )}
-                                                                
+
+                                                                {sub.type === 'match' && (
+                                                                    <div className="mb-2">
+                                                                        <div className="text-sm text-gray-600">
+                                                                            Your Matches:
+                                                                            <span className={`${subResult.status === 'correct' ? 'text-green-600' : subResult.status === 'incorrect' ? 'text-red-600' : 'text-gray-600'}`}>
+                                                                                {subUserAnswer && Object.entries(subUserAnswer).length > 0 ? (
+                                                                                    <div className="mt-1">
+                                                                                        {Object.entries(subUserAnswer).map(([key, value]) => (
+                                                                                            <div key={key} className="flex justify-between">
+                                                                                                <span className="text-gray-700">{key}</span>
+                                                                                                <span className="text-gray-600">{value}</span>
+                                                                                            </div>
+                                                                                        ))}
+                                                                                    </div>
+                                                                                ) : (
+                                                                                    <span className="italic">Not Answered</span>
+                                                                                )}
+                                                                            </span>
+                                                                        </div>
+                                                                        <div className="text-sm text-gray-600">
+                                                                            Correct Matches:
+                                                                            <span className="text-green-600">
+                                                                                {sub.correct_pairs && Object.entries(sub.correct_pairs).length > 0 ? (
+                                                                                    <div className="mt-1">
+                                                                                        {Object.entries(sub.correct_pairs).map(([key, value]) => (
+                                                                                            <div key={key} className="flex justify-between">
+                                                                                                <span className="text-gray-700">{key}</span>
+                                                                                                <span className="text-gray-600">{value}</span>
+                                                                                            </div>
+                                                                                        ))}
+                                                                                    </div>
+                                                                                ) : (
+                                                                                    <span className="italic">No correct matches</span>
+                                                                                )}
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+
+
+
                                                                 {/* Show explanation */}
                                                                 {sub.explanation && (
                                                                     <div className="mt-2">
@@ -565,7 +666,7 @@ const ResultPage = () => {
                                                     })}
                                                 </div>
                                             )}
-                                            
+
                                             {/* Show options for regular MCQ and MSQ */}
                                             {q.type !== 'comprehension' && (q.type === 'mcq' || q.type === 'msq') && q.options && q.options.length > 0 && (
                                                 <div className="mb-4">
@@ -574,14 +675,13 @@ const ResultPage = () => {
                                                         {q.options.map((option, i) => {
                                                             const isCorrect = q.type === 'mcq' ? q.correct_option === i : q.correct_options?.includes(i);
                                                             const isUserAnswer = q.type === 'mcq' ? userAnswers[q.id] === i : Array.isArray(userAnswers[q.id]) && userAnswers[q.id].includes(i);
-                                                            
+
                                                             return (
-                                                                <div 
-                                                                    key={i} 
-                                                                    className={`flex items-center p-2 rounded ${
-                                                                        isCorrect ? 'bg-green-50 border border-green-200' : 
+                                                                <div
+                                                                    key={i}
+                                                                    className={`flex items-center p-2 rounded ${isCorrect ? 'bg-green-50 border border-green-200' :
                                                                         (isUserAnswer && !isCorrect ? 'bg-red-50 border border-red-200' : '')
-                                                                    }`}
+                                                                        }`}
                                                                 >
                                                                     <div className="w-6 h-6 flex items-center justify-center rounded-full bg-gray-200 text-gray-700 mr-3 flex-shrink-0">
                                                                         {String.fromCharCode(65 + i)}
@@ -599,7 +699,7 @@ const ResultPage = () => {
                                                     </div>
                                                 </div>
                                             )}
-                                            
+
                                             {/* Show correct answer for fill-in-the-blank and numerical */}
                                             {q.type !== 'comprehension' && (q.type === 'fill' || q.type === 'numerical') && (
                                                 <div className="mb-4">
@@ -609,7 +709,23 @@ const ResultPage = () => {
                                                     </div>
                                                 </div>
                                             )}
-                                            
+
+                                            {q.type !== 'comprehension' && q.type === 'match' && (
+                                                <div className="mb-4">
+                                                    <h3 className="font-medium text-gray-700 mb-2">Correct Matches:</h3>
+                                                    <div className="pl-2 border-l-4 border-green-300 py-1 bg-green-50">
+                                                        {q.correct_pairs && Object.entries(q.correct_pairs).map(([key, value]) => (
+                                                            <div key={key} className="flex justify-between">
+                                                                <span className="text-gray-700">{key}</span>
+                                                                <span className="text-gray-600">{value}</span>
+
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+
+
                                             {/* Show true/false answer */}
                                             {q.type !== 'comprehension' && q.type === 'tf' && (
                                                 <div className="mb-4">
