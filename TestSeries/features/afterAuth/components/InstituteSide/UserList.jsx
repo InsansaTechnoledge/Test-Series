@@ -8,6 +8,7 @@ import { useCachedBatches } from '../../../../hooks/useCachedBatches'
 import { useCachedRoleGroup } from '../../../../hooks/useCachedRoleGroup'
 import { useQueryClient } from '@tanstack/react-query'
 import { useUser } from '../../../../contexts/currentUserContext'
+import { DeleteUser } from '../../../../utils/services/userService'
 
 const UserList = () => {
     const { user } = useUser();
@@ -48,6 +49,13 @@ const UserList = () => {
             [id]: prev[id] ? !prev[id] : true
         }));
     }
+
+    const handleDeleteUser = async (id) => {
+        console.log('delete clicked')
+        const response = await DeleteUser(id)
+        alert('user Deleted')
+      }
+      
 
     return (
         <>
@@ -181,7 +189,9 @@ const UserList = () => {
                                             </td>
                                             <td className="flex justify-center mx-auto w-fit px-6 py-4 gap-8">
                                                 <button
+                                                    onClick={() => {navigate('/institute/user-detail' ,{ state: {userId: user._id}} )}}
                                                     className="font-medium text-black hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer">
+                                                    
                                                     <Eye />
                                                 </button>
                                                 <button
@@ -189,9 +199,11 @@ const UserList = () => {
                                                     <Edit />
                                                 </button>
                                                 <button
-                                                    className="font-medium text-red-500 hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer">
-                                                    <Trash />
+                                                onClick={() => handleDeleteUser(user._id)}  // this is the MongoDB _id
+                                                className="font-medium text-red-500 hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer">
+                                                <Trash />
                                                 </button>
+
                                             </td>
                                         </tr>
 

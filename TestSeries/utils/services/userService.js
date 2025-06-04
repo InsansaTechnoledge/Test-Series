@@ -14,4 +14,8 @@ export const fetchUserList=async(id)=>{
     return response.data;
 }
 
-
+export const DeleteUser = async (userId) => {
+    const response = await api.delete(`/v1/users/delete/${userId}`);
+    return response.data;
+  };
+  

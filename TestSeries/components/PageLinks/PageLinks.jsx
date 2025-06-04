@@ -37,6 +37,7 @@ import UploadVideo from '../../features/Video/Pages/uploadVideo';
 import EditBatchPage from '../../features/afterAuth/components/InstituteSide/EditPages/EditBatchPage';
 import StudentViewPage from '../../features/afterAuth/components/InstituteSide/ViewPages/StudentViewPage';
 import StudentEditPage from '../../features/afterAuth/components/InstituteSide/EditPages/EditStudentPage';
+import UserViewPage from '../../features/afterAuth/components/InstituteSide/ViewPages/UserViewPage';
 const PageLinks = () => {
   const { user, setUser } = useUser();
   // const navigate = useNavigate();
@@ -79,6 +80,7 @@ const PageLinks = () => {
               <Route path='/institute' element={<OrganizationLayout />}>
                 <Route path='batch-list' element={<BatchList />} />
                 <Route path='user-list' element={<UserList />} />
+                <Route path='user-detail' element={<UserViewPage/>}/>
                 <Route path='create-user' element={<CreateUser />} />
                 <Route path='create-batch' element={<CreateBatch />} />
                 <Route path='add-student' element={<CreateStudent />} />
