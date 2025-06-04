@@ -266,6 +266,17 @@ export const deleteStudent = async (req, res) => {
   }
 }
 
+export const deleteStudentsFunction=async (array)=>{
+  
+    if (!Array.isArray(array)) {
+      throw new Error('Invalid input: expected a non-empty array');
+    }
+
+    const deleted = await Student.deleteMany({ _id: { $in: array } });
+
+    return deleted;
+}
+
 export const changeStudentBatch = async (req, res) => {
   try {
 

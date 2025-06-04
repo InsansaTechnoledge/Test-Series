@@ -7,18 +7,27 @@ import { useCachedBatches } from '../../../../hooks/useCachedBatches';
 import RefreshButton from '../../utility/RefreshButton';
 import { useQueryClient } from '@tanstack/react-query';
 import { useUser } from '../../../../contexts/currentUserContext';
+import BackButton from '../../../constants/BackButton';
+import DeleteBatchModal from '../../utility/DeleteBatchModal';
+import { useCachedUser } from '../../../../hooks/useCachedUser';
+import { useCachedStudents } from '../../../../hooks/useCachedStudents';
+
 
 const BatchList = () => {
     const navigate = useNavigate();
 
-    const {user} = useUser();
+    const { user } = useUser();
     const { batches, isloading, isError } = useCachedBatches();
     const [filteredBatches, setFilteredBatches] = useState(batches);
     const [selectedYear, setSelectedYear] = useState('');
     const queryClient = useQueryClient();
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [batchId, setBatchId] = useState(null);
+    const {users}=useCachedUser();
+    const {students}=useCachedStudents();
 
-    const refreshFunction =async () => {
-       await queryClient.invalidateQueries(['batches', user._id]);
+    const refreshFunction = async () => {
+        await queryClient.invalidateQueries(['batches', user._id]);
     }
 
     const uniqueYears = [...new Set(batches.map(batch => batch.year))];
@@ -31,14 +40,17 @@ const BatchList = () => {
         }
     }, [selectedYear]);
 
-    useEffect(()=>{
-        if(batches){
+    useEffect(() => {
+        if (batches) {
             setFilteredBatches(batches);
         }
-    },[batches])
+    }, [batches])
 
     return (
         <>
+            <div className='flex justify-between items-center mb-5'>
+                <BackButton />
+            </div>
             <div className='h-full flex flex-col'>
                 <div className=''>
                     {/* <Heading title={selectedYear ? `Batch List for ${selectedYear}` : "All Batches"} */}
@@ -52,7 +64,7 @@ const BatchList = () => {
                             <h2 className='font-bold text-lg text-blue-900'>Total Batches: {filteredBatches?.length}</h2>
                         </div>
                         <div className='flex flex-col md:flex-row gap-4'>
-                            <RefreshButton refreshFunction={refreshFunction}/>
+                            <RefreshButton refreshFunction={refreshFunction} />
                             <button className='bg-blue-900 text-white py-2 px-4 rounded-md hover:cursor-pointer font-semibold hover:scale-105 flex space-x-2 transition-all duration-300'
                                 onClick={() => navigate('/institute/create-batch')}>
                                 <span>
@@ -90,68 +102,71 @@ const BatchList = () => {
                         <table className="w-full text-sm text-left rtl:text-right text-blue-950">
                             <thead className="text-xs text-blue-950 text-center uppercase bg-gray-50">
                                 <tr>
-                                    <th scope="col" className="w-2/10 px-6 py-3">
-                                        Batch name
-                                    </th>
-                                    <th scope="col" className="w-1/10 px-6 py-3">
-                                        Year
-                                    </th>
-                                    <th scope="col" className="w-2/10 px-6 py-3">
-                                        Syllabus
-                                    </th>
-
-                                    <th scope="col" className="w-2/10 px-6 py-3">
-                                        Actions
-                                    </th>
+                                    <th scope="col" className="w-2/10 px-6 py-3">Batch name</th>
+                                    <th scope="col" className="w-1/10 px-6 py-3">Year</th>
+                                    <th scope="col" className="w-2/10 px-6 py-3">Syllabus</th>
+                                    <th scope="col" className="w-2/10 px-6 py-3">Actions</th>
                                 </tr>
                             </thead>
-                            {
-                                filteredBatches?.map((batch, idx) => (
-                                    <tbody key={idx}>
-                                        <tr className="bg-white border-b border-gray-200 hover:bg-gray-50 text-blue-600 text-lg">
-                                            <th scope="row" className="px-6 py-4 font-medium text-blue-600 whitespace-nowrap ">
-                                                {batch.name}
-                                            </th>
-                                            <td className="px-6 py-4 text-center">
-                                                {batch.year}
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <button className='mx-auto flex space-x-2 hover:cursor-pointer hover:underline'>
-                                                    <div className='my-auto'>
-                                                        <NotepadText />
-                                                    </div>
-                                                    <span>
-                                                        View Syllabus
-                                                    </span>
-                                                </button>
-                                            </td>
-                                            <td className="mx-auto w-fit px-6 py-4 flex justify-center gap-8">
 
-                                                <button
-                                                    className=" font-medium text-black hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer"
-                                                    onClick={() => navigate(`/institute/batch-details`,{state: { batchId: batch.id } } )}>
-                                                    <Eye />
-                                                </button>
-                                                <button
-                                                    className="font-medium text-blue-500 hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer"
-                                                    onClick={() => navigate(`/institute/edit-batch`, { state: { batchId: batch.id } })}>
-                                                    <Edit />
-                                                </button>
-                                                <button
-                                                    className="font-medium text-red-500 hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer">
-                                                    <Trash />
-                                                </button>
-                                            </td>
-                                        </tr>
-
-                                    </tbody>
-                                ))
-                            }
+                            <tbody>
+                                {filteredBatches?.map((batch, idx) => (
+                                    <tr key={idx} className="bg-white border-b border-gray-200 hover:bg-gray-50 text-blue-600 text-lg">
+                                        <th scope="row" className="px-6 py-4 font-medium text-blue-600 whitespace-nowrap">
+                                            {batch.name}
+                                        </th>
+                                        <td className="px-6 py-4 text-center">{batch.year}</td>
+                                        <td className="px-6 py-4">
+                                            <button className="mx-auto flex space-x-2 hover:cursor-pointer hover:underline">
+                                                <div className="my-auto"><NotepadText /></div>
+                                                <span>View Syllabus</span>
+                                            </button>
+                                        </td>
+                                        <td className="mx-auto w-fit px-6 py-4 flex justify-center gap-8">
+                                            <button
+                                                className="font-medium text-black hover:underline bg-gray-200 py-1 px-4 rounded-lg"
+                                                onClick={() => navigate(`/institute/batch-details`, { state: { batchId: batch.id } })}
+                                            >
+                                                <Eye />
+                                            </button>
+                                            <button
+                                                className="font-medium text-blue-500 hover:underline bg-gray-200 py-1 px-4 rounded-lg"
+                                                onClick={() => navigate(`/institute/edit-batch`, { state: { batchId: batch.id } })}
+                                            >
+                                                <Edit />
+                                            </button>
+                                            <button
+                                                className="font-medium text-red-500 hover:underline bg-gray-200 py-1 px-4 rounded-lg"
+                                                onClick={() => {
+                                                    setShowDeleteModal(true);
+                                                    setBatchId(batch.id);
+                                                     // 👈 also ensure you set the batch ID
+                                                }}
+                                            >
+                                                <Trash />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
                         </table>
+
+                        {showDeleteModal && (
+                            <DeleteBatchModal
+                                batchId={batchId}
+                                faculties={users.filter(user => user.batch.includes(batchId)).map(f => f._id)}
+                                students={students.filter(student => student.batch.currentBatch===(batchId)).map(s => s._id)}
+                                setShowDeleteModal={setShowDeleteModal}
+                            />
+                        )}
+
                     </div>
 
 
                 </div>
+
+
+
             </div>
 
         </>
