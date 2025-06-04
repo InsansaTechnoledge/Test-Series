@@ -37,36 +37,48 @@ export const registerUser = async (req, res) => {
 
 export const updateUser = async (req, res) => {
     const { userId, Data } = req.body;
-    try {
-        data = JSON.parse(Data.batch);
-        if (!userId) {
-            return new APIError(400, ["UserId is required!!"]).send(res);
-        }
-        if (!Data) {
-            return new APIError(400, ["Data is required!!"]).send(res);
-        }
-        Data.updatedBy = {
-            id: req.user._id || req.user.id,
-            model: req.user.role === "organization" ? "Organization" : "User"
-        };
-        const user = await User.findByIdAndUpdate(
-            userId,
-            { $set: Data },
-            { new: true }
-        );
-        if (!user) {
-            return new APIError(404, ["User not found"]).send(res);
-        }
-
-        return new APIResponse(200, user, "User updated successfully!!").send(res);
-
-    } catch (err) {
-        console.log(err);
-        new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while updating user", err.message || ""]).send(res);
+  
+    if (!userId) {
+      return new APIError(400, ["UserId is required!!"]).send(res);
     }
-
-};
-
+  
+    if (!Data) {
+      return new APIError(400, ["Data is required!!"]).send(res);
+    }
+  
+    try {
+      // If Data.batch is a stringified JSON, parse it
+      if (Data.batch && typeof Data.batch === "string") {
+        Data.batch = JSON.parse(Data.batch);
+      }
+  
+      // Add updatedBy information
+      Data.updatedBy = {
+        id: req.user._id || req.user.id,
+        model: req.user.role === "organization" ? "Organization" : "User"
+      };
+  
+      const updatedUser = await User.findByIdAndUpdate(
+        userId,
+        { $set: Data },
+        { new: true }
+      );
+  
+      if (!updatedUser) {
+        return new APIError(404, ["User not found"]).send(res);
+      }
+  
+      return new APIResponse(200, updatedUser, "User updated successfully!").send(res);
+  
+    } catch (err) {
+      console.error(err);
+      return new APIError(500, [
+        "Something went wrong while updating user",
+        err.message || ""
+      ]).send(res);
+    }
+  };
+  
 
 // export const updateUsersFunction = async (userIds, Data, requestedUser) => {
 

@@ -243,7 +243,7 @@ export const updateStudent = async (req, res) => {
     return new APIResponse(200, updated, 'student data updated').send(res);
 
   } catch (e) {
-    new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while updating the students", err.message || ""]).send(res);
+    new APIError(e?.response?.status || e?.status || 500, ["Something went wrong while updating the students", e.message || ""]).send(res);
 
 
   }
