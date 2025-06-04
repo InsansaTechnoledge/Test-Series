@@ -92,16 +92,7 @@ const BatchViewPage = () => {
                                 ))}
 
                             </select> */}
-                            <label className='hover:bg-gray-300 hover:cursor-pointer flex bg-gray-100 px-4 py-2 rounded-md gap-2'>
-                                <div>
-                                    <Search />
-                                </div>
-                                <input
-
-                                    className='focus: outline-0'
-                                    placeholder='search batch'
-                                />
-                            </label>
+                           
                         </div>
                     </div>
                     <div className='flex flex-col lg:flex-row justify-between gap-4 mb-5'>
