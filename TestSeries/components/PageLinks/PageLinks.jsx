@@ -35,6 +35,7 @@ import LandingRoutes from '../../routes/LandingRoutes';
 import VideoDisplay from '../../features/Video/Pages/VideoDisplay';
 import UploadVideo from '../../features/Video/Pages/uploadVideo';
 import EditBatchPage from '../../features/afterAuth/components/InstituteSide/EditPages/EditBatchPage';
+import StudentViewPage from '../../features/afterAuth/components/InstituteSide/ViewPages/StudentViewPage';
 const PageLinks = () => {
   const { user, setUser } = useUser();
   // const navigate = useNavigate();
@@ -81,6 +82,8 @@ const PageLinks = () => {
                 <Route path='create-batch' element={<CreateBatch />} />
                 <Route path='add-student' element={<CreateStudent />} />
                 <Route path='student-list' element={<StudentListPage />} />
+                <Route path='student-landing' element={<StudentLanding />} />
+                <Route path='student-detail' element={<StudentViewPage/>}/>
                 <Route path='create-role-group' element={<FeatureBasedRoleGroups />} />
                 <Route path='add-student' element={<CreateStudent />} />
                 <Route path='create-exam' element={<CreateExam />} />
@@ -91,9 +94,10 @@ const PageLinks = () => {
                 <Route path='*' element={<div>Invalid path</div>} />
               </Route>
             </Route>
+
             <Route element={<StudentRoutes />}>
               <Route path='/student' element={<StudentLayout />}>
-                <Route path='student-landing' element={<StudentLanding />} />
+                
                 <Route path='upcoming-exams' element={<UpcomingExam />} />
                 <Route path='completed-exams' element={<ResultsPage />} />
               <Route path='result/:examId' element={<ResultDetailPage />} />

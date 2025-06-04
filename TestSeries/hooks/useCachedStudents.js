@@ -32,9 +32,12 @@ export const useCachedStudents = () => {
         retry: 0,
     });
 
+    const studentMap = Object.fromEntries(students?.map(s => [s._id, s]));
+
     return {
         students,
         isLoading,
-        isError
+        isError,
+        studentMap
     }
 };

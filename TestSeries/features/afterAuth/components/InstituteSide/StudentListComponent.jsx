@@ -117,6 +117,12 @@ useEffect(() => {
 
   }
 
+  const handleViewProfile = () => {
+      
+  };
+
+
+
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-6">
       <div className="max-w-6xl mx-auto">
@@ -129,7 +135,7 @@ useEffect(() => {
             </div>
             <div className="flex flex-col sm:flex-row gap-3">
               {selectedStudents.length > 0 && (
-                <button
+                <button 
                   onClick={confirmDeleteSelected}
                   className="inline-flex items-center justify-center gap-2 bg-red-100 text-red-700 hover:bg-red-200 px-4 py-2.5 rounded-lg transition font-medium"
                 >
@@ -293,7 +299,8 @@ useEffect(() => {
                               <div className="py-1">
                                 <button
                                   className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                                >
+                                  onClick={() => navigate('/institute/student-detail', { state: { studentId: student._id } })}
+                                  >
                                   <Eye size={16} />
                                   View Profile
                                 </button>
@@ -303,17 +310,7 @@ useEffect(() => {
                                   <Edit size={16} />
                                   Edit Student
                                 </button>
-                                <button
-                                  className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left"
-                                  onClick={() => {
-                                    setStudentsToDelete([student.id])
-                                    setShowConfirmDelete(true)
-                                    setIsDropdownOpen(null)
-                                  }}
-                                >
-                                  <Trash2 size={16} />
-                                  Delete Student
-                                </button>
+                               
                               </div>
                             </div>
                           )}
