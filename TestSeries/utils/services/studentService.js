@@ -33,3 +33,10 @@ export const deleteStudentById = async (ids) => {
     const response = await api.delete(`/v1/student/delete/${ids}`);
     return response.data;
 };
+
+export const updateStudentById = async (studentId, updatedData) => {
+  const response = await api.patch(`/v1/student/update/${studentId}`, updatedData, {
+    headers: { 'Content-Type': 'application/json' },
+  });
+  return response.data;
+};

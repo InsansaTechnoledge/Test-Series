@@ -306,6 +306,7 @@ useEffect(() => {
                                 </button>
                                 <button
                                   className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                                  onClick={() => navigate('/institute/student-edit', { state: { studentId: student._id } })}
                                 >
                                   <Edit size={16} />
                                   Edit Student

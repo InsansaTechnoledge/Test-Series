@@ -36,6 +36,7 @@ import VideoDisplay from '../../features/Video/Pages/VideoDisplay';
 import UploadVideo from '../../features/Video/Pages/uploadVideo';
 import EditBatchPage from '../../features/afterAuth/components/InstituteSide/EditPages/EditBatchPage';
 import StudentViewPage from '../../features/afterAuth/components/InstituteSide/ViewPages/StudentViewPage';
+import StudentEditPage from '../../features/afterAuth/components/InstituteSide/EditPages/EditStudentPage';
 const PageLinks = () => {
   const { user, setUser } = useUser();
   // const navigate = useNavigate();
@@ -84,6 +85,7 @@ const PageLinks = () => {
                 <Route path='student-list' element={<StudentListPage />} />
                 <Route path='student-landing' element={<StudentLanding />} />
                 <Route path='student-detail' element={<StudentViewPage/>}/>
+                <Route path='student-edit' element={<StudentEditPage/>}/>
                 <Route path='create-role-group' element={<FeatureBasedRoleGroups />} />
                 <Route path='add-student' element={<CreateStudent />} />
                 <Route path='create-exam' element={<CreateExam />} />
