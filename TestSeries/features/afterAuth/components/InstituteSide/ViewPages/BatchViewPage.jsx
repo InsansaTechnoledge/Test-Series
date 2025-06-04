@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import HeadingUtil from "../../../utility/HeadingUtil";
 import { useCachedBatches } from "../../../../../hooks/useCachedBatches";
 import { useCachedUser } from "../../../../../hooks/useCachedUser";
@@ -8,29 +8,47 @@ import { useQueryClient } from "@tanstack/react-query";
 import dateFormatter from "../../../../../utils/dateFormatter";
 import { useEffect, useState } from "react";
 import { useUser } from "../../../../../contexts/currentUserContext";
+import { useCachedStudents } from "../../../../../hooks/useCachedStudents";
 
 const BatchViewPage = () => {
-    const { batchId } = useParams();
+    const location = useLocation();
+    const { batchId } = location.state || {};
     const { batchMap } = useCachedBatches();
     const batch = batchMap[batchId];
-    const {users, userMap } = useCachedUser();
+    const { users, userMap } = useCachedUser();
     const queryClient = useQueryClient();
-    const [hideFaculty,setHideFaculty] = useState(false);
-    const {user}=useUser();
+    const [hideFaculty, setHideFaculty] = useState(false);
+    const [hideStudents, setHideStudents] = useState(false);
+    const { user } = useUser();
+    const { students } = useCachedStudents();
+    const [fileteredStudents, setFilteredStudents] = useState([]);
+    const navigate=useNavigate();
 
-const [faculty, setFaculty] = useState(() =>
-  users?.filter(user => Array.isArray(user.batch) && user.batch.includes(batchId)) || []
-);
+    useEffect(() => {
+        if (students && batchId) {
+            const filteredStudents = students.filter(student =>
+                student.batch.currentBatch === batchId ||
+                student.batch.previousBatches?.includes(batchId)
+            );
+            setFilteredStudents(filteredStudents);
+
+        }
+    }, [students, batchId]);
+
+
+    const [faculty, setFaculty] = useState(() =>
+        users?.filter(user => Array.isArray(user.batch) && user.batch.includes(batchId)) || []
+    );
 
 
     useEffect(() => {
-    if (users && batchId) {
-        const filteredFaculty = users.filter(
-            user => Array.isArray(user.batch) && user.batch.includes(batchId)
-        );
-        setFaculty(filteredFaculty);
-    }
-}, [users, batchId]);
+        if (users && batchId) {
+            const filteredFaculty = users.filter(
+                user => Array.isArray(user.batch) && user.batch.includes(batchId)
+            );
+            setFaculty(filteredFaculty);
+        }
+    }, [users, batchId]);
 
 
     if (!batch) {
@@ -58,7 +76,7 @@ const [faculty, setFaculty] = useState(() =>
                         <div className='flex flex-col md:flex-row gap-4'>
                             <RefreshButton refreshFunction={refreshFunction} />
                             <button className='hover:bg-gray-300 hover:cursor-pointer flex bg-gray-100 px-4 py-2 rounded-md gap-2'
-                                onClick={() => navigate('/institute/create-batch')}>
+                                onClick={() => navigate('/institute/edit-batch', { state: { batchId: batch.id } })}>
                                 <span>
                                     Edit Batch
                                 </span>
@@ -123,96 +141,114 @@ const [faculty, setFaculty] = useState(() =>
                     </div>
 
 
-<div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-    <button className="bg-blue-500 text-white px-4 py-2 rounded-md mb-4"
-    onClick={() =>{ {}
-        // console.log("hide faculty", hideFaculty);
-            setHideFaculty(!hideFaculty);
-            }}>
-        <span className="flex items-center gap-2">
-            <span>
-                {
-                hideFaculty
-                    ? "Show Assigned Faculties"
-                    : "Hide Assigned Faculties" 
-                }
-                </span>
-            <ArrowDownNarrowWideIcon className="w-4 h-4" />
-        </span>    
-    </button>
-    {!hideFaculty && (
-                        <table className="w-full text-sm text-left rtl:text-right text-blue-950">
-                            <thead className="text-xs text-blue-950 text-center uppercase bg-gray-50">
-                                <tr>
-                                    <th scope="col" className="w-1/10 px-6 py-3">
-                                        Sr. No.
-                                    </th>   
-                                    <th scope="col" className="w-2/10 px-6 py-3">
-                                        Assigned Faculty
-                                    </th>
-                                    <th scope="col" className="w-2/10 px-6 py-3">
-                                        Email
-                                    </th>
-                                    <th scope="col" className="w-2/10 px-6 py-3">
-                                        UserId
-                                    </th>
-                                    {/* <th scope="col" className="w-2/10 px-6 py-3">
+                    <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+                        <button className="bg-blue-500 text-white px-4 py-2 rounded-md mb-4"
+                            onClick={() => {
+                                { }
+                                // console.log("hide faculty", hideFaculty);
+                                setHideFaculty(!hideFaculty);
+                            }}>
+                            <span className="flex items-center gap-2">
+                                <span>
+                                    {
+                                        hideFaculty
+                                            ? "Show Assigned Faculties"
+                                            : "Hide Assigned Faculties"
+                                    }
+                                </span>
+                                <ArrowDownNarrowWideIcon className="w-4 h-4" />
+                            </span>
+                        </button>
+                        {!hideFaculty && (
+                            <table className="w-full text-sm text-left rtl:text-right text-blue-950">
+                                <thead className="text-xs text-blue-950 text-center uppercase bg-gray-50">
+                                    <tr>
+                                        <th scope="col" className="w-1/10 px-6 py-3">
+                                            Sr. No.
+                                        </th>
+                                        <th scope="col" className="w-2/10 px-6 py-3">
+                                            Assigned Faculty
+                                        </th>
+                                        <th scope="col" className="w-2/10 px-6 py-3">
+                                            Email
+                                        </th>
+                                        <th scope="col" className="w-2/10 px-6 py-3">
+                                            UserId
+                                        </th>
+                                        {/* <th scope="col" className="w-2/10 px-6 py-3">
                                         Role
                                     </th> */}
-                                </tr>
-                            </thead>
-                            {
-                                faculty?.map((faculty, idx) => (
-                                    <tbody key={idx}>
-                                        <tr className="bg-white border-b border-gray-200 hover:bg-gray-50 text-lg text-gray-600 text-center">
-                                            <td scope="row" className="px-6 py-4">
-                                                {idx + 1}
-                                            </td>
-                                            <td scope="row" className="px-6 py-4">
-                                                {faculty.name}
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                {faculty.email}
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                {faculty.userId}
-                                            </td>
-                                            
-                                        </tr>
+                                    </tr>
+                                </thead>
+                                {
+                                    faculty?.map((faculty, idx) => (
+                                        <tbody key={idx}>
+                                            <tr className="bg-white border-b border-gray-200 hover:bg-gray-50 text-lg text-gray-600 text-center">
+                                                <td scope="row" className="px-6 py-4">
+                                                    {idx + 1}
+                                                </td>
+                                                <td scope="row" className="px-6 py-4">
+                                                    {faculty.name}
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    {faculty.email}
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    {faculty.userId}
+                                                </td>
 
-                                    </tbody>
-                                ))
-                            }
-                        </table>
-     )} 
+                                            </tr>
+
+                                        </tbody>
+                                    ))
+                                }
+                            </table>
+                        )}
                     </div>
 
 
+                    <div className="relative overflow-x-auto shadow-md sm:rounded-lg mt-6">
+                        <button
+                            className="bg-blue-500 text-white px-4 py-2 rounded-md mb-4"
+                            onClick={() => setHideStudents(!hideStudents)}
+                        >
+                            <span className="flex items-center gap-2">
+                                <span>
+                                    {hideStudents ? "Show Assigned Students" : "Hide Assigned Students"}
+                                </span>
+                                <ArrowDownNarrowWideIcon className="w-4 h-4" />
+                            </span>
+                        </button>
 
-
-                    {/* <div>
-                        <h3 className="bg-purple-100 text-purple-800 px-4 py-2 rounded-t-xl font-semibold">Students Details</h3>
-                        <table className="w-full text-sm border">
-                            <thead>
-                                <tr className="bg-gray-100 text-left">
-                                    <th className="p-3 border">No.</th>
-                                    <th className="p-3 border">Name</th>
-                                    <th className="p-3 border">Email ID</th>
-                                    <th className="p-3 border">Phone Number</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {students.map((student, idx) => (
-                                    <tr key={idx} className="border-b">
-                                        <td className="p-3 border">{idx + 1}</td>
-                                        <td className="p-3 border">{student.name}</td>
-                                        <td className="p-3 border">Example123@Gmail.Com</td>
-                                        <td className="p-3 border">+91 12345 12345</td>
+                        {!hideStudents && (
+                            <table className="w-full text-sm text-left rtl:text-right text-blue-950">
+                                <thead className="text-xs text-blue-950 text-center uppercase bg-gray-50">
+                                    <tr>
+                                        <th scope="col" className="w-1/10 px-6 py-3">Sr. No.</th>
+                                        <th scope="col" className="w-2/10 px-6 py-3">Student Name</th>
+                                        <th scope="col" className="w-2/10 px-6 py-3">Email</th>
+                                        <th scope="col" className="w-2/10 px-6 py-3">currentBatch</th>
+                                        <th scope="col" className="w-2/10 px-6 py-3">Previous Batches</th>
                                     </tr>
+                                </thead>
+                                {fileteredStudents?.map((student, idx) => (
+                                    <tbody key={idx}>
+                                        <tr className="bg-white border-b border-gray-200 hover:bg-gray-50 text-lg text-gray-600 text-center">
+                                            <td className="px-6 py-4">{idx + 1}</td>
+                                            <td className="px-6 py-4">{student.name}</td>
+                                            <td className="px-6 py-4">{student.email}</td>
+                                            <td className="px-6 py-4">{batchMap[student.batch?.currentBatch].name}</td>
+                                            <td className="px-6 py-4">{
+                                                student.batch?.previousBatch.length > 0
+                                                    ? student.batch?.previousBatch.map(prevBatchId => batchMap[prevBatchId].name).join(', ')
+                                                    : "No previous batches"
+                                            }</td>
+                                        </tr>
+                                    </tbody>
                                 ))}
-                            </tbody>
-                        </table>
-                    </div> */}
+                            </table>
+                        )}
+                    </div>
                 </div>
             </div>
         </>

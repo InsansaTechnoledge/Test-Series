@@ -129,11 +129,12 @@ const BatchList = () => {
 
                                                 <button
                                                     className=" font-medium text-black hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer"
-                                                    onClick={() => navigate(`/institute/batch/${batch.id}`)}>
+                                                    onClick={() => navigate(`/institute/batch-details`,{state: { batchId: batch.id } } )}>
                                                     <Eye />
                                                 </button>
                                                 <button
-                                                    className="font-medium text-blue-500 hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer">
+                                                    className="font-medium text-blue-500 hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer"
+                                                    onClick={() => navigate(`/institute/edit-batch`, { state: { batchId: batch.id } })}>
                                                     <Edit />
                                                 </button>
                                                 <button

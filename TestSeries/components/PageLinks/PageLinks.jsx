@@ -34,6 +34,7 @@ import InstituteRoutes from '../../routes/InstituteRoutes';
 import LandingRoutes from '../../routes/LandingRoutes';
 import VideoDisplay from '../../features/Video/Pages/VideoDisplay';
 import UploadVideo from '../../features/Video/Pages/uploadVideo';
+import EditBatchPage from '../../features/afterAuth/components/InstituteSide/EditPages/EditBatchPage';
 const PageLinks = () => {
   const { user, setUser } = useUser();
   // const navigate = useNavigate();
@@ -85,7 +86,8 @@ const PageLinks = () => {
                 <Route path='create-exam' element={<CreateExam />} />
                 <Route path='exam-list' element={<ExamListPage />} />
                 <Route path='institute-landing' element={<InstituteLandingPage />} />
-                  <Route path='batch/:batchId' element={<BatchViewPage />} />
+                  <Route path='batch-details' element={<BatchViewPage />} />
+                  <Route path='edit-batch' element={<EditBatchPage />} />
                 <Route path='*' element={<div>Invalid path</div>} />
               </Route>
             </Route>
