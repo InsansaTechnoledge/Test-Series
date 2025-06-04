@@ -1,6 +1,6 @@
 import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
 import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
-import { CreateOrganizationBatch , getOrganizationBacthes ,updateOrganizationBatch , deleteOrganizationBatch} from "../../utils/SqlQueries/batch.queries.js";
+import { CreateOrganizationBatch, getOrganizationBacthes, updateOrganizationBatch, deleteOrganizationBatch } from "../../utils/SqlQueries/batch.queries.js";
 import { createSyllabus } from "../../utils/SqlQueries/syllabus.queries.js";
 import { updateUsersFunction } from "../FirstDB/user.controllers.js";
 
@@ -13,10 +13,10 @@ export const createOrgBatch = async (req, res) => {
     data.organization_id = req.user.role === 'organization' ? req.user._id : req.user.organization_id;
     data.created_by = req.user._id;
 
-    let createdSyllabus ;
+    let createdSyllabus;
     if (syllabus) {
       const syllabusData = {
-        syllabus:syllabus,
+        syllabus: syllabus,
         created_at: new Date(),
         updated_at: new Date(),
         updated_by: req.user._id
@@ -33,66 +33,79 @@ export const createOrgBatch = async (req, res) => {
     if (faculties && faculties.length > 0) {
       const batchId = batch[0].id;
       // Pass batchId as an array to updateUsersFunction to push into batch array
-      await updateUsersFunction(faculties, { batch: [batchId] }, req.user);
+      await updateUsersFunction(faculties, { batchAdd: [batchId] }, req.user);
     }
 
     return new APIResponse(200, batch, 'Batch created successfully').send(res);
   } catch (err) {
-    if( err.code === '23505') {
+    if (err.code === '23505') {
       return new APIError(400, ["Batch with this name already exists"]).send(res);
     }
-    else{
-    console.log(err);
-    new APIError(err?.response?.status || err?.status || 500,
-      ["Something went wrong while creating the batch", err.message || ""]
-    ).send(res);
+    else {
+      console.log(err);
+      new APIError(err?.response?.status || err?.status || 500,
+        ["Something went wrong while creating the batch", err.message || ""]
+      ).send(res);
+    }
   }
-}
 };
 
-  
-  export const getOrgBatches = async (req, res) => {
-    try {
-      //here id would be array of ids , so always pass the is
-      const { id, organization_id, year } = req.mergedQuery||req.query;
-      const batches= await getOrganizationBacthes({ id, organization_id, year });
-      return new APIResponse(200, batches, 'Batch(s) fetched successfully').send(res);
-      
-    } catch (err) {
-      console.log(err);
-      new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while fetching the batch(s)", err.message || ""]).send(res);
 
-    }
-  };
-  
-  export const updateOrgBatch = async (req, res) => {
-    try {
-      const { id } = req.params;
-      let updates = req.body;
-      updates.updated_at = new Date();
-      updates.updated_by = req.user.id;
-  
-      if (!id) return new APIError(400, 'Batch ID is required').send(res);
-  
-      const updated = await updateOrganizationBatch(id, updates);
-      return new APIResponse(200, updated, 'Batch updated successfully').send(res);
-    } catch (e) {
-      new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while updating the batch", err.message || ""]).send(res);
-      
-    }
-  };
-  
-  export const deleteOrgBatch = async (req, res) => {
-    try {
-      const { id } = req.params;
-  
-      if (!id) return new APIError(400, 'Batch ID is required').send(res);
-  
-      const deleted = await deleteOrganizationBatch(id);
-      return new APIResponse(200, deleted, 'Batch deleted successfully').send(res);
-    } catch (err) {
-      console.log(err);
-      new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while deleting the batch", err.message || ""]).send(res);
+export const getOrgBatches = async (req, res) => {
+  try {
+    //here id would be array of ids , so always pass the is
+    const { id, organization_id, year } = req.mergedQuery || req.query;
+    const batches = await getOrganizationBacthes({ id, organization_id, year });
+    return new APIResponse(200, batches, 'Batch(s) fetched successfully').send(res);
 
+  } catch (err) {
+    console.log(err);
+    new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while fetching the batch(s)", err.message || ""]).send(res);
+
+  }
+};
+
+export const updateOrgBatch = async (req, res) => {
+  try {
+    const { id } = req.params;
+    let {facultiesToAdd, facultiesToRemove ,...updates} = req.body;
+    updates.updated_at = new Date();
+    updates.updated_by = req.user.id;
+
+    if (!id) return new APIError(400, 'Batch ID is required').send(res);
+
+    const updated = await updateOrganizationBatch(id, updates);
+
+    if (facultiesToAdd && facultiesToAdd.length > 0) {
+      const batchId = updated.id;
+      // Pass batchId as an array to updateUsersFunction to push into batch array
+      await updateUsersFunction(facultiesToAdd, { batchAdd: [batchId] }, req.user);
     }
-  };
+
+    if( facultiesToRemove && facultiesToRemove.length > 0) {
+      const batchId = updated.id;
+      // Pass batchId as an array to updateUsersFunction to pull from batch array
+      await updateUsersFunction(facultiesToRemove, { batchRemove: [batchId] }, req.user);
+    }
+
+    return new APIResponse(200, updated, 'Batch updated successfully').send(res);
+  } catch (err) {
+    new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while updating the batch", err.message || ""]).send(res);
+
+  }
+};
+
+export const deleteOrgBatch = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) return new APIError(400, 'Batch ID is required').send(res);
+
+    const deleted = await deleteOrganizationBatch(id);
+    return new APIResponse(200, deleted, 'Batch deleted successfully').send(res);
+  } catch (err) {
+    console.log(err);
+    new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while deleting the batch", err.message || ""]).send(res);
+
+  }
+};

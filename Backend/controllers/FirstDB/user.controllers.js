@@ -102,18 +102,22 @@ export const updateUsersFunction = async (userIds, Data, requestedUser) => {
         model: requestedUser.role === "organization" ? "Organization" : "User"
     };
 
-
     const updateOps = {
         $set: { ...Data },
     };
-
-
-    if (Data.batch) {
+//if data  faculties has to add the batch to array
+    if (Data.batchAdd) {
         updateOps.$addToSet = {
-            batch: { $each: Array.isArray(Data.batch) ? Data.batch : [Data.batch] }
+            batch: { $each: Array.isArray(Data.batchAdd) ? Data.batchAdd : [Data.batchAdd] }
         };
 
         delete updateOps.$set.batch;
+    }
+//if faculty has to remove the batch from array
+    if (Data.batchRemove) {
+        updateOps.$pull = {
+            batch: { $in: Array.isArray(Data.batchRemove) ? Data.batchRemove : [Data.batchRemove] }
+        };
     }
 
     const result = await User.updateMany(

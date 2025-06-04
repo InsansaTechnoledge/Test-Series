@@ -13,3 +13,5 @@ export const fetchUserList=async(id)=>{
     const response=await api.get(`/v1/users/getUser/?userId=${id}`);
     return response.data;
 }
+
+
