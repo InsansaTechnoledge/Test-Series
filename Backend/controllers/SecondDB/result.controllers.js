@@ -11,7 +11,7 @@ export const addResult = async (req, res) => {
         console.log(resultData);
         const result = await Result.create(resultData);
 
-        await updateRanksForExam(resultData.examId);
+        // await updateRanksForExam(resultData.examId);
         return new APIResponse(200, result, "Result added successfully!").send(res);
     }
     catch (err) {
