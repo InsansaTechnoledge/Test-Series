@@ -204,7 +204,7 @@ export const getUser = async (req, res) => {
 
                 user = await User.find({
                     organizationId: orgId,
-                    batch: { $in: Array.isArray(req.user.batchId) ? req.user.batchId : [req.user.batchId] }
+                    batch: { $in: Array.isArray(req.user.batch.currentBatch) ? req.user.batch.currentBatch : [req.user.batch.currentBatch] }
                 }).lean();
 
             } else{
