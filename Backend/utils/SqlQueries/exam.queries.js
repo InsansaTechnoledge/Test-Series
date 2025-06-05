@@ -26,31 +26,40 @@ export const updateExam = async (examData, examId) => {
 };
 
 export const fetchSelective = async (conditions) => {
-    let query = supabase
-      .from("batch_exam")
-      .select(
-        `*,
-         batch_id (
-           name,
-           year
-         )`
-      );
-  
-    Object.entries(conditions).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== '') {
-        query = query.eq(key, value);
-      }
-    });
-  
-    const { data, error } = await query;
-    if (error) throw error;
-    return data;
-  };
-  
+  let query = supabase
+    .from("batch_exam")
+    .select(`
+      id,
+      name,
+      date,
+      duration,
+      total_marks,
+      organization_id,
+      batch_id,
+       go_live,
+      batch:batch_id (
+        name,
+        year
+      )
+    `);
+
+  Object.entries(conditions).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      query = query.eq(key, value);
+    }
+  });
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return data;
+};
+
+
+
   export const fetchExamNameById = async (examId) => {
     const { data, error } = await supabase
       .from("batch_exam")
-      .select("name")
+      .select("*")
       .eq("id", examId)
       .single();
   
@@ -82,17 +91,17 @@ export const deleteExam = async (id) => {
 };
 
 export const setExamLive = async (examId,orgId) => {
-    const { data, error } = await supabase
-      .from('batch_exam')
-      .update({
-        go_live: true,   // this will also trigger status = 'live' if you added the trigger
-        updated_at: new Date()
-      })
-      .eq('id', examId)
-      .eq('organization_id', orgId)
-      .select()
-      .single();
-  
+  const { data, error } = await supabase
+  .from('batch_exam')
+  .update({
+    go_live: true,
+    updated_at: new Date()
+  })
+  .eq('id', examId)
+  .eq('organization_id', orgId)
+  .select()
+  .single();
+
     if (error) throw error;
     return data;
   };
@@ -112,3 +121,25 @@ export const setExamLive = async (examId,orgId) => {
     if (error) throw error;
     return data;
   };
+
+  // export const fetchExamsWithoutQuestionsQuery = async () => {
+  //   const { data, error } = await supabase
+  //     .from('batch_exam')
+  //     .select('*, questions(id)')
+  //     .is('questions.id', null); // exams with no questions
+  
+  //   if (error) throw error;
+  
+  //   return data;
+  // };
+
+  export const fetchExamsWithoutQuestionsQuery = async (organization_id) => {
+    const { data, error } = await supabase
+  .rpc('get_exams_without_questions', { org_id: organization_id });
+
+
+  
+    if (error) throw error;
+    return data;
+  };
+  

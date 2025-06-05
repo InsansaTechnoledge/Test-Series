@@ -182,7 +182,7 @@ export const forgotPassword = async (req, res) => {
 export const deleteUser = async (req, res) => {
     const { userId } = req.params;
     try {
-        const user = await User.findOneAndDelete({ userId });
+        const user = await User.findByIdAndDelete(userId);
         new APIResponse(200, user, "User deleted successfully!!").send(res);
     } catch (err) {
         console.log(err);
@@ -195,7 +195,7 @@ export const getUser = async (req, res) => {
     const { userId } = req.query;
     try {
 
-        const orgId = req.user.role === "organization" ? req.user._id : req.user.organizationId;
+        const orgId = req.user.role === "organization" ? req.user._id : req.user.organizationId; 
         let user;
         if (userId)
             user = await User.findOne({ _id: userId }).lean();

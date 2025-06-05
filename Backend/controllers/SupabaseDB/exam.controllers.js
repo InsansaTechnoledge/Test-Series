@@ -1,4 +1,4 @@
-import { createExam, deleteExam, fetchSelective, updateExam, setExamLive, fetchNonLiveExams } from '../../utils/SqlQueries/exam.queries.js';
+import { createExam, deleteExam, fetchSelective, updateExam, setExamLive, fetchNonLiveExams , fetchExamsWithoutQuestionsQuery , fetchExamNameById} from '../../utils/SqlQueries/exam.queries.js';
 import { APIError } from '../../utils/ResponseAndError/ApiError.utils.js'
 import { APIResponse } from '../../utils/ResponseAndError/ApiResponse.utils.js'
 import Result from '../../models/SecondDB/result.model.js';
@@ -6,6 +6,11 @@ import Result from '../../models/SecondDB/result.model.js';
 export const addExam = async (req, res) => {
   try {
     const examData = req.body;
+
+    // Ensure organization_id is present!
+    if (!examData.organization_id) {
+      examData.organization_id = req.user.role === 'organization' ? req.user._id : req.user.organizationId;
+    }
 
     const examDataWithUpdateMetaData = {
       ...examData,
@@ -26,6 +31,7 @@ export const addExam = async (req, res) => {
     ).send(res);
   }
 };
+
 
 
 export const updateExamById = async (req, res) => {
@@ -50,49 +56,31 @@ export const updateExamById = async (req, res) => {
 
 export const fetchExamBasedOnCondition = async (req, res) => {
   try {
-    // Construct the query object safely
     const baseQuery = {
       ...req.query,
       organization_id: req.user.role === 'organization' ? req.user._id : req.user.organizationId,
     };
 
-  if (req.user.role === 'student') {
-  const currentBatch = req.user.batch?.currentBatch;
-
-  if (!currentBatch) {
-   return new APIError(400, ['Current batch not found for student']).send(res);
-  } else {
-    baseQuery.batch_id = currentBatch;
-  }
-}
-
     const exams = await fetchSelective(baseQuery);
 
     // If user is a student, mark attempted exams
     if (req.user.role === 'student') {
-      const results = await Result.find(
-        { studentId: req.user._id },
-        { examId: 1 }
-      );
-
+      const results = await Result.find({ studentId: req.user._id }, { examId: 1 });
       const attemptedExamIds = new Set(results.map(result => result.examId.toString()));
-
       const examList = exams.map(exam => ({
         ...exam,
         hasAttempted: attemptedExamIds.has(exam.id?.toString() || exam._id?.toString()),
       }));
-
       return new APIResponse(200, examList, "Exams fetched successfully!").send(res);
     }
 
-    // For non-student roles, return exams directly
+    // Non-student roles
+    console.log("✅ Final API data:", exams);
+
     return new APIResponse(200, exams, "Exams fetched successfully!").send(res);
   } catch (err) {
     console.error("Error fetching exams:", err);
-    return new APIError(
-      err?.response?.status || err?.status || 500,
-      ["Something went wrong while fetching exam", err.message]
-    ).send(res);
+    return new APIError(err?.status || 500, ["Something went wrong while fetching exam", err.message]).send(res);
   }
 };
 
@@ -149,6 +137,39 @@ export const getUpcomingExams = async (req, res) => {
     return new APIError(
       err?.status || 500,
       ["Something went wrong while fetching upcoming exams", err?.message]
+    ).send(res);
+  }
+};
+
+// export const fetchExamsWithoutQuestions = async (req, res) => {
+//   try {
+//     const data = await fetchExamsWithoutQuestionsQuery();
+//     return new APIResponse(200, data, "Exams without questions fetched successfully!").send(res);
+//   } catch (err) {
+//     console.error("Error fetching exams without questions:", err);
+//     return new APIError(
+//       err?.status || 500,
+//       ["Something went wrong while fetching exams without questions", err.message]
+//     ).send(res);
+//   }
+// };
+
+export const fetchExamsWithoutQuestions = async (req, res) => {
+  try {
+    const orgId = req.user.role === 'organization' ? req.user._id : req.user.organizationId || req.user.orgId;
+
+    if (!orgId) {
+      return new APIError(400, ['Organization ID not found']).send(res);
+    }
+
+    const examsWithoutQuestions = await fetchExamsWithoutQuestionsQuery(orgId);
+
+    return new APIResponse(200, examsWithoutQuestions, "Exams without questions fetched successfully!").send(res);
+  } catch (err) {
+    console.error("❌ Error fetching exams without questions:", err);
+    return new APIError(
+      err?.status || 500,
+      ["Something went wrong while fetching exams without questions", err.message]
     ).send(res);
   }
 };
