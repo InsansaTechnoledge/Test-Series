@@ -3,6 +3,8 @@ import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
 import { CreateOrganizationBatch, getOrganizationBacthes, updateOrganizationBatch, deleteOrganizationBatch } from "../../utils/SqlQueries/batch.queries.js";
 import { createSyllabus } from "../../utils/SqlQueries/syllabus.queries.js";
 import { updateUsersFunction } from "../FirstDB/user.controllers.js";
+import { deleteStudentsFunction } from "../FirstDB/student.controllers.js";
+import { deleteExamByBatchId } from "./exam.controllers.js";
 
 ////have to crete the function rpc call when i add the syllabus for the partoicular batch 
 export const createOrgBatch = async (req, res) => {
@@ -96,16 +98,64 @@ export const updateOrgBatch = async (req, res) => {
 };
 
 export const deleteOrgBatch = async (req, res) => {
+  const { id } = req.params;
+  const { faculties = [], students = [] } = req.body;
+
+  if (!id) {
+    return new APIError(400, 'Batch ID is required').send(res);
+  }
+
+  let deletedBatch = null;
+  let deletedFaculties = [];
+  let deletedStudents = [];
+  let deletedExams = [];
+
   try {
-    const { id } = req.params;
+    // Delete batch first
+    deletedBatch = await deleteOrganizationBatch(id);
+    if (!deletedBatch) {
+      return new APIError(404, 'Batch not found or already deleted').send(res);
+    }
 
-    if (!id) return new APIError(400, 'Batch ID is required').send(res);
+    // Remove batch from faculty users
+    if (faculties.length > 0) {
+      deletedFaculties = await updateUsersFunction(faculties, { batchRemove: [deletedBatch.id] }, req.user);
+    }
 
-    const deleted = await deleteOrganizationBatch(id);
-    return new APIResponse(200, deleted, 'Batch deleted successfully').send(res);
+    if (students.length > 0) {
+      deletedStudents = await deleteStudentsFunction(students);
+    }
+    deletedExams = await deleteExamByBatchId(deletedBatch.id);
+
+    return new APIResponse(200, {
+      batch: deletedBatch,
+      faculties: deletedFaculties,
+      students: deletedStudents,
+      exams: deletedExams
+    }, 'Batch deleted successfully').send(res);
+
   } catch (err) {
-    console.log(err);
-    new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while deleting the batch", err.message || ""]).send(res);
+    console.error("Error in batch deletion:", err);
 
+    // Retry missing steps if possible (best-effort)
+    try {
+      if (deletedBatch) {
+        if (faculties.length > 0 && deletedFaculties.length === 0) {
+          deletedFaculties = await updateUsersFunction(faculties, { batchRemove: [deletedBatch.id] }, req.user);
+        }
+
+        if (students.length > 0 && deletedStudents.length === 0) {
+          deletedStudents = await deleteStudentsFunction(students);
+        }
+      }
+    } catch (retryErr) {
+      console.warn("Retry step failed:", retryErr);
+      // Optional: Log retry failure to an error log service
+    }
+
+    return new APIError(
+      err?.response?.status || err?.status || 500,
+      ["Something went wrong while deleting the batch", err.message || ""]
+    ).send(res);
   }
 };

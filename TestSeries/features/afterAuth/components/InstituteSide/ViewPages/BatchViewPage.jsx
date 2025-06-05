@@ -3,12 +3,14 @@ import HeadingUtil from "../../../utility/HeadingUtil";
 import { useCachedBatches } from "../../../../../hooks/useCachedBatches";
 import { useCachedUser } from "../../../../../hooks/useCachedUser";
 import RefreshButton from "../../../utility/RefreshButton";
-import { ArrowDownNarrowWideIcon, Edit, Search } from "lucide-react";
+import { ArrowDownNarrowWideIcon, Edit, LucideSquareSplitHorizontal, Search, Trash } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import dateFormatter from "../../../../../utils/dateFormatter";
 import { useEffect, useState } from "react";
 import { useUser } from "../../../../../contexts/currentUserContext";
 import { useCachedStudents } from "../../../../../hooks/useCachedStudents";
+import BackButton from "../../../../constants/BackButton";
+import DeleteBatchModal from "../../../utility/DeleteBatchModal";
 
 const BatchViewPage = () => {
     const location = useLocation();
@@ -22,7 +24,10 @@ const BatchViewPage = () => {
     const { user } = useUser();
     const { students } = useCachedStudents();
     const [fileteredStudents, setFilteredStudents] = useState([]);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
     const navigate=useNavigate();
+
+    
 
     useEffect(() => {
         if (students && batchId) {
@@ -62,6 +67,9 @@ const BatchViewPage = () => {
 
     return (
         <>
+        <div className="flex justify-between items-center mb-4">
+            <BackButton />
+            </div>
             <HeadingUtil heading={`Batch Information`} description={`This is the detailed information of batch ${batch.name}`} />
 
             <div className="p-6 space-y-6 text-gray-800">
@@ -84,6 +92,19 @@ const BatchViewPage = () => {
                                     <Edit />
                                 </div>
                             </button>
+                            <button className='hover:bg-gray-300 hover:cursor-pointer flex bg-gray-100 px-4 py-2 rounded-md gap-2'
+                                onClick={() => {
+                                    setShowDeleteModal(true);
+                                    
+                                }}>
+                                <span>
+                                    Delete Batch
+                                </span>
+                                <div>
+                                    <Trash />
+                                </div>
+                            </button>
+                        
                             {/* <select className='rounded-md bg-white py-2 px-4'
                                 onChange={(e) => setSelectedYear(e.target.value)}>
                                 <option value={""}>--select year--</option>
@@ -98,7 +119,18 @@ const BatchViewPage = () => {
                     <div className='flex flex-col lg:flex-row justify-between gap-4 mb-5'>
                         <div className='my-auto'>
                             <h2 className='font-bold text-lg text-blue-900'>{`Overview`}</h2>
-                            <div className="text-sm text-gray-600">{`Created by : ${userMap[batch.created_by]}`}</div>
+                            <div className="text-sm text-gray-600">{`Created by : ${userMap[batch.created_by]
+                            ?
+                            userMap[batch.created_by] 
+                            : 
+                                (batch.created_by ===user._id ?
+                                    user.name 
+                                : 
+                                (batch.created_by === user.organizationId ?
+                                    user.organizationName 
+                                : 'Unknown Creator(not in system)'
+                            ))
+                            }`}</div>
                             <div className="text-sm text-gray-600">{`Year : ${batch.year}`}</div>
                             <div className="flex flex-wrap gap-2 mt-2 text-sm text-gray-600">
                                 Subjects :
@@ -241,6 +273,14 @@ const BatchViewPage = () => {
                         )}
                     </div>
                 </div>
+                {showDeleteModal && (
+                    <DeleteBatchModal 
+                        batchId={batchId} 
+                        faculties={faculty.map(faculty => faculty._id)} 
+                        students={fileteredStudents.map(student => student._id)}
+                        setShowDeleteModal={setShowDeleteModal} 
+                    />
+                )}
             </div>
         </>
 

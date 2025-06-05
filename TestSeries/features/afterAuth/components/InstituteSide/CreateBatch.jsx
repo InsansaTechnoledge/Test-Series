@@ -138,8 +138,6 @@ const CreateBatch = () => {
       setSelectedFaculties([]);
       setFaculty(prev => ([...prev, ...selectedFaculties]));
 
-      await queryClient.invalidateQueries(['batches', user._id]);
-
     }
    }catch (error) {
 
@@ -149,6 +147,9 @@ const CreateBatch = () => {
       }else{
       alert('Failed to create batch. Please try again.');
       console.error('Error creating batch:',error.response);}
+    }
+    finally{
+            await queryClient.invalidateQueries(['batches', user._id]);
     }
 
 

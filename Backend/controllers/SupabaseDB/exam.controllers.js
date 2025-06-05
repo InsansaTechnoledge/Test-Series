@@ -88,7 +88,7 @@ export const fetchExamBasedOnCondition = async (req, res) => {
 export const deleteExamById = async (req, res) => {
   try {
     const { id } = req.params;
-    const exam = await deleteExam(id);
+    const exam = await deleteExam(id,null);
 
     return new APIResponse(200, exam, "Deleted successfully").send(res);
   }
@@ -96,6 +96,11 @@ export const deleteExamById = async (req, res) => {
     console.log(err);
     return new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while fetching exam", err.message]).send(res);
   }
+}
+
+export const deleteExamByBatchId = async (batchId)=>{
+  const exams=await deleteExam(null, batchId);
+  return exams;
 }
 
 
