@@ -1,9 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { fetchUserList } from '../utils/services/userService';
 import { useUser } from '../contexts/currentUserContext';
+import { useEffect } from 'react';
 
 
 export const useCachedUser = () => {
+
+    
     const {user} = useUser();
     const fetchUserListFunction = async () => {
         try {

@@ -226,12 +226,12 @@ const BatchViewPage = () => {
                                     <tbody key={idx}>
                                         <tr className="bg-white border-b border-gray-200 hover:bg-gray-50 text-lg text-gray-600 text-center">
                                             <td className="px-6 py-4">{idx + 1}</td>
-                                            <td className="px-6 py-4">{student.name}</td>
+                                            <td className="px-6 py-4">{student?.name}</td>
                                             <td className="px-6 py-4">{student.email}</td>
-                                            <td className="px-6 py-4">{batchMap[student.batch?.currentBatch].name}</td>
+                                            <td className="px-6 py-4">{batchMap[student.batch?.currentBatch]?.name}</td>
                                             <td className="px-6 py-4">{
                                                 student.batch?.previousBatch.length > 0
-                                                    ? student.batch?.previousBatch.map(prevBatchId => batchMap[prevBatchId].name).join(', ')
+                                                    ? student.batch?.previousBatch.map(prevBatchId => batchMap[prevBatchId]?.name).join(', ')
                                                     : "No previous batches"
                                             }</td>
                                         </tr>

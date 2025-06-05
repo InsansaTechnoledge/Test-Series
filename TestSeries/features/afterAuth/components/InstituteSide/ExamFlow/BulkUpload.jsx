@@ -2,8 +2,8 @@ import React, {useState} from 'react';
 import * as XLSX from 'xlsx';
 import { v4 as uuidv4 } from 'uuid';
 import { generateSampleExcel } from './SampleExcel';
-const BulkUpload = ({ setQuestions }) => {
-    const [isUploading, setIsUploading] = useState(false);
+const BulkUpload = ({ setQuestions, organizationId }) => {
+  const [isUploading, setIsUploading] = useState(false);
     const [uploadResult, setUploadResult] = useState(null);
     
     // const handleFile = async (e) => {
@@ -107,7 +107,9 @@ const BulkUpload = ({ setQuestions }) => {
           const parsed = rows.map((row) => {
             const base = {
               id: uuidv4(),
+              organization_id: organizationId, // ✅ add this!
               type: row.type?.toLowerCase(),
+              question_type: row.type?.toLowerCase(),
               question_text: row.question_text || '',
               explanation: row.explanation || '',
               difficulty: row.difficulty?.toLowerCase() || 'easy',

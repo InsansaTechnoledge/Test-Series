@@ -20,4 +20,14 @@ export const goLiveExam = async (examId) => {
     return response.data;
   };
   
-  
+
+export const deleteExam = async (id) => {
+    const response = await api.delete(`/v1/exam/${id}`)
+    return response.data
+}
+
+
+export const fetchExamsWithoutQuestions = async (orgId) => {
+  const response = await api.get(`/v1/exam/pending-no-questions?orgId=${orgId}`);
+  return response.data;
+};

@@ -38,6 +38,7 @@ import EditBatchPage from '../../features/afterAuth/components/InstituteSide/Edi
 import StudentViewPage from '../../features/afterAuth/components/InstituteSide/ViewPages/StudentViewPage';
 import StudentEditPage from '../../features/afterAuth/components/InstituteSide/EditPages/EditStudentPage';
 import UserViewPage from '../../features/afterAuth/components/InstituteSide/ViewPages/UserViewPage';
+import EditUserPage from '../../features/afterAuth/components/InstituteSide/EditPages/EditUserPage';
 const PageLinks = () => {
   const { user, setUser } = useUser();
   // const navigate = useNavigate();
@@ -80,17 +81,17 @@ const PageLinks = () => {
               <Route path='/institute' element={<OrganizationLayout />}>
                 <Route path='batch-list' element={<BatchList />} />
                 <Route path='user-list' element={<UserList />} />
+                <Route path='user-edit/:id' element={<EditUserPage/>}/>
                 <Route path='user-detail' element={<UserViewPage/>}/>
                 <Route path='create-user' element={<CreateUser />} />
                 <Route path='create-batch' element={<CreateBatch />} />
                 <Route path='add-student' element={<CreateStudent />} />
-                <Route path='student-list' element={<StudentListPage />} />
-                <Route path='student-landing' element={<StudentLanding />} />
+                <Route path='student-list' element={<StudentListPage />}/>
                 <Route path='student-detail' element={<StudentViewPage/>}/>
                 <Route path='student-edit' element={<StudentEditPage/>}/>
                 <Route path='create-role-group' element={<FeatureBasedRoleGroups />} />
                 <Route path='add-student' element={<CreateStudent />} />
-                <Route path='create-exam' element={<CreateExam />} />
+                <Route path='create-exam/:examId?' element={<CreateExam />} />
                 <Route path='exam-list' element={<ExamListPage />} />
                 <Route path='institute-landing' element={<InstituteLandingPage />} />
                   <Route path='batch-details' element={<BatchViewPage />} />
@@ -101,7 +102,8 @@ const PageLinks = () => {
 
             <Route element={<StudentRoutes />}>
               <Route path='/student' element={<StudentLayout />}>
-                
+              <Route path='student-landing' element={<StudentLanding />} />
+
                 <Route path='upcoming-exams' element={<UpcomingExam />} />
                 <Route path='completed-exams' element={<ResultsPage />} />
               <Route path='result/:examId' element={<ResultDetailPage />} />

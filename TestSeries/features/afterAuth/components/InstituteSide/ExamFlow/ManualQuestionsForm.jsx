@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
-const ManualQuestionForm = ({ setQuestions }) => {
+const ManualQuestionForm = ({ setQuestions, organizationId }) => {
 
 
     const initialFormState = {
@@ -74,6 +74,9 @@ const ManualQuestionForm = ({ setQuestions }) => {
         negative_marks: parseInt(form.negative_marks) || 0,
         subject: form.subject,
         chapter: form.chapter,
+        question_type: form.type,
+        organization_id: organizationId,
+
       };
     
       if (form.type === 'mcq') {

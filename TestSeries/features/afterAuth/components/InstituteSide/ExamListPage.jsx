@@ -9,6 +9,8 @@ const ExamListPage = () => {
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
 
+  console.log(exams)
+
   const getExams = async () => {
     try {
       setLoading(true);
@@ -23,20 +25,27 @@ const ExamListPage = () => {
 
   const handleGoLive = async (examId) => {
     try {
+      console.log('⏳ Starting go live for exam:', examId);
       setUpdatingId(examId);
-      await goLiveExam(examId);
+  
+      const res = await goLiveExam(examId);
+      console.log('✅ goLiveExam API response:', res);
+  
       await getExams();
+      console.log('✅ Exams reloaded after go live');
     } catch (err) {
       console.error('❌ Failed to set exam live:', err);
     } finally {
       setUpdatingId(null);
     }
   };
+  
+  
 
   const groupByBatch = (examList) => {
     const result = {};
     examList.forEach((exam) => {
-      const batchName = exam.batch_id?.name || 'Unknown Batch';
+      const batchName = exam.batch?.name || 'Unknown Batch';
       if (!result[batchName]) result[batchName] = [];
       result[batchName].push(exam);
     });
@@ -109,7 +118,7 @@ const ExamListPage = () => {
                     <h2 className="text-2xl font-bold text-gray-800">{batchName}</h2>
                     <p className="text-gray-600 flex items-center space-x-2">
                       <Calendar className="w-4 h-4" />
-                      <span>Year: {batchExams[0]?.batch_id?.year || 'N/A'}</span>
+                      <span>Year: {batchExams[0]?.batch?.year || 'N/A'}</span>
                       <span className="mx-2">•</span>
                       <span>{batchExams.length} exam{batchExams.length !== 1 ? 's' : ''}</span>
                     </p>
@@ -162,7 +171,7 @@ const ExamListPage = () => {
                           <span>Year</span>
                         </span>
                         <span className="font-semibold text-gray-700">
-                          {exam.batch_id?.year || 'N/A'}
+                          {exam.batch?.year || 'N/A'}
                         </span>
                       </div>
 

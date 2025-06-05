@@ -8,11 +8,12 @@ import { useEffect } from 'react';
 
 const FacultySection = () => {
   const { users } = useCachedUser();
-  const [facultyData, setFacultyData] = useState([users]);
+  const [facultyData, setFacultyData] = useState([]);
 
   useEffect(() => {
-    if(users){
+    if (users) {
       setFacultyData(users);
+      console.log("faculty data", users);
     }
   }, [users]);
 
@@ -26,7 +27,6 @@ const FacultySection = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mt-14 max-w-5xl mx-auto px-4">
-
         {facultyData.map((faculty, index) => (
           <div key={index} className="flex items-start gap-6">
             <img
@@ -37,16 +37,6 @@ const FacultySection = () => {
             <div>
               <h3 className="text-xl font-bold text-blue-900">{faculty.name}</h3>
               <p className="text-sm text-red-600 font-semibold mt-1">{faculty.email}</p>
-
-              {/* <p className="text-sm text-gray-700 mt-2">{faculty.bio}</p>
-              <div className="flex items-center gap-4 mt-4">
-                <a href={faculty.social.linkedin} target="_blank" rel="noopener noreferrer">
-                  <LinkedinIcon className="w-5 h-5 text-gray-500 hover:text-blue-700 transition" />
-                </a>
-                <a href={faculty.social.twitter} target="_blank" rel="noopener noreferrer">
-                  <TwitterIcon className="w-5 h-5 text-gray-500 hover:text-blue-500 transition" />
-                </a>
-              </div> */}
             </div>
           </div>
         ))}

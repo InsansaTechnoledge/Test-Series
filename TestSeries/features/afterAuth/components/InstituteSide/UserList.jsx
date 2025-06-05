@@ -195,6 +195,7 @@ const UserList = () => {
                                                     <Eye />
                                                 </button>
                                                 <button
+                                                    onClick={() => navigate(`/institute/user-edit/${user._id}`)}
                                                     className="font-medium text-blue-500 hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer">
                                                     <Edit />
                                                 </button>
