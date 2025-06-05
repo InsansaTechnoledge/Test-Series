@@ -9,6 +9,6 @@ router.get('/upcoming', getUpcomingExams);
 router.get('/pending-no-questions' , fetchExamsWithoutQuestions)
 router.patch('/:id', updateExamById);
 router.delete('/:id', deleteExamById);
-router.put('/:id/go-live', goLiveExamById);
+router.patch('/:id/go-live', goLiveExamById);
 
 export default router;

@@ -11,7 +11,7 @@ export const fetchExamById = async (examId) => {
 }
   
 export const goLiveExam = async (examId,status) => {
-    const response = await api.put(`/v1/exam/${examId}/go-live`, { status });
+    const response = await api.patch(`/v1/exam/${examId}/go-live`, { status });
     return response.data;
   };
 

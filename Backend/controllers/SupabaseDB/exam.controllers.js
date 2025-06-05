@@ -107,7 +107,7 @@ export const deleteExamByBatchId = async (batchId)=>{
 export const goLiveExamById = async (req, res) => {
   try {
     const { id } = req.params;
-    const status  = req.body;
+    const {status } = req.body;
 
     const orgId = req.user?.role === 'organization' ? req.user._id : req.user.organizationId || req.user.orgId;
 
