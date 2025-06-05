@@ -6,9 +6,10 @@ import QuestionPreview from './QuestionPreview';
 import HeadingUtil from '../../../utility/HeadingUtil';
 import NeedHelpComponent from '../components/NeedHelpComponent';
 import { uploadExamQuestions } from '../../../../../utils/services/questionUploadService';
-import { deleteExam , fetchExamById } from '../../../../../utils/services/examService';
+// import { deleteExam , fetchExamById } from '../../../../../utils/services/examService';
 import { useParams, useNavigate } from 'react-router-dom';
 import BackButton from '../../../../constants/BackButton';
+import DeleteExamModal from './DeleteExamModal';
 
 
 const CreateExam = () => {
@@ -17,6 +18,7 @@ const CreateExam = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { examId } = useParams();
     const navigate = useNavigate(); 
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
 
     // console.log(examDetails)
     const handleNewExam = (newExam) => {
@@ -86,18 +88,18 @@ const CreateExam = () => {
       }
     };
     
-    const handleDeleteExam = async () => {
-      console.log(`deleting exam : ${examDetails.id}`)
-      const id = examDetails.id
-      try{
-        const res = await deleteExam(id)
-        console.log(`deleted` , res)
-        navigate('/institute/institute-landing')
+    // const handleDeleteExam = async () => {
+    //   console.log(`deleting exam : ${examDetails.id}`)
+    //   const id = examDetails.id
+    //   try{
+    //     const res = await deleteExam(id)
+    //     console.log(`deleted` , res)
+    //     navigate('/institute/institute-landing')
 
-      } catch(e) {
-        console.log('error creating exam ', e)
-      }
-    }
+    //   } catch(e) {
+    //     console.log('error creating exam ', e)
+    //   }
+    // }
       
    
     return (
@@ -177,14 +179,28 @@ const CreateExam = () => {
             </button>
 
             <button
-                onClick={() => handleDeleteExam()}
+                onClick={() =>{
+                  setShowDeleteModal(true);
+                  console.log(`deleting exam : ${examDetails.id}`)
+                }}
                 className="bg-red-600 text-white px-4 py-2 mt-4 rounded hover:bg-red-700 transition"
               >
                 Delete exam 
             </button>
+         
           </>
+          
         )}
+           {
+            showDeleteModal && (
+              <DeleteExamModal
+                examId={examDetails?.id}
+                setShowDeleteModal={setShowDeleteModal}
+                />
+            )
+          }
       </div>
+      
     );
   };
   

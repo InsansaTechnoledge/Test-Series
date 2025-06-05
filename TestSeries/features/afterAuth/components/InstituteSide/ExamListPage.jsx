@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { Clock, Users, CheckCircle, PlayCircle, Loader2, Calendar, BookOpen, Globe, Heading, CirclePause } from 'lucide-react';
+import { Clock, Users, CheckCircle, PlayCircle, Loader2, Calendar, BookOpen, Globe, Heading, CirclePause, Trash } from 'lucide-react';
 import { goLiveExam, fetchUpcomingExams } from '../../../../utils/services/examService';
 import HeadingUtil from '../../utility/HeadingUtil';
 import NeedHelpComponent from './components/NeedHelpComponent';
 import usePendingExams from '../../../../hooks/useExamData';
 import { useNavigate } from 'react-router-dom';
+import DeleteExamModal from './ExamFlow/DeleteExamModal';
 
 const ExamListPage = () => {
   const [exams, setExams] = useState([]);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
   const { pendingExams } = usePendingExams();
-  const navigate=useNavigate();
+  const navigate = useNavigate();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [examToDelete,setExamToDelete] = useState(null);
 
 
   const getExams = async () => {
@@ -26,11 +29,11 @@ const ExamListPage = () => {
     }
   };
 
-  const handleGoLive = async (examId,go_live) => {
+  const handleGoLive = async (examId, go_live) => {
     try {
       setUpdatingId(examId);
 
-      const res = await goLiveExam(examId,go_live);
+      const res = await goLiveExam(examId, go_live);
 
       await getExams();
     } catch (err) {
@@ -41,7 +44,7 @@ const ExamListPage = () => {
   };
 
   const handleAddQuestion = (examId) => {
-   navigate(`/institute/create-exam/${examId}`);
+    navigate(`/institute/create-exam/${examId}`);
   };
 
 
@@ -142,8 +145,8 @@ const ExamListPage = () => {
                       <div className="flex items-start justify-between">
 
                         <div className={`px-3 py-1 rounded-full text-xs font-semibold ${exam.status === 'live'
-                            ? 'bg-green-100 text-green-700 border border-green-200'
-                            : 'bg-yellow-100 text-yellow-700 border border-yellow-200'
+                          ? 'bg-green-100 text-green-700 border border-green-200'
+                          : 'bg-yellow-100 text-yellow-700 border border-yellow-200'
                           }`}>
                           {exam.go_live ? (
                             <div className="flex items-center space-x-1">
@@ -156,6 +159,19 @@ const ExamListPage = () => {
                               <span>DRAFT</span>
                             </div>
                           )}
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <button
+                            className="text-grey-700 hover:text-red-600 transition-colors duration-200"
+                            tooltip="Delete Exam"
+                            onClick={()=>{
+                              setShowDeleteModal(true);
+                              setExamToDelete(exam.id);
+                            }
+                            }
+                          >
+                            <Trash className="w-5 h-5" />
+                          </button>
                         </div>
                       </div>
 
@@ -211,36 +227,36 @@ const ExamListPage = () => {
                     {!exam.go_live && (
                       <div className="mt-6 pt-4 border-t border-gray-100">
                         {pendingExams.some(p => p.id === exam.id)
-                        ? (
-                        
-                          <button
-                            onClick={() =>handleAddQuestion(exam.id)}
-                            className="w-full py-3 px-4 rounded-xl font-semibold text-sm bg-green-600 text-white shadow-md hover:bg-green-700 transition-all duration-200"
-                          >
-                            Add Question
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => handleGoLive(exam.id,exam.go_live)}
-                            disabled={updatingId === exam.id}
-                            className={`w-full py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-200 flex items-center justify-center space-x-2 ${updatingId === exam.id
+                          ? (
+
+                            <button
+                              onClick={() => handleAddQuestion(exam.id)}
+                              className="w-full py-3 px-4 rounded-xl font-semibold text-sm bg-green-600 text-white shadow-md hover:bg-green-700 transition-all duration-200"
+                            >
+                              Add Question
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => handleGoLive(exam.id, exam.go_live)}
+                              disabled={updatingId === exam.id}
+                              className={`w-full py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-200 flex items-center justify-center space-x-2 ${updatingId === exam.id
                                 ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                                 : 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white shadow-md hover:shadow-lg transform hover:scale-105'
-                              }`}
-                          >
-                            {updatingId === exam.id ? (
-                              <>
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                                <span>Activating...</span>
-                              </>
-                            ) : (
-                              <>
-                                <PlayCircle className="w-4 h-4" />
-                                <span>Go Live</span>
-                              </>
-                            )}
-                          </button>
-                        )}
+                                }`}
+                            >
+                              {updatingId === exam.id ? (
+                                <>
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                  <span>Activating...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <PlayCircle className="w-4 h-4" />
+                                  <span>Go Live</span>
+                                </>
+                              )}
+                            </button>
+                          )}
                       </div>
                     )}
 
@@ -252,16 +268,16 @@ const ExamListPage = () => {
                           <span>Exam is Live</span>
                         </div>
                         <button
-                            onClick={() => handleGoLive(exam.id,exam.go_live)}
-                            disabled={updatingId === exam.id}
-                            className={`w-full py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-200 flex items-center justify-center space-x-2 ${updatingId === exam.id
-                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                : 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white shadow-md hover:shadow-lg transform hover:scale-105'
-                              }`}
-                          >
+                          onClick={() => handleGoLive(exam.id, exam.go_live)}
+                          disabled={updatingId === exam.id}
+                          className={`w-full py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-200 flex items-center justify-center space-x-2 ${updatingId === exam.id
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                            : 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white shadow-md hover:shadow-lg transform hover:scale-105'
+                            }`}
+                        >
                           <span className="flex items-center space-x-2 text-sm align-center">
-                          <CirclePause className='pl-1 pr-1'/>
-                          Pause The Exam
+                            <CirclePause className='pl-1 pr-1' />
+                            Pause The Exam
                           </span>
                         </button>
                       </div>
@@ -270,8 +286,18 @@ const ExamListPage = () => {
                 ))}
               </div>
             </div>
+      
+              
           ))
+           
         )}
+         {showDeleteModal && (
+              <DeleteExamModal
+                examId={examToDelete}
+                setShowDeleteModal={setShowDeleteModal}
+              />
+            )
+            }
       </div>
     </div>
   );
