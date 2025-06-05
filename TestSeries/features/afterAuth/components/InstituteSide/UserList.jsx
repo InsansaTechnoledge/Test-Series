@@ -9,6 +9,7 @@ import { useCachedRoleGroup } from '../../../../hooks/useCachedRoleGroup'
 import { useQueryClient } from '@tanstack/react-query'
 import { useUser } from '../../../../contexts/currentUserContext'
 import { DeleteUser } from '../../../../utils/services/userService'
+import DeleteUserModal from '../../utility/DeleteUserModal'
 
 const UserList = () => {
     const { user } = useUser();
@@ -18,9 +19,10 @@ const UserList = () => {
     const [filteredUsers, setFilteredUsers] = useState(users);
     const [selectedBatch, setSelectedBatch] = useState('');
     const queryClient = useQueryClient();
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [userIdToDelete, setUserIdToDelete] = useState(null);
 
-
-    const refreshFunction =async  () => {
+    const refreshFunction = async () => {
         await queryClient.invalidateQueries(['Users', user._id]);
         await queryClient.invalidateQueries(['roleGroups', user._id]);
         await queryClient.invalidateQueries(['batches', user._id]);
@@ -50,12 +52,8 @@ const UserList = () => {
         }));
     }
 
-    const handleDeleteUser = async (id) => {
-        console.log('delete clicked')
-        const response = await DeleteUser(id)
-        alert('user Deleted')
-      }
-      
+
+
 
     return (
         <>
@@ -189,9 +187,9 @@ const UserList = () => {
                                             </td>
                                             <td className="flex justify-center mx-auto w-fit px-6 py-4 gap-8">
                                                 <button
-                                                    onClick={() => {navigate('/institute/user-detail' ,{ state: {userId: user._id}} )}}
+                                                    onClick={() => { navigate('/institute/user-detail', { state: { userId: user._id } }) }}
                                                     className="font-medium text-black hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer">
-                                                    
+
                                                     <Eye />
                                                 </button>
                                                 <button
@@ -200,9 +198,12 @@ const UserList = () => {
                                                     <Edit />
                                                 </button>
                                                 <button
-                                                onClick={() => handleDeleteUser(user._id)}  // this is the MongoDB _id
-                                                className="font-medium text-red-500 hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer">
-                                                <Trash />
+                                                    onClick={() => {
+                                                        setShowDeleteModal(true);
+                                                        setUserIdToDelete(user._id);  // 👈 store the user ID to delete
+                                                    }}  // this is the MongoDB _id
+                                                    className="font-medium text-red-500 hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer">
+                                                    <Trash />
                                                 </button>
 
                                             </td>
@@ -214,7 +215,14 @@ const UserList = () => {
                         </table>
                     </div>
 
-
+                            {
+                                showDeleteModal && userIdToDelete && (
+                                    <DeleteUserModal
+                                        userId={userIdToDelete}
+                                        setShowDeleteModal={setShowDeleteModal}
+                                        />
+                                )
+                            }
                 </div>
             </div>
         </>

@@ -1,18 +1,22 @@
 import React from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useCachedUser } from '../../../../../hooks/useCachedUser';
 import { useCachedRoleGroup } from '../../../../../hooks/useCachedRoleGroup';
 import { useCachedBatches } from '../../../../../hooks/useCachedBatches';
-import { User, Mail, Users, BookOpen, Shield, Hash } from 'lucide-react';
+import { User, Mail, Users, BookOpen, Shield, Hash, Edit, Trash } from 'lucide-react';
 import BackButton from '../../../../constants/BackButton';
+import { useState } from 'react';
+import DeleteUserModal from '../../../utility/DeleteUserModal';
 
 const UserViewPage = () => {
     const location = useLocation();
     const userId = location.state.userId
 
-    const {userMap } = useCachedUser();
-    const {roleMap} = useCachedRoleGroup();
-    const {batchMap} = useCachedBatches();
+    const { userMap } = useCachedUser();
+    const { roleMap } = useCachedRoleGroup();
+    const { batchMap } = useCachedBatches();
+    const navigate = useNavigate();
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
 
     const userData = userMap[userId]
 
@@ -25,14 +29,55 @@ const UserViewPage = () => {
     console.log(userMap[userId])
     return (
         <div className=" p-6">
-            <BackButton/>
+
+
             <div className="max-w-4xl mx-auto">
+                <div className='flex flex-col lg:flex-row justify-between gap-4 mb-5'>
+
+                    <div className='my-auto'>
+                        <BackButton />
+                    </div>
+                    <div className='flex flex-col md:flex-row gap-4'>
+                        <button className='hover:bg-gray-300 hover:cursor-pointer flex bg-gray-100 px-4 py-2 rounded-md gap-2'
+                            onClick={() => navigate(`/institute/user-edit/${userId}`)}>
+                            <span>
+                                Edit User
+                            </span>
+                            <div>
+                                <Edit />
+                            </div>
+                        </button>
+                        <button className='hover:bg-gray-300 hover:cursor-pointer flex bg-gray-100 px-4 py-2 rounded-md gap-2'
+                            onClick={() => {
+                                setShowDeleteModal(true);
+
+                            }}>
+                            <span>
+                                Delete User
+                            </span>
+                            <div>
+                                <Trash />
+                            </div>
+                        </button>
+
+                        {/* <select className='rounded-md bg-white py-2 px-4'
+                                onChange={(e) => setSelectedYear(e.target.value)}>
+                                <option value={""}>--select year--</option>
+                                {uniqueYears.map(year => (
+                                    <option key={year} value={year}>{year}</option>
+                                ))}
+
+                            </select> */}
+
+                    </div>
+                </div>
+
                 {/* Header */}
                 <div className="bg-white rounded-2xl shadow-xl border border-blue-100 mb-8 overflow-hidden">
                     <div className="bg-gradient-to-r from-blue-600 to-blue-700 h-32 relative">
                         <div className="absolute -bottom-12 left-8">
-                                {/* <User className="w-12 h-12 text-blue-600" /> */}
-                                <img src={userData.profilePhoto} alt="" />
+                            {/* <User className="w-12 h-12 text-blue-600" /> */}
+                            <img src={userData.profilePhoto} alt="" />
                         </div>
                     </div>
                     <div className="pt-16 pb-8 px-8">
@@ -100,7 +145,7 @@ const UserViewPage = () => {
                         </h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                             {batchNames.map((batchName, index) => (
-                                <div 
+                                <div
                                     key={index}
                                     className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200"
                                 >
@@ -119,8 +164,13 @@ const UserViewPage = () => {
                         )}
                     </div>
                 </div>
+                {showDeleteModal && (
+                    <DeleteUserModal
+                        userId={userId}
+                        setShowDeleteModal={setShowDeleteModal}
+                    />
+                )}
 
-               
             </div>
         </div>
     )

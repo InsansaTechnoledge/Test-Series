@@ -76,46 +76,46 @@ const BatchViewPage = () => {
 
                 <div className='rounded-xl p-5 bg-gray-200 inset-shadow-md flex-grow flex flex-col overflow-auto'>
 
-                    <div className='flex flex-col lg:flex-row justify-between gap-4 mb-5'>
+                        <div className='flex flex-col lg:flex-row justify-between gap-4 mb-5'>
 
-                        <div className='my-auto'>
-                            <h1 className='font-bold text-xl text-blue-900'>{`Name :  ${batch.name}`}</h1>
-                        </div>
-                        <div className='flex flex-col md:flex-row gap-4'>
-                            <RefreshButton refreshFunction={refreshFunction} />
-                            <button className='hover:bg-gray-300 hover:cursor-pointer flex bg-gray-100 px-4 py-2 rounded-md gap-2'
-                                onClick={() => navigate('/institute/edit-batch', { state: { batchId: batch.id } })}>
-                                <span>
-                                    Edit Batch
-                                </span>
-                                <div>
-                                    <Edit />
-                                </div>
-                            </button>
-                            <button className='hover:bg-gray-300 hover:cursor-pointer flex bg-gray-100 px-4 py-2 rounded-md gap-2'
-                                onClick={() => {
-                                    setShowDeleteModal(true);
-                                    
-                                }}>
-                                <span>
-                                    Delete Batch
-                                </span>
-                                <div>
-                                    <Trash />
-                                </div>
-                            </button>
-                        
-                            {/* <select className='rounded-md bg-white py-2 px-4'
-                                onChange={(e) => setSelectedYear(e.target.value)}>
-                                <option value={""}>--select year--</option>
-                                {uniqueYears.map(year => (
-                                    <option key={year} value={year}>{year}</option>
-                                ))}
+                            <div className='my-auto'>
+                                <h1 className='font-bold text-xl text-blue-900'>{`Name :  ${batch.name}`}</h1>
+                            </div>
+                            <div className='flex flex-col md:flex-row gap-4'>
+                                <RefreshButton refreshFunction={refreshFunction} />
+                                <button className='hover:bg-gray-300 hover:cursor-pointer flex bg-gray-100 px-4 py-2 rounded-md gap-2'
+                                    onClick={() => navigate('/institute/edit-batch', { state: { batchId: batch.id } })}>
+                                    <span>
+                                        Edit Batch
+                                    </span>
+                                    <div>
+                                        <Edit />
+                                    </div>
+                                </button>
+                                <button className='hover:bg-gray-300 hover:cursor-pointer flex bg-gray-100 px-4 py-2 rounded-md gap-2'
+                                    onClick={() => {
+                                        setShowDeleteModal(true);
+                                        
+                                    }}>
+                                    <span>
+                                        Delete Batch
+                                    </span>
+                                    <div>
+                                        <Trash />
+                                    </div>
+                                </button>
+                            
+                                {/* <select className='rounded-md bg-white py-2 px-4'
+                                    onChange={(e) => setSelectedYear(e.target.value)}>
+                                    <option value={""}>--select year--</option>
+                                    {uniqueYears.map(year => (
+                                        <option key={year} value={year}>{year}</option>
+                                    ))}
 
-                            </select> */}
-                           
+                                </select> */}
+                            
+                            </div>
                         </div>
-                    </div>
                     <div className='flex flex-col lg:flex-row justify-between gap-4 mb-5'>
                         <div className='my-auto'>
                             <h2 className='font-bold text-lg text-blue-900'>{`Overview`}</h2>

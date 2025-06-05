@@ -4,6 +4,7 @@ import { useCachedUser } from '../../../../../hooks/useCachedUser';
 import { useCachedRoleGroup } from '../../../../../hooks/useCachedRoleGroup';
 import { useCachedBatches } from '../../../../../hooks/useCachedBatches';
 import { UpdateUser } from '../../../../../utils/services/userService';
+import BackButton from '../../../../constants/BackButton';
 
 const EditUserPage = () => {
   const { id } = useParams();
@@ -61,7 +62,10 @@ const EditUserPage = () => {
   
 
   return (
+    <>
+         <BackButton />
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 p-6">
+ 
       <div className="max-w-2xl mx-auto">
         <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-blue-100 p-8">
           {/* Header */}
@@ -181,6 +185,7 @@ const EditUserPage = () => {
         </div>
       </div>
     </div>
+      </>
   );
 };
 
