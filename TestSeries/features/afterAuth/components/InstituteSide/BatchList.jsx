@@ -48,9 +48,7 @@ const BatchList = () => {
 
     return (
         <>
-            <div className='flex justify-between items-center mb-5'>
-                <BackButton />
-            </div>
+
             <div className='h-full flex flex-col'>
                 <div className=''>
                     {/* <Heading title={selectedYear ? `Batch List for ${selectedYear}` : "All Batches"} */}

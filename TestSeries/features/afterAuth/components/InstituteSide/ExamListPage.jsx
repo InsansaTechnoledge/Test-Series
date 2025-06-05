@@ -5,7 +5,6 @@ import HeadingUtil from '../../utility/HeadingUtil';
 import NeedHelpComponent from './components/NeedHelpComponent';
 import usePendingExams from '../../../../hooks/useExamData';
 import { useNavigate } from 'react-router-dom';
-import BackButton from '../../../constants/BackButton';
 
 const ExamListPage = () => {
   const [exams, setExams] = useState([]);
@@ -80,7 +79,6 @@ const ExamListPage = () => {
 
   return (
     <div className="min-h-screen ">
-      <BackButton />
       {/* Header Section */}
       {/* <div className="bg-white shadow-sm border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-6 py-8">
