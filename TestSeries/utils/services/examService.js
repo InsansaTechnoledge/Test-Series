@@ -10,8 +10,8 @@ export const fetchExamById = async (examId) => {
     return response.data;
 }
   
-export const goLiveExam = async (examId) => {
-    const response = await api.put(`/v1/exam/${examId}/go-live`);
+export const goLiveExam = async (examId,status) => {
+    const response = await api.put(`/v1/exam/${examId}/go-live`, { status });
     return response.data;
   };
 

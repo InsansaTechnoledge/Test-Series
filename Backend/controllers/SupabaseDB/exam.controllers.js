@@ -107,6 +107,7 @@ export const deleteExamByBatchId = async (batchId)=>{
 export const goLiveExamById = async (req, res) => {
   try {
     const { id } = req.params;
+    const {status}  = req.body;
 
     const orgId = req.user?.role === 'organization' ? req.user._id : req.user.organizationId || req.user.orgId;
 
@@ -114,7 +115,7 @@ export const goLiveExamById = async (req, res) => {
       return new APIError(400, ['Missing organization ID in auth context']).send(res);
     }
 
-    const exam = await setExamLive(id, orgId);
+    const exam = await setExamLive(id, orgId,status);
 
     return new APIResponse(200, exam, "Exam is now live").send(res);
   } catch (err) {

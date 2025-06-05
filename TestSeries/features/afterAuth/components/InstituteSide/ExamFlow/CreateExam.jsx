@@ -8,6 +8,7 @@ import NeedHelpComponent from '../components/NeedHelpComponent';
 import { uploadExamQuestions } from '../../../../../utils/services/questionUploadService';
 import { deleteExam , fetchExamById } from '../../../../../utils/services/examService';
 import { useParams, useNavigate } from 'react-router-dom';
+import BackButton from '../../../../constants/BackButton';
 
 
 const CreateExam = () => {
@@ -101,6 +102,7 @@ const CreateExam = () => {
    
     return (
       <div className="p-6 max-w-6xl mx-auto">
+        <BackButton />
         {/* <h1 className="text-3xl font-bold mb-6">Create New Exam</h1> */}
         <HeadingUtil heading="Create New Exam" description="there are 2 ways to create an exam , manually or bulk upload"/>
         <NeedHelpComponent heading="want to create new exam ?" about="first download sample excel template to bulk upload" question="can i use both meathods to create exam ?" answer="users can use both meathods and all types of questions to create new exam"/>

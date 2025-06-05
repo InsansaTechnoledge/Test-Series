@@ -56,17 +56,17 @@ export const fetchSelective = async (conditions) => {
 
 
 
-  export const fetchExamNameById = async (examId) => {
-    const { data, error } = await supabase
-      .from("batch_exam")
-      .select("*")
-      .eq("id", examId)
-      .single();
-  
-    if (error) throw error;
-    return data.name;
-  };
-  
+export const fetchExamNameById = async (examId) => {
+  const { data, error } = await supabase
+    .from("batch_exam")
+    .select("*")
+    .eq("id", examId)
+    .single();
+
+  if (error) throw error;
+  return data.name;
+};
+
 
 
 
@@ -123,11 +123,11 @@ export const deleteExam = async (id, batch_id) => {
   return data;
 };
 
-export const setExamLive = async (examId, orgId) => {
+export const setExamLive = async (examId, orgId,status) => {
   const { data, error } = await supabase
     .from('batch_exam')
     .update({
-      go_live: true,   // this will also trigger status = 'live' if you added the trigger
+      go_live: !status,   // this will also trigger status = 'live' if you added the trigger
       updated_at: new Date()
     })
     .eq('id', examId)
@@ -148,31 +148,28 @@ export const fetchNonLiveExams = async (organization_id) => {
           year
         )
       `)
-      .eq("go_live", false)
-      .eq("organization_id", organization_id);
-  
-    if (error) throw error;
-    return data;
-  };
+    .eq("go_live", false)
+    .eq("organization_id", organization_id);
 
-  // export const fetchExamsWithoutQuestionsQuery = async () => {
-  //   const { data, error } = await supabase
-  //     .from('batch_exam')
-  //     .select('*, questions(id)')
-  //     .is('questions.id', null); // exams with no questions
-  
-  //   if (error) throw error;
-  
-  //   return data;
-  // };
+  if (error) throw error;
+  return data;
+};
 
-  export const fetchExamsWithoutQuestionsQuery = async (organization_id) => {
-    const { data, error } = await supabase
-  .rpc('get_exams_without_questions', { org_id: organization_id });
+// export const fetchExamsWithoutQuestionsQuery = async () => {
+//   const { data, error } = await supabase
+//     .from('batch_exam')
+//     .select('*, questions(id)')
+//     .is('questions.id', null); // exams with no questions
 
+//   if (error) throw error;
 
-  
-    if (error) throw error;
-    return data;
-  };
-  
+//   return data;
+// };
+
+export const fetchExamsWithoutQuestionsQuery = async (organization_id) => {
+  const { data, error } = await supabase
+    .rpc('get_exams_without_questions', { org_id: organization_id });
+  if (error) throw error;
+  return data;
+};
+

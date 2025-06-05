@@ -53,14 +53,13 @@ const ExamForm = ({ onSubmit }) => {
     }
   };
 
-  const safeExams = Array.isArray(pendingExams?.data) ? pendingExams.data : [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-6">
       <div className="max-w-4xl mx-auto">
         {/* Pending Exams Alert Section */}
         <div className="mb-8">
-          {safeExams.length === 0 ? (
+          {pendingExams.length === 0 ? (
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-6 shadow-sm">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
@@ -82,7 +81,7 @@ const ExamForm = ({ onSubmit }) => {
                 <h2 className="text-xl font-bold text-blue-900">You have these exams pending (complete or delete them)</h2>
               </div>
               <ul className="space-y-2">
-                {safeExams.map((exam, index) => (
+                {pendingExams.map((exam, index) => (
                   <li key={exam?.id || index} className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
                     <span className="text-blue-800 font-medium">{exam?.name || 'Unnamed Exam'}</span>
@@ -258,7 +257,7 @@ const ExamForm = ({ onSubmit }) => {
               </div>
             )}
   
-            {safeExams.length === 0 ? (
+            {pendingExams.length === 0 ? (
               <div className="text-center py-12">
                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -270,7 +269,7 @@ const ExamForm = ({ onSubmit }) => {
               </div>
             ) : (
               <div className="space-y-4">
-                {safeExams.map((exam, index) => (
+                {pendingExams.map((exam, index) => (
                   <div
                     key={exam?.id || index}
                     className="group bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-200 hover:from-blue-100 hover:to-indigo-100"
@@ -291,7 +290,7 @@ const ExamForm = ({ onSubmit }) => {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                             </svg>
                             {/* <span>Batch ID: {exam?.batch_id || 'N/A'}</span> */}
-                            <span>Batch Name and Id : {batchMap[exam?.batch_id].name || 'N/A'} | {exam?.batch_id || 'N/A'}</span>
+                            <span>Batch Name and Id : {batchMap[exam?.batch_id]?.name || 'N/A'} | {exam?.batch_id || 'N/A'}</span>
                           </div>
                           <div className="flex items-center space-x-1">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

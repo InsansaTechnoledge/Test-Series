@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { Clock, Users, CheckCircle, PlayCircle, Loader2, Calendar, BookOpen, Globe, Heading } from 'lucide-react';
-import { goLiveExam , fetchUpcomingExams } from '../../../../utils/services/examService';
+import { Clock, Users, CheckCircle, PlayCircle, Loader2, Calendar, BookOpen, Globe, Heading, CirclePause } from 'lucide-react';
+import { goLiveExam, fetchUpcomingExams } from '../../../../utils/services/examService';
 import HeadingUtil from '../../utility/HeadingUtil';
 import NeedHelpComponent from './components/NeedHelpComponent';
+import usePendingExams from '../../../../hooks/useExamData';
+import { useNavigate } from 'react-router-dom';
+import BackButton from '../../../constants/BackButton';
 
 const ExamListPage = () => {
   const [exams, setExams] = useState([]);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
+  const { pendingExams } = usePendingExams();
+  const navigate=useNavigate();
 
-  console.log(exams)
 
   const getExams = async () => {
     try {
@@ -23,24 +27,25 @@ const ExamListPage = () => {
     }
   };
 
-  const handleGoLive = async (examId) => {
+  const handleGoLive = async (examId,go_live) => {
     try {
-      console.log('⏳ Starting go live for exam:', examId);
       setUpdatingId(examId);
-  
-      const res = await goLiveExam(examId);
-      console.log('✅ goLiveExam API response:', res);
-  
+
+      const res = await goLiveExam(examId,go_live);
+
       await getExams();
-      console.log('✅ Exams reloaded after go live');
     } catch (err) {
       console.error('❌ Failed to set exam live:', err);
     } finally {
       setUpdatingId(null);
     }
   };
-  
-  
+
+  const handleAddQuestion = (examId) => {
+   navigate(`/institute/create-exam/${examId}`);
+  };
+
+
 
   const groupByBatch = (examList) => {
     const result = {};
@@ -75,6 +80,7 @@ const ExamListPage = () => {
 
   return (
     <div className="min-h-screen ">
+      <BackButton />
       {/* Header Section */}
       {/* <div className="bg-white shadow-sm border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-6 py-8">
@@ -94,7 +100,7 @@ const ExamListPage = () => {
         </div>
       </div> */}
 
-      <HeadingUtil heading="List of Created/Drafted Exams" description="this shows list of all the exams organization created batchwise"/>
+      <HeadingUtil heading="List of Created/Drafted Exams" description="this shows list of all the exams organization created batchwise" />
 
       <NeedHelpComponent heading="Want to Live your Exam ?" about="schedule or immediatly live the exam" question="can i revert live exam ?" answer="yes, you can click on pause button to pause the exams (unless any user started it)" />
       {/* Main Content */}
@@ -113,7 +119,7 @@ const ExamListPage = () => {
               {/* Batch Header */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
                 <div className="flex items-center space-x-4">
-                  
+
                   <div>
                     <h2 className="text-2xl font-bold text-gray-800">{batchName}</h2>
                     <p className="text-gray-600 flex items-center space-x-2">
@@ -136,13 +142,12 @@ const ExamListPage = () => {
                     {/* Exam Header */}
                     <div className="space-y-4">
                       <div className="flex items-start justify-between">
-                        
-                        <div className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          exam.status === 'live' 
-                            ? 'bg-green-100 text-green-700 border border-green-200' 
+
+                        <div className={`px-3 py-1 rounded-full text-xs font-semibold ${exam.status === 'live'
+                            ? 'bg-green-100 text-green-700 border border-green-200'
                             : 'bg-yellow-100 text-yellow-700 border border-yellow-200'
-                        }`}>
-                          {exam.go_live  ? (
+                          }`}>
+                          {exam.go_live ? (
                             <div className="flex items-center space-x-1">
                               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                               <span>LIVE</span>
@@ -177,20 +182,19 @@ const ExamListPage = () => {
 
                       <div className="flex items-center justify-between text-sm">
                         {
-                            exam.go_live ? "" : (
-                                <>
-                                 <span className="text-gray-500 flex items-center space-x-2">
+                          exam.go_live ? "" : (
+                            <>
+                              <span className="text-gray-500 flex items-center space-x-2">
                                 <Globe className="w-4 h-4" />
                                 <span>Go Live</span>
-                                </span>
-                                </>
-                          ) 
-                        
+                              </span>
+                            </>
+                          )
+
                         }
-                        
-                        <span className={`font-semibold flex items-center space-x-1 ${
-                          exam.go_live ? 'text-green-600' : 'text-gray-500'
-                        }`}>
+
+                        <span className={`font-semibold flex items-center space-x-1 ${exam.go_live ? 'text-green-600' : 'text-gray-500'
+                          }`}>
                           {exam.go_live ? (
                             <>
                               <CheckCircle className="w-4 h-4" />
@@ -206,32 +210,42 @@ const ExamListPage = () => {
                       </div>
                     </div>
 
-                    {/* Action Button */}
                     {!exam.go_live && (
                       <div className="mt-6 pt-4 border-t border-gray-100">
-                        <button
-                          onClick={() => handleGoLive(exam.id)}
-                          disabled={updatingId === exam.id}
-                          className={`w-full py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-200 flex items-center justify-center space-x-2 ${
-                            updatingId === exam.id
-                              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                              : 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white shadow-md hover:shadow-lg transform hover:scale-105'
-                          }`}
-                        >
-                          {updatingId === exam.id ? (
-                            <>
-                              <Loader2 className="w-4 h-4 animate-spin" />
-                              <span>Activating...</span>
-                            </>
-                          ) : (
-                            <>
-                              <PlayCircle className="w-4 h-4" />
-                              <span>Go Live</span>
-                            </>
-                          )}
-                        </button>
+                        {pendingExams.some(p => p.id === exam.id)
+                        ? (
+                        
+                          <button
+                            onClick={() =>handleAddQuestion(exam.id)}
+                            className="w-full py-3 px-4 rounded-xl font-semibold text-sm bg-green-600 text-white shadow-md hover:bg-green-700 transition-all duration-200"
+                          >
+                            Add Question
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleGoLive(exam.id,exam.go_live)}
+                            disabled={updatingId === exam.id}
+                            className={`w-full py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-200 flex items-center justify-center space-x-2 ${updatingId === exam.id
+                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                : 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white shadow-md hover:shadow-lg transform hover:scale-105'
+                              }`}
+                          >
+                            {updatingId === exam.id ? (
+                              <>
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                <span>Activating...</span>
+                              </>
+                            ) : (
+                              <>
+                                <PlayCircle className="w-4 h-4" />
+                                <span>Go Live</span>
+                              </>
+                            )}
+                          </button>
+                        )}
                       </div>
                     )}
+
 
                     {exam.go_live && (
                       <div className="mt-6 pt-4 border-t border-gray-100">
@@ -239,6 +253,19 @@ const ExamListPage = () => {
                           <CheckCircle className="w-4 h-4" />
                           <span>Exam is Live</span>
                         </div>
+                        <button
+                            onClick={() => handleGoLive(exam.id,exam.go_live)}
+                            disabled={updatingId === exam.id}
+                            className={`w-full py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-200 flex items-center justify-center space-x-2 ${updatingId === exam.id
+                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                : 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white shadow-md hover:shadow-lg transform hover:scale-105'
+                              }`}
+                          >
+                          <span className="flex items-center space-x-2 text-sm align-center">
+                          <CirclePause className='pl-1 pr-1'/>
+                          Pause The Exam
+                          </span>
+                        </button>
                       </div>
                     )}
                   </div>
