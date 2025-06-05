@@ -22,9 +22,13 @@ const ExamForm = ({ onSubmit }) => {
   });
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setForm(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
   };
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
