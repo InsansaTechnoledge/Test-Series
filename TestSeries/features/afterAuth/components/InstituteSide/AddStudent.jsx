@@ -279,7 +279,7 @@ const AddStudent = () => {
       };
     } catch (error) {
       console.error('Submission failed:', error);
-      alert('Something went wrong during submission');
+      alert( 'Something went wrong during submission');
     }
   };
 

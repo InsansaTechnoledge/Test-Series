@@ -104,12 +104,12 @@ const EditBatchPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
+        const {inputValue,...formValues}=formData;
         const updatedBatch = {
-            ...formData,
+            ...formValues,
             facultiesToAdd,
             facultiesToRemove // add this line
         };
-        console.log("Updated Batch:", updatedBatch);
 
         try {
             const response = await updateBatch(batchId, updatedBatch);
@@ -118,7 +118,9 @@ const EditBatchPage = () => {
                 alert("Batch updated successfully!");
                 await queryClient.invalidateQueries(['batches', user._id]);
                 await queryClient.invalidateQueries(['Users', user._id])// Invalidate batches cache
-                navigate(-1);
+                navigate(`/institute/batch-details`, 
+                   {state: { batchId } } );
+                
             }
 
         } catch (err) {
