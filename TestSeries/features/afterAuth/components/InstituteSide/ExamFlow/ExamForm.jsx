@@ -3,23 +3,30 @@ import { addExamAPI } from '../../../../../utils/services/questionUploadService'
 import { useUser } from '../../../../../contexts/currentUserContext';
 import { useCachedBatches } from '../../../../../hooks/useCachedBatches';
 import { usePendingExams } from '../../../../../hooks/useExamData';
+import { useEffect } from 'react';
+import { updateExam } from '../../../../../utils/services/examService';
 
-const ExamForm = ({ onSubmit }) => {
-  const { user } = useUser();
-  const { batches = [] , batchMap } = useCachedBatches();
 
-  const { pendingExams, isLoading: pendingLoading } = usePendingExams();
-
-  console.log(pendingExams)
-  const [form, setForm] = useState({
-    name: '',
+const ExamForm = ({ onSubmit ,initialData={ name: '',
     date: '',
     total_marks: '',
     duration: '',
     batch_id: '',
-    //have to add the live until logic here
+  }}) => {
+  const { user } = useUser();
+  const { batches = [] , batchMap } = useCachedBatches();
 
-  });
+  const { pendingExams, isLoading: pendingLoading } = usePendingExams();
+  
+
+
+  console.log(pendingExams)
+  const [form, setForm] = useState(initialData);
+
+    useEffect(() => {
+    setForm(initialData);
+    console.log("Initial data set in form:", initialData);
+  }, [initialData]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -35,7 +42,8 @@ const ExamForm = ({ onSubmit }) => {
 
     const payload = {
       ...form,
-      organization_id: user.role==='organization'?user._id :user.organizationId
+      organization_id: user.role==='organization'?user._id :user.organizationId,
+      date: new Date(form.date).toISOString().split('T')[0],
       // organization_id: user?.user?._id   // ✅ Inject orgId here reliably
     };
 
@@ -45,8 +53,22 @@ const ExamForm = ({ onSubmit }) => {
     }
 
     try {
-      const response = await addExamAPI(payload);
-      onSubmit(response.data);
+      let response = {};
+
+      if(form.id){
+        console.log("Updating existing exam with ID:", form.id);
+        console.log("Payload for update:", payload);
+        const {batch,...examData}=payload;
+        console.log("Exam data to update:", examData);
+       response = await updateExam(form.id, examData);
+        console.log("Exam updated successfully:", response.data);
+      
+      }
+      else{
+       response = await addExamAPI(payload);
+    }
+      onSubmit(response?.data);
+    
     } catch (error) {
       console.error('Error creating exam:', error);
       alert('Failed to create exam.');
@@ -232,13 +254,17 @@ const ExamForm = ({ onSubmit }) => {
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                <span>Save Exam Info</span>
+
+                <span>{
+                  form.id ? 'Update Exam' : 'Create Exam'
+                  }</span>
               </button>
             </div>
           </form>
         </div>
   
-        {/* Pending Exams Section */}
+        {/* Pending Exams Section */}{
+          !form.id && (
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
           <div className="bg-gradient-to-r from-blue-600 to-blue-600 px-8 py-6">
             <h2 className="text-2xl font-bold text-white flex items-center space-x-3">
@@ -322,6 +348,7 @@ const ExamForm = ({ onSubmit }) => {
             )}
           </div>
         </div>
+  )}
       </div>
     </div>
   );

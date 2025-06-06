@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-// import { deleteExam } from '../../../utils/services/examService';
 import { useQueryClient } from '@tanstack/react-query';
-// import { useUser } from '../../../contexts/currentUserContext';
+import { useUser } from '../../../../../contexts/currentUserContext';
+import { deleteExam } from '../../../../../utils/services/examService';
 
 const DeleteExamModal = ({ examId, setShowDeleteModal }) => {
   const [loading, setLoading] = useState(false);
@@ -13,13 +13,13 @@ const DeleteExamModal = ({ examId, setShowDeleteModal }) => {
   const handleDelete = async () => {
     try {
       setLoading(true);
-    //   const response = await deleteExam(examId);
-    //   if (response.status === 200) {
+      const response = await deleteExam(examId);
+      if (response.status === 200) {
         alert('Exam deleted successfully.');
         setShowDeleteModal(false);
         await queryClient.invalidateQueries(['exams', user._id]);
         navigate('/institute/exam-list');
-    //   }
+      }
     } catch (error) {
       console.error('Error deleting exam:', error);
       alert('Failed to delete exam.');

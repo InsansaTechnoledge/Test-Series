@@ -19,6 +19,7 @@ export const addExam = async (req, res) => {
       updated_at: new Date(),
       updated_by: req.user._id,
     };
+    console.log("Exam data with update metadata:", examDataWithUpdateMetaData);
 
     const exam = await createExam(examDataWithUpdateMetaData);
 
@@ -41,9 +42,12 @@ export const updateExamById = async (req, res) => {
 
     const examDataWithUpdateMetaData = {
       ...examData,
-      updated_at: Date.now(),
+      total_marks: Number(examData.total_marks),
+      duration: Number(examData.duration),
+      updated_at: new Date(),
       updated_by: req.user._id
     }
+    console.log("Exam data with update metadata:", examDataWithUpdateMetaData);
     const exam = await updateExam(examDataWithUpdateMetaData, id);
 
     return new APIResponse(200, exam, 'Exam Updated successfully').send(res);

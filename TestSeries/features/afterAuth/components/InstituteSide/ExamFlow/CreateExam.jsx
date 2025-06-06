@@ -6,9 +6,10 @@ import QuestionPreview from './QuestionPreview';
 import HeadingUtil from '../../../utility/HeadingUtil';
 import NeedHelpComponent from '../components/NeedHelpComponent';
 import { uploadExamQuestions } from '../../../../../utils/services/questionUploadService';
-import { deleteExam , fetchExamById } from '../../../../../utils/services/examService';
+import { fetchExamById } from '../../../../../utils/services/examService';
 import { useParams, useNavigate } from 'react-router-dom';
 import BackButton from '../../../../constants/BackButton';
+import DeleteExamModal from './DeleteExamModal';
 
 
 const CreateExam = () => {
@@ -17,6 +18,9 @@ const CreateExam = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { examId } = useParams();
     const navigate = useNavigate(); 
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [editingExam, setEditingExam] = useState(false);
+
 
     // console.log(examDetails)
     const handleNewExam = (newExam) => {
@@ -86,18 +90,18 @@ const CreateExam = () => {
       }
     };
     
-    const handleDeleteExam = async () => {
-      console.log(`deleting exam : ${examDetails.id}`)
-      const id = examDetails.id
-      try{
-        const res = await deleteExam(id)
-        console.log(`deleted` , res)
-        navigate('/institute/institute-landing')
+    // const handleDeleteExam = async () => {
+    //   console.log(`deleting exam : ${examDetails.id}`)
+    //   const id = examDetails.id
+    //   try{
+    //     const res = await deleteExam(id)
+    //     console.log(`deleted` , res)
+    //     navigate('/institute/institute-landing')
 
-      } catch(e) {
-        console.log('error creating exam ', e)
-      }
-    }
+    //   } catch(e) {
+    //     console.log('error creating exam ', e)
+    //   }
+    // }
       
    
     return (
@@ -107,7 +111,7 @@ const CreateExam = () => {
         <HeadingUtil heading="Create New Exam" description="there are 2 ways to create an exam , manually or bulk upload"/>
         <NeedHelpComponent heading="want to create new exam ?" about="first download sample excel template to bulk upload" question="can i use both meathods to create exam ?" answer="users can use both meathods and all types of questions to create new exam"/>
         
-        {!examDetails ? (
+        {/* {!examDetails ? (
           <ExamForm onSubmit={handleNewExam} />
         ) : (
           <div className="bg-blue-50 p-4 rounded mb-6">
@@ -128,9 +132,49 @@ const CreateExam = () => {
               </button>
             </div>
           </div>
-        )}
+        )} */}
+
+        {!examDetails || editingExam ? (
+  <ExamForm
+    onSubmit={(updatedExam) => {
+
+      setExamDetails(updatedExam);
+      setEditingExam(false);
+      // If it's a new exam, redirect to its page
+      if (!examId) {
+       handleNewExam(updatedExam);
+      }
+    }}
+    initialData={examDetails || { name: '',
+    date: '',
+    total_marks: '',
+    duration: '',
+    batch_id: '',
+  }} // for edit form
+  />
+) : (
+  <div className="bg-blue-50 p-4 rounded mb-6">
+    <div className="flex justify-between items-center">
+      <div>
+        <h2 className="text-xl font-semibold">{examDetails.name}</h2>
+        <p className="text-gray-600">
+          Date: {examDetails.date} | 
+          Duration: {examDetails.duration} mins | 
+          Total Marks: {examDetails.total_marks}
+        </p>
+      </div>
+      <button 
+        onClick={() => setEditingExam(true)}
+        className="text-blue-600 hover:text-blue-800"
+      >
+        Edit
+      </button>
+    </div>
+  </div>
+)}
+
   
-        {examDetails && (
+        {examDetails && !editingExam &&(
           <>
             <div className="mt-6 border-t pt-6">
               <h2 className="text-xl font-semibold mb-4">Add Questions</h2>
@@ -177,14 +221,28 @@ const CreateExam = () => {
             </button>
 
             <button
-                onClick={() => handleDeleteExam()}
+                onClick={() =>{
+                  setShowDeleteModal(true);
+                  console.log(`deleting exam : ${examDetails.id}`)
+                }}
                 className="bg-red-600 text-white px-4 py-2 mt-4 rounded hover:bg-red-700 transition"
               >
                 Delete exam 
             </button>
+         
           </>
+          
         )}
+           {
+            showDeleteModal && (
+              <DeleteExamModal
+                examId={examDetails?.id}
+                setShowDeleteModal={setShowDeleteModal}
+                />
+            )
+          }
       </div>
+      
     );
   };
   
