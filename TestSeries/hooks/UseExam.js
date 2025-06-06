@@ -6,10 +6,25 @@ import { useUser } from '../contexts/currentUserContext';
 // Hook to fetch exams
 export const useExams = () => {
   const { user } = useUser();
+
+  const fetchUpcomingExamsFunction = async () => {
+    try{
+      const response = await fetchUpcomingExams();
+      
+      if (response.status === 200) {
+        return response.data;
+      } else {
+        throw new Error('Failed to fetch exams');
+      }
+    }catch (error) {
+      console.error('Error fetching exams:', error);
+      return []; // Return empty array on error
+    }
+  }
   
   return useQuery({
     queryKey: ['exams', user?._id],
-    queryFn: fetchUpcomingExams, 
+    queryFn: fetchUpcomingExamsFunction, 
     enabled: !!user?._id, // Only run query if user ID exists
     staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
     cacheTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
@@ -89,6 +104,7 @@ export const useExamManagement = () => {
   const deleteMutation = useDeleteExam();
   const groupedExams = useGroupedExams(examsQuery.data);
 
+  
   return {
     // Exam data
     exams: examsQuery.data || [],
