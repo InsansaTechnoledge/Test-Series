@@ -93,6 +93,44 @@ export const organizationLogin = async (req, res) => {
         new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while organization login", err.message || ""]).send(res);
     }
 };
+export const instituteLogin = async (req, res) => {
+    try {
+        const lastLogin = new Date();
+
+        const rememberMe = req.body.rememberMe;
+
+        if (rememberMe) {
+            req.session.cookie.maxAge = 1000 * 60 * 60 * 24 * 7; // 7 days
+        }
+        else {
+            req.session.cookie.maxAge = 1000 * 60 * 60 * 24 * 1;
+        }
+        let role;
+        let institute;
+        if(req.user.role ==='user'){
+         institute = await User.findByIdAndUpdate(
+            req.user._id,
+            { lastLogin: lastLogin },
+            { new: true }
+        );
+        role = "user";
+    }
+    else if(req.user.role === 'organization'){
+        institute = await Organization.findByIdAndUpdate(
+            req.user._id,
+            { lastLogin: lastLogin },
+            { new: true }
+        );
+        role = "organization";
+    }
+
+        return new APIResponse(200, {user:{...institute.toObject(), role:role}}, "User logged in successfully!!").send(res);
+
+    } catch (err) {
+        console.log(err);
+        new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while institute login", err.message || ""]).send(res);
+    }
+}
 
 export const studentLogin = async (req, res) => {
     try {

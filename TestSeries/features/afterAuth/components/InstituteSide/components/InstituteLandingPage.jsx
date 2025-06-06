@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { use } from 'react'
 import bg from '../../../../../assests/Landing/Hero/herobg2.png'
 import { useUser } from '../../../../../contexts/currentUserContext'
 import { MapPin, Mail, Phone, Globe } from 'lucide-react'
@@ -14,7 +14,12 @@ const InstituteLandingPage = () => {
       </div>
     )
   }
+
+  
   return (
+
+    user && user.role==='organization'?
+    (
     <div className="h-[600px] flex flex-col">
       <div className="relative flex items-center justify-center h-full bg-gradient-to-r from-blue-900 to-indigo-900 overflow-hidden">
         <div className="absolute inset-0 z-0">
@@ -85,6 +90,12 @@ const InstituteLandingPage = () => {
         </div>
       </div>
     </div>
+      
+   
+    ):
+    (
+      <div>this is user of organization</div>
+    )
   )
 }
 
