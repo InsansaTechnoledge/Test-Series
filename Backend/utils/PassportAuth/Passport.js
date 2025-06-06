@@ -76,6 +76,44 @@ passport.use('org-local',
     }
 ));
 
+passport.use('institute-local',
+  new LocalStrategy(
+    { usernameField: 'email', passwordField: 'password' },
+    async (email, password, done) => {
+      try {
+        // Try Organization first
+        const org = await Organization.findOne({ email }).select('+password');
+        if (org) {
+          const isMatch = await org.comparePassword(password);
+          if (isMatch) {
+            return done(null, { ...org.toObject(), role: 'organization' });
+          } else {
+            return done(null, false, { message: 'Incorrect password.' });
+          }
+        }
+
+        // If not org, try User
+        const user = await User.findOne({ email }).select('+password');
+        if (user) {
+          const isMatch = await user.comparePassword(password);
+          if (isMatch) {
+            return done(null, { ...user.toObject(), role: 'user' });
+          } else {
+            return done(null, false, { message: 'Incorrect password.' });
+          }
+        }
+
+        // If neither found
+        return done(null, false, { message: 'No user or organization found with this email.' });
+
+      } catch (err) {
+        return done(err);
+      }
+    }
+  )
+);
+
+
 
 passport.serializeUser((user, done) => {
     // done(null,{id:user._id,role:user.roleId} );
