@@ -123,13 +123,14 @@ export const deleteExam = async (id, batch_id) => {
   return data;
 };
 
-export const setExamLive = async (examId, orgId,status) => {
+export const setExamLive = async (examId, orgId, status) => {
   const { data, error } = await supabase
     .from('batch_exam')
     .update({
-      go_live: !status,   // this will also trigger status = 'live' if you added the trigger
-      updated_at: new Date()
+      go_live: status,  
+      updated_at: new Date() 
     })
+    
     .eq('id', examId)
     .eq('organization_id', orgId)
     .select()
@@ -138,6 +139,7 @@ export const setExamLive = async (examId, orgId,status) => {
   if (error) throw error;
   return data;
 };
+
 
 export const fetchNonLiveExams = async (organization_id) => {
   const { data, error } = await supabase

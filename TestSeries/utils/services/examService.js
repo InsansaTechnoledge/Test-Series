@@ -17,7 +17,7 @@ export const goLiveExam = async (examId,status) => {
 
   export const fetchUpcomingExams = async () => {
     const response = await api.get(`/v1/exam`);
-    return response.data;
+    return response.data.data;
   };
   
 
