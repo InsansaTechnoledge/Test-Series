@@ -58,3 +58,19 @@ export const deleteSyllabus = async (syllabusId) => {
 
     return data;
 };
+
+export const getSyllabusById = async (syllabusId) => {
+    const { data, error } = await supabase
+      .from('batch_syllabus')
+      .select('*')
+      .eq('id', syllabusId)
+      .single(); // Get only one record
+  
+    if (error) {
+      console.error("Supabase error:", error);
+      throw error;
+    }
+  
+    return data;
+  };
+  

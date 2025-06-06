@@ -39,6 +39,7 @@ import StudentViewPage from '../../features/afterAuth/components/InstituteSide/V
 import StudentEditPage from '../../features/afterAuth/components/InstituteSide/EditPages/EditStudentPage';
 import UserViewPage from '../../features/afterAuth/components/InstituteSide/ViewPages/UserViewPage';
 import EditUserPage from '../../features/afterAuth/components/InstituteSide/EditPages/EditUserPage';
+import SyllabusViewPage from '../../features/afterAuth/components/InstituteSide/ViewPages/SyllabusViewPage';
 const PageLinks = () => {
   const { user, setUser } = useUser();
   // const navigate = useNavigate();
@@ -93,6 +94,7 @@ const PageLinks = () => {
                 <Route path='add-student' element={<CreateStudent />} />
                 <Route path='create-exam/:examId?' element={<CreateExam />} />
                 <Route path='exam-list' element={<ExamListPage />} />
+                <Route path='syllabus/:syllabusId' element={<SyllabusViewPage/>}/>
                 <Route path='institute-landing' element={<InstituteLandingPage />} />
                   <Route path='batch-details' element={<BatchViewPage />} />
                   <Route path='edit-batch' element={<EditBatchPage />} />

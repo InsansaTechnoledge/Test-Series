@@ -1,6 +1,6 @@
 import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
 import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
-import { createSyllabus ,updateSyllabus,deleteSyllabus} from "../../utils/SqlQueries/syllabus.queries.js";
+import { createSyllabus ,updateSyllabus,deleteSyllabus , getSyllabusById} from "../../utils/SqlQueries/syllabus.queries.js";
 
 export const AddSyllabus = async (req, res) => {
     const syllabusData = req.body;
@@ -30,6 +30,30 @@ export const getSyllabusData = async (req, res) => {
     }
 
 };
+
+export const fetchSyllabusById = async (req, res) => {
+    try {
+      const { id } = req.params; // syllabus ID from route param
+  
+      if (!id) {
+        return new APIError(400, ['Syllabus ID is required']).send(res);
+      }
+  
+      const syllabus = await getSyllabusById(id);
+  
+      if (!syllabus) {
+        return new APIError(404, ['Syllabus not found']).send(res);
+      }
+  
+      return new APIResponse(200, syllabus, 'Syllabus fetched successfully!').send(res);
+    } catch (err) {
+      console.error('❌ Error fetching syllabus:', err);
+      return new APIError(
+        err?.status || 500,
+        ['Something went wrong while fetching the syllabus', err?.message]
+      ).send(res);
+    }
+  };
 
 export const updateSyllabusData = async (req, res) => {
     const syllabusData= req.body;

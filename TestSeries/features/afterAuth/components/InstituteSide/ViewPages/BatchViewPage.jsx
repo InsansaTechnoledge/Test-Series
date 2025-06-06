@@ -25,9 +25,9 @@ const BatchViewPage = () => {
     const { students } = useCachedStudents();
     const [fileteredStudents, setFilteredStudents] = useState([]);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const navigate=useNavigate();
+    const navigate = useNavigate();
 
-    
+    console.log("b" , batch)
 
     useEffect(() => {
         if (students && batchId) {
@@ -155,10 +155,14 @@ const BatchViewPage = () => {
                                         <div>{`Updated by : ${userMap[batch.updated_by]}`}</div>
                                     </>
                                 }
-
-                                <button className="mt-2 inline-flex items-center gap-1 text-blue-600 hover:underline">
+                                {
+                                    batch.syllabus_id != null ?
+                                <button onClick={() => navigate(`/institute/syllabus/${batch.syllabus_id}`)} className="mt-10 inline-flex items-center gap-1 text-blue-600 hover:underline">
                                     View Syllabus →
                                 </button>
+                                :
+                                <p className="mt-10 text-red-600">syllabus not applicable</p>
+                                }
                             </div>
                         </div>
                     </div>
