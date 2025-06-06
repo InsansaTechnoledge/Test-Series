@@ -80,6 +80,7 @@ const PageLinks = () => {
           <Route element={<AfterAuthLayout />}>
             <Route element={<InstituteRoutes />}>
               <Route path='/institute' element={<OrganizationLayout />}>
+              
                 <Route path='batch-list' element={<BatchList />} />
                 <Route path='user-list' element={<UserList />} />
                 <Route path='user-edit/:id' element={<EditUserPage/>}/>

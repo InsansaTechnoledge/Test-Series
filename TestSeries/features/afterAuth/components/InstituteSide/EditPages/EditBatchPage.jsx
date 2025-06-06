@@ -73,25 +73,28 @@ const EditBatchPage = () => {
 
     useEffect(() => {
         if (!initialFormData) return;
-
+      
+        const { inputValue, ...currentFormData } = formData;
+      
         const isFormDataChanged =
-            formData.name !== initialFormData.name ||
-            formData.year !== initialFormData.year ||
-            JSON.stringify(formData.subjects) !== JSON.stringify(initialFormData.subjects);
-
-        const isFacultyChanged =
-            JSON.stringify(selectedFaculty.slice().sort()) !== JSON.stringify(initialFaculty.slice().sort());
+          currentFormData.name !== initialFormData.name ||
+          currentFormData.year.toString() !== initialFormData.year.toString() ||
+          JSON.stringify(currentFormData.subjects) !== JSON.stringify(initialFormData.subjects);
+      
+        const sortedCurrent = [...selectedFaculty].sort();
+        const sortedInitial = [...initialFaculty].sort();
+        const isFacultyChanged = JSON.stringify(sortedCurrent) !== JSON.stringify(sortedInitial);
+      
         if (isFacultyChanged) {
-            const add = selectedFaculty.filter(id => !initialFaculty.includes(id));
-            const remove = initialFaculty.filter(id => !selectedFaculty.includes(id));
-
-
-            setFacultiesToAdd(add);
-            setFacultiesToRemove(remove);
+          const add = selectedFaculty.filter(id => !initialFaculty.includes(id));
+          const remove = initialFaculty.filter(id => !selectedFaculty.includes(id));
+          setFacultiesToAdd(add);
+          setFacultiesToRemove(remove);
         }
-
+      
         setHasChanges(isFormDataChanged || isFacultyChanged);
-    }, [formData, selectedFaculty, initialFormData, initialFaculty]);
+      }, [formData, selectedFaculty, initialFormData, initialFaculty]);
+      
 
 
     const handleChange = (e) => {
