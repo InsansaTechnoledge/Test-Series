@@ -1,4 +1,5 @@
-const { Feature }= await import ("../../models/FirstDB/features.model.js")
+const { Feature } = await import("../../models/FirstDB/features.model.js")
+import { Role } from "../../models/FirstDB/roles.model.js";
 import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js"
 import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js"
 
@@ -17,7 +18,7 @@ export const createFeature = async (req, res) => {
       }
 
       const hydratedDocs = body.map((item) => item.createdAt ? item : { ...item, createdAt: new Date() });
-const data = await Feature.insertMany(hydratedDocs);
+      const data = await Feature.insertMany(hydratedDocs);
 
       return new APIResponse(200, data, 'Features created successfully').send(res);
     }
@@ -38,79 +39,79 @@ const data = await Feature.insertMany(hydratedDocs);
 };
 
 
-export const fetchAllFeatures = async(req,res) => {
-    try{
-        const data = await Feature.find().lean()
+export const fetchAllFeatures = async (req, res) => {
+  try {
+    const data = await Feature.find().lean()
 
-        if(!data || data.length === 0) return new APIError(400, 'feature you are looking for , is either removed or does not exists').send(res);
+    if (!data || data.length === 0) return new APIError(400, 'feature you are looking for , is either removed or does not exists').send(res);
 
-        return new APIResponse(200, data , 'all features fetched successfully').send(res);
-    } catch(e) {
-        new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while fetching all features", err.message || ""]).send(res);
+    return new APIResponse(200, data, 'all features fetched successfully').send(res);
+  } catch (e) {
+    new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while fetching all features", err.message || ""]).send(res);
 
-    }
+  }
 }
 
-export const ToggleActiveOrInactive = async (req,res) => {
-    try{
+export const ToggleActiveOrInactive = async (req, res) => {
+  try {
 
-        const {id} = req.params
+    const { id } = req.params
 
-        const data = await Feature.findById(id)
+    const data = await Feature.findById(id)
 
-        if(!data ) return new APIError(400, 'feature you are looking for , is either removed or does not exists').send(res);
+    if (!data) return new APIError(400, 'feature you are looking for , is either removed or does not exists').send(res);
 
-        data.status = data.status === 'active' ? 'inactive' : 'active'
+    data.status = data.status === 'active' ? 'inactive' : 'active'
 
-        await data.save();
+    await data.save();
 
-        return new APIResponse(200 , data , `Feature has been set to ${data.status}`).send(res);
+    return new APIResponse(200, data, `Feature has been set to ${data.status}`).send(res);
 
-    } catch(e) {
-        new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while activating/in-activating the feature", err.message || ""]).send(res);
-        
-    }
+  } catch (e) {
+    new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while activating/in-activating the feature", err.message || ""]).send(res);
+
+  }
 }
 
-export const updateFeature = async(req,res) => {
-    try{
+export const updateFeature = async (req, res) => {
+  try {
 
-        const {id} = req.params
+    const { id } = req.params
 
-        const data = await Feature.findById(id)
+    const data = await Feature.findById(id)
 
-        if(!data ) return new APIError(400, 'feature you are looking for , is either removed or does not exists').send(res);
+    if (!data) return new APIError(400, 'feature you are looking for , is either removed or does not exists').send(res);
 
-        const update = req.body
+    const update = req.body
 
-        const updated = await Feature.findByIdAndUpdate(id , update , {new: true})
+    const updated = await Feature.findByIdAndUpdate(id, update, { new: true })
 
-        return new APIResponse(200, updated , 'feature updated successfully').send(res)
+    return new APIResponse(200, updated, 'feature updated successfully').send(res)
 
 
-    } catch(e) {
-        new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while updating the feature", err.message || ""]).send(res);
-        
-    }
+  } catch (e) {
+    new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while updating the feature", err.message || ""]).send(res);
+
+  }
 }
 
-export const deleteFeature = async(req , res) => {
-    try{
+export const deleteFeature = async (req, res) => {
+  try {
 
-        const {id} = req.params
+    const { id } = req.params
 
-        const data = await Feature.findById(id)
+    const data = await Feature.findByIdAndDelete(id);
+    await Role.updateMany(
+      { features: id },
+      { $pull: { features: id } }
+    );
 
-        if(!data ) return new APIError(400, 'feature you are looking for , is already deleted').send(res);
+    return new APIResponse(200, null, 'feature deleted successfully').send(res)
 
-        await Feature.findByIdAndDelete(id)
+  } catch (e) {
+    new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while deleting the feature", err.message || ""]).send(res);
 
-        return new APIResponse(200, null, 'feature deleted successfully').send(res)
-
-    } catch (e) {
-        new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while deleting the feature", err.message || ""]).send(res);
-
-    }
+  }
 }
 
 // export const fetchAllInactivateFeatures = async (req,res) => {

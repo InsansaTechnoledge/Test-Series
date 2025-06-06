@@ -6,14 +6,15 @@ import LiveExamCard from './LiveExamCard';
 import { fetchUpcomingExams } from '../../../../../utils/services/examService';
 import { useUser } from '../../../../../contexts/currentUserContext'
 import { useNavigate } from 'react-router-dom'
-import useExams from './useExams';
+import { useExamManagement } from '../../../../../hooks/UseExam';
+
 
 const UpcomingExam = () => {
   const [liveExams, setLiveExams] = useState([]);
   const [upcomingExams, setUpcomingExams] = useState([]);
   const user = useUser();
   const navigate = useNavigate();
-  const {exams}=useExams();
+  const {exams}=useExamManagement();
 
   const question = "How To assign role groups to users ?";
   const answer = "Use the created role groups to assign permissions to users in your add user section.";
