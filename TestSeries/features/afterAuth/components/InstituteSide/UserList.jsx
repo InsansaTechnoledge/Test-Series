@@ -15,7 +15,7 @@ const UserList = () => {
     const { user } = useUser();
     const { users, isLoading, isError } = useCachedUser();
     const { batches, batchMap } = useCachedBatches();
-    const { roleMap } = useCachedRoleGroup();
+    const { roleMap ,hasActiveFeatureInRole} = useCachedRoleGroup();
     const [filteredUsers, setFilteredUsers] = useState(users);
     const [selectedBatch, setSelectedBatch] = useState('');
     const queryClient = useQueryClient();
@@ -31,6 +31,8 @@ const UserList = () => {
     useEffect(() => {
         if (users) {
             setFilteredUsers(users);
+//example usage:            
+// console.log("hasFeature", hasActiveFeatureInRole({featureId:'683061baeeb53072d9ad40ec',roleId:'683ed20bd5b60d8f8a437f2a'}));
         }
     }, [users])
 
