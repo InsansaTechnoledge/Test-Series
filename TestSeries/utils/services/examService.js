@@ -31,3 +31,8 @@ export const fetchExamsWithoutQuestions = async (orgId) => {
   const response = await api.get(`/v1/exam/pending-no-questions?orgId=${orgId}`);
   return response.data;
 };
+
+export const updateExam=async(examId, examData) => {
+  const response = await api.patch(`/v1/exam/${examId}`, examData);
+  return response.data;
+};

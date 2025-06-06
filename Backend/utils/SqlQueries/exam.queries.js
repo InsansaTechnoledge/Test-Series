@@ -16,7 +16,7 @@ export const createExam = async (examData) => {
 export const updateExam = async (examData, examId) => {
   const { data, error } = await supabase
     .from("batch_exam")
-    .update(examData)
+    .update([examData])
     .eq('id', examId)
     .select()
     .single();
