@@ -44,7 +44,7 @@ export const updateExamById = async (req, res) => {
       ...examData,
       total_marks: Number(examData.total_marks),
       duration: Number(examData.duration),
-      updated_at: Date.now(),
+      updated_at: new Date(),
       updated_by: req.user._id
     }
     console.log("Exam data with update metadata:", examDataWithUpdateMetaData);

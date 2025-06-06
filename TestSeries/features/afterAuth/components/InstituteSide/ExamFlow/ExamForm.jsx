@@ -25,6 +25,7 @@ const ExamForm = ({ onSubmit ,initialData={ name: '',
 
     useEffect(() => {
     setForm(initialData);
+    console.log("Initial data set in form:", initialData);
   }, [initialData]);
 
   const handleChange = (e) => {
