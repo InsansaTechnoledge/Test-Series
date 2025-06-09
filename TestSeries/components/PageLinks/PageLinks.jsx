@@ -40,11 +40,8 @@ import StudentEditPage from '../../features/afterAuth/components/InstituteSide/E
 import UserViewPage from '../../features/afterAuth/components/InstituteSide/ViewPages/UserViewPage';
 import EditUserPage from '../../features/afterAuth/components/InstituteSide/EditPages/EditUserPage';
 import SyllabusViewPage from '../../features/afterAuth/components/InstituteSide/ViewPages/SyllabusViewPage';
-<<<<<<< HEAD
 import MonacoCodeEditor from '../../features/Test/CodeEditor/CodeEditor';
-=======
 import YoutubeConnection from '../../features/Video/Pages/YoutubeConnection';
->>>>>>> 469dc481ff90d48a6cbb25e6276e7a55b6308051
 const PageLinks = () => {
   const { user, setUser } = useUser();
   // const navigate = useNavigate();
