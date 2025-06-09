@@ -3,6 +3,25 @@ import { connOne } from "../../database/MongoDB.js";
 import bcrypt from 'bcrypt';
 import validator from 'validator';
 
+const youtubeInfoSchema=new Schema({
+user:{
+    googleId: { type: String, required: true },
+    name: { type: String, required: true },
+    profilePhoto: { type: String, required: true },
+    email: { type: String, required: true, unique: true}
+
+},
+  tokens:{
+
+      accessToken: { type: String, required: true },
+      refreshToken: { type: String, required: true },
+      expiry: { type: Date, required: true },
+    
+  }
+
+},
+{_id: false});
+
 const userSchema = new Schema({
 
   name: {
@@ -99,6 +118,9 @@ const userSchema = new Schema({
       required: true,
       enum: ['User', 'Organization'],
     }
+  },
+  youtubeInfo:{
+    type:youtubeInfoSchema
   }
 
 

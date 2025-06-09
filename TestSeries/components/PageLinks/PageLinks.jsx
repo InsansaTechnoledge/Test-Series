@@ -40,7 +40,11 @@ import StudentEditPage from '../../features/afterAuth/components/InstituteSide/E
 import UserViewPage from '../../features/afterAuth/components/InstituteSide/ViewPages/UserViewPage';
 import EditUserPage from '../../features/afterAuth/components/InstituteSide/EditPages/EditUserPage';
 import SyllabusViewPage from '../../features/afterAuth/components/InstituteSide/ViewPages/SyllabusViewPage';
+<<<<<<< HEAD
 import MonacoCodeEditor from '../../features/Test/CodeEditor/CodeEditor';
+=======
+import YoutubeConnection from '../../features/Video/Pages/YoutubeConnection';
+>>>>>>> 469dc481ff90d48a6cbb25e6276e7a55b6308051
 const PageLinks = () => {
   const { user, setUser } = useUser();
   // const navigate = useNavigate();
@@ -68,8 +72,8 @@ const PageLinks = () => {
   return (
     <Router>
       <Routes>
-        
-      {/* </Routes>
+
+        {/* </Routes>
       <Routes> */}
         <Route element={<AuthLayout />}>
           <Route path='/institute-registration' element={<InstituteRegistrationPage />} />
@@ -84,33 +88,35 @@ const PageLinks = () => {
               
                 <Route path='batch-list' element={<BatchList />} />
                 <Route path='user-list' element={<UserList />} />
-                <Route path='user-edit/:id' element={<EditUserPage/>}/>
-                <Route path='user-detail' element={<UserViewPage/>}/>
+                <Route path='user-edit/:id' element={<EditUserPage />} />
+                <Route path='user-detail' element={<UserViewPage />} />
                 <Route path='create-user' element={<CreateUser />} />
                 <Route path='create-batch' element={<CreateBatch />} />
                 <Route path='add-student' element={<CreateStudent />} />
-                <Route path='student-list' element={<StudentListPage />}/>
-                <Route path='student-detail' element={<StudentViewPage/>}/>
-                <Route path='student-edit' element={<StudentEditPage/>}/>
+                <Route path='student-list' element={<StudentListPage />} />
+                <Route path='student-detail' element={<StudentViewPage />} />
+                <Route path='student-edit' element={<StudentEditPage />} />
                 <Route path='create-role-group' element={<FeatureBasedRoleGroups />} />
                 <Route path='add-student' element={<CreateStudent />} />
                 <Route path='create-exam/:examId?' element={<CreateExam />} />
                 <Route path='exam-list' element={<ExamListPage />} />
-                <Route path='syllabus/:syllabusId' element={<SyllabusViewPage/>}/>
+                <Route path='syllabus/:syllabusId' element={<SyllabusViewPage />} />
                 <Route path='institute-landing' element={<InstituteLandingPage />} />
-                  <Route path='batch-details' element={<BatchViewPage />} />
-                  <Route path='edit-batch' element={<EditBatchPage />} />
+                <Route path='batch-details' element={<BatchViewPage />} />
+                <Route path='edit-batch' element={<EditBatchPage />} />
+                <Route path='test' element={<TestWindow />} />
+
                 <Route path='*' element={<div>Invalid path</div>} />
               </Route>
             </Route>
 
             <Route element={<StudentRoutes />}>
               <Route path='/student' element={<StudentLayout />}>
-              <Route path='student-landing' element={<StudentLanding />} />
+                <Route path='student-landing' element={<StudentLanding />} />
 
                 <Route path='upcoming-exams' element={<UpcomingExam />} />
                 <Route path='completed-exams' element={<ResultsPage />} />
-              <Route path='result/:examId' element={<ResultDetailPage />} />
+                <Route path='result/:examId' element={<ResultDetailPage />} />
               </Route>
             </Route>
           </Route>
@@ -120,9 +126,10 @@ const PageLinks = () => {
           <Route path="/" element={<LandingRoutes />} />
         </Route>
 
-        <Route path='test' element={<TestWindow />} />
+                <Route path='video' element={<YoutubeConnection />} />
+                <Route path='video/upload' element={<UploadVideo />} />
         <Route path='session-expired' element={<SessionExpireError />} />
-        <Route path='video' element={<UploadVideo />}/>
+        {/* <Route path='video' element={<UploadVideo />}/> */}
         <Route path='code' element={<MonacoCodeEditor/>}/>
 
       </Routes>
