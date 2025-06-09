@@ -92,10 +92,10 @@ const saveUserData = async (userData, userId, role) => {
 export const uploadVideo = async (req, res) => {
   try {
     const filePath = req.file.path;
-    const { title, description } = req.body;
+    const { title, description , batchId} = req.body;
 
     
-    const batchId = "d894fdf4-94f6-4f51-b070-46bbba57a86d";
+    // const batchId = "d894fdf4-94f6-4f51-b070-46bbba57a86d";
 
     const videoId = await uploadToYouTube(filePath, title, description, req.user);
     if (!videoId) {
