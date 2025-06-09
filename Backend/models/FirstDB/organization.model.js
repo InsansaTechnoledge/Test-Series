@@ -68,7 +68,27 @@ const subscriptionSchema = new Schema({
 },
 {
     _id: false
-})
+});
+
+
+const youtubeInfoSchema=new Schema({
+user:{
+    googleId: { type: String, required: true },
+    name: { type: String, required: true },
+    profilePhoto: { type: String, required: true },
+    email: { type: String, required: true, unique: true}
+
+},
+  tokens:{
+
+      accessToken: { type: String, required: true },
+      refreshToken: { type: String, required: true },
+      expiry: { type: Date, required: true },
+    
+  }
+
+},
+{_id: false});
 
 const OrganizationSchema = new Schema({
     name: {
@@ -139,6 +159,7 @@ const OrganizationSchema = new Schema({
         default: true
       },
       subscription: subscriptionSchema,
+      youtubeInfo: youtubeInfoSchema,
 }, 
 {
     timestamps: true
