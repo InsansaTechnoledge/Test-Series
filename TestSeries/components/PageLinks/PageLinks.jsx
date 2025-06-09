@@ -40,6 +40,7 @@ import StudentEditPage from '../../features/afterAuth/components/InstituteSide/E
 import UserViewPage from '../../features/afterAuth/components/InstituteSide/ViewPages/UserViewPage';
 import EditUserPage from '../../features/afterAuth/components/InstituteSide/EditPages/EditUserPage';
 import SyllabusViewPage from '../../features/afterAuth/components/InstituteSide/ViewPages/SyllabusViewPage';
+import MonacoCodeEditor from '../../features/Test/CodeEditor/CodeEditor';
 const PageLinks = () => {
   const { user, setUser } = useUser();
   // const navigate = useNavigate();
@@ -122,6 +123,7 @@ const PageLinks = () => {
         <Route path='test' element={<TestWindow />} />
         <Route path='session-expired' element={<SessionExpireError />} />
         <Route path='video' element={<UploadVideo />}/>
+        <Route path='code' element={<MonacoCodeEditor/>}/>
 
       </Routes>
     </Router>
