@@ -4,6 +4,7 @@ import { uploadVideo } from '../../../utils/services/videoService';
 const UploadVideo = () => {
     const [video, setVideo] = useState();
     const [formData, setFormData] = useState({});
+    
     const onChangeHandler = (name, value) => {
         setFormData(prev => ({
             ...prev,
@@ -21,48 +22,96 @@ const UploadVideo = () => {
     }
 
     return (
-        <>
-
-            <div className='text-xl font-bold'>uploadVideo</div>
-            <div className='flex flex-col gap-4'>
-
-                <div className='flex gap-2'>
-                    <div>
-                        Title:
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white p-6">
+            <div className="max-w-4xl mx-auto">
+                <div className="bg-white rounded-2xl shadow-xl border border-blue-100 overflow-hidden">
+                    {/* Header */}
+                    <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-6">
+                        <h1 className="text-3xl font-bold text-white mb-2">Upload Video</h1>
+                        <p className="text-blue-100">Share your content with the world</p>
                     </div>
-                    <input
-                        name='title'
-                        onChange={(e) => onChangeHandler(e.target.name, e.target.value)}
-                        className='border'
-                        value={formData?.title || ''}
-                        type='text'
-                    />
-                </div>
-                <div className='flex gap-2'>
-                    <div>
-                        Description:
+                    
+                    {/* Content */}
+                    <div className="px-8 py-8">
+                        <div className="space-y-8">
+                            
+                            {/* Title Input */}
+                            <div className="space-y-2">
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                    Video Title
+                                </label>
+                                <input
+                                    name='title'
+                                    onChange={(e) => onChangeHandler(e.target.name, e.target.value)}
+                                    className='w-full px-4 py-3 border-2 border-blue-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-300 focus:border-blue-500 transition-all duration-300 bg-blue-50/30'
+                                    value={formData?.title || ''}
+                                    type='text'
+                                    placeholder="Enter a compelling title for your video"
+                                />
+                            </div>
+                            
+                            {/* Description Input */}
+                            <div className="space-y-2">
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                    Video Description
+                                </label>
+                                <textarea
+                                    name='description'
+                                    onChange={(e) => onChangeHandler(e.target.name, e.target.value)}
+                                    className='w-full px-4 py-3 border-2 border-blue-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-300 focus:border-blue-500 transition-all duration-300 bg-blue-50/30 resize-y min-h-[120px]'
+                                    value={formData?.description || ''}
+                                    placeholder="Describe your video content, include relevant keywords and tags"
+                                />
+                            </div>
+                            
+                            {/* File Upload */}
+                            <div className="space-y-2">
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                    Upload Video File
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        name='video'
+                                        onChange={(e) => onChangeHandler(e.target.name, e.target.files[0])}
+                                        className='w-full px-4 py-3 border-2 border-blue-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-300 focus:border-blue-500 transition-all duration-300 bg-blue-50/30 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 file:cursor-pointer'
+                                        type='file' 
+                                        accept='.mp4, .mov'
+                                    />
+                                    <p className="text-xs text-gray-500 mt-2">
+                                        Supported formats: MP4, MOV • Max file size: 2GB
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            {/* Upload Guidelines */}
+                            <div className="bg-gradient-to-r from-blue-50 to-white p-6 rounded-xl border border-blue-200">
+                                <h3 className="font-semibold text-blue-700 mb-3">Upload Guidelines</h3>
+                                <ul className="text-sm text-gray-600 space-y-1">
+                                    <li>• Ensure your video content follows community guidelines</li>
+                                    <li>• Use clear, descriptive titles and descriptions</li>
+                                    <li>• Choose appropriate tags for better discoverability</li>
+                                    <li>• Upload high-quality content for the best viewer experience</li>
+                                </ul>
+                            </div>
+                            
+                            {/* Submit Button */}
+                            <div className="text-center pt-4">
+                                <button
+                                    className='bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-300'
+                                    onClick={handleSubmit}
+                                >
+                                    <svg className="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                    </svg>
+                                    Upload Video
+                                </button>
+                                <p className="text-sm text-gray-500 mt-3">Your video will be processed and made available shortly</p>
+                            </div>
+                        </div>
                     </div>
-                    <textarea
-                        name='description'
-                        onChange={(e) => onChangeHandler(e.target.name, e.target.value)}
-                        className='border'
-                        value={formData?.description || ''}
-                    />
-                </div>
-                <div className='flex gap-2'>
-                    <div>Upload video</div>
-                    <input
-                        name='video'
-                        onChange={(e) => onChangeHandler(e.target.name, e.target.files[0])}
-                        className='border'
-                        type='file' accept='.mp4, .mov' />
                 </div>
             </div>
-            <button
-            className='bg-blue-500 px-4 py-2 text-white'
-            onClick={handleSubmit}
-            >Submit</button>
-        </>
+        </div>
     )
 }
 

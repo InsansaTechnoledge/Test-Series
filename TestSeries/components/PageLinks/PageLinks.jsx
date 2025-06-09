@@ -102,6 +102,8 @@ const PageLinks = () => {
                 <Route path='batch-details' element={<BatchViewPage />} />
                 <Route path='edit-batch' element={<EditBatchPage />} />
                 <Route path='test' element={<TestWindow />} />
+                <Route path='video' element={<YoutubeConnection />} />
+                <Route path='video/upload' element={<UploadVideo />} />
 
                 <Route path='*' element={<div>Invalid path</div>} />
               </Route>
@@ -123,8 +125,8 @@ const PageLinks = () => {
           <Route path="/" element={<LandingRoutes />} />
         </Route>
 
-                <Route path='video' element={<YoutubeConnection />} />
-                <Route path='video/upload' element={<UploadVideo />} />
+
+                
         <Route path='session-expired' element={<SessionExpireError />} />
         {/* <Route path='video' element={<UploadVideo />}/> */}
         <Route path='code' element={<MonacoCodeEditor/>}/>
