@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
 import { uploadVideo } from '../../../utils/services/videoService';
+import { useCachedBatches } from '../../../hooks/useCachedBatches';
 
 const UploadVideo = () => {
     const [video, setVideo] = useState();
     const [formData, setFormData] = useState({});
-    
+    const { batches } = useCachedBatches();
+
     const onChangeHandler = (name, value) => {
         setFormData(prev => ({
             ...prev,
@@ -15,7 +17,7 @@ const UploadVideo = () => {
     const handleSubmit = async () => {
         console.log(formData);
         const response = await uploadVideo(formData);
-        if(response.status==200){
+        if (response.status == 200) {
             console.log(response.data);
             alert("Video uploaded successfully");
         }
@@ -30,11 +32,31 @@ const UploadVideo = () => {
                         <h1 className="text-3xl font-bold text-white mb-2">Upload Video</h1>
                         <p className="text-blue-100">Share your content with the world</p>
                     </div>
-                    
+
                     {/* Content */}
                     <div className="px-8 py-8">
                         <div className="space-y-8">
-                            
+
+                            <div className="space-y-2">
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                    Select Batch
+                                </label>
+                                <select
+                                    name="batchId"
+                                    onChange={(e) => onChangeHandler(e.target.name, e.target.value)}
+                                    value={formData?.batchId || ''}
+                                    className="w-full px-4 py-3 border-2 border-blue-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-300 focus:border-blue-500 transition-all duration-300 bg-blue-50/30"
+                                >
+                                    <option value="" disabled>Select a batch</option>
+                                    {
+                                        batches.map((batch, idx) => (
+                                            <option key={idx} value={batch.id}>{batch.name}</option>
+                                        ))
+                                    }
+                                </select>
+                            </div>
+
+
                             {/* Title Input */}
                             <div className="space-y-2">
                                 <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -49,7 +71,7 @@ const UploadVideo = () => {
                                     placeholder="Enter a compelling title for your video"
                                 />
                             </div>
-                            
+
                             {/* Description Input */}
                             <div className="space-y-2">
                                 <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -63,7 +85,7 @@ const UploadVideo = () => {
                                     placeholder="Describe your video content, include relevant keywords and tags"
                                 />
                             </div>
-                            
+
                             {/* File Upload */}
                             <div className="space-y-2">
                                 <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -74,7 +96,7 @@ const UploadVideo = () => {
                                         name='video'
                                         onChange={(e) => onChangeHandler(e.target.name, e.target.files[0])}
                                         className='w-full px-4 py-3 border-2 border-blue-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-300 focus:border-blue-500 transition-all duration-300 bg-blue-50/30 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 file:cursor-pointer'
-                                        type='file' 
+                                        type='file'
                                         accept='.mp4, .mov'
                                     />
                                     <p className="text-xs text-gray-500 mt-2">
@@ -82,7 +104,7 @@ const UploadVideo = () => {
                                     </p>
                                 </div>
                             </div>
-                            
+
                             {/* Upload Guidelines */}
                             <div className="bg-gradient-to-r from-blue-50 to-white p-6 rounded-xl border border-blue-200">
                                 <h3 className="font-semibold text-blue-700 mb-3">Upload Guidelines</h3>
@@ -93,7 +115,7 @@ const UploadVideo = () => {
                                     <li>• Upload high-quality content for the best viewer experience</li>
                                 </ul>
                             </div>
-                            
+
                             {/* Submit Button */}
                             <div className="text-center pt-4">
                                 <button

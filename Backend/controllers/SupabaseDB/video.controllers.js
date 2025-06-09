@@ -96,7 +96,7 @@ export const uploadVideo = async (req, res) => {
 
     
     // const batchId = "d894fdf4-94f6-4f51-b070-46bbba57a86d";
-
+console.log("Batch ID:", batchId);
     const videoId = await uploadToYouTube(filePath, title, description, req.user);
     if (!videoId) {
       return new APIResponse(200, { message: "Video URL not found" }).send(res);
