@@ -1,7 +1,9 @@
+import { google } from "googleapis";
 import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js"
 import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
 import { addVideoIdToBatch } from "../../utils/SqlQueries/batch.queries.js";
 import { getOauthClient, uploadToYouTube } from "../../utils/Youtube/uploadVideoUtil.js";
+import User from "../../models/FirstDB/user.model.js";
 
 export const register = async (req, res) => {
   const SCOPES = [
