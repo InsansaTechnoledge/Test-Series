@@ -16,6 +16,7 @@ const UploadVideo = () => {
         const response = await uploadVideo(formData);
         if(response.status==200){
             console.log(response.data);
+            alert("Video uploaded successfully");
         }
     }
 
