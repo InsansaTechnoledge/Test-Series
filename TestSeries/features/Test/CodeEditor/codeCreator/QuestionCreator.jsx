@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Plus, Trash2, Save, Code } from 'lucide-react';
+import { saveContestQuestion } from '../../../../utils/services/contestQuestionService';
 
 export default function QuestionCreator() {
   const [formData, setFormData] = useState({
@@ -18,7 +19,7 @@ export default function QuestionCreator() {
       { input: '', output: '', explanation: '' }
     ],
     constraints: [''],
-    starterCode: {
+    starter_code: {
       javascript: '',
       python: '',
       java: '',
@@ -106,7 +107,7 @@ export default function QuestionCreator() {
   const handleStarterCodeChange = (language, value) => {
     setFormData(prev => ({
       ...prev,
-      starterCode: { ...prev.starterCode, [language]: value }
+      starter_code: { ...prev.starter_code, [language]: value }
     }));
   };
 
@@ -114,7 +115,7 @@ export default function QuestionCreator() {
     return Math.floor(Math.random() * 10000) + 1;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     const questionData = {
@@ -124,8 +125,18 @@ export default function QuestionCreator() {
     
     console.log('New Question Data:', JSON.stringify(questionData, null, 2));
     
+    //have to add the contest id in the question data 
+
+    // questionData.contest_id="68340eefea861ad36bb68e7d";
     
-    alert('Question created successfully! Check console for the data.');
+    try{
+      const response=await saveContestQuestion(questionData);
+      console.log(response.data);
+    }catch(error){
+      console.log("something went wrong while creating the contest questions!!",error);
+      alert("Something went wrong!!!, try again later");
+    }
+
   };
 
   return (
@@ -429,7 +440,7 @@ export default function QuestionCreator() {
             <label className="block text-sm font-semibold text-blue-800 mb-4">Starter Code</label>
             
             <div className="space-y-4">
-              {Object.entries(formData.starterCode).map(([language, code]) => (
+              {Object.entries(formData.starter_code).map(([language, code]) => (
                 <div key={language}>
                   <label className="block text-xs font-medium text-blue-700 mb-2 capitalize">
                     {language === 'cpp' ? 'C++' : language.charAt(0).toUpperCase() + language.slice(1)}
