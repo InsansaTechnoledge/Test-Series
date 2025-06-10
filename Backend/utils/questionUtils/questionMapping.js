@@ -67,7 +67,12 @@ export const mapQuestionData = (row, type, baseId) => {
           output_format: row.output_format || '',
           sample_input: row.sample_input || '',
           sample_output: row.sample_output || '',
-          test_cases: safeParse(row.test_cases, [])
+          test_cases: safeParse(row.test_cases, []),
+          title: row.title || '',
+          description: row.description || '',
+          examples: safeParse(row.examples, []),
+          constraints: safeParse(row.constraints, []),
+          starter_code: row.starter_code || '',
         };
 
       case 'comprehension':
