@@ -1,7 +1,5 @@
 import { google } from 'googleapis';
 import fs from 'fs';
-import { APIResponse } from '../ResponseAndError/ApiResponse.utils.js';
-import User from '../../models/FirstDB/user.model.js';
 
 // Initialize OAuth2 client
 
