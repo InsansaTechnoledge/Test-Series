@@ -50,5 +50,10 @@ export const controls = [
         name: "Upload videos",
         path : "video",
         icon: User
+    },
+    {
+        name: "create Contest",
+        path: "create-contest",
+        icon: User
     }
 ]

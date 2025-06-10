@@ -42,6 +42,7 @@ import SyllabusViewPage from '../../features/afterAuth/components/InstituteSide/
 import YoutubeConnection from '../../features/Video/Pages/YoutubeConnection';
 import CodingPlatform from '../../features/Test/CodeEditor/CodingPlatform';
 import QuestionCreator from '../../features/Test/CodeEditor/codeCreator/QuestionCreator';
+import CreateContest from '../../features/afterAuth/components/InstituteSide/CreateContest';
 
 const PageLinks = () => {
   const { user, setUser } = useUser();
@@ -97,8 +98,8 @@ const PageLinks = () => {
                 <Route path='institute-landing' element={<InstituteLandingPage />} />
                 <Route path='batch-details' element={<BatchViewPage />} />
                 <Route path='edit-batch' element={<EditBatchPage />} />
-                <Route path='test' element={<TestWindow />} />
                 <Route path='video' element={<YoutubeConnection />} />
+                <Route path='create-contest/:contestId?' element={<CreateContest/>}/>
                 <Route path='*' element={<div>Invalid path</div>} />
               </Route>
             </Route>
@@ -110,6 +111,8 @@ const PageLinks = () => {
                 <Route path='upcoming-exams' element={<UpcomingExam />} />
                 <Route path='completed-exams' element={ <ResultsPage />} />
                 <Route path='result/:examId' element={<ResultDetailPage />} />
+                <Route path='test' element={<TestWindow />} />
+
               </Route>
             </Route>
           </Route>
