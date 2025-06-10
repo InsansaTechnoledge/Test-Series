@@ -6,6 +6,7 @@ const useStudentExamResults = (studentId) => {
         try{
             const response=await getStudentResults();
             if(response.status===200){
+                console.log(response.data)
                 return response.data;
             }
         }catch(err){

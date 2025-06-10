@@ -17,6 +17,7 @@ const ResultsPage = () => {
     const [selectedResult, setSelectedResult] = useState(null);
     const navigate = useNavigate();
 
+    console.log(results)
     const question = ""
     const answer = ""
 
@@ -75,7 +76,7 @@ const ResultsPage = () => {
                                     <tbody key={idx}>
                                         <tr className=" bg-white border-b border-gray-200 hover:bg-gray-50 text-blue-600 text-lg">
                                             <th scope="row" className="px-6 py-4 font-medium text-blue-600 whitespace-nowrap ">
-                                                {result.examName}
+                                                {result.examName || "no data"}
                                             </th>
                                             <td className="px-4 text-sm py-2 justify-center">
                                                 <div className={`px-4 mx-auto py-2 rounded-full ${result.status==="Attempted" ? 'bg-green-100 text-green-800' : result.status==="Unattempted" ? "bg-yellow-100 text-yellow-800" : "bg-red-100 text-red-800"} w-fit`}>

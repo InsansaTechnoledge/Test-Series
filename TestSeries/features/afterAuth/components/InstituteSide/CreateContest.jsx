@@ -11,16 +11,16 @@ const CreateContest = () => {
   const [name, setName] = useState('');
   const [selectedBatches, setSelectedBatches] = useState([]);
   const [description, setDescription] = useState('');
-  const [duration , setDuration] = useState('')
+  const [duration, setDuration] = useState('');
+  const [schedule, setSchedule] = useState(''); // for scheduled type
+  const [validity, setValidity] = useState({
+    start: '',
+    end: '',
+  }); // for participation_based
 
   const { batches } = useCachedBatches();
   const user = useUser();
-
-//   console.log("sd",user)
-
-  const organizationId = user.user?._id || user.user.organizationId
-
-    // console.log('rsf', organizationId)
+  const organizationId = user.user?._id || user.user.organizationId;
 
   const batchOptions = batches.map(b => ({
     value: b.id,
@@ -29,12 +29,14 @@ const CreateContest = () => {
 
   const handleSubmit = () => {
     console.log('Form submitted:', {
-      type:ContestType,
+      type: ContestType,
       name,
       selectedBatches,
       description,
       duration,
-      organizationId
+      organizationId,
+      schedule,
+      validity,
     });
     // TODO: handle form submission
   };
@@ -175,6 +177,8 @@ const CreateContest = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
                     <input
                       type="date"
+                      value={validity.start}
+                      onChange={(e) => setValidity({ ...validity, start: e.target.value })}
                       className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                     />
                   </div>
@@ -182,6 +186,8 @@ const CreateContest = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-2">End Date</label>
                     <input
                       type="date"
+                      value={validity.end}
+                      onChange={(e) => setValidity({ ...validity, end: e.target.value })}
                       className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                     />
                   </div>
@@ -191,6 +197,8 @@ const CreateContest = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Event Date & Time</label>
                   <input
                     type="datetime-local"
+                    value={schedule}
+                    onChange={(e) => setSchedule(e.target.value)}
                     className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                   />
                 </div>
@@ -199,21 +207,21 @@ const CreateContest = () => {
 
             {/* Duration Field */}
             <div className="space-y-4">
-            <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
-                <Clock className="w-5 h-5 text-yellow-600" />
+                  <Clock className="w-5 h-5 text-yellow-600" />
                 </div>
                 <label className="text-lg font-semibold text-gray-800">Duration of Event (in minutes)</label>
-            </div>
-            <p className="text-sm text-red-500 ml-13">Events auto submits and end after below specified time</p>
-            <input
+              </div>
+              <p className="text-sm text-red-500 ml-13">Events auto submit and end after below specified time</p>
+              <input
                 type="number"
                 min="1"
                 placeholder="Enter duration in minutes"
                 value={duration}
                 onChange={(e) => setDuration(e.target.value)}
                 className=" ml-13 w-1/2 border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-            />
+              />
             </div>
 
             {/* Submit Button */}
