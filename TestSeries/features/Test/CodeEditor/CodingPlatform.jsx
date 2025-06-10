@@ -10,6 +10,7 @@ import CodeEditor from './components/CodeEditor';
 import HorizontalDragHandle from './components/HorizontalDragHandle';
 import OutputPanel from './components/OutPutPanel';
 import { Play, ChevronLeft, ChevronRight } from 'lucide-react';
+import HeaderComponent from './components/HeaderComponent';
 
 const CodingPlatform = () => {
   const [currentProblem, setCurrentProblem] = useState(0);
@@ -149,61 +150,19 @@ const CodingPlatform = () => {
    
     <div className="h-screen flex flex-col bg-white">
       {/* Header */}
-      <div className="border-b bg-white p-4 flex justify-between items-center flex-shrink-0">
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={() => setCurrentProblem(Math.max(0, currentProblem - 1))}
-            disabled={currentProblem === 0}
-            className="p-2 disabled:opacity-50"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-
-          <span className="font-medium">
-            Problem {currentProblem + 1} of {problems.length}
-          </span>
-
-          <button
-            onClick={() => setCurrentProblem(Math.min(problems.length - 1, currentProblem + 1))}
-            disabled={currentProblem === problems.length - 1}
-            className="p-2 disabled:opacity-50"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
-        </div>
-
-        <div className="flex items-center space-x-4">
-          <select
-            value={language}
-            onChange={(e) => setLanguage(e.target.value)}
-            className="border rounded px-3 py-2"
-          >
-            {languages.map((lang) => (
-              <option key={lang.value} value={lang.value}>
-                {lang.label}
-              </option>
-            ))}
-          </select>
-
-          <button
-            onClick={runCode}
-            disabled={isRunning}
-            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50 flex items-center space-x-2"
-          >
-            <Play className="w-4 h-4" />
-            <span>Run</span>
-          </button>
-
-          <button
-            onClick={runTests}
-            disabled={isRunning}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-          >
-            Test
-          </button>
-        </div>
-      </div>
-
+      
+        <HeaderComponent
+            problems={problems}
+            language={language}
+            setCurrentProblem={setCurrentProblem}
+            setLanguage={setLanguage}
+            currentProblem={currentProblem}
+            languages={languages}
+            runCode={runCode}
+            isRunning={isRunning}
+            runTests={runTests}
+        />
+        
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left Panel */}

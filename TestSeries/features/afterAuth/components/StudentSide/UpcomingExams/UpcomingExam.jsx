@@ -50,7 +50,7 @@ useEffect(()=>{
     // Replace with real userId or eventId if available
     const UserId = user?._id;
 
-    navigate(`/test?examId=${examId}`);
+    navigate(`/student/test?examId=${examId}`);
   };
 
   return (
