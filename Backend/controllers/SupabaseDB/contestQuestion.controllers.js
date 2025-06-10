@@ -1,4 +1,5 @@
 import { APIError } from "../../utils/ResponseAndError/ApiError.utils";
+import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils";
 
 export const addContestQuestion = async (req, res) => {
     try{
@@ -10,7 +11,10 @@ export const addContestQuestion = async (req, res) => {
         questionData.organization_id = req.user?.role=== 'organization' ? req.user._id : req.user.organizationId;
         questionData.created_at=new Date();
 
-        
+        const contestQuestion = await saveContestQuestion(questionData, contestId);
+        return new APIResponse(200, contestQuestion, "Contest question added successfully!").send(res);
+
+
 
     }catch(error){
         console.log("❌ Error adding contest question:", error);
