@@ -57,8 +57,10 @@ export const fetchStudentResults = async (req, res) => {
       (examData || []).forEach(exam => {
         examMap[exam.id] = exam.name;
       });
+      console.log("Exam Map:", examMap);
 
       const completeResults = studentResults.map(result => {
+        console.log("Result:", result);
         const examName = examMap[result.examId.toString()] || "Unknown Exam";
         return {
           ...result._doc,

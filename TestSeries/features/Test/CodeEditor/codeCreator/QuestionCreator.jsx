@@ -124,7 +124,7 @@ export default function QuestionCreator() {
     
     console.log('New Question Data:', JSON.stringify(questionData, null, 2));
     
-    // Show success message
+    
     alert('Question created successfully! Check console for the data.');
   };
 
@@ -275,7 +275,7 @@ export default function QuestionCreator() {
                   )}
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div>
                     <label className="block text-xs font-medium text-blue-700 mb-1">Input</label>
                     <textarea
@@ -304,6 +304,18 @@ export default function QuestionCreator() {
                       rows={2}
                       className="w-full px-3 py-2 border border-blue-200 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                       placeholder="Explanation..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-blue-700 mb-1">Passed percentage</label>
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={testCase.passed_percentage || ''}
+                      onChange={(e) => handleTestCaseChange(index, 'passed_percentage', e.target.value)}
+                      className="w-full px-3 py-2 border border-blue-200 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                      placeholder="Passed percentage (0-100) of this test case"
                     />
                   </div>
                 </div>

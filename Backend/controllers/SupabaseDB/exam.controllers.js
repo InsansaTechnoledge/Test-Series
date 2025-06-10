@@ -60,10 +60,17 @@ export const updateExamById = async (req, res) => {
 
 export const fetchExamBasedOnCondition = async (req, res) => {
   try {
-    const baseQuery = {
+
+    let baseQuery = {
       ...req.query,
       organization_id: req.user.role === 'organization' ? req.user._id : req.user.organizationId,
     };
+    if (req.user.role === 'student') {
+      baseQuery = {
+        ...baseQuery,
+        batch_id: req.user.batch.currentBatch, // Assuming student has a batchId field
+      };
+    }
 
     const exams = await fetchSelective(baseQuery);
 
@@ -73,7 +80,7 @@ export const fetchExamBasedOnCondition = async (req, res) => {
       const attemptedExamIds = new Set(results.map(result => result.examId.toString()));
       const examList = exams.map(exam => ({
         ...exam,
-        hasAttempted: attemptedExamIds.has(exam.id?.toString() || exam._id?.toString()),
+        hasAttempted: attemptedExamIds.has(exam.id?.toString()),
       }));
       return new APIResponse(200, examList, "Exams fetched successfully!").send(res);
     }
