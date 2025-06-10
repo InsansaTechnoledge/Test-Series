@@ -17,20 +17,16 @@ const YoutubeConnection = () => {
 
     const callbackUrl = async (code) => {
         try {
-            const callbackResponse = await callBack(code);
-            console.log("Callback Response:", callbackResponse);
-
-            // const authResponse = await checkAuth();
-            // if (authResponse.status === 200) {
-            //     setUser(authResponse.data.user);
-            // }
-
-            // Optional: navigate manually after setting user
-            navigate('/video/upload');
+          const callbackResponse = await callBack(code);
+          console.log("Callback Response:", callbackResponse);
+          console.log("Efsxc")
+          // Navigate to video upload, absolute path
+          navigate('/video/upload');
         } catch (error) {
-            console.error('Error during YouTube callback:', error);
+          console.error('Error during YouTube callback:', error);
         }
-    };
+      };
+      
 
     useEffect(() => {
         console.log("YoutubeConnection mounted");

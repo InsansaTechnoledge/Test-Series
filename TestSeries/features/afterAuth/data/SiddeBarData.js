@@ -45,5 +45,10 @@ export const controls = [
         name: "Exam List Page",
         path: "exam-list",
         icon: User
+    },
+    {
+        name: "Upload videos",
+        path : "video",
+        icon: User
     }
 ]

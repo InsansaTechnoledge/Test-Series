@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import BeforeAuthLanding from '../../features/beforeAuth/BeforeAuthLanding';
 import BeforeAuthLayout from '../../layouts/BeforeAuthLayout';
 import AuthLayout from '../../layouts/authLayout';
@@ -27,7 +27,6 @@ import ExamListPage from '../../features/afterAuth/components/InstituteSide/Exam
 import ResultsPage from '../../features/afterAuth/components/StudentSide/CompletedExams/ResultsPage';
 import TestWindow from '../../features/Test/TestWindow';
 import BatchViewPage from '../../features/afterAuth/components/InstituteSide/ViewPages/BatchViewPage';
-
 import ResultDetailPage from '../../features/afterAuth/components/StudentSide/CompletedExams/DetailedResultPage';
 import StudentRoutes from '../../routes/StudentRoutes';
 import InstituteRoutes from '../../routes/InstituteRoutes';
@@ -40,11 +39,13 @@ import StudentEditPage from '../../features/afterAuth/components/InstituteSide/E
 import UserViewPage from '../../features/afterAuth/components/InstituteSide/ViewPages/UserViewPage';
 import EditUserPage from '../../features/afterAuth/components/InstituteSide/EditPages/EditUserPage';
 import SyllabusViewPage from '../../features/afterAuth/components/InstituteSide/ViewPages/SyllabusViewPage';
-import MonacoCodeEditor from '../../features/Test/CodeEditor/CodeEditor';
 import YoutubeConnection from '../../features/Video/Pages/YoutubeConnection';
+import CodingPlatform from '../../features/Test/CodeEditor/CodingPlatform';
+import QuestionCreator from '../../features/Test/CodeEditor/codeCreator/QuestionCreator';
+
 const PageLinks = () => {
   const { user, setUser } = useUser();
-  // const navigate = useNavigate();
+
   const fetchUser = async () => {
     try {
       const response = await checkAuth();
@@ -54,7 +55,6 @@ const PageLinks = () => {
         setUser(null);
       }
     } catch (error) {
-      // alert("Something went wrong while fetching user data");
       console.error('Error fetching user:', error);
       setUser(null);
     }
@@ -69,20 +69,17 @@ const PageLinks = () => {
   return (
     <Router>
       <Routes>
-
-        {/* </Routes>
-      <Routes> */}
+        {/* Public Routes */}
         <Route element={<AuthLayout />}>
           <Route path='/institute-registration' element={<InstituteRegistrationPage />} />
           <Route path='/login' element={<LoginMainPage />} />
         </Route>
-        {/* <AuthRoutes> */}
 
+        {/* Authenticated Institute Routes */}
         <Route element={<AuthRoutes />}>
           <Route element={<AfterAuthLayout />}>
             <Route element={<InstituteRoutes />}>
               <Route path='/institute' element={<OrganizationLayout />}>
-              
                 <Route path='batch-list' element={<BatchList />} />
                 <Route path='user-list' element={<UserList />} />
                 <Route path='user-edit/:id' element={<EditUserPage />} />
@@ -94,7 +91,6 @@ const PageLinks = () => {
                 <Route path='student-detail' element={<StudentViewPage />} />
                 <Route path='student-edit' element={<StudentEditPage />} />
                 <Route path='create-role-group' element={<FeatureBasedRoleGroups />} />
-                <Route path='add-student' element={<CreateStudent />} />
                 <Route path='create-exam/:examId?' element={<CreateExam />} />
                 <Route path='exam-list' element={<ExamListPage />} />
                 <Route path='syllabus/:syllabusId' element={<SyllabusViewPage />} />
@@ -103,34 +99,35 @@ const PageLinks = () => {
                 <Route path='edit-batch' element={<EditBatchPage />} />
                 <Route path='test' element={<TestWindow />} />
                 <Route path='video' element={<YoutubeConnection />} />
-                <Route path='video/upload' element={<UploadVideo />} />
-
                 <Route path='*' element={<div>Invalid path</div>} />
               </Route>
             </Route>
 
+            {/* Student Routes */}
             <Route element={<StudentRoutes />}>
               <Route path='/student' element={<StudentLayout />}>
                 <Route path='student-landing' element={<StudentLanding />} />
-
                 <Route path='upcoming-exams' element={<UpcomingExam />} />
-                <Route path='completed-exams' element={<ResultsPage />} />
+                <Route path='completed-exams' element={ <ResultsPage />} />
                 <Route path='result/:examId' element={<ResultDetailPage />} />
               </Route>
             </Route>
           </Route>
         </Route>
-        {/* Routes with BeforeAuthLayout */}
+
+        {/* Before Auth Landing */}
         <Route element={<BeforeAuthLayout />}>
           <Route path="/" element={<LandingRoutes />} />
         </Route>
 
-
-                
+        {/* Top-level routes */}
+        <Route path='video' element={<YoutubeConnection />} /> {/* <== Fix added! */}
+        <Route path='video/upload' element={<UploadVideo />} />
         <Route path='session-expired' element={<SessionExpireError />} />
-        {/* <Route path='video' element={<UploadVideo />}/> */}
-        <Route path='code' element={<MonacoCodeEditor/>}/>
+        <Route path='code' element={<CodingPlatform/>} />
+        <Route path='code-create' element={<QuestionCreator/>}/>
 
+        
       </Routes>
     </Router>
   );
