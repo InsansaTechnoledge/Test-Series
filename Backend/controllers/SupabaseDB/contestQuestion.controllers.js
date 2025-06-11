@@ -57,8 +57,6 @@ export const testContestQuestion = async (req, res) => {
             return new APIError(400, ["Code, test cases, and language are required"]).send(res);
         }
 
-
-
         for (const testCase of testCases) {
             const response = await fetch('https://emkc.org/api/v2/piston/execute', {
                 method: 'POST',
@@ -103,7 +101,6 @@ export const testContestQuestion = async (req, res) => {
 export const runContestCode = async (req, res) => {
     try {
         const { code, problem, currentLang } = req.body;
-        console.log("Running contest code with:", { code, problem, currentLang });
 
         const response = await fetch('https://emkc.org/api/v2/piston/execute', {
             method: 'POST',
