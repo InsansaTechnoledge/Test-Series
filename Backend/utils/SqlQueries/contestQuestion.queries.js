@@ -18,6 +18,7 @@ export const fetchContestQuestions = async (contestId) => {
         .select()
         .eq("contest_id", contestId);
 
+
     if (error) throw error;
     return data;
 };

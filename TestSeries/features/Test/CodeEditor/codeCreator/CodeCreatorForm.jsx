@@ -1,4 +1,4 @@
-import { Code, Plus } from "lucide-react";
+import { Code, Plus, Trash2 } from "lucide-react";
 
 const CodeCreatorForm = ({formData,setFormData}) => {
 

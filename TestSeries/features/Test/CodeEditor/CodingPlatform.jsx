@@ -11,7 +11,8 @@ import HorizontalDragHandle from './components/HorizontalDragHandle';
 import OutputPanel from './components/OutPutPanel';
 import { Play, ChevronLeft, ChevronRight } from 'lucide-react';
 import HeaderComponent from './components/HeaderComponent';
-import { getContestQuestions } from '../../../utils/services/contestQuestionService';
+import { getContestQuestions, runContestCode, runContestTestCases } from '../../../utils/services/contestQuestionService';
+
 
 const CodingPlatform = () => {
   const [currentProblem, setCurrentProblem] = useState(0);
@@ -23,20 +24,22 @@ const CodingPlatform = () => {
   const [outputTab, setOutputTab] = useState('testcase');
   const [output, setOutput] = useState('');
   const [errors, setErrors] = useState([]);
+    const contest_id = '81f0d239-90d5-4f6d-8a1c-edc5fa931cb2'; 
 
   const getCodeQuestions = async(contest_id) => {
 
     const response=await getContestQuestions(contest_id);
+    if(!response || !response.data) {
+      return [];
+    }
     if(response.status === 200) {
-      return response.data;
+      return response.data; 
     } else {
       console.error("Failed to fetch questions:", response.statusText);
       return [];
     }
 
   };
-
-  const contest_id = '81f0d239-90d5-4f6d-8a1c-edc5fa931cb2'; // Replace with your actual contest ID
 const [problems,setProblems] = useState([]);
 
 useEffect(() => {
@@ -64,6 +67,9 @@ fetchProblems();
     }
   }, [currentProblem, language, problem]);
 
+
+
+
   const runCode = async () => {
     setIsRunning(true);
     setOutput('');
@@ -72,18 +78,20 @@ fetchProblems();
     try {
       const currentLang = languages.find((l) => l.value === language);
 
-      const response = await fetch('https://emkc.org/api/v2/piston/execute', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          language: currentLang.pistonLang,
-          version: currentLang.version,
-          files: [{ name: getFileName(language), content: code }],
-          stdin: problem.sample_input
-        })
-      });
+const response=await runContestCode(code,problem, currentLang);
+      if(response.status!==200){
+        setErrors(['Failed to run code: ' + response.statusText]);
+        setIsRunning(false);
+        return;
+      }
+      const result = response.data;
+      if (!result) {
+        setErrors(['No response from server']);
+        setIsRunning(false);
 
-      const result = await response.json();
+
+        return;
+      }
 
       if (result.compile && result.compile.stderr) {
         setErrors((prev) => [...prev, result.compile.stderr]);
@@ -106,7 +114,7 @@ fetchProblems();
 
   const runTests = async () => {
     setIsRunning(true);
-    const results = [];
+    let results = [];
     setErrors([]);
 
     try {
@@ -123,39 +131,13 @@ fetchProblems();
         return;
       }
 
-      for (const testCase of problem.test_cases) {
-        const response = await fetch('https://emkc.org/api/v2/piston/execute', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            language: currentLang.pistonLang,
-            version: currentLang.version,
-            files: [{ name: getFileName(language), content: code }],
-            stdin: testCase.input
-          })
-        });
-
-        const result = await response.json();
-
-        const runOutput = result.run?.stdout?.trim() || '';
-        const compileError = result.compile?.stderr || '';
-        const runtimeError = result.run?.stderr || '';
-
-        if (compileError) {
-          setErrors((prev) => [...prev, compileError]);
-        }
-        if (runtimeError) {
-          setErrors((prev) => [...prev, runtimeError]);
-        }
-
-        const passed = runOutput === testCase.expected_output;
-        results.push({
-          passed,
-          expected: testCase.expected_output,
-          actual: runOutput,
-          explanation: testCase.explanation
-        });
+      const response=await runContestTestCases(code,problem.test_cases, currentLang);
+      if(response.status===200){
+        results=response.data.results,
+        setErrors(response.data.errors || []);
       }
+
+
     } catch (error) {
       console.error('runTests error:', error);
       setErrors(['Test execution failed: ' + error.message]);
@@ -166,10 +148,6 @@ fetchProblems();
     setOutputTab('testcase');
   };
 
-  const getFileName = (lang) => {
-    const files = { javascript: 'main.js', python: 'main.py', java: 'Main.java', cpp: 'main.cpp' };
-    return files[lang] || 'main.txt';
-  };
 
   return (
    
