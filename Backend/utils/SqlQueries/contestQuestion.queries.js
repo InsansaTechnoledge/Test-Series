@@ -11,3 +11,13 @@ export const saveContestQuestion=async (questionData) => {
     if (error) throw error;
     return data;
 };
+
+export const fetchContestQuestions = async (contestId) => {
+    const { data, error } = await supabase
+        .from("contest_questions")
+        .select()
+        .eq("contest_id", contestId);
+
+    if (error) throw error;
+    return data;
+};

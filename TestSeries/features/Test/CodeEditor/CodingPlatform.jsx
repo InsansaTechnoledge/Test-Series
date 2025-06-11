@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { problems } from './Data/Problems';
+// import { problems } from './Data/Problems';
 import { languages } from './Data/Language';
 import { useResizable } from './hooks/useResizable';
 import { useVerticalResizable } from './hooks/useVerticleResizable';
@@ -11,6 +11,7 @@ import HorizontalDragHandle from './components/HorizontalDragHandle';
 import OutputPanel from './components/OutPutPanel';
 import { Play, ChevronLeft, ChevronRight } from 'lucide-react';
 import HeaderComponent from './components/HeaderComponent';
+import { getContestQuestions } from '../../../utils/services/contestQuestionService';
 
 const CodingPlatform = () => {
   const [currentProblem, setCurrentProblem] = useState(0);
@@ -23,16 +24,40 @@ const CodingPlatform = () => {
   const [output, setOutput] = useState('');
   const [errors, setErrors] = useState([]);
 
-  // Resizable hooks
+  const getCodeQuestions = async(contest_id) => {
+
+    const response=await getContestQuestions(contest_id);
+    if(response.status === 200) {
+      return response.data;
+    } else {
+      console.error("Failed to fetch questions:", response.statusText);
+      return [];
+    }
+
+  };
+
+  const contest_id = '81f0d239-90d5-4f6d-8a1c-edc5fa931cb2'; // Replace with your actual contest ID
+const [problems,setProblems] = useState([]);
+
+useEffect(() => {
+const fetchProblems = async () => {
+   const data = await getCodeQuestions(contest_id);
+    setProblems(data);
+};
+fetchProblems();
+  
+}, [contest_id]);
   const leftPanel = useResizable(50, 20, 80);
   const outputPanel = useVerticalResizable(200, 100, 500);
+
+
 
   const problem = problems[currentProblem];
 
   useEffect(() => {
-    if (problem && problem.starterCode) {
-      const starterCode = problem.starterCode[language] || '';
-      setCode(starterCode);
+    if (problem && problem.starter_code) {
+      const starter_code = problem.starter_code[language] || '';
+      setCode(starter_code);
       setTestResults([]);
       setOutput('');
       setErrors([]);

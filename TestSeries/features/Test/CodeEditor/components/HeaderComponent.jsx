@@ -1,5 +1,5 @@
 import React from 'react'
-import { ChevronLeft, ChevronRight, Play, Code, Clock, Star, Users, TestTube } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Play, Code, Clock, Star, Users, TestTube, Send } from 'lucide-react'
 
 const HeaderComponent = ({problems, language, setCurrentProblem, setLanguage, currentProblem, languages, runCode, isRunning, runTests}) => {
   const currentProblemData = problems[currentProblem];
@@ -80,7 +80,7 @@ const HeaderComponent = ({problems, language, setCurrentProblem, setLanguage, cu
               disabled={isRunning}
               className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 transition-all duration-200 shadow-md hover:shadow-lg"
             >
-              <TestTube className="w-4 h-4" />
+              <Send className="w-4 h-4" />
               <span className="font-medium">{isRunning ? 'Running Test Cases' : 'Submit Test'}</span>
             </button>
           </div>
