@@ -40,7 +40,8 @@ export const fetchSelective = async (conditions) => {
       batch:batch_id (
         name,
         year
-      )
+      ),
+      reapplicable
     `);
 
   Object.entries(conditions).forEach(([key, value]) => {

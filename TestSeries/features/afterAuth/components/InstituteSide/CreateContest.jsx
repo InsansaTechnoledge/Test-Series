@@ -5,6 +5,8 @@ import { useCachedBatches } from '../../../../hooks/useCachedBatches';
 import { Calendar, Users, Trophy, FileText, Clock, Play } from 'lucide-react';
 import Select from 'react-select';
 import { useUser } from '../../../../contexts/currentUserContext';
+import { createContest } from '../../../../utils/services/contestService';
+import { useNavigate } from 'react-router-dom';
 
 const CreateContest = () => {
   const [ContestType, setContestType] = useState('participation_based');
@@ -12,33 +14,46 @@ const CreateContest = () => {
   const [selectedBatches, setSelectedBatches] = useState([]);
   const [description, setDescription] = useState('');
   const [duration, setDuration] = useState('');
-  const [schedule, setSchedule] = useState(''); // for scheduled type
+  const [schedule, setSchedule] = useState(null); // for scheduled type
   const [validity, setValidity] = useState({
     start: '',
     end: '',
-  }); // for participation_based
+  }); 
+  const navigate=useNavigate();
 
   const { batches } = useCachedBatches();
   const user = useUser();
-  const organizationId = user.user?._id || user.user.organizationId;
 
   const batchOptions = batches.map(b => ({
     value: b.id,
     label: b.name,
   }));
 
-  const handleSubmit = () => {
-    console.log('Form submitted:', {
+  const handleSubmit = async() => {
+    const formData={
       type: ContestType,
       name,
       selectedBatches,
       description,
       duration,
-      organizationId,
       schedule,
       validity,
-    });
-    // TODO: handle form submission
+    }
+    console.log('Form submitted:', formData);
+
+    try{
+      const response=await createContest(formData);
+      if(response.status === 200){
+        console.log('Contest created successfully:', response.data);
+        navigate('/institute/contest-list'); 
+      }
+    } catch (error) {
+      console.error('Error creating contest:', error);
+      alert('Failed to create contest. Please try again.');
+    }
+
+
+    
   };
 
   return (
