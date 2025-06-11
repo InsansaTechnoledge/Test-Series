@@ -38,11 +38,33 @@ export default function QuestionCreator() {
 
     //have to add the contest id in the question data 
 
-    questionData.contest_id = "ac126fbd-65d2-4651-a384-bef9d15f35ba";
+    questionData.contest_id = "81f0d239-90d5-4f6d-8a1c-edc5fa931cb2";
 
     try {
       const response = await saveContestQuestion(questionData);
       console.log(response.data);
+      if(response.status === 200) {
+        alert("Question created successfully!");
+        setFormData({
+          title: '',
+          difficulty: 'easy',
+          prompt: '',
+          input_format: '',
+          output_format: '',
+          sample_input: '',
+          sample_output: '',
+          test_cases: [{ input: '', expected_output: '', explanation: '' }],
+          description: '',
+          examples: [{ input: '', output: '', explanation: '' }],
+          constraints: [''],
+          starter_code: {
+            javascript: '',
+            python: '',
+            java: '',
+            cpp: ''
+          }
+        });
+      }
     } catch (error) {
       console.log("something went wrong while creating the contest questions!!", error);
       alert("Something went wrong!!!, try again later");

@@ -13,6 +13,7 @@ export const addContestQuestion = async (req, res) => {
         questionData.created_at=new Date();
 
         const contestQuestion = await saveContestQuestion(questionData);
+        
         return new APIResponse(200, contestQuestion, "Contest question added successfully!").send(res);
 
 
