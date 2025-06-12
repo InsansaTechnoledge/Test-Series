@@ -272,3 +272,75 @@ BEGIN
     RETURN result;
 END;
 $$;
+
+
+  CREATE OR REPLACE FUNCTION create_contest_with_batches(
+ p_selected_batches UUID[],
+  p_organization_id TEXT,
+  p_name TEXT, 
+  p_type TEXT,
+  p_duration SMALLINT,
+  p_created_at TIMESTAMPTZ,
+  p_updated_at TIMESTAMPTZ,
+  p_schedule TIMESTAMPTZ DEFAULT NULL,
+  p_live_until TIMESTAMPTZ DEFAULT NULL,
+  p_go_live BOOLEAN DEFAULT FALSE,
+  p_description TEXT DEFAULT NULL,
+  p_validity JSONB DEFAULT '{}'::jsonb
+)
+RETURNS TABLE (
+    id UUID,
+    name TEXT,
+    organization_id TEXT,
+    type TEXT,
+    schedule TIMESTAMPTZ,
+    duration smallint,
+    live_until TIMESTAMPTZ,
+    go_live boolean,
+    created_at TIMESTAMPTZ,
+    updated_at TIMESTAMPTZ,
+    description TEXT,
+    validity jsonb
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    new_contest_id UUID := gen_random_uuid();
+    batch_id UUID;
+BEGIN
+    -- Insert the contest
+    INSERT INTO organization_contest (
+        id, organization_id,name,type,schedule,duration,live_until,go_live,created_at,updated_at,description,validity
+    )
+    VALUES (
+        new_contest_id,p_organization_id,p_name,p_type,p_schedule,p_duration,p_live_until,p_go_live,p_created_at,p_updated_at,p_description,p_validity
+    );
+
+    -- Insert into contest_batch table for each batch
+   FOREACH batch_id IN ARRAY p_selected_batches
+LOOP
+    INSERT INTO batchxcontest (batch_id, contest_id)
+    VALUES (batch_id, new_contest_id);
+END LOOP;
+
+    -- Return the inserted contest
+    RETURN QUERY
+SELECT 
+  oc.id,
+  oc.name,
+  oc.organization_id,
+  oc.type,
+  oc.schedule,
+  oc.duration,
+  oc.live_until,
+  oc.go_live,
+  oc.created_at,
+  oc.updated_at,
+  oc.description,
+  oc.validity
+FROM organization_contest oc
+WHERE oc.id = new_contest_id;
+
+    
+END;
+$$;
