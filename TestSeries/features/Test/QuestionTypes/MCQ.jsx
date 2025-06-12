@@ -17,57 +17,76 @@ const MCQ = ({ selectedQuestion, option, setOption }) => {
   };
 
   return (
-    <div>
-      <div className='flex justify-end mb-2 gap-4'>
-        <div className='text-green-700 font-bold rounded-lg px-4 py-2'>
+    <div className="space-y-6 p-6">
+      {/* Marking Scheme */}
+      <div className="flex flex-wrap justify-end gap-4">
+        <div className="bg-green-100 text-green-800 font-semibold rounded-lg px-4 py-2">
           Correct: +{selectedQuestion.positive_marks}
         </div>
-        <div className='text-red-700 font-bold rounded-lg px-4 py-2'>
+        <div className="bg-red-100 text-red-800 font-semibold rounded-lg px-4 py-2">
           Wrong: -{selectedQuestion.negative_marks}
         </div>
-        <div className='text-gray-700 font-bold rounded-lg px-4 py-2'>
+        <div className="bg-gray-100 text-gray-800 font-semibold rounded-lg px-4 py-2">
           Unattempted: 0
         </div>
       </div>
-
-      <h3 className='font-bold text-3xl'>
-        Q{selectedQuestion.index}. {selectedQuestion.question_text || 'No question text'}
-      </h3>
-
-      {selectedQuestion.image && (
-        <img
-          src={selectedQuestion.image}
-          alt={`Question ${selectedQuestion.index} illustration`}
-          className='mt-4 max-w-full rounded shadow'
-        />
-      )}
-
-      <div className='mt-10 space-y-4'>
+  
+      {/* Question */}
+      <div>
+        <h3 className="font-bold text-2xl sm:text-3xl leading-relaxed">
+          Q{selectedQuestion.index}.{' '}
+          {selectedQuestion.question_text || (
+            <span className="text-red-500">No question text</span>
+          )}
+        </h3>
+  
+        {/* Optional Image */}
+        {selectedQuestion.image && (
+          <div className="mt-4">
+            <img
+              src={selectedQuestion.image}
+              alt={`Question ${selectedQuestion.index} illustration`}
+              className="rounded-lg shadow-md max-w-full h-auto"
+            />
+          </div>
+        )}
+      </div>
+  
+      {/* Options */}
+      <div className="mt-8 space-y-5">
         {Array.isArray(selectedQuestion.options) && selectedQuestion.options.length > 0 ? (
           selectedQuestion.options.map((opt, idx) => (
-            <div key={idx} className='flex text-2xl space-x-2 items-center'>
+            <label
+              key={idx}
+              htmlFor={`option-${idx}-${selectedQuestion.id}`}
+              className={`flex items-center gap-4 text-lg sm:text-xl p-4 rounded-md border cursor-pointer transition-all duration-200
+                ${
+                  option === idx
+                    ? 'bg-blue-100 border-blue-500 text-blue-800 font-semibold'
+                    : 'bg-white border-gray-300 hover:border-blue-400 hover:bg-blue-50'
+                }`}
+            >
               <input
-                type='radio'
+                type="radio"
                 id={`option-${idx}-${selectedQuestion.id}`}
                 checked={option === idx}
                 onChange={() => handleChangeOption(idx)}
                 name={`option-${selectedQuestion.id}`}
                 value={opt}
-                className='accent-blue-500'
+                className="accent-blue-600 w-5 h-5"
               />
-              <label htmlFor={`option-${idx}-${selectedQuestion.id}`} className='cursor-pointer'>
-                {opt}
-              </label>
-            </div>
+              {opt}
+            </label>
           ))
         ) : (
-          <div className='text-red-500 font-bold'>
+          <div className="text-red-500 font-bold">
             No options available for this question.
           </div>
         )}
       </div>
     </div>
   );
+  
 };
 
 export default MCQ;

@@ -62,17 +62,24 @@ const ComprehensionQuestion = ({ selectedQuestion, option, setOption }) => {
     };
 
     return (
-        <div className='space-y-10'>
-            <div className='bg-gray-100 p-6 rounded'>
-                <h3 className='font-bold text-3xl mb-4'>Comprehension</h3>
-                <p className='text-lg whitespace-pre-line'>{selectedQuestion.passage}</p>
-            </div>
-
-            <div className='space-y-10'>
-                {selectedQuestion.sub_questions?.map(renderSubQuestion)}
-            </div>
+        <div className="space-y-10 p-6">
+          {/* Comprehension Passage */}
+          <div className="bg-yellow-50 p-6 rounded-xl shadow ring-1 ring-yellow-100">
+            <h3 className="font-bold text-2xl sm:text-3xl text-yellow-800 mb-3 flex items-center gap-2">
+               Comprehension
+            </h3>
+            <p className="text-lg sm:text-xl leading-relaxed text-gray-800 whitespace-pre-line">
+              {selectedQuestion.passage}
+            </p>
+          </div>
+      
+          {/* Sub-Questions */}
+          <div className="space-y-8">
+            {selectedQuestion.sub_questions?.map(renderSubQuestion)}
+          </div>
         </div>
-    );
+      );
+      
 };
 
 export default ComprehensionQuestion;
