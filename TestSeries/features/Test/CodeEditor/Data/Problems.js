@@ -248,5 +248,206 @@ export const problems = [
       return 0;
   }`
       }
-    }
+    },
+    {
+        id: 3,
+        title: "Merge Sorted Arrays",
+        difficulty: "Easy",
+        prompt: "Given two sorted integer arrays nums1 and nums2, merge them into a single sorted array. Return the merged array.",
+        input_format: "Two lines:\nFirst line contains space-separated integers for nums1.\nSecond line contains space-separated integers for nums2.",
+        output_format: "Return a JSON array of the merged sorted integers.",
+        sample_input: "1 2 3\n2 5 6",
+        sample_output: "[1, 2, 2, 3, 5, 6]",
+        test_cases: [
+          { input: "1 2 3\n2 5 6", expected_output: "[1, 2, 2, 3, 5, 6]", explanation: "Merged and sorted." },
+          { input: "0\n0", expected_output: "[0, 0]", explanation: "Both arrays contain a single element 0." },
+          { input: "4 5 6\n", expected_output: "[4, 5, 6]", explanation: "Second array is empty." }
+        ],
+        description: "Merge two sorted arrays into a single sorted array.",
+        examples: [
+          {
+            input: "nums1 = [1,2,3], nums2 = [2,5,6]",
+            output: "[1,2,2,3,5,6]"
+          }
+        ],
+        constraints: [
+          "0 <= nums1.length, nums2.length <= 10^4",
+          "-10^9 <= nums1[i], nums2[i] <= 10^9"
+        ],
+        starterCode: {
+          javascript: `function mergeArrays() {
+        const fs = require('fs');
+        const lines = fs.readFileSync('/dev/stdin', 'utf-8').trim().split('\\n');
+        const nums1 = lines[0].split(' ').map(Number);
+        const nums2 = lines[1].split(' ').map(Number);
+      
+        // Your solution here
+      
+        console.log(JSON.stringify(result));
+      }
+      mergeArrays();`,
+          python: `def mergeArrays():
+        import sys
+        lines = sys.stdin.read().splitlines()
+        nums1 = list(map(int, lines[0].split()))
+        nums2 = list(map(int, lines[1].split()))
+      
+        # Your solution here
+      
+        import json
+        print(json.dumps(result))
+      
+      mergeArrays()`,
+          java: `// Similar structure as previous starterCode`,
+          cpp: `// Similar structure as previous starterCode`
+        }
+      },
+      {
+        id: 4,
+        title: "Palindrome Number",
+        difficulty: "Easy",
+        prompt: "Given an integer x, return true if x is a palindrome, and false otherwise.",
+        input_format: "Single integer x.",
+        output_format: "Return 'true' if x is a palindrome, 'false' otherwise.",
+        sample_input: "121",
+        sample_output: "true",
+        test_cases: [
+          { input: "121", expected_output: "true", explanation: "121 reversed is still 121." },
+          { input: "-121", expected_output: "false", explanation: "Negative numbers are not palindromes." },
+          { input: "10", expected_output: "false", explanation: "10 reversed is 01." }
+        ],
+        description: "Check whether a number is a palindrome.",
+        examples: [
+          { input: "x = 121", output: "true" },
+          { input: "x = -121", output: "false" }
+        ],
+        constraints: ["-2^31 <= x <= 2^31 - 1"],
+        starterCode: {
+          javascript: `function isPalindrome() {
+        const x = parseInt(require('fs').readFileSync('/dev/stdin').toString().trim());
+      
+        // Your solution here
+      
+        console.log(result ? 'true' : 'false');
+      }
+      isPalindrome();`,
+          python: `def isPalindrome():
+        import sys
+        x = int(sys.stdin.read())
+      
+        # Your solution here
+      
+        print('true' if result else 'false')
+      isPalindrome()`
+        }
+      },
+      {
+        id: 5,
+        title: "FizzBuzz",
+        difficulty: "Easy",
+        prompt: "Given an integer n, return a string array answer (1-indexed) where:\n- answer[i] == \"FizzBuzz\" if i is divisible by 3 and 5.\n- answer[i] == \"Fizz\" if i is divisible by 3.\n- answer[i] == \"Buzz\" if i is divisible by 5.\n- answer[i] == i (as a string) otherwise.",
+        input_format: "Single integer n.",
+        output_format: "JSON array of strings.",
+        sample_input: "5",
+        sample_output: "[\"1\",\"2\",\"Fizz\",\"4\",\"Buzz\"]",
+        test_cases: [
+          { input: "5", expected_output: "[\"1\",\"2\",\"Fizz\",\"4\",\"Buzz\"]", explanation: "Correct FizzBuzz sequence" },
+          { input: "15", expected_output: "[\"1\",\"2\",\"Fizz\",\"4\",\"Buzz\",\"Fizz\",\"7\",\"8\",\"Fizz\",\"Buzz\",\"11\",\"Fizz\",\"13\",\"14\",\"FizzBuzz\"]", explanation: "FizzBuzz at 15" }
+        ],
+        description: "Return FizzBuzz sequence up to n.",
+        examples: [{ input: "n = 5", output: "[\"1\",\"2\",\"Fizz\",\"4\",\"Buzz\"]" }],
+        constraints: ["1 <= n <= 10^4"],
+        starterCode: {
+          javascript: `function fizzBuzz() {
+        const n = parseInt(require('fs').readFileSync('/dev/stdin').toString().trim());
+      
+        // Your solution here
+      
+        console.log(JSON.stringify(result));
+      }
+      fizzBuzz();`,
+          python: `def fizzBuzz():
+        import sys
+        n = int(sys.stdin.read())
+      
+        # Your solution here
+      
+        import json
+        print(json.dumps(result))
+      fizzBuzz()`
+        }
+      },
+      {
+        id: 6,
+        title: "Reverse String",
+        difficulty: "Easy",
+        prompt: "Write a function that reverses a string. The input string is given as a single line.",
+        input_format: "Single string s",
+        output_format: "Reversed string",
+        sample_input: "hello",
+        sample_output: "olleh",
+        test_cases: [
+          { input: "hello", expected_output: "olleh", explanation: "Reversed form" },
+          { input: "racecar", expected_output: "racecar", explanation: "Palindrome" },
+          { input: " ", expected_output: " ", explanation: "Single space" }
+        ],
+        description: "Reverse the input string and return it.",
+        examples: [{ input: "s = 'hello'", output: "olleh" }],
+        constraints: ["1 <= s.length <= 10^4"],
+        starterCode: {
+          javascript: `function reverseString() {
+        const s = require('fs').readFileSync('/dev/stdin').toString().trim();
+      
+        // Your solution here
+      
+        console.log(result);
+      }
+      reverseString();`,
+          python: `def reverseString():
+        import sys
+        s = sys.stdin.read().strip()
+      
+        # Your solution here
+      
+        print(result)
+      reverseString()`
+        }
+      },
+      {
+        id: 7,
+        title: "Count Vowels",
+        difficulty: "Easy",
+        prompt: "Given a string s, count the number of vowels (a, e, i, o, u) in it. The input string can include lowercase and uppercase letters.",
+        input_format: "Single line containing the string s",
+        output_format: "Integer count of vowels",
+        sample_input: "Hello World",
+        sample_output: "3",
+        test_cases: [
+          { input: "Hello World", expected_output: "3", explanation: "e, o, o are vowels" },
+          { input: "bcdfg", expected_output: "0", explanation: "No vowels present" },
+          { input: "AEIOU", expected_output: "5", explanation: "All uppercase vowels" }
+        ],
+        description: "Count how many vowels are present in a string.",
+        examples: [{ input: "s = 'Hello'", output: "2" }],
+        constraints: ["1 <= s.length <= 10^4"],
+        starterCode: {
+          javascript: `function countVowels() {
+        const s = require('fs').readFileSync('/dev/stdin').toString().trim();
+      
+        // Your solution here
+      
+        console.log(result);
+      }
+      countVowels();`,
+          python: `def countVowels():
+        import sys
+        s = sys.stdin.read().strip()
+      
+        # Your solution here
+      
+        print(result)
+      countVowels()`
+        }
+      }
+      
   ];

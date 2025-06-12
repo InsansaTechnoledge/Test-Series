@@ -61,6 +61,10 @@ const TestWindow = () => {
   }, [subjectSpecificQuestions]);
 
   useEffect(() => {
+    console.log("vc" , eventDetails);
+    
+  },[])
+  useEffect(() => {
     if (eventDetails) {
       const cached = localStorage.getItem('testQuestions');
       if (!cached) {
@@ -194,136 +198,134 @@ const TestWindow = () => {
   }
 
   return (
-    <div className='flex'>
-      {
-        !eventDetails ? (
-          <div>Loading test</div>
-        ) : (
-          <>
-            <div className='p-3 flex flex-col'>
-
-              {/* <div className="text-center text-lg font-bold py-2 text-purple-600">
-{proctorStatus}
-</div> */}
-
-              {warning && (
-                <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 bg-yellow-100 border-l-4 border-yellow-600 text-yellow-900 px-6 py-3 rounded-xl shadow-lg text-center w-[90%] sm:w-[500px] font-medium">
-                  <span className="text-xl mr-2">⚠️</span>
-                  {warning === "No face detected" && countdown !== null
-                    ? `You have ${countdown} sec to come back to the screen`
-                    : warning}
-                </div>
-              )}
-
-              {showFinalPopup && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center px-4 sm:px-0">
-                  <div className="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 p-6 rounded-2xl shadow-2xl max-w-2xl w-full animate-fade-in">
-                    <div className="text-center">
-                      <h2 className="text-2xl sm:text-3xl font-bold text-red-600 flex items-center justify-center gap-2">
-                        <span>🚨</span> Multiple Anomalies Detected
-                      </h2>
-                      <p className="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-300">
-                        Your test is being auto-submitted due to repeated violations. Please review the detected incidents below:
-                      </p>
-                    </div>
-
-                    <ul className="mt-4 max-h-48 overflow-y-auto text-sm sm:text-base bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-600 rounded-md px-4 py-3 space-y-1 list-disc list-inside shadow-inner">
-                      {allWarnings.map((item, idx) => (
-                        <li key={idx} className="text-red-700 dark:text-red-300">
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-
-                    <div className="mt-6 text-center">
-                      <button
-                        onClick={handleSubmitTest}
-                        className="inline-flex items-center justify-center px-6 py-2.5 text-white bg-purple-600 hover:bg-purple-700 rounded-lg text-base font-semibold transition duration-200 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                      >
-                        Okay, Close Test
-                      </button>
-                    </div>
+    
+    <div className="flex flex-col ">
+      {!eventDetails ? (
+        <div className="flex justify-center items-center h-full text-lg font-medium text-gray-700">
+          Loading test...
+        </div>
+      ) : (
+        <>
+          <div className="relative flex flex-col w-full px-4 py-4 sm:px-6">
+  
+            {/* Warning Banner */}
+            {warning && (
+              <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-yellow-100 border-l-4 border-yellow-600 text-yellow-900 px-6 py-3 rounded-xl shadow-lg text-center w-[90%] sm:w-[500px] font-medium">
+                <span className="text-xl mr-2">⚠️</span>
+                {warning === "No face detected" && countdown !== null
+                  ? `You have ${countdown} sec to come back to the screen`
+                  : warning}
+              </div>
+            )}
+  
+            {/* Final Popup */}
+            {showFinalPopup && (
+              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center px-4">
+                <div className="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 p-6 rounded-2xl shadow-2xl w-full max-w-2xl animate-fade-in">
+                  <div className="text-center">
+                    <h2 className="text-2xl sm:text-3xl font-bold text-red-600 flex items-center justify-center gap-2">
+                      <span>🚨</span> Multiple Anomalies Detected
+                    </h2>
+                    <p className="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-300">
+                      Your test is being auto-submitted due to repeated violations. Please review the detected incidents below:
+                    </p>
                   </div>
-                </div>
-              )}
-
-              {/* Header + Timer + Scoring Info */}
-              <div className='flex w-full justify-between space-x-5'>
-                <div className='font-bold p-5'>
-                  <h1 className='text-3xl font-bold'>{eventDetails.batch_id.name}</h1>
-                  <h2 className='text-lg font-bold'>{eventDetails.batch_id.name}</h2>
-                </div>
-                <div className="flex items-center gap-2 text-red-700 font-semibold px-4 py-1.5 bg-red-100 border border-red-300 rounded-xl shadow-sm">
-                  <span className="text-lg">🚨</span>
-                  Warnings: <span className="text-red-800 font-bold">{warningCount}</span>/5
-                </div>
-
-                <div className='flex justify-end space-x-3 bg-gray-100 border-purple-600 border-2 rounded-lg p-3'>
-                  {/* <div className='text-green-700 font-bold border rounded-lg px-4 py-2'>Correct: +{eventDetails.exam.positive_marks}</div> */}
-                  {/* <div className='text-red-700 font-bold border rounded-lg px-4 py-2'>Wrong: -{eventDetails.exam.negative_marks}</div> */}
-                  {/* <div className='text-gray-700 font-bold border rounded-lg px-4 py-2'>Unattempted: 0</div> */}
-                  <div className='px-4 py-2 bg-purple-200 rounded-lg font-semibold'>
-                    <div>Time Left</div>
-                    <div className='text-xl font-bold'>
-                      {/* <CountdownTimer initialTime={eventDetails.duration} handleSubmitTest={handleSubmitTest} submitted={submitted} /> */}
-                    </div>
+                  <ul className="mt-4 max-h-48 overflow-y-auto text-sm sm:text-base bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-600 rounded-md px-4 py-3 space-y-1 list-disc list-inside shadow-inner">
+                    {allWarnings.map((item, idx) => (
+                      <li key={idx} className="text-red-700 dark:text-red-300">{item}</li>
+                    ))}
+                  </ul>
+                  <div className="mt-6 text-center">
+                    <button
+                      onClick={handleSubmitTest}
+                      className="inline-flex items-center justify-center px-6 py-2.5 text-white bg-purple-600 hover:bg-purple-700 rounded-lg text-base font-semibold transition duration-200 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    >
+                      Okay, Close Test
+                    </button>
                   </div>
                 </div>
               </div>
-
-              <div className='grid grid-cols-5 mt-5 space-x-5 p-3'>
-                <div className='col-span-3 flex flex-col space-y-5 p-3'>
-                  <QuestionSection
-                    setSubjectSpecificQuestions={setSubjectSpecificQuestions}
-                    setSelectedQuestion={setSelectedQuestion}
-                    selectedQuestion={selectedQuestion}
-                    selectedSubject={selectedSubject}
-                    subjectSpecificQuestions={subjectSpecificQuestions}
-                  />
-                </div>
-                <div className='col-span-2'>
-                  <QuestionListSection
-                    subjectSpecificQuestions={subjectSpecificQuestions}
-                    setSubjectSpecificQuestions={setSubjectSpecificQuestions}
-                    selectedSubject={selectedSubject}
-                    setSelectedSubject={setSelectedSubject}
-                    selectedQuestion={selectedQuestion}
-                    setSelectedQuestion={setSelectedQuestion}
-                    eventDetails={eventDetails}
-                  />
+            )}
+  
+            {/* Header */}
+            <div className="flex flex-col border-3  mb-12 py-3 px-2 sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6 ">
+              <div>
+                <h1 className="text-xl sm:text-3xl font-bold">{eventDetails.batch_id.name}</h1>
+                <h2 className="text-md sm:text-lg font-semibold text-gray-600">{eventDetails.batch_id.name}</h2>
+              </div>
+  
+              <div className="flex items-center gap-2 text-red-700 font-semibold px-4 py-1.5 bg-red-100 border border-red-300 rounded-xl shadow-sm w-fit">
+                <span className="text-lg">🚨</span>
+                Warnings: <span className="text-red-800 font-bold">{warningCount}</span>/5
+              </div>
+  
+              <div className="flex justify-end bg-gray-100 border-purple-600 border-2 rounded-lg p-3 space-x-3 w-fit">
+                <div className="px-4 py-2 bg-purple-200 rounded-lg font-semibold text-center">
+                  <div>Time Left</div>
+                  <div className="text-xl font-bold">
+                    <CountdownTimer initialTime={eventDetails.duration} handleSubmitTest={handleSubmitTest} submitted={submitted} />
+                  </div>
                 </div>
               </div>
-
+            </div>
+  
+            {/* Main Content */}
+            <div className="flex flex-col  lg:flex-row gap-4 w-full">
+              {/* Left: QuestionSection */}
+              <div className="w-full lg:w-3/5 border-3 py-3 px-2 ">
+                <QuestionSection
+                  setSubjectSpecificQuestions={setSubjectSpecificQuestions}
+                  setSelectedQuestion={setSelectedQuestion}
+                  selectedQuestion={selectedQuestion}
+                  selectedSubject={selectedSubject}
+                  subjectSpecificQuestions={subjectSpecificQuestions}
+                />
+              </div>
+  
+              {/* Right: QuestionListSection */}
+              <div className="w-full border-3 py-3 px-2 lg:w-2/5">
+                <QuestionListSection
+                  subjectSpecificQuestions={subjectSpecificQuestions}
+                  setSubjectSpecificQuestions={setSubjectSpecificQuestions}
+                  selectedSubject={selectedSubject}
+                  setSelectedSubject={setSelectedSubject}
+                  selectedQuestion={selectedQuestion}
+                  setSelectedQuestion={setSelectedQuestion}
+                  eventDetails={eventDetails}
+                />
+              </div>
+            </div>
+  
+            {/* Submit Button */}
+            <div className="text-center mt-8">
               <button
                 onClick={() => setShowSubmitModal(true)}
-                className='mx-auto mt-10 rounded-md text-lg font-semibold bg-blue-900 px-4 py-2 w-fit text-white'
+                className="rounded-md text-lg font-semibold bg-blue-900 px-6 py-2 text-white shadow hover:bg-blue-800 transition duration-200"
               >
                 Submit Test
               </button>
-
-                            {showSubmitModal && (
-                <SubmitModal
-                  setShowSubmitModal={setShowSubmitModal}
-                  setSubmitted={setSubmitted}
-                />
-              )}
-
-              {
-                submitted && (
-                  <>
-                    <p className="mt-4 text-green-700 font-semibold">
-                      ✅ Your form has been submitted successfully!
-                    </p>
-                  </>
-                )
-              }
             </div>
-          </>
-        )
-      }
-
+  
+            {/* Submit Modal */}
+            {showSubmitModal && (
+              <SubmitModal
+                setShowSubmitModal={setShowSubmitModal}
+                setSubmitted={setSubmitted}
+              />
+            )}
+  
+            {/* Submission Confirmation */}
+            {submitted && (
+              <p className="mt-4 text-center text-green-700 font-semibold">
+                ✅ Your form has been submitted successfully!
+              </p>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
+  
 };
 
 export default TestWindow;
