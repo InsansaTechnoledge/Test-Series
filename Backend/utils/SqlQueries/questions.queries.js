@@ -103,7 +103,8 @@ export const fetchQuestionsSelectively = async (conditions) => {
     p_subject: null,
     p_chapter: null,
     p_question_type: null,
-    p_difficulty: null
+    p_difficulty: null,
+    p_already_given_exam:false
   };
 
   // Map conditions to RPC parameters
@@ -113,7 +114,8 @@ export const fetchQuestionsSelectively = async (conditions) => {
     subject: 'p_subject',
     chapter: 'p_chapter',
     question_type: 'p_question_type',
-    difficulty: 'p_difficulty'
+    difficulty: 'p_difficulty',
+    already_given_exam: 'p_already_given_exam'
   };
 
   // Apply conditions dynamically (same logic as your original)
