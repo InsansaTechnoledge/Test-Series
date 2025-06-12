@@ -2,9 +2,14 @@ import React, { useState } from 'react';
 import { Plus, Trash2, Save, Code } from 'lucide-react';
 import { saveContestQuestion } from '../../../../utils/services/contestQuestionService';
 import CodeCreatorForm from './codeCreatorForm';
+import { useSearchParams } from 'react-router-dom';
 
 export default function QuestionCreator() {
 
+  const [searchParams]=useSearchParams();
+  const contestId= searchParams.get("contestId");
+
+console.log("contestId", contestId);
   const [formData, setFormData] = useState({
     title: '',
     difficulty: 'easy',
@@ -38,7 +43,8 @@ export default function QuestionCreator() {
 
     //have to add the contest id in the question data 
 
-    questionData.contest_id = "81f0d239-90d5-4f6d-8a1c-edc5fa931cb2";
+    questionData.contest_id = contestId;
+
 
     try {
       const response = await saveContestQuestion(questionData);

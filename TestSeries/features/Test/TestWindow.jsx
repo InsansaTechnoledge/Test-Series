@@ -43,7 +43,11 @@ const TestWindow = () => {
 
       const subjectSet = new Set(questions.map(q => q.subject));
 
-
+      console.log("Exam details:", exam);
+      console.log("Questions loaded:", questions);
+      console.log("Subjects found:", Array.from(subjectSet));
+      // Set event details with exam and questions
+      console.log("Exam details:", exam);
       setEventDetails(prev => ({
         ...prev,
         ...exam,
@@ -51,19 +55,21 @@ const TestWindow = () => {
         subjects: Array.from(subjectSet),
       }));
     }
+   
   }, [questions, isQuestionLoading, isExamLoading]);
 
-
+useEffect(() => {
+  if (eventDetails) {
+    console.log("Updated event details:", eventDetails);
+  }
+}, [eventDetails]);
   useEffect(() => {
     if (subjectSpecificQuestions) {
       console.log("subjectspecific", subjectSpecificQuestions);
     }
   }, [subjectSpecificQuestions]);
 
-  useEffect(() => {
-    console.log("vc" , eventDetails);
-    
-  },[])
+ 
   useEffect(() => {
     if (eventDetails) {
       const cached = localStorage.getItem('testQuestions');
@@ -93,10 +99,10 @@ const TestWindow = () => {
   }, [selectedSubject]);
 
   useEffect(() => {
-    if(submitted) {
+    if (submitted) {
       handleSubmitTest();
     }
-  },[submitted]);
+  }, [submitted]);
 
   const getCorrectResponse = (question) => {
     switch (question.question_type) {
@@ -194,11 +200,16 @@ const TestWindow = () => {
   }
 
   if (isExamLoading || isQuestionLoading) {
-    return <div>Loading...</div>
+    return <div>Loading...🥲
+      <>
+        {console.log("Loading exam details or questions...", isQuestionLoading)}
+        {console.log("Exam details:", isExamLoading)}
+      </>
+    </div>
   }
 
   return (
-    
+
     <div className="flex flex-col ">
       {!eventDetails ? (
         <div className="flex justify-center items-center h-full text-lg font-medium text-gray-700">
@@ -207,7 +218,7 @@ const TestWindow = () => {
       ) : (
         <>
           <div className="relative flex flex-col w-full px-4 py-4 sm:px-6">
-  
+
             {/* Warning Banner */}
             {warning && (
               <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-yellow-100 border-l-4 border-yellow-600 text-yellow-900 px-6 py-3 rounded-xl shadow-lg text-center w-[90%] sm:w-[500px] font-medium">
@@ -217,7 +228,7 @@ const TestWindow = () => {
                   : warning}
               </div>
             )}
-  
+
             {/* Final Popup */}
             {showFinalPopup && (
               <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center px-4">
@@ -246,19 +257,19 @@ const TestWindow = () => {
                 </div>
               </div>
             )}
-  
+
             {/* Header */}
             <div className="flex flex-col border-3  mb-12 py-3 px-2 sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6 ">
               <div>
-                <h1 className="text-xl sm:text-3xl font-bold">{eventDetails.batch_id.name}</h1>
-                <h2 className="text-md sm:text-lg font-semibold text-gray-600">{eventDetails.batch_id.name}</h2>
+                <h1 className="text-xl sm:text-3xl font-bold">{eventDetails.batch.name}</h1>
+                <h2 className="text-md sm:text-lg font-semibold text-gray-600">{eventDetails.batch.year}</h2>
               </div>
-  
+
               <div className="flex items-center gap-2 text-red-700 font-semibold px-4 py-1.5 bg-red-100 border border-red-300 rounded-xl shadow-sm w-fit">
                 <span className="text-lg">🚨</span>
                 Warnings: <span className="text-red-800 font-bold">{warningCount}</span>/5
               </div>
-  
+
               <div className="flex justify-end bg-gray-100 border-purple-600 border-2 rounded-lg p-3 space-x-3 w-fit">
                 <div className="px-4 py-2 bg-purple-200 rounded-lg font-semibold text-center">
                   <div>Time Left</div>
@@ -268,7 +279,7 @@ const TestWindow = () => {
                 </div>
               </div>
             </div>
-  
+
             {/* Main Content */}
             <div className="flex flex-col  lg:flex-row gap-4 w-full">
               {/* Left: QuestionSection */}
@@ -281,7 +292,7 @@ const TestWindow = () => {
                   subjectSpecificQuestions={subjectSpecificQuestions}
                 />
               </div>
-  
+
               {/* Right: QuestionListSection */}
               <div className="w-full border-3 py-3 px-2 lg:w-2/5">
                 <QuestionListSection
@@ -295,7 +306,7 @@ const TestWindow = () => {
                 />
               </div>
             </div>
-  
+
             {/* Submit Button */}
             <div className="text-center mt-8">
               <button
@@ -305,7 +316,7 @@ const TestWindow = () => {
                 Submit Test
               </button>
             </div>
-  
+
             {/* Submit Modal */}
             {showSubmitModal && (
               <SubmitModal
@@ -313,7 +324,7 @@ const TestWindow = () => {
                 setSubmitted={setSubmitted}
               />
             )}
-  
+
             {/* Submission Confirmation */}
             {submitted && (
               <p className="mt-4 text-center text-green-700 font-semibold">
@@ -325,7 +336,7 @@ const TestWindow = () => {
       )}
     </div>
   );
-  
+
 };
 
 export default TestWindow;

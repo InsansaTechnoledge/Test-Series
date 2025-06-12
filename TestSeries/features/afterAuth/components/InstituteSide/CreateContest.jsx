@@ -45,7 +45,7 @@ const CreateContest = () => {
       const response=await createContest(formData);
       if(response.status === 200){
         console.log('Contest created successfully:', response.data);
-        navigate('/institute/contest-list'); 
+        navigate('/institute/code-create/?contestId=' + response.data.id);
       }
     } catch (error) {
       console.error('Error creating contest:', error);

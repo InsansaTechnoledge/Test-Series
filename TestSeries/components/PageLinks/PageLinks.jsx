@@ -111,6 +111,7 @@ const PageLinks = () => {
                 <Route path='video' element={<YoutubeConnection />} />
                 <Route path='create-contest/:contestId?' element={<CreateContest/>}/>
                 <Route path='contest-list' element={<ContestList/>} />
+                <Route path='code-create' element={<QuestionCreator/>}/>
                 <Route path='*' element={<div>Invalid path</div>} />
               </Route>
             </Route>
@@ -138,7 +139,7 @@ const PageLinks = () => {
         <Route path='video/upload' element={<UploadVideo />} />
         <Route path='session-expired' element={<SessionExpireError />} />
         <Route path='code' element={<CodingPlatform/>} />
-        <Route path='code-create' element={<QuestionCreator/>}/>
+
 
         
       </Routes>

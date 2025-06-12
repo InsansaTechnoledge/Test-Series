@@ -4,14 +4,14 @@ create table public.Batch_syllabus (
   created_at timestamp with time zone default now()
 );
 
-create table public.Organization_Batch (
-  id uuid primary key default gen_random_uuid(),
-  organization_id text not null,
-  name text not null,
-  year int2 not null,
-  syllabus_id uuid references public.Batch_syllabus(id),
-  created_at timestamp with time zone default now()
-);
+  create table public.Organization_Batch (
+    id uuid primary key default gen_random_uuid(),
+    organization_id text not null,
+    name text not null,
+    year int2 not null,
+    syllabus_id uuid references public.Batch_syllabus(id),
+    created_at timestamp with time zone default now()
+  );
 
 create table public.Batch_exam (
   id uuid primary key default gen_random_uuid(),
@@ -113,3 +113,162 @@ create table public.question_code (
   sample_output text,
   test_cases jsonb -- e.g., [{input: "2 3", output: "5"}]
 );
+
+
+-- Optimized PostgreSQL RPC function to replicate fetchQuestionsSelectively behavior
+CREATE OR REPLACE FUNCTION fetch_questions_selectively(
+    p_exam_id UUID DEFAULT NULL,
+    p_organization_id TEXT DEFAULT NULL,
+    p_subject TEXT DEFAULT NULL,
+    p_chapter TEXT DEFAULT NULL,
+    p_question_type TEXT DEFAULT NULL,
+    p_difficulty TEXT DEFAULT NULL,
+   p_already_given_exam NULL
+) 
+RETURNS JSONB
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    result JSONB := '[]'::JSONB;
+    question_record RECORD;
+    specialized_data JSONB;
+    sub_questions_data JSONB := '[]'::JSONB;
+    sub_question_record RECORD;
+    sub_specialized_data JSONB;
+    all_comprehension_sub_ids UUID[] := ARRAY[]::UUID[];
+    sub_q_id UUID;
+BEGIN
+
+  IF p_exam_id IS NOT NULL AND p_already_given IS TRUE THEN
+    -- Student has already attempted the exam, check if it's reapplicable
+    PERFORM 1
+    FROM batch_exam 
+    WHERE id = p_exam_id AND reapplicable IS TRUE;
+
+    IF NOT FOUND THEN 
+        RETURN '[]'::JSONB;  -- Not allowed to reattempt, so return nothing
+    END IF;
+  END IF;
+    -- First pass: collect all comprehension sub-question IDs
+    FOR question_record IN 
+        SELECT q.*, qc.sub_question_ids
+        FROM questions q
+        LEFT JOIN question_comprehension qc ON q.id = qc.id AND q.question_type = 'comprehension'
+        WHERE 
+            (p_exam_id IS NULL OR q.exam_id = p_exam_id)
+            AND (p_organization_id IS NULL OR p_organization_id = '' OR q.organization_id = p_organization_id)
+            AND (p_subject IS NULL OR p_subject = '' OR q.subject = p_subject)
+            AND (p_chapter IS NULL OR p_chapter = '' OR q.chapter = p_chapter)
+            AND (p_question_type IS NULL OR p_question_type = '' OR q.question_type = p_question_type)
+            AND (p_difficulty IS NULL OR p_difficulty = '' OR q.difficulty = p_difficulty)
+    LOOP
+        IF question_record.question_type = 'comprehension' AND question_record.sub_question_ids IS NOT NULL THEN
+            all_comprehension_sub_ids := all_comprehension_sub_ids || question_record.sub_question_ids;
+        END IF;
+    END LOOP;
+
+    -- Second pass: build enriched questions
+    FOR question_record IN 
+        SELECT q.*
+        FROM questions q
+        WHERE 
+            (p_exam_id IS NULL OR q.exam_id = p_exam_id)
+            AND (p_organization_id IS NULL OR p_organization_id = '' OR q.organization_id = p_organization_id)
+            AND (p_subject IS NULL OR p_subject = '' OR q.subject = p_subject)
+            AND (p_chapter IS NULL OR p_chapter = '' OR q.chapter = p_chapter)
+            AND (p_question_type IS NULL OR p_question_type = '' OR q.question_type = p_question_type)
+            AND (p_difficulty IS NULL OR p_difficulty = '' OR q.difficulty = p_difficulty)
+            -- Filter out comprehension sub-questions
+            AND NOT (q.id = ANY(all_comprehension_sub_ids))
+    LOOP
+        -- Get specialized data based on question type
+        specialized_data := '{}'::JSONB;
+        
+        CASE question_record.question_type
+            WHEN 'mcq' THEN
+                SELECT to_jsonb(mcq.*) INTO specialized_data 
+                FROM question_mcq mcq WHERE mcq.id = question_record.id;
+                
+            WHEN 'msq' THEN
+                SELECT to_jsonb(msq.*) INTO specialized_data 
+                FROM question_msq msq WHERE msq.id = question_record.id;
+                
+            WHEN 'fill' THEN
+                SELECT to_jsonb(fill.*) INTO specialized_data 
+                FROM question_fill fill WHERE fill.id = question_record.id;
+                
+            WHEN 'tf' THEN
+                SELECT to_jsonb(tf.*) INTO specialized_data 
+                FROM question_tf tf WHERE tf.id = question_record.id;
+                
+            WHEN 'match' THEN
+                SELECT to_jsonb(match.*) INTO specialized_data 
+                FROM question_match match WHERE match.id = question_record.id;
+                
+            WHEN 'numerical' THEN
+                SELECT to_jsonb(num.*) INTO specialized_data 
+                FROM question_numerical num WHERE num.id = question_record.id;
+                
+            WHEN 'code' THEN
+                SELECT to_jsonb(code.*) INTO specialized_data 
+                FROM question_code code WHERE code.id = question_record.id;
+                
+            WHEN 'comprehension' THEN
+                SELECT to_jsonb(comp.*) INTO specialized_data 
+                FROM question_comprehension comp WHERE comp.id = question_record.id;
+                
+                -- Handle sub-questions for comprehension
+                sub_questions_data := '[]'::JSONB;
+                
+                IF (specialized_data->'sub_question_ids') IS NOT NULL AND jsonb_array_length(specialized_data->'sub_question_ids') > 0 THEN
+                    FOR sub_q_id IN SELECT (jsonb_array_elements_text(specialized_data->'sub_question_ids'))::UUID
+                    LOOP
+                        -- Get sub-question base data
+                        SELECT * INTO sub_question_record 
+                        FROM questions WHERE id = sub_q_id;
+                        
+                        IF sub_question_record IS NOT NULL THEN
+                            -- Get sub-question specialized data
+                            sub_specialized_data := '{}'::JSONB;
+                            
+                            CASE sub_question_record.question_type
+                                WHEN 'mcq' THEN
+                                    SELECT to_jsonb(mcq.*) INTO sub_specialized_data 
+                                    FROM question_mcq mcq WHERE mcq.id = sub_q_id;
+                                WHEN 'msq' THEN
+                                    SELECT to_jsonb(msq.*) INTO sub_specialized_data 
+                                    FROM question_msq msq WHERE msq.id = sub_q_id;
+                                WHEN 'fill' THEN
+                                    SELECT to_jsonb(fill.*) INTO sub_specialized_data 
+                                    FROM question_fill fill WHERE fill.id = sub_q_id;
+                                WHEN 'tf' THEN
+                                    SELECT to_jsonb(tf.*) INTO sub_specialized_data 
+                                    FROM question_tf tf WHERE tf.id = sub_q_id;
+                                WHEN 'numerical' THEN
+                                    SELECT to_jsonb(num.*) INTO sub_specialized_data 
+                                    FROM question_numerical num WHERE num.id = sub_q_id;
+                                ELSE
+                                    sub_specialized_data := '{}'::JSONB;
+                            END CASE;
+                            
+                            -- Merge sub-question data
+                            sub_questions_data := sub_questions_data || 
+                                jsonb_build_array(to_jsonb(sub_question_record) || COALESCE(sub_specialized_data, '{}'::JSONB));
+                        END IF;
+                    END LOOP;
+                END IF;
+                
+                -- Add sub_questions to specialized_data
+                specialized_data := specialized_data || jsonb_build_object('sub_questions', sub_questions_data);
+        END CASE;
+        
+        -- Merge question data with specialized data
+        result := result || jsonb_build_array(
+            to_jsonb(question_record) || COALESCE(specialized_data, '{}'::JSONB)
+        );
+        
+    END LOOP;
+
+    RETURN result;
+END;
+$$;
