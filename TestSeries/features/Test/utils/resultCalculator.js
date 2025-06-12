@@ -21,6 +21,10 @@ export const calculateResult = (responses) => {
         if (!isAttempted) {
             unattempted.push(question_id);
             return;
+        }
+
+        const safeToString = (value) => {
+            return value !== null && value !== undefined ? value.toString().trim().toLowerCase() : '';
         };
 
         switch (question_type) {
@@ -28,7 +32,7 @@ export const calculateResult = (responses) => {
             case "numerical":
             case "tf":
             case "fill":
-                isCorrect = user_response.toString().trim().toLowerCase() === correct_response.toString().trim().toLowerCase()
+                isCorrect = safeToString(user_response) === safeToString(correct_response);
                 break;
             case 'msq': // multiple correct options
                 if (Array.isArray(user_response) && Array.isArray(correct_response)) {
@@ -53,7 +57,6 @@ export const calculateResult = (responses) => {
                 for (let subId in correct_response) {
                     const correct = correct_response?.[subId][0];
                     const user = user_response?.[subId];
-                    console.log("UEER", user);
 
                     const isUserAttempted =
                         user !== null &&
@@ -66,22 +69,20 @@ export const calculateResult = (responses) => {
                             (typeof user === 'object' && Object.keys(user).length > 0)
                         );
 
-
                     if (!isUserAttempted) {
                         continue;
                     }
+
                     const positive_marks = correct_response?.[subId][1];
                     const negative_marks = correct_response?.[subId][2];
                     const question_type = correct_response?.[subId][3];
                     let subCorrect = false;
-                    console.log(question_type);
+
                     switch (question_type) {
                         case "mcq":
                         case "numerical":
                         case "tf":
-                            subCorrect = user?.toString().trim().toLowerCase() === correct?.toString().trim().toLowerCase();
-
-                            console.log(subCorrect);
+                            subCorrect = safeToString(user) === safeToString(correct);
                             break;
 
                         case "msq":
@@ -94,7 +95,7 @@ export const calculateResult = (responses) => {
                         case "fill":
                             subCorrect = typeof user === "string" &&
                                 typeof correct === "string" &&
-                                user.trim().toLowerCase() === correct.trim().toLowerCase();
+                                safeToString(user) === safeToString(correct);
                             break;
 
                         case "matching":
@@ -124,7 +125,7 @@ export const calculateResult = (responses) => {
         }
 
         if (question_type !== 'comprehension') {
-            totalMarks += isCorrect ? positive_marks : negative_marks;
+            totalMarks += isCorrect ? positive_marks : -negative_marks;  
         }
 
         if (!isCorrect) {
@@ -137,32 +138,8 @@ export const calculateResult = (responses) => {
     });
 
     return { 
-        totalMarks:Number(totalMarks.toFixed(2)) ,
+        totalMarks: Number(totalMarks.toFixed(2)),
         unattempted, 
-        wrongAnswers };
+        wrongAnswers 
+    };
 }
-
-
-// switch (question.question_type) {
-//     case "mcq":
-//         return question.correct_option;
-//     case "msq":
-//         return question.correct_options;
-//     case "fill":
-//     case "numerical":
-//         return question.correct_answer;
-//     case "tf":
-//         return question.is_true;
-//     case "match":
-//         return question.correct_pairs;
-//     case "comprehension":
-//         return question.sub_questions.reduce((acc, sub_q) => {
-//             const response = getCorrectResponse(sub_q);
-//             return {
-//                 ...acc,
-//                 [sub_q.id]: response
-//             };
-//         }, {})
-//     default:
-//         return question.correct_response;
-// }

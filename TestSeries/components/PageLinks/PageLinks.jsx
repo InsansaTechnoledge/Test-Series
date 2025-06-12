@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import BeforeAuthLanding from '../../features/beforeAuth/BeforeAuthLanding';
 import BeforeAuthLayout from '../../layouts/BeforeAuthLayout';
@@ -47,6 +47,7 @@ import ContestList from '../../features/afterAuth/components/InstituteSide/Conte
 
 const PageLinks = () => {
   const { user, setUser } = useUser();
+  const [loading, setLoading] = useState(true);
 
   const fetchUser = async () => {
     try {
@@ -59,14 +60,22 @@ const PageLinks = () => {
     } catch (error) {
       console.error('Error fetching user:', error);
       setUser(null);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     if (!user) {
       fetchUser();
+    } else {
+      setLoading(false);
     }
-  }, []);
+  }, [user]);
+
+  if (loading) {
+    return <div>Loading...</div>; // or a spinner
+  }
 
   return (
     <Router>
@@ -114,7 +123,6 @@ const PageLinks = () => {
                 <Route path='completed-exams' element={ <ResultsPage />} />
                 <Route path='result/:examId' element={<ResultDetailPage />} />
                 <Route path='test' element={<TestWindow />} />
-
               </Route>
             </Route>
           </Route>

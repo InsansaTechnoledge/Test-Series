@@ -347,9 +347,9 @@ const ResultPage = () => {
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl font-semibold">Exam Results ({filteredQuestions.length} of {totalQuestions} questions)</h2>
                     <div className="text-sm text-gray-700 space-x-4">
-                        <span>Scored: <strong className="text-green-600">{scoredMarks}</strong></span>
+                        <span>Scored: <strong className={`${scoredMarks >= 0 ? "text-green-600" : "text-red-600"}`}>{scoredMarks}</strong></span>
                         <span>Out of: <strong>{totalMarks}</strong></span>
-                        <span>Percentage: <strong className={`${percentage >= 60 ? "text-green-600" : "text-red-600"}`}>{percentage}%</strong></span>
+                        <span>Percentage: <strong className={`${percentage >= 33 ? "text-green-600" : "text-red-600"}`}>{percentage}%</strong></span>
                         <span>Rank: <strong>{resultData.rank}</strong></span>
 
                     </div>
@@ -369,7 +369,7 @@ const ResultPage = () => {
                         <option value="numerical">Numerical</option>
                         <option value="match">Match</option>
                         <option value="comprehension">Comprehension</option>
-                        <option value="code">Coding</option>
+                        <option value="code">Coding</option>    
                     </select>
 
                     <select
