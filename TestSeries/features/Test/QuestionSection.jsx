@@ -6,13 +6,15 @@ import TrueFalseQuestion from './QuestionTypes/TrueFalseQuestion';
 import MatchingQuestion from './QuestionTypes/MatchingQuestion';
 import ComprehensionQuestion from './QuestionTypes/ComprehensionQuestion';
 import NumericalQuestion from './QuestionTypes/NumericQuestion';
+import CodeQuestion from './QuestionTypes/CodeQuestion';
 
 const QuestionSection = ({ setSelectedQuestion, selectedQuestion, selectedSubject, subjectSpecificQuestions, setSubjectSpecificQuestions }) => {
 
     const [option, setOption] = useState('');
     if (!selectedQuestion) {
         return (
-            <div>Loading...</div>
+            <div>Loading...
+            </div>
         )
     }
 
@@ -58,6 +60,10 @@ const QuestionSection = ({ setSelectedQuestion, selectedQuestion, selectedSubjec
                         return false;
                     })
                 );
+
+            case 'code': // option is string (code)
+                return typeof option === 'string' && option.trim() !== '';
+            
 
             default:
                 return false;
@@ -162,6 +168,9 @@ const QuestionSection = ({ setSelectedQuestion, selectedQuestion, selectedSubjec
                     return acc;
                 }, {});
 
+            case 'code':
+                return ''; // reset code to empty string
+
             default:
                 return null;
         }
@@ -187,7 +196,9 @@ const QuestionSection = ({ setSelectedQuestion, selectedQuestion, selectedSubjec
               case 'comprehension':
                 return <ComprehensionQuestion selectedQuestion={selectedQuestion} option={option} setOption={setOption} />;
               case 'numerical':
-                return <NumericalQuestion selectedQuestion={selectedQuestion} option={option} setOption={setOption} />;
+                return <NumericalQuestion selectedQuestion={selectedQuestion} option={option} setOption={setOption} />;rn
+              case 'code':
+                return <CodeQuestion selectedQuestion={selectedQuestion} option={option} setOption={setOption} />;
               default:
                 return null;
             }
