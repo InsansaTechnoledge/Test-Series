@@ -44,6 +44,7 @@ import CodingPlatform from '../../features/Test/CodeEditor/CodingPlatform';
 import QuestionCreator from '../../features/Test/CodeEditor/codeCreator/QuestionCreator';
 import CreateContest from '../../features/afterAuth/components/InstituteSide/CreateContest';
 import ContestList from '../../features/afterAuth/components/InstituteSide/ContestList';
+import CertificateCreation from '../../features/Certificates/CertificateCreation';
 
 const PageLinks = () => {
   const { user, setUser } = useUser();
@@ -139,7 +140,7 @@ const PageLinks = () => {
         <Route path='video/upload' element={<UploadVideo />} />
         <Route path='session-expired' element={<SessionExpireError />} />
         <Route path='code' element={<CodingPlatform/>} />
-
+        <Route path='certificate-creation' element={<CertificateCreation/>}/>
 
         
       </Routes>
