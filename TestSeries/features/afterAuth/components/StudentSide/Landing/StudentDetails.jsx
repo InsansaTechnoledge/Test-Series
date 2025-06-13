@@ -7,12 +7,14 @@ import {
 import { useUser } from '../../../../../contexts/currentUserContext';
 import { useEffect, useState } from 'react';
 import { useCachedBatches } from '../../../../../hooks/useCachedBatches';
+import { useNavigate } from 'react-router-dom';
 
 export default function StudentDetails() {
     const {user}=useUser();
     const [student,setStudent]=useState(user);
     const {batchMap}=useCachedBatches();
     const studentBatch=batchMap[user?.batch?.currentBatch];
+    const navigate=useNavigate();
 
     useEffect(() => {
         if (user) {
@@ -105,10 +107,9 @@ export default function StudentDetails() {
               <NotepadText size={18} className="text-blue-600" />
               <button className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-blue-700 border border-blue-300 rounded-lg hover:bg-blue-800 hover:text-white transition-colors"
               onClick={() => {
-                // Add your logic to view syllabus here
-                console.log("View Syllabus clicked");
+               navigate(`/syllabus/${studentBatch?.syllabus_id}`);
               }}>
-                {studentBatch?.syllabus ? "View Syllabus" : "Syllabus not added yet"}
+                {studentBatch?.syllabus_id ? "View Syllabus" : "Syllabus not added yet"}
 
               </button>
             </div>

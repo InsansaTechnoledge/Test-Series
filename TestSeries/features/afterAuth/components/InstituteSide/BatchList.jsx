@@ -7,7 +7,6 @@ import { useCachedBatches } from '../../../../hooks/useCachedBatches';
 import RefreshButton from '../../utility/RefreshButton';
 import { useQueryClient } from '@tanstack/react-query';
 import { useUser } from '../../../../contexts/currentUserContext';
-import BackButton from '../../../constants/BackButton';
 import DeleteBatchModal from '../../utility/DeleteBatchModal';
 import { useCachedUser } from '../../../../hooks/useCachedUser';
 import { useCachedStudents } from '../../../../hooks/useCachedStudents';
@@ -87,7 +86,7 @@ const BatchList = () => {
                     <td className="px-6 py-4">
                       {batch.syllabus_id ? (
                         <button
-                          onClick={() => navigate(`/institute/syllabus/${batch.syllabus_id}`)}
+                          onClick={() => navigate(`/syllabus/${batch.syllabus_id}`)}
                           className="flex space-x-2 hover:underline"
                         >
                           <NotepadText />
