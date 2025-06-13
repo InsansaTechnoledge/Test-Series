@@ -39,11 +39,17 @@ const TestWindow = () => {
 
   useEffect(() => {
     if (!isExamLoading && !isQuestionLoading && questions && questions.length > 0) {
+      for (const quest of questions) {
+                      if (!quest.subject || quest.subject.trim() === "") {
+            quest.subject = "Unspecified";  // Replace empty subject with "Unspecified"
+          }
+        }
       const subjectSet = new Set(questions.map(q => q.subject));
       console.log("Exam details:", exam);
       console.log("Questions loaded:", questions);
       console.log("Subjects found:", Array.from(subjectSet));
-      
+
+
       setEventDetails(prev => ({
         ...prev,
         ...exam,
@@ -52,22 +58,17 @@ const TestWindow = () => {
       }));
     }
   }, [questions, isQuestionLoading, isExamLoading]);
-  
+
   useEffect(() => {
     if (eventDetails) {
       const cached = localStorage.getItem('testQuestions');
-      
-      // Debugging output to see event details and cached data
-      console.log("Event details:", eventDetails);
-      console.log("Cached data:", cached);
-  
+
+
       if (!cached) {
         const reduced = eventDetails.questions.reduce((acc, quest) => {
           // Check if the subject is empty or null
-          if (!quest.subject || quest.subject.trim() === "") {
-            quest.subject = "Unspecified";  // Replace empty subject with "Unspecified"
-          }
-  
+
+
           if (!acc[quest.subject]) {
             acc[quest.subject] = [{ ...quest, index: 1, status: 'unanswered', response: null }];
           } else {
@@ -75,7 +76,7 @@ const TestWindow = () => {
           }
           return acc;
         }, {});
-  
+
         console.log("Reduced subject-specific questions:", reduced);
         setSubjectSpecificQuestions(reduced);
       } else {
@@ -84,13 +85,13 @@ const TestWindow = () => {
         console.log("Decrypted subject-specific questions:", decrypted);
         setSubjectSpecificQuestions(decrypted);
       }
-  
+
       // Set the selected subject (use the first valid subject if possible)
       setSelectedSubject(eventDetails.subjects[0] || "Unspecified");
     }
   }, [eventDetails]);
-  
-  
+
+
 
 
   useEffect(() => {
@@ -99,7 +100,7 @@ const TestWindow = () => {
     }
   }, [subjectSpecificQuestions]);
 
- 
+
   useEffect(() => {
     if (eventDetails) {
       const cached = localStorage.getItem('testQuestions');
@@ -109,7 +110,7 @@ const TestWindow = () => {
           if (quest.subject.trim() === "") {
             quest.subject = "Unspecified"; // or just exclude it
           }
-  
+
           if (!acc[quest.subject]) {
             acc[quest.subject] = [{ ...quest, index: 1, status: 'unanswered', response: null }];
           } else {
@@ -117,18 +118,18 @@ const TestWindow = () => {
           }
           return acc;
         }, {});
-  
+
         setSubjectSpecificQuestions(reduced);
       } else {
         const bytes = CryptoJS.AES.decrypt(cached, secretKey);
         const decrypted = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
         setSubjectSpecificQuestions(decrypted);
       }
-  
+
       setSelectedSubject(eventDetails.subjects[0]);
     }
   }, [eventDetails]);
-  
+
   useEffect(() => {
     if (selectedSubject && subjectSpecificQuestions) {
       setSelectedQuestion(subjectSpecificQuestions[selectedSubject][0]);

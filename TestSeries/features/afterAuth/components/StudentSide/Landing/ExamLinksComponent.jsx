@@ -1,15 +1,18 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-export default function  ExamLinksComponent({ Data , grid }) {
+export default function ExamLinksComponent({ Data, grid }) {
   const navigate = useNavigate();
   console.log(grid)
   return (
     <div className="px-4 py-8">
       <div className="max-w-6xl mx-auto">
 
-      <div className={`grid grid-cols-1 sm:grid-cols-2 ${grid?.[0]?.grid ? `lg:${grid[0].grid}` : 'lg:grid-cols-2'} gap-6 md:gap-8`}>
-      {Data.map((card, index) => {
+        <div className={`grid grid-cols-1 sm:grid-cols-3 ${grid?.[0]?.grid
+          ?
+          `lg:${grid[0].grid}`
+          :
+          'lg:grid-cols-3'} gap-6 md:gap-8`}>
+          {Data.map((card, index) => {
             const Icon = card?.icon;
             const Rank = card?.rank;
 
@@ -17,7 +20,7 @@ export default function  ExamLinksComponent({ Data , grid }) {
               <button
                 key={index}
                 className={`rounded-xl border p-6 flex flex-col items-center text-center transition-all duration-300 transform hover:scale-105 cursor-pointer ${card.color} ${card.shadow}`}
-                onClick={()=>navigate(card.path)}
+                onClick={() => navigate(card.path)}
               >
                 <div className="p-3 rounded-full mb-4 bg-white shadow-inner w-14 h-14 flex items-center justify-center">
                   {Icon ? (

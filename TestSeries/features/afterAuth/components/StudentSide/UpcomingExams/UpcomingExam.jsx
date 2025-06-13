@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import HeadingUtil from '../../../utility/HeadingUtil';
 import NeedHelpComponent from '../../InstituteSide/components/NeedHelpComponent';
 import UpcomingExamCard from './UpcomingExamCard';
 import LiveExamCard from './LiveExamCard';
-import { fetchUpcomingExams } from '../../../../../utils/services/examService';
 import { useUser } from '../../../../../contexts/currentUserContext'
 import { useNavigate } from 'react-router-dom'
 import { useExamManagement } from '../../../../../hooks/UseExam';
@@ -14,36 +13,18 @@ const UpcomingExam = () => {
   const [upcomingExams, setUpcomingExams] = useState([]);
   const user = useUser();
   const navigate = useNavigate();
-  const {exams}=useExamManagement();
+  const { exams } = useExamManagement();
 
   const question = "How To assign role groups to users ?";
   const answer = "Use the created role groups to assign permissions to users in your add user section.";
 
+  useEffect(() => {
+    const upcoming = exams?.filter(exam => exam.go_live === false || exam.go_live === "FALSE");
+    setUpcomingExams(upcoming);
 
-  // useEffect(() => {
-  //   const getExams = async () => {
-  //     try {
-  //       const exams = await fetchUpcomingExams();
-
-  //       const upcoming = exams.filter(exam => exam.go_live === false || exam.go_live === "FALSE");
-  //       setUpcomingExams(upcoming);
-
-  //       const live = exams.filter(exam => exam.go_live === true || exam.go_live === "TRUE")
-  //       setLiveExams(live)
-  //     } catch (error) {
-  //       console.error("❌ Error fetching upcoming exams:", error);
-  //     }
-  //   };
-
-  //   getExams();
-  // }, []);
-useEffect(()=>{
-  const upcoming = exams?.filter(exam => exam.go_live === false || exam.go_live === "FALSE");
-        setUpcomingExams(upcoming);
-
-        const live = exams?.filter(exam => exam.go_live === true || exam.go_live === "TRUE")
-        setLiveExams(live)
-},[exams])
+    const live = exams?.filter(exam => exam.go_live === true || exam.go_live === "TRUE")
+    setLiveExams(live)
+  }, [exams])
 
 
   const handleStartTest = (examId) => {

@@ -45,6 +45,7 @@ import QuestionCreator from '../../features/Test/CodeEditor/codeCreator/Question
 import CreateContest from '../../features/afterAuth/components/InstituteSide/CreateContest';
 import ContestList from '../../features/afterAuth/components/InstituteSide/ContestList';
 import CertificateCreation from '../../features/Certificates/CertificateCreation';
+import ContestListPage from '../../features/afterAuth/components/StudentSide/Coding-Contests/ContestListPage';
 
 const PageLinks = () => {
   const { user, setUser } = useUser();
@@ -105,7 +106,6 @@ const PageLinks = () => {
                 <Route path='create-role-group' element={<FeatureBasedRoleGroups />} />
                 <Route path='create-exam/:examId?' element={<CreateExam />} />
                 <Route path='exam-list' element={<ExamListPage />} />
-                <Route path='syllabus/:syllabusId' element={<SyllabusViewPage />} />
                 <Route path='institute-landing' element={<InstituteLandingPage />} />
                 <Route path='batch-details' element={<BatchViewPage />} />
                 <Route path='edit-batch' element={<EditBatchPage />} />
@@ -125,6 +125,7 @@ const PageLinks = () => {
                 <Route path='completed-exams' element={ <ResultsPage />} />
                 <Route path='result/:examId' element={<ResultDetailPage />} />
                 <Route path='test' element={<TestWindow />} />
+                <Route path='coding-contests' element={<ContestListPage />}/>
               </Route>
             </Route>
           </Route>
@@ -141,6 +142,7 @@ const PageLinks = () => {
         <Route path='session-expired' element={<SessionExpireError />} />
         <Route path='code' element={<CodingPlatform/>} />
         <Route path='certificate-creation' element={<CertificateCreation/>}/>
+           <Route path='syllabus/:syllabusId' element={<SyllabusViewPage />} />
 
         
       </Routes>
