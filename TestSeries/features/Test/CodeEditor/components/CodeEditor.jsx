@@ -30,6 +30,14 @@ const CodeEditor = ({ code, onChange, language }) => {
     };
   }, []);
 
+  useEffect(() => {
+  const model = editorRef.current?.getModel();
+  if (model && language) {
+    monaco.editor.setModelLanguage(model, language);
+  }
+}, [language]);
+
+
   const initializeEditor = () => {
     if (containerRef.current && !editorRef.current) {
       const monacoEditor = window.monaco.editor.create(containerRef.current, {
