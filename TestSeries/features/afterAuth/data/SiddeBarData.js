@@ -55,5 +55,10 @@ export const controls = [
         name: "create Contest",
         path: "create-contest",
         icon: User
+    },
+    {
+        name: "contest list",
+        path: "contest-list",
+        icon: User
     }
 ]

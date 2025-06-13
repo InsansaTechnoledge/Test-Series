@@ -5,7 +5,7 @@ export const createContest=async(payload)=>{
     return response.data;
 }
 
-export const FetchContest = async () => {
-    const response = await api.get('');
+export const FetchContest = async () => {    
+    const response = await api.get('/v1/contest');
     return response.data;
 }

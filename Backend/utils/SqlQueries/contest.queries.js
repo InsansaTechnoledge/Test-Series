@@ -37,3 +37,16 @@ export const createContestQuery = async (payload) => {
 //     if (error) throw error;
 //     return data;
 // }
+
+export const fetchContest = async (organizationId) => {
+    if (!organizationId) throw new Error("organizationId is required");
+  
+    const { data, error } = await supabase
+      .from("organization_contest")
+      .select()
+      .eq("organization_id", organizationId);
+  
+    if (error) throw error;
+    return data;
+  };
+
