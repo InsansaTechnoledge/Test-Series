@@ -45,7 +45,7 @@ import QuestionCreator from '../../features/Test/CodeEditor/codeCreator/Question
 import CreateContest from '../../features/afterAuth/components/InstituteSide/CreateContest';
 import ContestList from '../../features/afterAuth/components/InstituteSide/ContestList';
 import CertificateCreation from '../../features/Certificates/CertificateCreation';
-import ContestListPage from '../../features/afterAuth/components/StudentSide/Coding-Contests/ContestListPage';
+import ContestListPage from '../../features/afterAuth/components/StudentSide/Coding-Contests/ContestListPageStudent';
 
 const PageLinks = () => {
   const { user, setUser } = useUser();

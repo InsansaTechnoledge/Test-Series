@@ -38,15 +38,90 @@ export const createContestQuery = async (payload) => {
 //     return data;
 // }
 
-export const fetchContest = async (organizationId) => {
-    if (!organizationId) throw new Error("organizationId is required");
-  
-    const { data, error } = await supabase
+export const fetchContest = async (organizationId, batchId,userId) => {
+  let data, error;
+
+   if (!batchId && !userId) {
+    const res = await supabase
       .from("organization_contest")
       .select()
       .eq("organization_id", organizationId);
-  
+    data = res.data;
+    error = res.error;
+  }
+
+  // Case 2: Only batchId is present
+  if (batchId && !userId) {
+    const batchRes = await supabase
+      .from('batchxcontest')
+      .select('contest_id')
+      .eq('batch_id', batchId);
+    if (batchRes.error) throw batchRes.error;
+
+    const contestIds = batchRes.data.map(item => item.contest_id);
+    const contestRes = await supabase
+      .from('organization_contest')
+      .select()
+      .in('id', contestIds);
+
+    data = contestRes.data;
+    error = contestRes.error;
+  }
+
+  // Case 3: Only userId is present
+  if (userId && !batchId) {
+    const participantRes = await supabase
+      .from('contestxparticipant')
+      .select('contest_id')
+      .eq('participant_id', userId);
+    if (participantRes.error) throw participantRes.error;
+
+    const contestIds = participantRes.data.map(item => item.contest_id);
+    const contestRes = await supabase
+      .from('organization_contest')
+      .select()
+      .in('id', contestIds);
+
+    data = contestRes.data;
+    error = contestRes.error;
+  }
+
+  // Case 4: Both batchId and userId are present
+  if (batchId && userId) {
+    const [batchRes, participantRes] = await Promise.all([
+      supabase.from('batchxcontest').select('contest_id').eq('batch_id', batchId),
+      supabase.from('contestxparticipant').select('contest_id').eq('participant_id', userId)
+    ]);
+
+    if (batchRes.error) throw batchRes.error;
+    if (participantRes.error) throw participantRes.error;
+    
+    const batches=await supabase
+      .from('organization_contest')
+      .select()
+      .in('id', batchRes.data.map(item => item.contest_id));
+
+    for (const contest of batches.data) {
+      contest.isEnrolled = participantRes.data.some(item => item.contest_id === contest.id);
+    }
+    data = batches.data;
+    error = batches.error;
+}
+    
+
+
+  if (error) throw error;
+  return data;
+};
+
+export const enrollStudentToContestQuery = async (contestId, userId) => {
+  console.log("Enrolling user:", userId, "to contest:", contestId);
+    const { data, error } = await supabase
+        .from("contestxparticipant")
+        .insert([{ contest_id: contestId, participant_id: userId ,status: 'enrolled'}])
+        .select();
+
     if (error) throw error;
     return data;
-  };
+}
 
