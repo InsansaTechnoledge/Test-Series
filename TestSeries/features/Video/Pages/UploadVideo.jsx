@@ -1,11 +1,13 @@
 import React, { useState } from 'react'
 import { uploadVideo } from '../../../utils/services/videoService';
 import { useCachedBatches } from '../../../hooks/useCachedBatches';
+import {useNavigate} from 'react-router-dom'
 
 const UploadVideo = () => {
     const [video, setVideo] = useState();
     const [formData, setFormData] = useState({});
     const { batches } = useCachedBatches();
+    const navigate=useNavigate();
 
     const onChangeHandler = (name, value) => {
         setFormData(prev => ({
@@ -20,6 +22,7 @@ const UploadVideo = () => {
         if (response.status == 200) {
             console.log(response.data);
             alert("Video uploaded successfully");
+            navigate('/institute/institute-landing');
         }
     }
 
