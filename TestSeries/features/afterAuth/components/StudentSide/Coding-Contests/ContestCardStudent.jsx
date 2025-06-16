@@ -69,7 +69,8 @@ const ContestCard = ({ contest , handleParticipate ,notParticipated}) => {
             //encrypt the contest id
 
             const contestId = CryptoJS.AES.encrypt(contest.id,SECRET_KEY).toString();
-            navigate(`/student/contest/${contestId}`);
+            const safeId=encodeURIComponent(contestId);
+            navigate(`/student/contest/${safeId}`);
           }}
           className="mt-4 bg-green-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-green-700">
             Go Live

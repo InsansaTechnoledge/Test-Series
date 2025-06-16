@@ -29,7 +29,7 @@ export const createContest = async (req, res) => {
 export const FetchContest = async (req, res) => {
     try {
         const batchId = req.query.batchId;
-        const userId = req.query.userId;
+        const userId = req.user.role === 'student' ? req.user._id : null;
         const organizationId = req.user?._id || req.user?.organizationId;
 
 

@@ -1,28 +1,29 @@
 import { use, useEffect, useState } from "react";
 import HeadingUtil from "../../../utility/HeadingUtil";
 import NeedHelpComponent from "../../InstituteSide/components/NeedHelpComponent";
-import { enrollContest, FetchContest } from "../../../../../utils/services/contestService";
-import { useUser } from "../../../../../contexts/currentUserContext";
+import { enrollContest } from "../../../../../utils/services/contestService";
 import ContestCard from "./ContestCardStudent";
+import useCachedContests from "../../../../../hooks/useCachedContests";
+
 
 const ContestListPage = () => {
-
-    const [contestList, setContestList] = useState([]);
+    const {contestList,isLoading} = useCachedContests();
+    const [contests, setContests] = useState([]);
     const [enrolledContests, setEnrolledContests] = useState([]);
-    const { user } = useUser();
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        const fetchContestList = async () => {
-            const response = await FetchContest(user.batch.currentBatch, user._id);
-            if (response.status === 200) {
-                setContestList(response.data.filter(contest => contest.isEnrolled === false));
-                setEnrolledContests(response.data.filter(contest => contest.isEnrolled === true));
-                console.log("Contest List:", response.data);
-            }
-        };
+        if (!contestList || contestList.length === 0) {
+            console.log("No contests available or contestList is empty.");
+            setLoading(true);
+            return;
+        }
+        setContests(contestList.filter(contest => contest.isEnrolled === false));
+        setEnrolledContests(contestList.filter(contest => contest.isEnrolled === true));
+        setLoading(false);
 
-        fetchContestList();
-    }, []);
+    }, [contestList]);
+
 
     const handleParticipate = async (contestId) => {
         try {
@@ -39,11 +40,11 @@ const ContestListPage = () => {
             }
             console.log("Enrolled Contest Response:", response.data);
 
-            setEnrolledContests(prev => [...prev, contestList.find(contest => contest.id === contestId)]);
+            setEnrolledContests(prev => [...prev, contests.find(contest => contest.id === contestId)]);
             console.log("Enrolled Contests:", enrolledContests);
-            setContestList(prev => prev.filter(contest => contest.id !== contestId));
+            setContests(prev => prev.filter(contest => contest.id !== contestId));
 
-            console.log("Updated Contest List:", contestList);
+            console.log("Updated Contest List:", contests);
 
 
         } catch (error) {
@@ -58,8 +59,9 @@ const ContestListPage = () => {
         } catch (error) {
             console.error("Error in enrolled contests:", error);
         }
-    }, [contestList, enrolledContests]);
+    }, [contests, enrolledContests]);
 
+    {loading && <div className="text-center text-gray-500">Loading contests...</div>}
 
 
     return (
@@ -99,8 +101,8 @@ const ContestListPage = () => {
             <div className="max-w-6xl mx-auto">
                 <div className="contest-list">
                     <label className="text-lg font-semibold mb-4">Available Contests</label>
-                    {contestList && contestList.length > 0 ? (
-                        contestList.map((contest, index) => (
+                    {contests && contests.length > 0 ? (
+                        contests.map((contest, index) => (
                             <ContestCard key={index}
                                 contest={contest}
                                 handleParticipate={handleParticipate}
