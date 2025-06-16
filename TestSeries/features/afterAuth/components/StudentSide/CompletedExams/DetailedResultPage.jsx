@@ -12,6 +12,7 @@ const ResultPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterType, setFilterType] = useState('all');
     const [filterResult, setFilterResult] = useState('all');
+    
 
     const [searchParams] = useSearchParams();
     const examName = searchParams.get('name');
@@ -23,7 +24,7 @@ const ResultPage = () => {
             try {
                 setLoading(true);
                 console.log('Fetching result data for examId:', examId);
-                const data = await getResultDetail(examId);
+                const data = await getResultDetail(examId,false);
                 console.log(data);
                 setResultData(data);
             } catch (err) {

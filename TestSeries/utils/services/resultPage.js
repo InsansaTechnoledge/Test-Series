@@ -5,7 +5,7 @@ export const getStudentResults = async () => {
     return data;
   };
 
-  export const getResultDetail = async (examId) => {
-    const { data } = await api.get(`/v1/result/exam/${examId}`);
+  export const getResultDetail = async (examId,forAllStudents) => {
+    const { data } = await api.get(`/v1/result/exam/${examId}/${forAllStuents}`);
     return data.data;
   };

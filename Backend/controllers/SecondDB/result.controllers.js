@@ -43,8 +43,7 @@ export const fetchStudentResults = async (req, res) => {
       }
   
       let studentResults = await Result.find(
-        { studentId },
-        { examId: 1, marks: 1, rank: 1, status: 1, createdAt: 1, updatedAt: 1, resultDate: 1 }
+        { studentId }
       );
       
       if (!studentResults || studentResults.length === 0) {
@@ -128,8 +127,30 @@ export const fetchDetailedResultById = async (req, res) => {
 export const fetchAllResultsForExam = async (req, res) => {
     try {
       const studentId = req.user._id;
-      const { examId } = req.params;
-  
+      const { examId,forAllStudents } = req.params;
+  if(forAllStudents){
+    const results = await Result.find({ examId }).populate('studentId', 'name studentId');
+    if (!results || results.length === 0) {
+      return new APIError(404, ["Results for exam not found"]).send(res);
+    }
+    const questions= await fetchQuestionsSelectively({ exam_id: examId });
+
+    return new APIResponse(
+      200,
+      {
+        results: results.map(result => ({
+          ...result._doc,
+          studentName: result.studentId.name,
+          studentId: result.studentId.studentId
+        })),
+        questions
+      },
+      "Results and questions fetched successfully!"
+    ).send(res);
+    
+
+  }
+  else{
       const result = await Result.findOne({ studentId, examId });
   
       if (!result) {
@@ -150,6 +171,7 @@ export const fetchAllResultsForExam = async (req, res) => {
         },
         "Result and questions fetched"
       ).send(res);
+    }
     } catch (err) {
       console.error("Error in fetchAllResultsForExam:", err);
       return new APIError(500, ["Failed to fetch result and questions", err.message]).send(res);
