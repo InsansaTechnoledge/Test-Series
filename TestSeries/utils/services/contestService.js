@@ -9,3 +9,8 @@ export const FetchContest = async () => {
     const response = await api.get('/v1/contest');
     return response.data;
 }
+
+export const deleteContest = async (id) => {
+    const resonse = await api.delete(`v1/contest/${id}`)
+    return resonse.data;
+}

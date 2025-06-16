@@ -50,3 +50,19 @@ export const fetchContest = async (organizationId) => {
     return data;
   };
 
+  export const deleteContest = async (contestId) => {
+
+    if (!contestId) throw new Error("constesId is required");
+
+    const {data , error} = await supabase
+    .from("organization_contest")
+    .delete()
+    .eq("id", contestId)
+    .select()
+    .maybeSingle();
+
+    if (error) throw error;
+  return data;
+}
+
+

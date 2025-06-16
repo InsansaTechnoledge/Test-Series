@@ -1,7 +1,8 @@
 import React from 'react';
 import { Calendar, Clock, Users, Play } from 'lucide-react';
+import { deleteContest } from '../../../../../utils/services/contestService';
 
-const ContestCard = ({ contest }) => {
+const ContestCard = ({ contest , setContest }) => {
     
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -27,6 +28,18 @@ const ContestCard = ({ contest }) => {
     const end = new Date(validity.end);
     return now >= start && now <= end;
   };
+
+  const handleDelete = async (id) => {
+    console.log('deleting contest of id:' , id);
+
+    const deleteData = await deleteContest(id);
+
+    setContest((prevContests) => prevContests.filter((item) => item.id !== id));
+
+    alert('Contest deleted successfully',);
+
+    
+  }
 
   const getContestStatus = (contestItem) => {
     if (contestItem.go_live) return { text: 'LIVE', color: 'text-green-600 bg-green-50' };
@@ -154,7 +167,7 @@ const ContestCard = ({ contest }) => {
                     'View Details'
                   )}
                 </button>
-                <button className='bg-red-400 text-gray-100 w-full py-2 px-2 rounded-lg'>
+                <button onClick={() => handleDelete(contestItem.id)} className='bg-red-400 text-gray-100 w-full py-2 px-2 rounded-lg mt-4 '>
                     Delete
                 </button>
               </div>

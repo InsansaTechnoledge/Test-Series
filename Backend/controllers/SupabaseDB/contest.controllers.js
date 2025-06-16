@@ -1,6 +1,6 @@
 import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
 import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
-import { createContestQuery, fetchContest } from "../../utils/SqlQueries/contest.queries.js";
+import { createContestQuery, deleteContest, fetchContest } from "../../utils/SqlQueries/contest.queries.js";
 
 export const createContest = async(req, res) => {
     const payload = req.body;
@@ -46,3 +46,19 @@ export const FetchContest = async (req, res) => {
       return new APIError(500, ['There was an error in fetching contest details', e.message]).send(res);
     }
   };
+
+export const DeleteContest = async (req , res) => {
+    try{
+
+        const id = req.params.id
+
+        const deleteData = await deleteContest(id)
+
+        if(!deleteData) return new APIError(400 , "could not delete contest").send(res);
+
+        return new APIResponse(200 , 'contest deleted successfully').send(res);
+
+    } catch (e) {
+        return new APIError(500 , 'something went wrong while deleting contest').send(res);
+    }
+}
