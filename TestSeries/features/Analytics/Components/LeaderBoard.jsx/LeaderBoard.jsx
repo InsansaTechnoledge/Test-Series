@@ -1,11 +1,17 @@
 import React, { useEffect, useState } from 'react'
+import { getResultDetail } from '../../../../utils/services/resultPage'
+import { useExams } from '../../../../hooks/UseExam'
 
 const LeaderBoard = () => {
+    const {exams } = useExams()
+
+    console.log(exams)
+
     const [ExamData ,  setExamData] = useState([])
 
     useEffect(() => {
-        const getData = () => {
-            
+        const getData = async () => {
+            const data = await getResultDetail()
         }
     },[])
   return (
