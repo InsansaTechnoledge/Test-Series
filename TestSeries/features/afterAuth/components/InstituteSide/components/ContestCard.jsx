@@ -1,8 +1,12 @@
 import React from 'react';
 import { Calendar, Clock, Users, Play } from 'lucide-react';
 import { deleteContest } from '../../../../../utils/services/contestService';
+import { useQueryClient } from '@tanstack/react-query';
+import { useUser } from '../../../../../contexts/currentUserContext';
 
 const ContestCard = ({ contest , setContest }) => {
+  const { user } = useUser();
+  const queryClient=useQueryClient();
     
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -35,6 +39,8 @@ const ContestCard = ({ contest , setContest }) => {
     const deleteData = await deleteContest(id);
 
     setContest((prevContests) => prevContests.filter((item) => item.id !== id));
+    queryClient.invalidateQueries(['contests',user._id]);
+    
 
     alert('Contest deleted successfully',);
 
@@ -63,7 +69,7 @@ const ContestCard = ({ contest , setContest }) => {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
-      {contestData.map((contestItem) => {
+      {contestData?.map((contestItem) => {
         const status = getContestStatus(contestItem);
         const isParticipationBased = contestItem.type === 'participation_based';
         
