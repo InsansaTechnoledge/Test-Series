@@ -46,6 +46,7 @@ import CreateContest from '../../features/afterAuth/components/InstituteSide/Cre
 import ContestList from '../../features/afterAuth/components/InstituteSide/ContestList';
 import CertificateCreation from '../../features/Certificates/CertificateCreation';
 import ContestListPage from '../../features/afterAuth/components/StudentSide/Coding-Contests/ContestListPageStudent';
+import ContestInstructionWindow from '../../features/afterAuth/components/StudentSide/Coding-Contests/ContestInstructionWindow';
 
 const PageLinks = () => {
   const { user, setUser } = useUser();
@@ -126,6 +127,8 @@ const PageLinks = () => {
                 <Route path='result/:examId' element={<ResultDetailPage />} />
                 <Route path='test' element={<TestWindow />} />
                 <Route path='coding-contests' element={<ContestListPage />}/>
+                <Route path='contest/:contestId' element={<ContestInstructionWindow/>} />
+                <Route path='code/:contestId' element={<CodingPlatform />} />
               </Route>
             </Route>
           </Route>
@@ -140,7 +143,7 @@ const PageLinks = () => {
         <Route path='video' element={<YoutubeConnection />} /> {/* <== Fix added! */}
         <Route path='video/upload' element={<UploadVideo />} />
         <Route path='session-expired' element={<SessionExpireError />} />
-        <Route path='code' element={<CodingPlatform/>} />
+        {/* <Route path='code' element={<CodingPlatform/>} /> */}
         <Route path='certificate-creation' element={<CertificateCreation/>}/>
            <Route path='syllabus/:syllabusId' element={<SyllabusViewPage />} />
 

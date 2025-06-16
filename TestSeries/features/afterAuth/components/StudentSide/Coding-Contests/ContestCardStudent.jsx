@@ -1,6 +1,10 @@
 import { CalendarDays, Clock, Info, ListChecks } from 'lucide-react';
+import {useNavigate} from 'react-router-dom';
+import CryptoJS from 'crypto-js';
 
 const ContestCard = ({ contest , handleParticipate ,notParticipated}) => {
+  const navigate=useNavigate();
+  const SECRET_KEY='THIS IS SECRET KEY FOR ENCRYPTION';
   return (
     <div className="hover:scale-[102%] transition-all duration-200 flex flex-col gap-3 shadow-md p-6 m-3 rounded-xl bg-white border">
       {/* Title + Status */}
@@ -56,6 +60,20 @@ const ContestCard = ({ contest , handleParticipate ,notParticipated}) => {
             <div className="mt-4 text-green-600 font-semibold">
             You have already enrolled in this contest.
             </div>
+        )}
+
+        {contest.go_live && (
+          <button 
+          onClick={()=>{
+            console.log("clicked");
+            //encrypt the contest id
+
+            const contestId = CryptoJS.AES.encrypt(contest.id,SECRET_KEY).toString();
+            navigate(`/student/contest/${contestId}`);
+          }}
+          className="mt-4 bg-green-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-green-700">
+            Go Live
+          </button>
         )}
     </div>
   );

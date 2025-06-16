@@ -38,10 +38,10 @@ export const isOrgAndUserAndStudentAuthenticated = async (req, res, next) => {
         req.mergedQuery.id = Array.isArray(req.user.batch) ? req.user.batch : [req.user.batch];
       }
     } else{
-      if (!req.query.id && req.user?.batchId) {
-        req.mergedQuery.id = Array.isArray(req.user?.batchId)
-          ? req.user.batchId
-          : [req.user.batchId];
+      if (!req.query.id && req.user?.batch.currentBatch) {
+        req.mergedQuery.id = Array.isArray(req.user?.batch.currentBatch)
+          ? req.user.batch.currentBatch
+          : [req.user.batch.currentBatch];
       }
     }
 
