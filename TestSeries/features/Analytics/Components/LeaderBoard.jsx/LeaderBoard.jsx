@@ -12,7 +12,7 @@ const LeaderBoard = () => {
         const getData = async () => {
             if (exam) {
                 try {
-                    const data = await getResultDetail(exam , false); 
+                    const data = await getResultDetail(exam , true); 
                     console.log("t" , data)
                     // setExamData(data);
                 } catch (error) {
