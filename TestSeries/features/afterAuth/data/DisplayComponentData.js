@@ -1,4 +1,4 @@
-import { Calendar, Clock, CheckCircle, SquareCode, School} from 'lucide-react';
+import { Calendar, Clock, CheckCircle, SquareCode, School , } from 'lucide-react';
 
 
 export const cards = [
@@ -29,7 +29,7 @@ export const cards = [
       color: 'bg-yellow-100 text-blue-600 border-blue-200',
       shadow: 'shadow-blue-200/50',
       path: '/student/classroom'
-    }
+    },
   ];
   
 export const Rank = [

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { uploadVideo } from '../../../utils/services/videoService';
-import { useCachedBatches } from '../../../hooks/useCachedBatches';
+import { uploadVideo } from '../../utils/services/videoService';
+import { useCachedBatches } from '../../hooks/useCachedBatches';
 import {useNavigate} from 'react-router-dom'
 
 const UploadVideo = () => {

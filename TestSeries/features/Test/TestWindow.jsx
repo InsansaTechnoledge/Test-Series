@@ -25,7 +25,7 @@ const TestWindow = () => {
   const [showFinalPopup, setShowFinalPopup] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const { user } = useUser();
-  const secretKey = 'secret-key-for-encryption';
+  const secretKey = import.meta.env.VITE_SECRET_KEY_FOR_TESTWINDOW;
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const navigate = useNavigate();

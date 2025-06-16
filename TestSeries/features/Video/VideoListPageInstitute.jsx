@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useCachedBatches } from '../../../hooks/useCachedBatches';
-import { DeleteVideoFromBatch } from '../../../utils/services/batchService';
+import { useCachedBatches } from '../../hooks/useCachedBatches';
+import { DeleteVideoFromBatch } from '../../utils/services/batchService';
 
 const VideoListPageInstitute = () => {
   const { batches } = useCachedBatches();

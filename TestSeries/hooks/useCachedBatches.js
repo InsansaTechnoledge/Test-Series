@@ -6,6 +6,7 @@ export const useCachedBatches = () => {
     const {user} = useUser();
     const fetchBatchListFunction = async () => {
     try{
+
           const response = await fetchBatchList();
         if (response.status !== 200) {
             throw new Error('Network response was not ok');
