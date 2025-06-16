@@ -3,6 +3,7 @@ import ExamAnalysis from './Components/Exam/ExamAnalysis'
 import useStudentExamResults from '../afterAuth/components/StudentSide/CompletedExams/useExamResults';
 import { useUser } from '../../contexts/currentUserContext';
 import WrongQuestionAnalysis from './Components/WrongQuestion/WrongQuestionAnalysis';
+import LeaderBoard from './Components/LeaderBoard.jsx/LeaderBoard';
 const Analysis = () => {
     const {user} = useUser()
     const {results} = useStudentExamResults(user._id);
@@ -14,6 +15,8 @@ const Analysis = () => {
       <ExamAnalysis results={results}/>
 
       <WrongQuestionAnalysis/>
+
+      <LeaderBoard/>
     </div>
   )
 }
