@@ -46,6 +46,8 @@ import CreateContest from '../../features/afterAuth/components/InstituteSide/Cre
 import ContestList from '../../features/afterAuth/components/InstituteSide/ContestList';
 import CertificateCreation from '../../features/Certificates/CertificateCreation';
 import ContestListPage from '../../features/afterAuth/components/StudentSide/Coding-Contests/ContestListPageStudent';
+import VideoListPageInstitute from '../../features/Video/Pages/VideoListPageInstitute';
+import StudentClassroom from '../../features/afterAuth/components/StudentSide/Landing/StudentClassroom';
 
 const PageLinks = () => {
   const { user, setUser } = useUser();
@@ -110,6 +112,7 @@ const PageLinks = () => {
                 <Route path='batch-details' element={<BatchViewPage />} />
                 <Route path='edit-batch' element={<EditBatchPage />} />
                 <Route path='video' element={<YoutubeConnection />} />
+                <Route path='video-list' element={<VideoListPageInstitute/>}/>
                 <Route path='create-contest/:contestId?' element={<CreateContest/>}/>
                 <Route path='contest-list' element={<ContestList/>} />
                 <Route path='code-create' element={<QuestionCreator/>}/>
@@ -126,6 +129,7 @@ const PageLinks = () => {
                 <Route path='result/:examId' element={<ResultDetailPage />} />
                 <Route path='test' element={<TestWindow />} />
                 <Route path='coding-contests' element={<ContestListPage />}/>
+                <Route path='classroom' element={<StudentClassroom/>}/>
               </Route>
             </Route>
           </Route>

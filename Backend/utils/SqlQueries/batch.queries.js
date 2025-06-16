@@ -66,3 +66,39 @@ export const addVideoIdToBatch = async (batchId, videoId) => {
   if(error) throw error;
   return data;
 }
+
+export const fetchVideoFromBatch = async (batchId) => {
+  const {data , error} = await supabase
+  .from('organization_batch')
+  .select('video_ids')
+  .eq('id' , batchId)
+
+  if(error) throw error;
+  return data
+}
+
+export const deleteVideoFromBatch = async (batchId, videoIdToDelete) => {
+  
+  const { data, error } = await supabase
+    .from('organization_batch')
+    .select('video_ids')
+    .eq('id', batchId)
+    .single();
+
+  if (error) throw error;
+
+  const currentVideos = data.video_ids || [];
+
+  
+  const updatedVideos = currentVideos.filter(id => id !== videoIdToDelete);
+
+ 
+  const { error: updateError } = await supabase
+    .from('organization_batch')
+    .update({ video_ids: updatedVideos })
+    .eq('id', batchId);
+
+  if (updateError) throw updateError;
+
+  return updatedVideos;
+};
