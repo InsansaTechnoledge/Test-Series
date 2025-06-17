@@ -9,6 +9,7 @@ const InstituteLandingPage = () => {
   const { user } = useUser();
   console.log("YYYY", user);
 
+
   if (!user) {
     return (
       <div>
@@ -26,9 +27,9 @@ const InstituteLandingPage = () => {
 
 
 
-          <div className="h-[400px] flex flex-col">
-            <div className="relative flex items-center justify-center h-full bg-gradient-to-r from-blue-900 to-indigo-900 overflow-hidden">
-              <div className="absolute inset-0 z-0">
+          <div className="h-[400px] flex flex-col ">
+            <div className="relative flex items-center justify-center h-full bg-gradient-to-r from-blue-900 to-indigo-900 overflow-hidden rounded-lg  ">
+              <div className="absolute inset-0 z-0 ">
 
                 <div className="absolute inset-0 bg-black opacity-50"></div>
               </div>
@@ -78,7 +79,7 @@ const InstituteLandingPage = () => {
                   )}
                 </div>
 
-                {/* Stats/Highlights Section */}
+
                 <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-8">
                   <div className="flex flex-col items-center p-2 bg-white/10 backdrop-blur-sm rounded-lg">
                     <span className="text-3xl md:text-4xl font-bold text-white">98</span>
@@ -98,7 +99,7 @@ const InstituteLandingPage = () => {
           </div>
 
 
-          <div className="min-h-screen bg-white text-center px-4 py-8">
+          <div className="min-h-screen bg-white text-center  py-8">
 
 
             <section className="bg-gray-200 p-2 rounded-lg mb-8">
@@ -120,7 +121,7 @@ const InstituteLandingPage = () => {
                         <p className="font-medium text-sm">{step}</p>
                       </div>
 
-                      {/* Arrow (only between steps) */}
+
                       {i < stepsToFollow.length - 1 && (
                         <svg
                           className="w-24 h-4 text-indigo-500"
@@ -137,7 +138,7 @@ const InstituteLandingPage = () => {
                   ))}
                 </div>
 
-                {/* Small screens: column view, no arrows */}
+
                 <div className="flex md:hidden flex-col gap-4">
                   {stepsToFollow.map((step, i) => (
                     <div key={i} className="flex items-start space-x-3">
