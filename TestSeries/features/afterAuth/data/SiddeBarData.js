@@ -67,3 +67,57 @@ export const controls = [
         icon: User
     }
 ]
+
+
+
+export const categories = [
+  {
+    name: 'Users & Roles',
+    icon: User,
+    features: [
+      'User Details',
+      'Add User',
+      'Create Role Group'
+    ]
+  },
+  {
+    name: 'Batches',
+    icon: User,
+    features: [
+      'All Batches',
+      'Create Batch'
+    ]
+  },
+  {
+    name: 'Students',
+    icon: User,
+    features: [
+      'Add Student',
+      'Student List'
+    ]
+  },
+  {
+    name: 'Exams',
+    icon: User,
+    features: [
+      'Create Exams',
+      'Exam List Page'
+    ]
+  },
+  {
+    name: 'Videos',
+    icon: User,
+    features: [
+      'Upload videos',
+      'Uploaded Videos'
+    ]
+  },
+  {
+    name: 'Contests',
+    icon: User,
+    features: [
+      'create Contest',
+      'contest list'
+    ]
+  }
+];
