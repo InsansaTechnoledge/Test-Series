@@ -2,17 +2,15 @@ import React, { useState } from 'react';
 import { Search, Settings, ChevronDown, Menu, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import { categories } from '../../data/SiddeBarData';
-import LogoutModal from '../../../../components/Logout/LogoutModal';
 import { controls } from '../../data/SiddeBarData'; // Assuming controls is imported from the correct path
 import { useUser } from '../../../../contexts/currentUserContext';
 
-const Navbar = () => {
+const Navbar = ({setShowLogoutModal}) => {
   const [activeCategory, setActiveCategory] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
-  const [showLogoutModel, setShowLogoutModal] = useState(false);
   const { user } = useUser();
   const navigate = useNavigate(); // Initialize the navigate function
 
@@ -28,10 +26,6 @@ const Navbar = () => {
   const toggleMobileSearch = () => {
     setShowMobileSearch(!showMobileSearch);
   };
-
-  if (showLogoutModel) {
-    return <LogoutModal setShowLogoutModal={setShowLogoutModal} />;
-  }
 
   const handleFeatureClick = (path) => {
     // Navigate to the selected feature path
