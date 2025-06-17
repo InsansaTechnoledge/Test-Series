@@ -34,8 +34,12 @@ import VideoListActive from '../../../assests/Navigator/videos/list video/list v
 import CrerateContest from '../../../assests/Navigator/code contest/code contest - nor.svg'
 import CrerateContestActive from '../../../assests/Navigator/code contest/code contest - act.svg'
 
-
-
+import AllBatch from "../../../assests/Navigator/batch/All batch/all batch - normal.svg"
+import user from "../../../assests/Navigator/User/user list/user list - nor.svg"
+import  student from "../../../assests/Navigator/students/students list/students list - nor.svg"
+import  exam from "../../../assests/Navigator/exam/publish exam/publish exam - nor.svg"
+import video from "../../../assests/Navigator/videos/list video/list video - nor.svg"
+import  contest from "../../../assests/Navigator/code contest/code contest - nor.svg"
 import { User } from 'lucide-react';
 
 export const controls = [
@@ -123,7 +127,7 @@ export const controls = [
 export const categories = [
   {
     name: 'Users & Roles',
-    icon: User,
+    icon: user,
     features: [
       'User Details',
       'Add User',
@@ -132,7 +136,7 @@ export const categories = [
   },
   {
     name: 'Batches',
-    icon: User,
+    icon: AllBatch,
     features: [
       'All Batches',
       'Create Batch'
@@ -140,7 +144,7 @@ export const categories = [
   },
   {
     name: 'Students',
-    icon: User,
+    icon: student,
     features: [
       'Add Student',
       'Student List'
@@ -148,7 +152,7 @@ export const categories = [
   },
   {
     name: 'Exams',
-    icon: User,
+    icon: exam,
     features: [
       'Create Exams',
       'Exam List Page'
@@ -156,7 +160,7 @@ export const categories = [
   },
   {
     name: 'Videos',
-    icon: User,
+    icon: video,
     features: [
       'Upload videos',
       'Uploaded Videos'
@@ -164,7 +168,7 @@ export const categories = [
   },
   {
     name: 'Contests',
-    icon: User,
+    icon: contest,
     features: [
       'Create Contest',
       'Contest list'

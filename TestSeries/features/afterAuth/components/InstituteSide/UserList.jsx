@@ -31,7 +31,7 @@ const UserList = () => {
     useEffect(() => {
         if (users) {
             setFilteredUsers(users);
-//example usage:            
+//example usage:
 // console.log("hasFeature", hasActiveFeatureInRole({featureId:'683061baeeb53072d9ad40ec',roleId:'683ed20bd5b60d8f8a437f2a'}));
         }
     }, [users])
@@ -59,7 +59,7 @@ const UserList = () => {
 
     return (
         <>
-            <div className='h-full flex flex-col'>
+             <div className='h-full flex flex-col'>
                 <div>
                     <HeadingUtil heading="All Users" description="you can view all users of your institute and filter them based on year" />
 
@@ -228,7 +228,15 @@ const UserList = () => {
                                 )
                             }
                 </div>
-            </div>
+            </div> 
+
+
+
+
+
+
+
+            
         </>
     )
 }

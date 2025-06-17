@@ -122,7 +122,7 @@ const Navbar = ({setShowLogoutModal}) => {
               <div className="max-w-4xl bg-gray-50 px-4 py-3 rounded-2xl">
                 <div className="flex items-center justify-center space-x-1">
                   {categories.map((category) => {
-                    const Icon = category.icon;
+                    
                     const isActive = activeCategory === category.name;
                     return (
                       <div key={category.name} className="relative">
@@ -132,7 +132,9 @@ const Navbar = ({setShowLogoutModal}) => {
                             isActive ? 'bg-indigo-100 text-indigo-700 shadow-sm' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                           }`}
                         >
-                          <Icon className="h-4 w-4" />
+                         <img 
+                src={ category.icon} 
+                alt={category.name}  className='h-4 w-4'></img>
                           <span className="font-medium text-sm">{category.name}</span>
                           <ChevronDown className={`h-4 w-4 transition-transform ${isActive ? 'rotate-180' : ''}`} />
                         </button>
@@ -171,6 +173,13 @@ const Navbar = ({setShowLogoutModal}) => {
                 <div className="space-y-1">
                   {categories.map((category) => {
                     const Icon = category.icon;
+                    {
+                      typeof Icon === 'string' ? (
+                        <img src={category.icon} alt={category.name} className="w-5 h-5" />
+                      ) : (
+                        <Icon className="w-5 h-5" />
+                      )
+                    }
                     const isActive = activeCategory === category.name;
                     return (
                       <div key={category.name}>
