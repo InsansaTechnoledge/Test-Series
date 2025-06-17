@@ -39,7 +39,7 @@ const BatchList = () => {
       <div className='h-full flex flex-col'>
         <HeadingUtil heading={selectedYear ? `Batch List for ${selectedYear}` : "All Batches"} description="you can view list of all batches in your institute" />
 
-        <div className='rounded-xl p-5 bg-gray-200 inset-shadow-md flex-grow flex flex-col overflow-auto'>
+        <div className='rounded-xl p-5  inset-shadow-md flex-grow flex flex-col overflow-auto bg-white shadow-2xl  border-gray-200'>
           <div className='flex flex-col lg:flex-row justify-between gap-4 mb-5'>
             <h2 className='font-bold text-lg text-blue-900 my-auto'>Total Batches: {filteredBatches?.length}</h2>
             <div className='flex flex-col md:flex-row gap-4'>
@@ -52,7 +52,7 @@ const BatchList = () => {
                 <PlusSquare />
               </button>
               <select
-                className='rounded-md bg-white py-2 px-4'
+                className='rounded-md bg-gray-200 py-2 px-4'
                 onChange={(e) => setSelectedYear(e.target.value)}
               >
                 <option value={""}>--select year--</option>
@@ -60,7 +60,7 @@ const BatchList = () => {
                   <option key={year} value={year}>{year}</option>
                 ))}
               </select>
-              <label className='space-x-2 flex rounded-md bg-white py-2 px-4'>
+              <label className='space-x-2 flex rounded-md bg-gray-200 py-2 px-4'>
                 <Search />
                 <input className='focus:outline-0' placeholder='search batch' />
               </label>
@@ -70,7 +70,7 @@ const BatchList = () => {
           {/* Batch list */}
           <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
             <table className="w-full text-sm text-left text-blue-950">
-              <thead className="text-xs text-center uppercase bg-gray-50">
+              <thead className="text-xs text-center uppercase bg-gray-200">
                 <tr>
                   <th className="w-2/10 px-6 py-3">Batch name</th>
                   <th className="w-1/10 px-6 py-3">Year</th>
@@ -80,7 +80,7 @@ const BatchList = () => {
               </thead>
               <tbody>
                 {filteredBatches?.map((batch, idx) => (
-                  <tr key={idx} className="bg-white border-b hover:bg-gray-50 text-blue-600 text-lg">
+                  <tr key={idx} className="bg-white border-b hover:bg-gray-50 text-blue-600 text-md">
                     <th className="px-6 py-4 font-medium whitespace-nowrap">{batch.name}</th>
                     <td className="px-6 py-4 text-center">{batch.year}</td>
                     <td className="px-6 py-4">
@@ -104,25 +104,25 @@ const BatchList = () => {
                     </td>
                     <td className="flex justify-center gap-4 px-6 py-4">
                       <button
-                        className="text-black bg-gray-200 py-1 px-4 rounded-lg hover:underline"
+                        className="text-black bg-gray-200 py-1 px-3 rounded-lg hover:underline"
                         onClick={() => navigate(`/institute/batch-details`, { state: { batchId: batch.id } })}
                       >
-                        <Eye />
+                        <Eye  className='size-4'/>
                       </button>
                       <button
-                        className="text-blue-500 bg-gray-200 py-1 px-4 rounded-lg hover:underline"
+                        className="text-blue-500 bg-gray-200 py-1 px-3 rounded-lg hover:underline"
                         onClick={() => navigate(`/institute/edit-batch`, { state: { batchId: batch.id } })}
                       >
-                        <Edit />
+                        <Edit className='size-4' />
                       </button>
                       <button
-                        className="text-red-500 bg-gray-200 py-1 px-4 rounded-lg hover:underline"
+                        className="text-red-500 bg-gray-200 py-1 px-3 rounded-lg hover:underline"
                         onClick={() => {
                           setShowDeleteModal(true);
                           setBatchId(batch.id);
                         }}
                       >
-                        <Trash />
+                        <Trash className='size-4' />
                       </button>
                     </td>
                   </tr>

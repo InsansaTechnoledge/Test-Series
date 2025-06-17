@@ -1,18 +1,18 @@
-import { useLocation, useNavigate } from "react-router-dom";
-import HeadingUtil from "../../../utility/HeadingUtil";
-import { useCachedBatches } from "../../../../../hooks/useCachedBatches";
-import { useCachedUser } from "../../../../../hooks/useCachedUser";
-import RefreshButton from "../../../utility/RefreshButton";
-import { ArrowDownNarrowWideIcon, Edit, LucideSquareSplitHorizontal, Search, Trash } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
-import dateFormatter from "../../../../../utils/dateFormatter";
+import { ArrowDownNarrowWideIcon, Edit, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useUser } from "../../../../../contexts/currentUserContext";
+import { useCachedBatches } from "../../../../../hooks/useCachedBatches";
 import { useCachedStudents } from "../../../../../hooks/useCachedStudents";
+import { useCachedUser } from "../../../../../hooks/useCachedUser";
+import dateFormatter from "../../../../../utils/dateFormatter";
 import BackButton from "../../../../constants/BackButton";
 import DeleteBatchModal from "../../../utility/DeleteBatchModal";
+import HeadingUtil from "../../../utility/HeadingUtil";
+import RefreshButton from "../../../utility/RefreshButton";
 
-const BatchViewPage = () => {
+const Page = () => {
     const location = useLocation();
     const { batchId } = location.state || {};
     const { batchMap } = useCachedBatches();
@@ -74,7 +74,7 @@ const BatchViewPage = () => {
 
             <div className="p-6 space-y-6 text-gray-800">
 
-                <div className='rounded-xl p-5 bg-gray-200 inset-shadow-md flex-grow flex flex-col overflow-auto'>
+                <div className='rounded-xl p-5 bg-white shadow-2xl inset-shadow-md flex-grow flex flex-col overflow-auto'>
 
                         <div className='flex flex-col lg:flex-row justify-between gap-4 mb-5'>
 
@@ -188,7 +188,7 @@ const BatchViewPage = () => {
                         </button>
                         {!hideFaculty && (
                             <table className="w-full text-sm text-left rtl:text-right text-blue-950">
-                                <thead className="text-xs text-blue-950 text-center uppercase bg-gray-50">
+                                <thead className="text-xs text-blue-950 text-center uppercase bg-gray-200">
                                     <tr>
                                         <th scope="col" className="w-1/10 px-6 py-3">
                                             Sr. No.
@@ -249,7 +249,7 @@ const BatchViewPage = () => {
 
                         {!hideStudents && (
                             <table className="w-full text-sm text-left rtl:text-right text-blue-950">
-                                <thead className="text-xs text-blue-950 text-center uppercase bg-gray-50">
+                                <thead className="text-xs text-blue-950 text-center uppercase bg-gray-200">
                                     <tr>
                                         <th scope="col" className="w-1/10 px-6 py-3">Sr. No.</th>
                                         <th scope="col" className="w-2/10 px-6 py-3">Student Name</th>
@@ -291,4 +291,4 @@ const BatchViewPage = () => {
     )
 };
 
-export default BatchViewPage;
+export default Page;

@@ -183,7 +183,7 @@ const CreateUser = () => {
                     description="you can add users to your institute and assign them specific roles"
                 />
             </div>
-            <div className="bg-white p-8 rounded-2xl shadow-xl space-y-10">
+            <div className="bg-blue-50 p-8 rounded-2xl shadow-xl space-y-10">
                 <div className="flex flex-col md:flex-row gap-8  items-center">
                     <div className="">
                         <img
@@ -389,12 +389,12 @@ const CreateUser = () => {
 
 
                         <div className="flex flex-col gap-2">
-                            <label htmlFor="batch" className="text-sm font-semibold text=gray-700">
+                            <label htmlFor="batch" className="text-sm font-semibold text-gray-700 ">
                                 Assign batches
                             </label>
                             <button
                                 onClick={() => setBatchesVisible(!batchesVisible)}
-                                className="bg-blue-900 text-white px-4 py-2 rounded-md w-fit hover:bg-blue-800 transition cursor-pointer"
+                                className="bg-blue-900 text-white px-6 py-2 rounded-md w-fit hover:bg-blue-800 transition cursor-pointer"
                             >
                                 {batchesVisible ? "Hide all batches" : "Show all batches"}
                             </button>
@@ -437,7 +437,7 @@ const CreateUser = () => {
                         </div>
                         <div className="flex flex-col gap-2 pt-4 cols-span-full justify-center w-fit ">
                             <button
-                                className="bg-blue-900 text-white px-6 py-3 rounded-lg  hover:bg-blue-800 transition cursor-pointer"
+                                className="bg-green-600 text-white px-6 py-3 rounded-lg  hover:bg-blue-800 transition cursor-pointer font-semibold"
                                 onClick={(e) => {
                                     onsubmitForm();
                                 }}

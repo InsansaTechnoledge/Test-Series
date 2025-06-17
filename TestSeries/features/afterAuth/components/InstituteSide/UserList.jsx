@@ -64,13 +64,31 @@ const UserList = () => {
                     <HeadingUtil heading="All Users" description="you can view all users of your institute and filter them based on year" />
 
                 </div>
-                <div className='rounded-xl p-5 bg-gray-200 inset-shadow-md flex-grow flex flex-col overflow-auto'>
-                    <div className='flex flex-col lg:flex-row justify-between gap-4 mb-5'>
+                <div className='rounded-xl  bg-white inset-shadow-md flex-grow flex flex-col overflow-auto shadow-2xl'>
+                    <div className='flex flex-col lg:flex-row justify-between gap-4 mb-2 bg-blue-100 px-2 py-2 rounded-none w-full'>
                         <div className='my-auto'>
-                            <h2 className='font-bold text-lg text-blue-900'>Total Users: {filteredUsers.length}</h2>
+                            <h2 className='font-bold text-lg text-blue-900 pl-4'>Total Users: {filteredUsers.length}</h2>
                         </div>
                         <div className='flex flex-col md:flex-row gap-4'>
-                            <RefreshButton refreshFunction={refreshFunction} />
+                        
+                        <label className='space-x-2 flex rounded-md bg-white py-2 px-4'>
+                                <div>
+                                    <Search />
+                                </div>
+                                <input
+
+                                    className='focus: outline-0 '
+                                    placeholder='search batch'
+                                />
+                            </label>
+                            <select className='rounded-md bg-white py-2 px-4'
+                                onChange={(e) => setSelectedBatch(e.target.value)}>
+                                <option value=''>--select Batch--</option>
+                                {batches.map(batch => (
+                                    <option key={batch.id} value={batch.id}>{batch.name}</option>
+                                ))}
+                            </select>
+                         
                             <button className='bg-blue-900 text-white py-2 px-4 rounded-md hover:cursor-pointer font-semibold hover:scale-105 flex space-x-2 transition-all duration-300'
                                 onClick={() => {
                                     navigate('/institute/create-user')
@@ -82,32 +100,16 @@ const UserList = () => {
                                     <PlusSquare />
                                 </div>
                             </button>
-                            <select className='rounded-md bg-white py-2 px-4'
-                                onChange={(e) => setSelectedBatch(e.target.value)}>
-                                <option value=''>--select Batch--</option>
-                                {batches.map(batch => (
-                                    <option key={batch.id} value={batch.id}>{batch.name}</option>
-                                ))}
-                            </select>
-                            <label className='space-x-2 flex rounded-md bg-white py-2 px-4'>
-                                <div>
-                                    <Search />
-                                </div>
-                                <input
-
-                                    className='focus: outline-0'
-                                    placeholder='search batch'
-                                />
-                            </label>
+                            <RefreshButton refreshFunction={refreshFunction} />
                         </div>
                     </div>
 
                     {/* user list */}
 
 
-                    <div className="relative overflow-auto shadow-md sm:rounded-lg h-[100%]">
-                        <table className="w-full text-sm text-left rtl:text-right text-blue-950">
-                            <thead className="text-xs text-blue-950 uppercase bg-gray-50">
+                    <div className="relative overflow-auto shadow-md  h-[100%] ">
+                        <table className="w-full text-sm text-left rtl:text-right text-blue-900">
+                            <thead className="text-xs text-blue-900 uppercase bg-gray-200 ">
                                 <tr className='text-center'>
                                     <th scope="col" className="w-2/10 px-6 py-3">
                                         Name
@@ -127,7 +129,7 @@ const UserList = () => {
                             {
                                 filteredUsers.map((user, idx) => (
                                     <tbody key={idx}>
-                                        <tr className=" bg-white border-b border-gray-200 hover:bg-gray-50 text-blue-600 text-lg">
+                                        <tr className=" bg-white border-b border-gray-200 hover:bg-gray-50 text-blue-600 text-sm">
                                             <th scope="row" className="px-6 py-4 font-medium text-blue-600 whitespace-nowrap ">
                                                 {user.name}
                                             </th>
@@ -192,12 +194,12 @@ const UserList = () => {
                                                     onClick={() => { navigate('/institute/user-detail', { state: { userId: user._id } }) }}
                                                     className="font-medium text-black hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer">
 
-                                                    <Eye />
+                                                    <Eye  className='size-4'/>
                                                 </button>
                                                 <button
                                                     onClick={() => navigate(`/institute/user-edit/${user._id}`)}
                                                     className="font-medium text-blue-500 hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer">
-                                                    <Edit />
+                                                    <Edit className='size-4' />
                                                 </button>
                                                 <button
                                                     onClick={() => {
@@ -205,7 +207,7 @@ const UserList = () => {
                                                         setUserIdToDelete(user._id);  // 👈 store the user ID to delete
                                                     }}  // this is the MongoDB _id
                                                     className="font-medium text-red-500 hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer">
-                                                    <Trash />
+                                                    <Trash  className='size-4'/>
                                                 </button>
 
                                             </td>
