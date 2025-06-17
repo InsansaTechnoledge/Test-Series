@@ -1,14 +1,14 @@
-import { useLocation, useNavigate } from "react-router-dom";
-import { useCachedBatches } from "../../../../../hooks/useCachedBatches";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import HeadingUtil from "../../../utility/HeadingUtil";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useUser } from "../../../../../contexts/currentUserContext";
+import { useCachedBatches } from "../../../../../hooks/useCachedBatches";
 import { useCachedUser } from "../../../../../hooks/useCachedUser";
 import { updateBatch } from "../../../../../utils/services/batchService";
-import { useQueryClient } from "@tanstack/react-query";
-import { useUser } from "../../../../../contexts/currentUserContext";
 import BackButton from "../../../../constants/BackButton";
+import HeadingUtil from "../../../utility/HeadingUtil";
 
-const EditBatchPage = () => {
+const BatchPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { batchId } = location.state || {};
@@ -149,15 +149,15 @@ const EditBatchPage = () => {
                 <BackButton />
             </div>
             <div className="p-6">
-                <HeadingUtil heading="Edit Batch" description={`Update details for batch: ${batch.name}`} />
-                <form onSubmit={handleSubmit} className="space-y-4 bg-gray-100 p-6 rounded-md shadow-md">
+                <HeadingUtil heading=" Batch" description={`Update details for batch: ${batch.name}`} />
+                <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 rounded-md shadow-2xl">
 
                     <label className="block font-medium mb-1">Batch Name</label>
                     <input
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
-                        className="w-full px-4 py-2 border rounded-md"
+                        className="w-full px-4 py-2 bg-gray-100 rounded-md"
                         required
                     />
                     <label className="block font-medium mb-1">Year</label>
@@ -166,7 +166,7 @@ const EditBatchPage = () => {
                         value={formData.year}
                         onChange={handleChange}
                         type="number"
-                        className="w-full px-4 py-2 border rounded-md"
+                        className="w-full px-4 py-2 rounded-md bg-gray-100"
                         required
                     />
 
@@ -225,7 +225,7 @@ const EditBatchPage = () => {
                                     }
                                 }
                             }}
-                            className="w-full px-4 py-2 border rounded-md"
+                            className="w-full px-4 py-2 bg-gray-100 rounded-md"
                         />
                     </div>
 
@@ -265,7 +265,7 @@ const EditBatchPage = () => {
                                 setSelectedFaculty([...selectedFaculty, facultyId]);
                             }
                         }}
-                        className="w-full mt-2 border px-4 py-2 rounded-md"
+                        className="w-full mt-2 bg-gray-100 px-4 py-2 rounded-md"
                     >
                         <option value="">-- Select Faculty --</option>
                         {users
@@ -288,4 +288,4 @@ const EditBatchPage = () => {
     );
 };
 
-export default EditBatchPage;
+export default BatchPage;

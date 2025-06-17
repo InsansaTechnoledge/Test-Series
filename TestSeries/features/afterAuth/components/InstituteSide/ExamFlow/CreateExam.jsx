@@ -105,7 +105,7 @@ const CreateExam = () => {
       
    
     return (
-      <div className="p-6 max-w-6xl mx-auto">
+      <div className="p-6 max-w-6xl mx-auto ">
         <BackButton />
         {/* <h1 className="text-3xl font-bold mb-6">Create New Exam</h1> */}
         <HeadingUtil heading="Create New Exam" description="there are 2 ways to create an exam , manually or bulk upload"/>
@@ -153,7 +153,7 @@ const CreateExam = () => {
   }} // for edit form
   />
 ) : (
-  <div className="bg-blue-50 p-4 rounded mb-6">
+  <div className="bg-blue-50 p-4 rounded mb-6 ">
     <div className="flex justify-between items-center">
       <div>
         <h2 className="text-xl font-semibold">{examDetails.name}</h2>
