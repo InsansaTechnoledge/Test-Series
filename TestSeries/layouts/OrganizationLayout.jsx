@@ -20,7 +20,7 @@ export default function OrganizationLayout() {
         <LogoutModal setShowLogoutModal={setShowLogoutModal} />
       )}
 
-      <div className="flex flex-col h-screen w-screen overflow-hidden">
+      <div className="flex bg-blue-50/30 flex-col h-screen w-screen overflow-hidden">
         <Navbar />
 
         <main className="flex-1 overflow-y-auto pb-24">
