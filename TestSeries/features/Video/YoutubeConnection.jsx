@@ -1,8 +1,8 @@
 import { useEffect } from "react";
-import { useUser } from "../../../contexts/currentUserContext";
+import { useUser } from "../../contexts/currentUserContext";
 import { useNavigate } from "react-router-dom";
-import { callBack, register } from "../../../utils/services/videoService";
-import { checkAuth } from "../../../utils/services/authService";
+import { callBack, register } from "../../utils/services/videoService";
+import { checkAuth } from "../../utils/services/authService";
 
 const YoutubeConnection = () => {
     // const { user, setUser } = useUser();

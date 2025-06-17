@@ -31,22 +31,25 @@ import ResultDetailPage from '../../features/afterAuth/components/StudentSide/Co
 import StudentRoutes from '../../routes/StudentRoutes';
 import InstituteRoutes from '../../routes/InstituteRoutes';
 import LandingRoutes from '../../routes/LandingRoutes';
-import VideoDisplay from '../../features/Video/Pages/VideoDisplay';
-import UploadVideo from '../../features/Video/Pages/uploadVideo';
+import VideoDisplay from '../../features/Video/VideoDisplay';
+import UploadVideo from '../../features/Video/UploadVideo';
 import EditBatchPage from '../../features/afterAuth/components/InstituteSide/EditPages/EditBatchPage';
 import StudentViewPage from '../../features/afterAuth/components/InstituteSide/ViewPages/StudentViewPage';
 import StudentEditPage from '../../features/afterAuth/components/InstituteSide/EditPages/EditStudentPage';
 import UserViewPage from '../../features/afterAuth/components/InstituteSide/ViewPages/UserViewPage';
 import EditUserPage from '../../features/afterAuth/components/InstituteSide/EditPages/EditUserPage';
 import SyllabusViewPage from '../../features/afterAuth/components/InstituteSide/ViewPages/SyllabusViewPage';
-import YoutubeConnection from '../../features/Video/Pages/YoutubeConnection';
+import YoutubeConnection from '../../features/Video/YoutubeConnection';
 import CodingPlatform from '../../features/Test/CodeEditor/CodingPlatform';
 import QuestionCreator from '../../features/Test/CodeEditor/codeCreator/QuestionCreator';
 import CreateContest from '../../features/afterAuth/components/InstituteSide/CreateContest';
 import ContestList from '../../features/afterAuth/components/InstituteSide/ContestList';
 import CertificateCreation from '../../features/Certificates/CertificateCreation';
 import ContestListPage from '../../features/afterAuth/components/StudentSide/Coding-Contests/ContestListPageStudent';
+import VideoListPageInstitute from '../../features/Video/VideoListPageInstitute';
+import StudentClassroom from '../../features/afterAuth/components/StudentSide/Landing/StudentClassroom';
 import ContestInstructionWindow from '../../features/afterAuth/components/StudentSide/Coding-Contests/ContestInstructionWindow';
+import Analysis from '../../features/Analytics/Analysis';
 
 const PageLinks = () => {
   const { user, setUser } = useUser();
@@ -111,6 +114,7 @@ const PageLinks = () => {
                 <Route path='batch-details' element={<BatchViewPage />} />
                 <Route path='edit-batch' element={<EditBatchPage />} />
                 <Route path='video' element={<YoutubeConnection />} />
+                <Route path='video-list' element={<VideoListPageInstitute/>}/>
                 <Route path='create-contest/:contestId?' element={<CreateContest/>}/>
                 <Route path='contest-list' element={<ContestList/>} />
                 <Route path='code-create' element={<QuestionCreator/>}/>
@@ -127,8 +131,10 @@ const PageLinks = () => {
                 <Route path='result/:examId' element={<ResultDetailPage />} />
                 <Route path='test' element={<TestWindow />} />
                 <Route path='coding-contests' element={<ContestListPage />}/>
+                <Route path='classroom' element={<StudentClassroom/>}/>
                 <Route path='contest/:contestId' element={<ContestInstructionWindow/>} />
                 <Route path='code/:contestId' element={<CodingPlatform />} />
+                <Route path='analysis' element={<Analysis/>}/>
               </Route>
             </Route>
           </Route>

@@ -52,6 +52,11 @@ export const controls = [
         icon: User
     },
     {
+        name: "Uploaded Videos",
+        path: "video-list",
+        icon: User
+    },
+    {
         name: "create Contest",
         path: "create-contest",
         icon: User

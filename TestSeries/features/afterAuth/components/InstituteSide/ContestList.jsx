@@ -1,26 +1,33 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
-import { FetchContest } from "../../../../utils/services/contestService";
 import ContestCard from "./components/ContestCard";
 import HeadingUtil from "../../utility/HeadingUtil";
 import NeedHelpComponent from "./components/NeedHelpComponent";
+import useCachedContests from "../../../../hooks/useCachedContests";
 
 const ContestList = () => {
-    const [contest , setContest] = useState([])
+    const { contestList,isLoading}=useCachedContests();
+    const [contest , setContest] = useState([]);
+    const [loading, setLoading] = useState(false);
 
-    useEffect(  () => {
-        const fetchData = async () => {
-            const getData = await FetchContest();
-            if(!getData || getData.length === 0) return console.log('no data found');
-            console.log(getData);           
-            const Data = getData.data;
-            setContest(Data);
-            console.log("d",contest);  
+
+    useEffect(() => {
+        if(!contestList){
+            setLoading(true);
+            return;
         }
-        fetchData();
-    },[])
+        setContest(contestList);
+        setLoading(false);
+        
+    }, [contestList]);
 
     
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500"></div>
+            </div>
+        );
+    }
     return (
         <div className="space-y-6">
 

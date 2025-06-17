@@ -1,6 +1,6 @@
 import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
 import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
-import { CreateOrganizationBatch, getOrganizationBacthes, updateOrganizationBatch, deleteOrganizationBatch } from "../../utils/SqlQueries/batch.queries.js";
+import { CreateOrganizationBatch, getOrganizationBacthes, updateOrganizationBatch, deleteOrganizationBatch, fetchVideoFromBatch , deleteVideoFromBatch} from "../../utils/SqlQueries/batch.queries.js";
 import { createSyllabus } from "../../utils/SqlQueries/syllabus.queries.js";
 import { updateUsersFunction } from "../FirstDB/user.controllers.js";
 import { deleteStudentsFunction } from "../FirstDB/student.controllers.js";
@@ -159,3 +159,35 @@ export const deleteOrgBatch = async (req, res) => {
     ).send(res);
   }
 };
+
+
+export const FetchYoutubeVideos = async (req , res) => {
+  try{
+    const id = req.params.batchId
+
+    const data = await fetchVideoFromBatch(id)
+
+    if(!data || data.length === 0) return new APIError(404 , 'no youtube videos available').send(res);
+
+    return new APIResponse(200 , data , 'fetched videos from youtube').send(res);
+
+  } catch(e) {
+      return new APIError(500 , ['something went wrong white fetching the videos' , e.message]).send(res);
+  }
+}
+
+export const handleDeleteVideo = async (req, res) => {
+  const { batchId, videoId } = req.body;
+
+  if (!batchId || !videoId) {
+    return res.status(400).json({ error: 'batchId and videoId are required.' });
+  }
+
+  try {
+    const updatedVideos = await deleteVideoFromBatch(batchId, videoId);
+    res.status(200).json({ message: 'Video deleted successfully.', video_ids: updatedVideos });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete video.', details: err.message });
+  }
+};
+
