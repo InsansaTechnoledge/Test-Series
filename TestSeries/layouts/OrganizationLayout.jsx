@@ -172,6 +172,8 @@ export default function OrganizationLayout() {
         <div className='flex flex-col flex-1'>
 
           <Navbar />
+      
+   
           <main className="flex-1 flex-col overflow-y-auto relative">
             {/* Mobile menu toggle button */}
             {isMobile && (

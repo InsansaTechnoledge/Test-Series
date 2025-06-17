@@ -28,16 +28,6 @@ const Navbar = () => {
             <span className="text-2xl font-semibold text-white">{User.name}</span>
           </a>
 
-          {/* Centered Nav Links */}
-          <div className="hidden md:flex flex-1 justify-center">
-            <ul className="flex space-x-8 text-white font-medium">
-              <li><a href="#" className="hover:text-blue-400">Home</a></li>
-              <li><a href="#" className="hover:text-blue-400">About</a></li>
-              <li><a href="#" className="hover:text-blue-400">Services</a></li>
-              <li><a href="#" className="hover:text-blue-400">Pricing</a></li>
-              <li><a href="#" className="hover:text-blue-400">Contact</a></li>
-            </ul>
-          </div>
 
           {/* Profile on the right */}
           <div className="relative ml-auto group">
