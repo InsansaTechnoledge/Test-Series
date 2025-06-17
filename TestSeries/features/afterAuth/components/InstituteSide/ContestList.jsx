@@ -28,6 +28,16 @@ const ContestList = () => {
             </div>
         );
     }
+
+    if(contest.length === 0){
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <h1 className="text-2xl font-bold text-gray-800">No Contests Created Yet!!</h1>
+            </div>
+        );
+    }
+
+
     return (
         <div className="space-y-6">
 

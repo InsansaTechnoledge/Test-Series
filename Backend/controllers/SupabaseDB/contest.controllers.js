@@ -41,7 +41,7 @@ export const FetchContest = async (req, res) => {
         const data = await fetchContest(organizationId, batchId,userId);
 
         if (!data || data.length === 0) {
-            return new APIError(404, 'Contest details not found').send(res);
+            return new APIResponse(404, [], 'No contests found').send(res);
         }
         console.log("Contest Data:", data);
         return new APIResponse(200, data, 'Contest fetching successful').send(res);
