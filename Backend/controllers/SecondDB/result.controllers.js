@@ -315,7 +315,14 @@ export const fetchAllStudentResultByExamId = async (req, res) => {
     // Sort by score in descending order for leaderboard
     enrichedResults.sort((a, b) => (b.score || 0) - (a.score || 0));
 
-    return new APIResponse(200, enrichedResults, 'Fetched student data successfully').send(res);
+        const questions= await fetchQuestionsSelectively({ exam_id: examId });
+const questionMap = {};
+(questions || []).forEach((q) => {
+  questionMap[q.id] = q;  // 👈 Make sure to use 'id' not '_id' if your questions use 'id'
+});
+
+
+    return new APIResponse(200, {enrichedResults,questionMap}, 'Fetched student data successfully').send(res);
 
   } catch (e) {
     console.error('Error fetching leaderboard data:', e);

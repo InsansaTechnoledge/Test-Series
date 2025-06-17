@@ -1,50 +1,7 @@
-import React, { useEffect, useState } from 'react'
-import { getAllStudentData } from '../../../../utils/services/resultPage'
-import { useExamManagement } from '../../../../hooks/UseExam'
 import { Trophy, Medal, Award, Users } from 'lucide-react'
 
 
-const LeaderBoard = () => {
-    const { exams } = useExamManagement()
-
-    const [exam, setExam] = useState('')
-    const [examData, setExamData] = useState([])
-    const [loading, setLoading] = useState(false)
-    const [error, setError] = useState('')
-
-    // Set default exam when exams are loaded
-    useEffect(() => {
-        if (exams.length > 0 && !exam) {
-            setExam(exams[0].id) 
-        }
-    }, [exams, exam])
-
-    useEffect(() => {
-        const getData = async () => {
-            if (exam) {
-                setLoading(true)
-                setError('')
-                try {
-                    const response = await getAllStudentData(exam);
-                    console.log("Full response:", response)
-                    
-                    // Fix: Access the data property from the response
-                    const results = response.data || response || [];
-                    setExamData(results);
-                    
-                } catch (error) {
-                    console.error('Failed to fetch leaderboard data:', error)
-                    setError('Failed to load leaderboard data. Please try again.')
-                } finally {
-                    setLoading(false)
-                }
-            } else {
-                setExamData([])
-            }
-        }
-
-        getData();
-    }, [exam])
+const LeaderBoard = ({ exams,exam, setExam, examData, loading, error }) => {
 
     const getRankIcon = (rank) => {
         switch (rank) {
