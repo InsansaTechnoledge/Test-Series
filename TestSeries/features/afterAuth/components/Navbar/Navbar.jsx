@@ -172,14 +172,10 @@ const Navbar = ({setShowLogoutModal}) => {
               <div className="px-4 py-6">
                 <div className="space-y-1">
                   {categories.map((category) => {
-                    const Icon = category.icon;
-                    {
-                      typeof Icon === 'string' ? (
-                        <img src={category.icon} alt={category.name} className="w-5 h-5" />
-                      ) : (
-                        <Icon className="w-5 h-5" />
-                      )
-                    }
+                    // const Icon = category.icon;
+                   
+                        
+                     
                     const isActive = activeCategory === category.name;
                     return (
                       <div key={category.name}>
@@ -190,7 +186,8 @@ const Navbar = ({setShowLogoutModal}) => {
                           }`}
                         >
                           <div className="flex items-center space-x-3">
-                            <Icon className="h-5 w-5" />
+                          
+                            <img src={category.icon} alt={category.name} className="w-5 h-5" />
                             <span className="font-medium">{category.name}</span>
                           </div>
                           <ChevronDown className={`h-5 w-5 transition-transform ${isActive ? 'rotate-180' : ''}`} />
