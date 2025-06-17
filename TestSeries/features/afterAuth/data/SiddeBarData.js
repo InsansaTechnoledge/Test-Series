@@ -25,7 +25,7 @@ import ExamListActive from '../../../assests/Navigator/exam/publish exam/publish
 import CreateExam from '../../../assests/Navigator/exam/create exam/create exam - nor.svg'
 import CreateExamActive from '../../../assests/Navigator/exam/create exam/create exam - act.svg'
 
-import UploadVideo from '../../../assests/Navigator/videos/video - act.svg'
+import UploadVideo from '../../../assests/Navigator/videos/video - nor.svg'
 import UploadVideoActive from '../../../assests/Navigator/videos/video - act.svg'
 
 import VideoList from '../../../assests/Navigator/videos/list video/list video - nor.svg'
