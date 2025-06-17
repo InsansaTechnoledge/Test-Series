@@ -130,8 +130,8 @@ export const categories = [
     name: 'Contests',
     icon: User,
     features: [
-      'create Contest',
-      'contest list'
+      'Create Contest',
+      'Contest list'
     ]
   }
 ];

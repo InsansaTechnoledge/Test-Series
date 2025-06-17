@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import {
-  Search, Settings, ChevronDown, Menu, X
-} from 'lucide-react';
-import { useUser } from '../../../../contexts/currentUserContext';
+import { Search, Settings, ChevronDown, Menu, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import { categories } from '../../data/SiddeBarData';
 import LogoutModal from '../../../../components/Logout/LogoutModal';
+import { controls } from '../../data/SiddeBarData'; // Assuming controls is imported from the correct path
+import { useUser } from '../../../../contexts/currentUserContext';
 
 const Navbar = () => {
   const [activeCategory, setActiveCategory] = useState('');
@@ -14,6 +14,7 @@ const Navbar = () => {
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [showLogoutModel, setShowLogoutModal] = useState(false);
   const { user } = useUser();
+  const navigate = useNavigate(); // Initialize the navigate function
 
   const handleCategoryClick = (categoryName) => {
     setActiveCategory(activeCategory === categoryName ? '' : categoryName);
@@ -32,13 +33,18 @@ const Navbar = () => {
     return <LogoutModal setShowLogoutModal={setShowLogoutModal} />;
   }
 
+  const handleFeatureClick = (path) => {
+    // Navigate to the selected feature path
+    navigate(`/institute/${path}`);
+    setShowMobileMenu(false); 
+  };
+
   return (
     <div className="w-full relative">
       {/* Main Navigation */}
       <div className="bg-indigo-600 py-1">
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
-
             {/* Mobile Menu Button */}
             <button
               onClick={toggleMobileMenu}
@@ -99,7 +105,7 @@ const Navbar = () => {
                 {/* Profile Dropdown */}
                 {showProfileDropdown && (
                   <div className="absolute top-full right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl border border-gray-200 z-[9999]">
-                    <div className="bg-gradient-to-r from-gray-500 to-gray-700 px-4 py-3">
+                    <div className="bg-indigo-800 px-4 py-3">
                       <div className="text-white font-semibold">{user.name}</div>
                       <div className="text-gray-100 text-sm">{user.email}</div>
                     </div>
@@ -116,136 +122,103 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* Mobile Search Input */}
-          {showMobileSearch && (
-            <div className="md:hidden px-4 pb-3">
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Search className="h-5 w-5 text-gray-400" />
+          {/* Categories Desktop */}
+          <div className="hidden md:block mt-4 ">
+            <div className="w-full flex justify-center px-6">
+              <div className="max-w-4xl bg-gray-50 px-4 py-3 rounded-2xl">
+                <div className="flex items-center justify-center space-x-1">
+                  {categories.map((category) => {
+                    const Icon = category.icon;
+                    const isActive = activeCategory === category.name;
+                    return (
+                      <div key={category.name} className="relative">
+                        <button
+                          onClick={() => handleCategoryClick(category.name)}
+                          className={`flex items-center space-x-2 px-3 py-2 rounded-lg ${
+                            isActive ? 'bg-indigo-100 text-indigo-700 shadow-sm' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                          }`}
+                        >
+                          <Icon className="h-4 w-4" />
+                          <span className="font-medium text-sm">{category.name}</span>
+                          <ChevronDown className={`h-4 w-4 transition-transform ${isActive ? 'rotate-180' : ''}`} />
+                        </button>
+                        {isActive && (
+                          <div className="absolute top-full left-0 mt-1 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-[9999]">
+                            <div className="py-2">
+                              {category.features.map((feature, i) => {
+                                const control = controls.find(
+                                  (control) => control.name === feature
+                                ); // Find the control that matches the feature
+                                return (
+                                  <button
+                                    key={i}
+                                    onClick={() => handleFeatureClick(control.path)} // Navigate to the path
+                                    className="w-full px-4 py-2 text-left text-gray-600 hover:bg-indigo-50 hover:text-indigo-700"
+                                  >
+                                    {feature}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 rounded-full text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400"
-                  placeholder="Search features, settings, or content..."
-                  autoFocus
-                />
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile Menu */}
+          {showMobileMenu && (
+            <div className="md:hidden fixed inset-0 top-[72px] bg-white z-[9999] overflow-y-auto">
+              <div className="px-4 py-6">
+                <div className="space-y-1">
+                  {categories.map((category) => {
+                    const Icon = category.icon;
+                    const isActive = activeCategory === category.name;
+                    return (
+                      <div key={category.name}>
+                        <button
+                          onClick={() => handleCategoryClick(category.name)}
+                          className={`w-full flex items-center justify-between px-4 py-3 rounded-lg ${
+                            isActive ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50'
+                          }`}
+                        >
+                          <div className="flex items-center space-x-3">
+                            <Icon className="h-5 w-5" />
+                            <span className="font-medium">{category.name}</span>
+                          </div>
+                          <ChevronDown className={`h-5 w-5 transition-transform ${isActive ? 'rotate-180' : ''}`} />
+                        </button>
+                        {isActive && (
+                          <div className="mt-2 ml-8 space-y-1">
+                            {category.features.map((feature, i) => {
+                              const control = controls.find(
+                                (control) => control.name === feature
+                              );
+                              return (
+                                <button
+                                  key={i}
+                                  onClick={() => handleFeatureClick(control.path)}
+                                  className="w-full text-left px-4 py-2 text-gray-600 hover:bg-indigo-50 hover:text-indigo-700 rounded-md"
+                                >
+                                  {feature}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           )}
         </div>
       </div>
-
-      {/* Categories Desktop */}
-      <div className="hidden md:block mt-4 border-b border-gray-200">
-        <div className="w-full flex justify-center px-6">
-          <div className="max-w-4xl bg-gray-50 px-4 py-3 rounded-2xl mb-4">
-            <div className="flex items-center justify-center space-x-1">
-              {categories.map((category) => {
-                const Icon = category.icon;
-                const isActive = activeCategory === category.name;
-                return (
-                  <div key={category.name} className="relative">
-                    <button
-                      onClick={() => handleCategoryClick(category.name)}
-                      className={`flex items-center space-x-2 px-3 py-2 rounded-lg ${
-                        isActive ? 'bg-indigo-100 text-indigo-700 shadow-sm' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                      }`}
-                    >
-                      <Icon className="h-4 w-4" />
-                      <span className="font-medium text-sm">{category.name}</span>
-                      <ChevronDown className={`h-4 w-4 transition-transform ${isActive ? 'rotate-180' : ''}`} />
-                    </button>
-                    {isActive && (
-                      <div className="absolute top-full left-0 mt-1 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-[9999]">
-                        <div className="py-2">
-                          {category.features.map((feature, i) => (
-                            <button
-                              key={i}
-                              className="w-full px-4 py-2 text-left text-gray-600 hover:bg-indigo-50 hover:text-indigo-700"
-                            >
-                              {feature}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      {showMobileMenu && (
-        <div className="md:hidden fixed inset-0 top-[72px] bg-white z-[9999] overflow-y-auto">
-          <div className="px-4 py-6">
-            <div className="space-y-1">
-              {categories.map((category) => {
-                const Icon = category.icon;
-                const isActive = activeCategory === category.name;
-                return (
-                  <div key={category.name}>
-                    <button
-                      onClick={() => handleCategoryClick(category.name)}
-                      className={`w-full flex items-center justify-between px-4 py-3 rounded-lg ${
-                        isActive ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50'
-                      }`}
-                    >
-                      <div className="flex items-center space-x-3">
-                        <Icon className="h-5 w-5" />
-                        <span className="font-medium">{category.name}</span>
-                      </div>
-                      <ChevronDown className={`h-5 w-5 transition-transform ${isActive ? 'rotate-180' : ''}`} />
-                    </button>
-                    {isActive && (
-                      <div className="mt-2 ml-8 space-y-1">
-                        {category.features.map((feature, i) => (
-                          <button
-                            key={i}
-                            onClick={() => {
-                              setShowMobileMenu(false);
-                              setActiveCategory('');
-                            }}
-                            className="w-full text-left px-4 py-2 text-gray-600 hover:bg-indigo-50 hover:text-indigo-700 rounded-md"
-                          >
-                            {feature}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Backdrop click handler */}
-      {(showProfileDropdown || (activeCategory && !showMobileMenu)) && (
-        <div
-          className="fixed inset-0 z-[9998]"
-          onClick={() => {
-            setShowProfileDropdown(false);
-            setActiveCategory('');
-          }}
-        />
-      )}
-
-      {/* Mobile Menu Backdrop */}
-      {showMobileMenu && (
-        <div
-          className="md:hidden fixed inset-0 bg-black/20 z-[9997]"
-          onClick={() => {
-            setShowMobileMenu(false);
-            setActiveCategory('');
-          }}
-        />
-      )}
     </div>
   );
 };

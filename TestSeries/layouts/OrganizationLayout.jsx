@@ -24,7 +24,7 @@ export default function OrganizationLayout() {
         <Navbar />
 
         <main className="flex-1 overflow-y-auto pb-24">
-          <div className="p-6 md:p-10 max-w-7xl mx-auto">
+          <div className="p-6">
             <Outlet />
           </div>
         </main>
