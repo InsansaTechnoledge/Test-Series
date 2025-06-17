@@ -1,73 +1,87 @@
-import { icons, User } from 'lucide-react'
+import BatchLogo from '../../../assests/Navigator/Batch.svg';
+import ActiveBatch from '../../../assests/Navigator/activeBatch.svg';
+import { User } from 'lucide-react';
 
 export const controls = [
     {
         name: "All Batches",
         path: 'batch-list',
-        icon: User
+        icon: BatchLogo, 
+        activeIcon: ActiveBatch
     },
     {
         name: "User Details",
         path: "user-list",
-        icon: User
+        icon: BatchLogo, 
+        activeIcon: ActiveBatch
     },
     {
         name: "Add User",
         path: "create-user",
-        icon: User
+        icon: BatchLogo, 
+        activeIcon: ActiveBatch
     },
     {
         name: "Create Batch",
         path: "create-batch",
-        icon: User
+        icon: BatchLogo, 
+        activeIcon: ActiveBatch
     },
     {
         name: "Create Role Group",
         path: "create-role-group",
-        icon: User
+        icon: BatchLogo, 
+        activeIcon: ActiveBatch
     },
     {
         name: "Add Student",
         path: "add-student",
-        icon: User
+        icon: BatchLogo, 
+        activeIcon: ActiveBatch
     },
     {
         name: "Student List",
         path: "student-list",
-        icon: User
+        icon: BatchLogo, 
+        activeIcon: ActiveBatch
     },
     {
         name: "Create Exams",
         path: "create-exam",
-        icon: User
+        icon: BatchLogo, 
+        activeIcon: ActiveBatch
     },
     {
         name: "Exam List Page",
         path: "exam-list",
-        icon: User
+        icon: BatchLogo, 
+        activeIcon: ActiveBatch
     },
     {
         name: "Upload videos",
-        path : "video",
-        icon: User
+        path: "video",
+        icon: BatchLogo, 
+        activeIcon: ActiveBatch
     },
     {
         name: "Uploaded Videos",
         path: "video-list",
-        icon: User
+        icon: BatchLogo, 
+        activeIcon: ActiveBatch
     },
     {
-        name: "create Contest",
+        name: "Create Contest",
         path: "create-contest",
-        icon: User
+        icon: BatchLogo, 
+        activeIcon: ActiveBatch
     },
     {
-        name: "contest list",
+        name: "Contest list",
         path: "contest-list",
-        icon: User
+        icon: BatchLogo, 
+        activeIcon: ActiveBatch
     }
-]
-
+];
 
 
 export const categories = [

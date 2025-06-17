@@ -154,66 +154,69 @@ export default function BottomNavigator({ setShowLogoutModal }) {
         <div className={getFlexClasses()}>
           {/* Main navigation items */}
           {controls.map((control, idx) => {
-            const isActive = location.pathname.includes(control.path);
-            const isHovered = hoveredIndex === idx;
+  const isActive = location.pathname.includes(control.path); // Check if the control is active
+  const isHovered = hoveredIndex === idx;
 
-            return (
-              <div
-                key={idx}
-                className="relative"
-                onMouseEnter={() => setHoveredIndex(idx)}
-                onMouseLeave={() => setHoveredIndex(null)}
-              >
-                <button
-                  onClick={() => {
-                    if (location.pathname.includes(control.path)) {
-                      navigate('/', { replace: true });
-                      setTimeout(() => navigate(control.path), 0);
-                    } else {
-                      navigate(control.path);
-                    }
-                  }}
-                  className={`
-                    relative flex items-center justify-center rounded-xl transition-all duration-300 ease-out
-                    ${isActive 
-                      ? 'bg-indigo-600 text-white shadow-lg' 
-                      : 'text-gray-600 hover:bg-white/40 hover:text-gray-800'}
-                    ${isHovered ? 'scale-110' : 'scale-100'}
-                    ${layoutPosition === 'left' || layoutPosition === 'right' ? 
-                      (isHovered ? (layoutPosition === 'left' ? 'translate-x-1' : '-translate-x-1') : '') : 
-                      (isHovered ? '-translate-y-1' : '')}
-                  `}
-                  style={{
-                    width: isHovered ? '60px' : '52px',
-                    height: isHovered ? '60px' : '52px',
-                  }}
-                >
-                  <control.icon 
-                    className={`transition-all duration-300 ${
-                      isHovered ? 'w-7 h-7' : 'w-6 h-6'
-                    }`} 
-                  />
+  return (
+            <div
+            key={idx}
+            className="relative"
+            onMouseEnter={() => setHoveredIndex(idx)}
+            onMouseLeave={() => setHoveredIndex(null)}
+            >
+            <button
+                onClick={() => {
+                if (location.pathname.includes(control.path)) {
+                    navigate('/', { replace: true });
+                    setTimeout(() => navigate(control.path), 0);
+                } else {
+                    navigate(control.path);
+                }
+                }}
+                className={`
+                relative flex items-center justify-center rounded-xl transition-all duration-300 ease-out
+                ${isActive 
+                    ? 'bg-indigo-600 text-white shadow-lg' 
+                    : 'text-gray-600 hover:bg-white/40 hover:text-gray-800'}
+                ${isHovered ? 'scale-110' : 'scale-100'}
+                ${layoutPosition === 'left' || layoutPosition === 'right' ? 
+                    (isHovered ? (layoutPosition === 'left' ? 'translate-x-1' : '-translate-x-1') : '') : 
+                    (isHovered ? '-translate-y-1' : '')}
+                `}
+                style={{
+                width: isHovered ? '60px' : '52px',
+                height: isHovered ? '60px' : '52px',
+                }}
+            >
+                {/* Conditionally render icon or activeIcon */}
+                <img 
+                src={isActive || isHovered ? control.activeIcon : control.icon} 
+                alt={control.name} 
+                className={`transition-all duration-300 ${
+                    isHovered ? 'w-7 h-7' : 'w-6 h-6'
+                }`} 
+                />
 
-                  {isActive && (
-                    <div className={`absolute bg-white rounded-full ${
-                      layoutPosition === 'left' 
-                        ? '-right-1 top-1/2 transform -translate-y-1/2 w-1 h-1'
-                        : layoutPosition === 'right'
-                        ? '-left-1 top-1/2 transform -translate-y-1/2 w-1 h-1'
-                        : '-bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1'
-                    }`} />
-                  )}
-                </button>
-
-                {isHovered && (
-                  <div className={`absolute px-3 py-2 bg-gray-900 text-white text-xs rounded-md whitespace-nowrap opacity-95 z-[60] ${getTooltipPosition()}`}>
-                    {control.name}
-                    <div className={`absolute ${getTooltipArrow()}`} />
-                  </div>
+                {isActive && (
+                <div className={`absolute bg-white rounded-full ${
+                    layoutPosition === 'left' 
+                    ? '-right-1 top-1/2 transform -translate-y-1/2 w-1 h-1'
+                    : layoutPosition === 'right'
+                    ? '-left-1 top-1/2 transform -translate-y-1/2 w-1 h-1'
+                    : '-bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1'
+                }`} />
                 )}
-              </div>
-            );
-          })}
+            </button>
+
+            {isHovered && (
+                <div className={`absolute px-3 py-2 bg-gray-900 text-white text-xs rounded-md whitespace-nowrap opacity-95 z-[60] ${getTooltipPosition()}`}>
+                {control.name}
+                <div className={`absolute ${getTooltipArrow()}`} />
+                </div>
+            )}
+            </div>
+        );
+        })}
 
           {/* Separator */}
           <div className={getSeparatorClasses()} />
