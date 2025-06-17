@@ -35,7 +35,7 @@ const Navbar = () => {
   return (
     <div className="w-full relative">
       {/* Main Navigation */}
-      <div className="bg-indigo-600 py-5">
+      <div className="bg-indigo-600 py-1">
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
 
