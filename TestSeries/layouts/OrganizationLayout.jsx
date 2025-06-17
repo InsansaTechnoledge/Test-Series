@@ -87,7 +87,7 @@ export default function OrganizationLayout() {
           onMouseLeave={() => !isMobile && !isPinned && setIsHovering(false)}
         >
 
-          {/* Toggle Pin Button (desktop only) */}
+         
           {!isMobile && (isPinned || isHovering) && (
             <div className='relative'>
               <button
@@ -100,7 +100,7 @@ export default function OrganizationLayout() {
           )}
 
           <div className="flex flex-col h-full">
-            {/* Logo */}
+           
             <div className="flex items-center p-4 border-b border-indigo-900">
               <BookOpen className="text-white w-8 h-8 flex-shrink-0" />
               <div className={`ml-2 text-white font-bold text-lg transition-opacity duration-200 ${showLabels ? 'opacity-100' : 'opacity-0'} overflow-hidden`} style={{ width: showLabels ? 'auto' : 0 }}>
@@ -108,7 +108,7 @@ export default function OrganizationLayout() {
               </div>
             </div>
 
-            {/* Navigation Items */}
+           
             <nav className="flex-grow py-4 px-2 overflow-y-auto">
               <div className="space-y-1">
                 {controls.map((control, idx) => {
@@ -128,7 +128,7 @@ export default function OrganizationLayout() {
                         <control.icon className={`w-6 h-6 ${isActive ? 'text-indigo-300' : ''}`} />
                       </div>
 
-                      {/* Label container with fixed width that changes opacity */}
+                    
                       <div className={`
                       ml-3 overflow-hidden transition-all duration-200
                       ${showLabels ? 'w-40' : 'w-0'}
@@ -136,7 +136,7 @@ export default function OrganizationLayout() {
                         <span className="whitespace-nowrap">{control.name}</span>
                       </div>
 
-                      {/* Active indicator */}
+                     
                       {isActive && (
                         <div className={`
                         ml-auto h-2 w-2 rounded-full bg-indigo-400 transition-opacity duration-200
@@ -149,10 +149,10 @@ export default function OrganizationLayout() {
               </div>
             </nav>
 
-            {/* Footer Actions */}
+           
             <div className="p-2 border-t border-indigo-900">
             
-              {/* About Organization Button */}
+              
               <button onClick={() => {navigate('/institute/institute-landing')}} className="flex items-center w-full text-gray-300 p-3 hover:bg-indigo-800 hover:text-white rounded-lg transition-colors duration-200">
                 <div className="w-6 flex-shrink-0 flex justify-center">
                   <Info className="w-6 h-6" />

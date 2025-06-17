@@ -1,5 +1,6 @@
 import { calculateResult } from "../../../TestSeries/features/Test/utils/resultCalculator.js";
 import Result from "../../models/SecondDB/result.model.js";
+import Student from "../../models/FirstDB/student.model.js";
 import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
 import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
 import { fetchExamNameById, fetchExamNames } from "../../utils/SqlQueries/exam.queries.js";
@@ -127,9 +128,17 @@ export const fetchDetailedResultById = async (req, res) => {
 export const fetchAllResultsForExam = async (req, res) => {
     try {
       const studentId = req.user._id;
-      const { examId,forAllStudents } = req.params;
+      const { examId } = req.params;
+      const forAllStudents = req.query.forAllStudents === 'true';
+
   if(forAllStudents){
-    const results = await Result.find({ examId }).populate('studentId', 'name studentId');
+    // const results = await Result.find({ examId }).populate('studentId', 'name studentId');
+    const results = await Result.find({ examId }).populate({
+      path: 'studentId',
+      model: Student, 
+      select: 'name studentId'
+    });
+
     if (!results || results.length === 0) {
       return new APIError(404, ["Results for exam not found"]).send(res);
     }
@@ -241,3 +250,76 @@ export const updateRanksForExam = async (examId) => {
     throw err;
   }
 };
+
+export const fetchAllStudentResultByExamId = async (req, res) => {
+  try {
+    const examId = req.params.examId;
+
+    if (!examId) {
+      return new APIError(400, 'ExamId is required').send(res);
+    }
+
+    // Fetch results from ConnTwo
+    const results = await Result.find({ examId: examId });
+
+    if (!results || results.length === 0) {
+      return new APIResponse(200, [], 'No results found for this exam').send(res);
+    }
+
+    // Extract unique student IDs
+    const studentIds = [...new Set(results.map(result => result.studentId))];
+
+    // Fetch student data from ConnOne
+    const students = await Student.find({ 
+      _id: { $in: studentIds } 
+    }).select('_id name email'); // Select only needed fields
+
+    // Create a map for quick student lookup
+    const studentMap = new Map();
+    students.forEach(student => {
+      studentMap.set(student._id.toString(), student);
+    });
+
+    // Group results by studentId and keep only the best score for each student
+    const bestResultsMap = new Map();
+    
+    results.forEach(result => {
+      const studentId = result.studentId.toString();
+      const currentScore = result.score || 0;
+      
+      if (!bestResultsMap.has(studentId) || 
+          currentScore > (bestResultsMap.get(studentId).score || 0)) {
+        bestResultsMap.set(studentId, result);
+      }
+    });
+
+    // Convert map to array and combine with student information
+    const enrichedResults = Array.from(bestResultsMap.values()).map(result => {
+      const student = studentMap.get(result.studentId.toString());
+      return {
+        _id: result._id,
+        examId: result.examId,
+        studentId: result.studentId,
+        studentName: student ? student.name : 'Unknown Student',
+        studentEmail: student ? student.email : null,
+        score: result.score,
+        totalQuestions: result.totalQuestions,
+        correctAnswers: result.correctAnswers,
+        wrongAnswers: result.wrongAnswers,
+        submittedAt: result.submittedAt,
+        // Include any other fields from your Result model
+        ...result.toObject()
+      };
+    });
+
+    // Sort by score in descending order for leaderboard
+    enrichedResults.sort((a, b) => (b.score || 0) - (a.score || 0));
+
+    return new APIResponse(200, enrichedResults, 'Fetched student data successfully').send(res);
+
+  } catch (e) {
+    console.error('Error fetching leaderboard data:', e);
+    return new APIError(500, ['Something went wrong while fetching leaderboard data', e.message]).send(res);
+  }
+}
+

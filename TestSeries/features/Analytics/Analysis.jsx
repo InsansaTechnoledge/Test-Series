@@ -14,9 +14,10 @@ const Analysis = () => {
 
       <ExamAnalysis results={results}/>
 
+      <LeaderBoard/>
+      
       <WrongQuestionAnalysis/>
 
-      <LeaderBoard/>
     </div>
   )
 }
