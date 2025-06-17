@@ -1,7 +1,6 @@
 import { BookOpen, Info, LogOut, Settings } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { controls } from '../features/afterAuth/data/SiddeBarData';
 import Navbar from '../features/afterAuth/components/Navbar/Navbar';
 import LogoutModal from '../components/Logout/LogoutModal';
 import BottomNavigator from '../features/afterAuth/components/Navigator/BottomNavigator';
@@ -21,7 +20,7 @@ export default function OrganizationLayout() {
       )}
 
       <div className="flex bg-blue-50/30 flex-col h-screen w-screen overflow-hidden">
-        <Navbar />
+        <Navbar setShowLogoutModal={setShowLogoutModal}/>
 
         <main className="flex-1 overflow-y-auto pb-24">
           <div className="p-6">
