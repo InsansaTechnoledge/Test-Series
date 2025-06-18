@@ -6,6 +6,7 @@ import usePendingExams from '../../../../hooks/useExamData';
 import { useNavigate } from 'react-router-dom';
 import DeleteExamModal from './ExamFlow/DeleteExamModal';
 import { useExamManagement } from '../../../../hooks/UseExam';
+import Banner from "../../../../assests/Institute/exam list.svg"
 const ExamListPage = () => {
   const [updatingId, setUpdatingId] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -101,6 +102,7 @@ const ExamListPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+   
       {/* Header */}
       <HeadingUtil 
         heading="List of Created/Drafted Exams" 

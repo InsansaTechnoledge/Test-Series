@@ -9,7 +9,7 @@ import NeedHelpComponent from './components/NeedHelpComponent'
 import { QueryClient } from '@tanstack/react-query'
 import { useUser } from '../../../../contexts/currentUserContext'
 import { useEffect } from 'react'
-
+import  Banner from "../../../../assests/Institute/add student.svg"
 const AddStudent = () => {
   const { user } = useUser();
   const [batch, setBatch] = useState('')
@@ -274,24 +274,33 @@ const AddStudent = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-indigo-50">
-      {/* Hero Header */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gray-600"></div>
-        <div className="absolute inset-0 bg-black opacity-20"></div>
-        
-        <div className="relative z-10 px-6 py-16 text-center">
-          <div className="inline-flex items-center space-x-3 mb-4">
-           
-            <h1 className="text-6xl md:text-7xl font-black text-white tracking-tight">
-              Add Students
-            </h1>
-          </div>
-          <p className="text-xl text-white text-opacity-90 max-w-2xl mx-auto leading-relaxed">
-            Create students and assign them to batches with our powerful management system
-          </p>
-        </div>
-      </div>
 
+      {/* Hero Header */}
+     
+      
+      <div className="relative overflow-hidden rounded-xl h-80">
+   
+    <img 
+        src={Banner} 
+        alt="Upload Banner"
+        className="absolute  w-full h-full object-cover"
+    />
+    
+  
+    <div className="absolute "></div>
+    
+    {/* Content */}
+    <div className="relative z-10 flex items-center justify-center h-full px-6 text-center">
+        <div>
+            <h1 className="text-5xl md:text-6xl font-black text-white tracking-tight mb-4 drop-shadow-lg">
+            Add Students
+            </h1>
+            <p className="text-xl text-white/90 max-w-2xl mx-auto drop-shadow-md">
+            Create students and assign them to batches with our powerful management system
+            </p>
+        </div>
+    </div>
+</div>
       <div className="max-w-7xl mx-auto px-6 -mt-8 relative z-20">
         {/* Help Component */}
         <div className="mb-8">
