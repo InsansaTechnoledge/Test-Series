@@ -8,7 +8,7 @@ import AddUser from '../../../assests/Navigator/User/add user/add user - nor.svg
 import AddUserActive from '../../../assests/Navigator/User/add user/add user - act.svg'
 
 import CreateBatch from '../../../assests/Navigator/batch/Create batch/create batch - normal.svg'
-import CreateBatchActive from '../../../assests/Navigator/batch/Create batch/create batch - normal.svg'
+import CreateBatchActive from '../../../assests/Navigator/batch/Create batch/create batch - act.svg'
 
 import RoloGroup from '../../../assests/Navigator/create role/create role - nor.svg'
 import RoloGroupActive from '../../../assests/Navigator/create role/create role - act.svg'
@@ -39,6 +39,12 @@ import CreateContestListActive from '../../../assests/Navigator/contest list/con
 
 
 
+import AllBatch from "../../../assests/Navigator/batch/batch - normal.svg"
+import user from "../../../assests/Navigator/User/user - nor.svg"
+import  student from "../../../assests/Navigator/students/sttudent - nor.svg"
+import  exam from "../../../assests/Navigator/exam/exam - nor.svg"
+import video from "../../../assests/Navigator/videos/video - nor.svg"
+import  contest from "../../../assests/Navigator/code contest/code contest - nor.svg"
 import { User } from 'lucide-react';
 
 export const controls = [
@@ -127,7 +133,7 @@ export const controls = [
 export const categories = [
   {
     name: 'Users & Roles',
-    icon: User,
+    icon: user,
     features: [
       'User Details',
       'Add User',
@@ -136,7 +142,7 @@ export const categories = [
   },
   {
     name: 'Batches',
-    icon: User,
+    icon: AllBatch,
     features: [
       'All Batches',
       'Create Batch'
@@ -144,7 +150,7 @@ export const categories = [
   },
   {
     name: 'Students',
-    icon: User,
+    icon: student,
     features: [
       'Add Student',
       'Student List'
@@ -152,7 +158,7 @@ export const categories = [
   },
   {
     name: 'Exams',
-    icon: User,
+    icon: exam,
     features: [
       'Create Exams',
       'Exam List Page'
@@ -160,7 +166,7 @@ export const categories = [
   },
   {
     name: 'Videos',
-    icon: User,
+    icon: video,
     features: [
       'Upload videos',
       'Uploaded Videos'
@@ -168,7 +174,7 @@ export const categories = [
   },
   {
     name: 'Contests',
-    icon: User,
+    icon: contest,
     features: [
       'Create Contest',
       'Contest list'

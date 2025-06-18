@@ -167,9 +167,7 @@ const InstituteLandingPage = () => {
                 ))}
               </div>
 
-              <button className="mt-6 px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition">
-                Get Started →
-              </button>
+          
             </section>
 
             <FAQSection studentFAQs={studentFAQs} teacherFAQs={teacherFAQs} />
