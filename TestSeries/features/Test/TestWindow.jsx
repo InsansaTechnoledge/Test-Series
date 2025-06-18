@@ -299,7 +299,7 @@ const TestWindow = () => {
             {/* Header */}
             <div className="flex flex-col border-3  mb-12 py-3 px-2 sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6 ">
               <div>
-                <h1 className="text-xl sm:text-3xl font-bold">{eventDetails.batch.name}</h1>
+                <h1 className="text-xl sm:text-3xl font-bold">{eventDetails.batch?.name}</h1>
                 <h2 className="text-md sm:text-lg font-semibold text-gray-600">{eventDetails.batch.year}</h2>
               </div>
 

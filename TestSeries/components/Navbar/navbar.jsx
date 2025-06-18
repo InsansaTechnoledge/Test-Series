@@ -1,43 +1,48 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom'; // Assuming you're using React Router
 import logo from "../../assests/Landing/Navbar/evalvo logo blue 2.svg"
+import { ArrowRight } from 'lucide-react';
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   return (
-    <nav className="flex justify-between items-center px-6 md:px-18 py-3  bg-transparent backdrop-blur-xl sticky top-0 z-50">
+    <nav className="flex justify-between items-center px-6 md:px-22 py-6  bg-transparent backdrop-blur-xl sticky top-0 z-50">
       {/* Logo */}
       <div className="flex items-center">
         <Link to="/" className="text-xl font-bold text-blue-600">
 
 
-        <img src={logo} width={100}></img>
+        <img src={logo} width={150}></img>
 
         </Link>
       </div>
 
      
       <div className="hidden md:flex space-x-8 text-gray-700">
-        <Link to="/" className="hover:text-blue-600 transition">Home</Link>
-        <Link to="/about" className="hover:text-blue-600 transition">About</Link>
-        <Link to="/services" className="hover:text-blue-600 transition">Services</Link>
-        <Link to="/contact" className="hover:text-blue-600 transition">Contact</Link>
+      <Link to="/" className="px-4 py-2 rounded-md hover:bg-indigo-100 hover:text-blue-600 transition duration-200"> Home</Link>
+        <Link to="/about" className="px-4 py-2 rounded-md hover:bg-indigo-100 hover:text-blue-600 transition duration-200">About</Link>
+        <Link to="/services" className="px-4 py-2 rounded-md hover:bg-indigo-100 hover:text-blue-600 transition duration-200">Services</Link>
+        <Link to="/contact" className="px-4 py-2 rounded-md hover:bg-indigo-100 hover:text-blue-600 transition duration-200">Contact</Link>
       </div>
 
       {/* Authentication Section */}
-      <div className="hidden md:flex items-center">
+      <div className="hidden  md:flex items-center">
         <div className="flex items-center border-r border-gray-200 pr-5 mr-5">
-          <Link to="/login?role=Student" className="text-blue-700 hover:text-blue-800 font-medium">
+          <Link to="/login?role=Student" className="text-gray-600 bg-gray-100 hover:bg-gray-200 py-4 px-5 rounded-full hover:text-gray-700 font-medium">
             Student Login
           </Link>
         </div>
         
         <div className="flex items-center space-x-4">
-          <Link to="/login?role=Institute" className="text-indigo-600 hover:text-indigo-700 font-medium">
+          <Link to="/login?role=Institute" className="text-gray-600 bg-gray-100 hover:bg-gray-200 py-4 px-5 rounded-full hover:text-gray-700 font-medium">
             Institute Login
           </Link>
-          <Link to="/institute-registration" className="bg-indigo-600 text-white px-5 py-2 rounded-md hover:bg-indigo-700 transition">
-            Register Institute
+          <Link
+              to="/institute-registration"
+              className="group bg-indigo-600 text-white px-5 py-4 rounded-full hover:bg-indigo-700 transition inline-flex items-center gap-2"
+          >
+              Register Institute
+              <ArrowRight className="transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
       </div>
@@ -56,24 +61,28 @@ const Navbar = () => {
       {isMobileMenuOpen && (
         <div className="md:hidden absolute top-14 left-0 right-0 bg-white shadow-md z-50">
           <div className="flex flex-col p-4">
-            <Link to="/" className="py-2 text-gray-700 hover:text-blue-600">Home</Link>
-            <Link to="/about" className="py-2 text-gray-700 hover:text-blue-600">About</Link>
-            <Link to="/services" className="py-2 text-gray-700 hover:text-blue-600">Services</Link>
-            <Link to="/contact" className="py-2 text-gray-700 hover:text-blue-600">Contact</Link>
+            <Link to="/" className="py-2 text-gray-700 hover:text-indigo-600">Home</Link>
+            <Link to="/about" className="py-2 text-gray-700 hover:text-indigo-600">About</Link>
+            <Link to="/services" className="py-2 text-gray-700 hover:text-indigo-600">Services</Link>
+            <Link to="/contact" className="py-2 text-gray-700 hover:text-indigo-600">Contact</Link>
             
             <div className="border-t border-gray-200 my-2 pt-2">
               <div className="flex justify-between items-center">
-                <Link to="/login?role=Student" className="flex-1 text-center py-2 text-blue-600 font-medium border-r border-gray-200">
+                <Link to="/login?role=Student" className="flex-1 text-center py-2 text-indigo-600 hover:text-indigo-700 font-medium border-r border-gray-200">
                   Student Login
                 </Link>
-                <Link to="/login?role=Institute" className="flex-1 text-center py-2 text-indigo-600 font-medium">
+                <Link to="/login?role=Institute" className="flex-1 text-center py-2 text-indigo-600 hover:text-indigo-700 font-medium">
                   Institute Login
                 </Link>
               </div>
-              <Link to="/institute-registration" className="block mt-3 bg-indigo-600 text-white py-2 rounded-md text-center">
+              <Link to="/institute-registration" className="block mt-3 bg-indigo-600 text-white py-2  text-center">
+                Register Institute
+              </Link>
+              <Link to="/institute-registration" className="block mt-3 bg-indigo-600 text-white py-2  text-center">
                 Register Institute
               </Link>
             </div>
+
           </div>
         </div>
       )}

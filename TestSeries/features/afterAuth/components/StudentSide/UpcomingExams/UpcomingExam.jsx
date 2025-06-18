@@ -19,13 +19,15 @@ const UpcomingExam = () => {
   const answer = "Use the created role groups to assign permissions to users in your add user section.";
 
   useEffect(() => {
-    const upcoming = exams?.filter(exam => exam.go_live === false || exam.go_live === "FALSE");
+    if (!exams) return;
+  
+    const upcoming = exams.filter(exam => exam.go_live === false || exam.go_live === "FALSE");
+    const live = exams.filter(exam => exam.go_live === true || exam.go_live === "TRUE");
+  
     setUpcomingExams(upcoming);
-
-    const live = exams?.filter(exam => exam.go_live === true || exam.go_live === "TRUE")
-    setLiveExams(live)
-  }, [exams])
-
+    setLiveExams(live);
+  }, [JSON.stringify(exams)]);
+  
 
   const handleStartTest = (examId) => {
     // Replace with real userId or eventId if available
