@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom'; // Assuming you're using React Router
-
+import logo from "../../assests/Landing/Navbar/evalvo logo blue 2.svg"
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
@@ -8,7 +8,12 @@ const Navbar = () => {
     <nav className="flex justify-between items-center px-6 md:px-18 py-3  bg-transparent backdrop-blur-xl sticky top-0 z-50">
       {/* Logo */}
       <div className="flex items-center">
-        <Link to="/" className="text-xl font-bold text-blue-600">MyLogo</Link>
+        <Link to="/" className="text-xl font-bold text-blue-600">
+
+
+        <img src={logo} width={100}></img>
+
+        </Link>
       </div>
 
      
