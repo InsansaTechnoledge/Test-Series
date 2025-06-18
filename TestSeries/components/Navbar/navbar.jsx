@@ -5,7 +5,7 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   return (
-    <nav className="flex justify-between items-center px-6 md:px-12 py-3 shadow-sm bg-white sticky top-0 z-50">
+    <nav className="flex justify-between items-center px-6 md:px-18 py-3  bg-transparent backdrop-blur-xl sticky top-0 z-50">
       {/* Logo */}
       <div className="flex items-center">
         <Link to="/" className="text-xl font-bold text-blue-600">MyLogo</Link>

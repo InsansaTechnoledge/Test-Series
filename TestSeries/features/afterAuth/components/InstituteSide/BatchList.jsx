@@ -10,6 +10,7 @@ import { useUser } from '../../../../contexts/currentUserContext';
 import DeleteBatchModal from '../../utility/DeleteBatchModal';
 import { useCachedUser } from '../../../../hooks/useCachedUser';
 import { useCachedStudents } from '../../../../hooks/useCachedStudents';
+import BatchBanner from '../../../../assests/Banners/BatchBanner.svg'
 
 const BatchList = () => {
   const navigate = useNavigate();
@@ -87,15 +88,17 @@ const BatchList = () => {
         <div className="absolute inset-0 bg-black opacity-20"></div>
         
         
-        <div className="relative z-10 px-6 py-16 text-center">
+        <div
+          className="relative z-10 px-6 py-24 text-center bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url(${BatchBanner})` }}
+        >
           <div className="inline-flex items-center space-x-3 mb-4">
-          
             <h1 className="text-6xl md:text-7xl font-black text-white tracking-tight">
               All Batches
             </h1>
-          
-          </div>
+          </div>  
         </div>
+
       </div>
 
       {/* Stats Dashboard */}
