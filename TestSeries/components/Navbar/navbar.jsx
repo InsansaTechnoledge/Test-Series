@@ -78,9 +78,7 @@ const Navbar = () => {
               <Link to="/institute-registration" className="block mt-3 bg-indigo-600 text-white py-2  text-center">
                 Register Institute
               </Link>
-              <Link to="/institute-registration" className="block mt-3 bg-indigo-600 text-white py-2  text-center">
-                Register Institute
-              </Link>
+             
             </div>
 
           </div>

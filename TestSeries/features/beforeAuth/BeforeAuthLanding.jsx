@@ -17,9 +17,9 @@ const BeforeAuthLanding = () => {
   return (
     <>
       <Hero />
-      <WhyYourInstitute />
-      <WhyTakeExam />
       <TestTypes />
+      {/* <WhyYourInstitute />   */}
+      <WhyTakeExam />
       <AiBranding/>
       <ProctoringWorking/>
       <SoftwareCapabilities leftCapabilities={leftCapabilities} rightCapabilities={rightCapabilities} benefits={benefits} />
