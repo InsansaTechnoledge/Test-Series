@@ -34,22 +34,25 @@ import VideoListActive from '../../../assests/Navigator/videos/list video/list v
 import CrerateContest from '../../../assests/Navigator/code contest/code contest - nor.svg'
 import CrerateContestActive from '../../../assests/Navigator/code contest/code contest - act.svg'
 
+import CreateContestList from '../../../assests/Navigator/contest list/contest list - nor.svg'
+import CreateContestListActive from '../../../assests/Navigator/contest list/contest list - act.svg'
+
 
 
 import { User } from 'lucide-react';
 
 export const controls = [
     {
+        name: "Create Batch",
+        path: "create-batch",
+        icon: CreateBatch, 
+        activeIcon: CreateBatchActive
+    },
+    {
         name: "All Batches",
         path: 'batch-list',
         icon: BatchLogo, 
         activeIcon: ActiveBatch
-    },
-    {
-        name: "User Details",
-        path: "user-list",
-        icon: UserList, 
-        activeIcon: UserListActive
     },
     {
         name: "Add User",
@@ -58,11 +61,12 @@ export const controls = [
         activeIcon: AddUserActive
     },
     {
-        name: "Create Batch",
-        path: "create-batch",
-        icon: CreateBatch, 
-        activeIcon: CreateBatchActive
+        name: "User Details",
+        path: "user-list",
+        icon: UserList, 
+        activeIcon: UserListActive
     },
+    
     {
         name: "Create Role Group",
         path: "create-role-group",
@@ -114,8 +118,8 @@ export const controls = [
     {
         name: "Contest list",
         path: "contest-list",
-        icon: BatchLogo, 
-        activeIcon: ActiveBatch
+        icon: CreateContestList, 
+        activeIcon: CreateContestListActive
     }
 ];
 

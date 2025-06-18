@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Edit, Eye, PlusSquare, Search, Trash } from 'lucide-react'
+import { Edit, Eye, PlusSquare, Search, Trash, Users, UserCheck, Shield, AlertTriangle } from 'lucide-react'
 import HeadingUtil from '../../utility/HeadingUtil'
 import { useNavigate } from 'react-router-dom'
 import RefreshButton from '../../utility/RefreshButton'
@@ -15,12 +15,15 @@ const UserList = () => {
     const { user } = useUser();
     const { users, isLoading, isError } = useCachedUser();
     const { batches, batchMap } = useCachedBatches();
-    const { roleMap ,hasActiveFeatureInRole} = useCachedRoleGroup();
+    const { roleMap, hasActiveFeatureInRole } = useCachedRoleGroup();
     const [filteredUsers, setFilteredUsers] = useState(users);
     const [selectedBatch, setSelectedBatch] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
     const queryClient = useQueryClient();
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [userIdToDelete, setUserIdToDelete] = useState(null);
+    const [expandedUsers, setExpandedUsers] = useState({});
+    const navigate = useNavigate();
 
     const refreshFunction = async () => {
         await queryClient.invalidateQueries(['Users', user._id]);
@@ -31,21 +34,28 @@ const UserList = () => {
     useEffect(() => {
         if (users) {
             setFilteredUsers(users);
-//example usage:            
-// console.log("hasFeature", hasActiveFeatureInRole({featureId:'683061baeeb53072d9ad40ec',roleId:'683ed20bd5b60d8f8a437f2a'}));
+            // Example usage:            
+            // console.log("hasFeature", hasActiveFeatureInRole({featureId:'683061baeeb53072d9ad40ec',roleId:'683ed20bd5b60d8f8a437f2a'}));
         }
     }, [users])
 
     useEffect(() => {
+        let filtered = users || [];
+        
+        // Filter by batch if selected
         if (selectedBatch) {
-            setFilteredUsers(users.filter(user => user.batch?.includes(selectedBatch)));
-        } else {
-            setFilteredUsers(users);
+            filtered = filtered.filter(user => user.batch?.includes(selectedBatch));
         }
-    }, [selectedBatch]);
-
-    const [expandedUsers, setExpandedUsers] = useState(filteredUsers);
-    const navigate = useNavigate();
+        
+        // Filter by search term
+        if (searchTerm) {
+            filtered = filtered.filter(user => 
+                user.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+        
+        setFilteredUsers(filtered);
+    }, [selectedBatch, searchTerm, users]);
 
     const handleExpandedUsers = (id) => {
         setExpandedUsers(prev => ({
@@ -54,182 +64,289 @@ const UserList = () => {
         }));
     }
 
-
-
+    const uniqueRoles = [...new Set(users?.map(user => roleMap[user?.roleId]?.name).filter(Boolean))];
 
     return (
-        <>
-            <div className='h-full flex flex-col'>
-                <div>
-                    <HeadingUtil heading="All Users" description="you can view all users of your institute and filter them based on year" />
-
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
+            
+            {/* Hero Header */}
+            <div className="relative overflow-hidden">
+                <div className="absolute inset-0 bg-gray-600"></div>
+                <div className="absolute inset-0 bg-black opacity-20"></div>
+                
+                <div className="relative z-10 px-6 py-16 text-center">
+                    <div className="inline-flex items-center space-x-3 mb-4">
+                        <h1 className="text-6xl md:text-7xl font-black text-white tracking-tight">
+                            All Users
+                        </h1>
+                    </div>
+                    <p className="text-xl text-blue-100 max-w-2xl mx-auto">
+                        Manage all users of your institute and filter them based on batches and roles
+                    </p>
                 </div>
-                <div className='rounded-xl  bg-white inset-shadow-md flex-grow flex flex-col overflow-auto shadow-2xl'>
-                    <div className='flex flex-col lg:flex-row justify-between gap-4 mb-2 bg-blue-100 px-2 py-2 rounded-none w-full'>
-                        <div className='my-auto'>
-                            <h2 className='font-bold text-lg text-blue-900 pl-4'>Total Users: {filteredUsers.length}</h2>
-                        </div>
-                        <div className='flex flex-col md:flex-row gap-4'>
-                        
-                        <label className='space-x-2 flex rounded-md bg-white py-2 px-4'>
-                                <div>
-                                    <Search />
-                                </div>
-                                <input
+            </div>
 
-                                    className='focus: outline-0 '
-                                    placeholder='search batch'
+            {/* Stats Dashboard */}
+            <div className="max-w-7xl mx-auto px-6 -mt-8 relative z-20">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div className="bg-white rounded-3xl p-6 shadow-xl border-l-4 border-blue-600 transform hover:scale-105 transition-all duration-300">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Total Users</p>
+                                <p className="text-4xl font-black text-blue-600">{filteredUsers?.length || 0}</p>
+                            </div>
+                            <div className="bg-blue-100 p-3 rounded-2xl">
+                                <Users className="w-8 h-8 text-blue-600" />
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="bg-white rounded-3xl p-6 shadow-xl border-l-4 border-green-600 transform hover:scale-105 transition-all duration-300">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Active Roles</p>
+                                <p className="text-4xl font-black text-green-600">{uniqueRoles.length}</p>
+                            </div>
+                            <div className="bg-green-100 p-3 rounded-2xl">
+                                <Shield className="w-8 h-8 text-green-600" />
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="bg-white rounded-3xl p-6 shadow-xl border-l-4 border-purple-600 transform hover:scale-105 transition-all duration-300">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Search Results</p>
+                                <p className="text-4xl font-black text-purple-600">{filteredUsers?.length || 0}</p>
+                            </div>
+                            <div className="bg-purple-100 p-3 rounded-2xl">
+                                <Search className="w-8 h-8 text-purple-600" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Control Panel */}
+                <div className="bg-white rounded-3xl shadow-xl p-6 mb-8 border border-gray-100">
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                        <div className="flex flex-col md:flex-row items-start md:items-center space-y-4 md:space-y-0 md:space-x-4">
+                            <div className="relative">
+                                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                <input 
+                                    className="bg-gray-50 border-2 border-gray-200 text-gray-900 rounded-2xl pl-12 pr-6 py-3 focus:ring-4 focus:ring-blue-200 focus:border-blue-400 transition-all duration-300 w-80"
+                                    placeholder="Search users..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
                                 />
-                            </label>
-                            <select className='rounded-md bg-white py-2 px-4'
-                                onChange={(e) => setSelectedBatch(e.target.value)}>
-                                <option value=''>--select Batch--</option>
-                                {batches.map(batch => (
+                            </div>
+                            
+                            <select
+                                className="bg-gray-50 border-2 border-gray-200 text-gray-900 rounded-2xl px-6 py-3 focus:ring-4 focus:ring-blue-200 focus:border-blue-400 transition-all duration-300 font-medium"
+                                onChange={(e) => setSelectedBatch(e.target.value)}
+                                value={selectedBatch}
+                            >
+                                <option value="">All Batches</option>
+                                {batches?.map(batch => (
                                     <option key={batch.id} value={batch.id}>{batch.name}</option>
                                 ))}
                             </select>
-                         
-                            <button className='bg-blue-900 text-white py-2 px-4 rounded-md hover:cursor-pointer font-semibold hover:scale-105 flex space-x-2 transition-all duration-300'
-                                onClick={() => {
-                                    navigate('/institute/create-user')
-                                }}>
-                                <span>
-                                    Add User
-                                </span>
-                                <div>
-                                    <PlusSquare />
-                                </div>
-                            </button>
+                        </div>
+
+                        <div className="flex items-center space-x-4">
                             <RefreshButton refreshFunction={refreshFunction} />
+                            <button
+                                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-2xl font-bold transition-all duration-300 hover:shadow-2xl hover:scale-105 flex items-center space-x-3 transform"
+                                onClick={() => navigate('/institute/create-user')}
+                            >
+                                <PlusSquare className="w-5 h-5" />
+                                <span>Add User</span>
+                            </button>
                         </div>
                     </div>
-
-                    {/* user list */}
-
-
-                    <div className="relative overflow-auto shadow-md  h-[100%] ">
-                        <table className="w-full text-sm text-left rtl:text-right text-blue-900">
-                            <thead className="text-xs text-blue-900 uppercase bg-gray-200 ">
-                                <tr className='text-center'>
-                                    <th scope="col" className="w-2/10 px-6 py-3">
-                                        Name
-                                    </th>
-                                    <th scope="col" className="w-2/10 px-6 py-3">
-                                        Batches allotted
-                                    </th>
-                                    <th scope="col" className="w-1/10 px-6 py-3">
-                                        Role
-                                    </th>
-
-                                    <th scope="col" className="w-2/10 px-6 py-3">
-                                        Actions
-                                    </th>
-                                </tr>
-                            </thead>
-                            {
-                                filteredUsers.map((user, idx) => (
-                                    <tbody key={idx}>
-                                        <tr className=" bg-white border-b border-gray-200 hover:bg-gray-50 text-blue-600 text-sm">
-                                            <th scope="row" className="px-6 py-4 font-medium text-blue-600 whitespace-nowrap ">
-                                                {user.name}
-                                            </th>
-                                            <td className="px-6 py-4 ">
-                                                <div className='flex justify-center flex-wrap gap-2 w-full'>
-                                                    {
-                                                        // expandedUsers?.user?._id
-                                                        expandedUsers[user._id || true]
-                                                            ?
-                                                            <>
-                                                                {
-                                                                    user.batch?.map((batch, idx) => (
-                                                                        <div key={idx}
-                                                                            className='flex rounded-md bg-blue-50  px-4 py-1'
-                                                                        >
-                                                                            {batchMap[batch]?.name} - {batchMap[batch]?.year}
-                                                                        </div>
-                                                                    ))
-                                                                }
-                                                                <div
-                                                                    className='my-auto hover:cursor-pointer hover:underline'
-                                                                    onClick={() => handleExpandedUsers(user?._id)}
-                                                                >
-                                                                    ...hide extra
-                                                                </div>
-                                                            </>
-                                                            :
-                                                            <>
-                                                                {user.batch?.slice(0, 2).map((batch, idx) => (
-                                                                    <div key={idx}
-                                                                        className='flex rounded-md bg-blue-50  px-4 py-1'
-                                                                    >
-                                                                        {batchMap[batch]?.name} - {batchMap[batch]?.year}
-                                                                    </div>
-
-                                                                ))}
-                                                                {
-                                                                    user.batch?.length > 2 &&
-                                                                    <div
-                                                                        className='my-auto hover:cursor-pointer hover:underline'
-                                                                        onClick={() => handleExpandedUsers(user?._id)}
-                                                                    >
-                                                                        ... + {user.batch?.length - 2} more
-                                                                    </div>
-                                                                }
-                                                            </>
-
-                                                    }
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 ">
-                                                <div className='mx-auto py-1 px-4 rounded-full bg-blue-50 w-fit'>
-                                                    {
-                                                        roleMap[user?.roleId]
-                                                            ? roleMap[user.roleId].name
-                                                            : <span className='text-red-500'>No role assigned yet!</span>
-                                                    }
-                                                </div>
-                                            </td>
-                                            <td className="flex justify-center mx-auto w-fit px-6 py-4 gap-8">
-                                                <button
-                                                    onClick={() => { navigate('/institute/user-detail', { state: { userId: user._id } }) }}
-                                                    className="font-medium text-black hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer">
-
-                                                    <Eye  className='size-4'/>
-                                                </button>
-                                                <button
-                                                    onClick={() => navigate(`/institute/user-edit/${user._id}`)}
-                                                    className="font-medium text-blue-500 hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer">
-                                                    <Edit className='size-4' />
-                                                </button>
-                                                <button
-                                                    onClick={() => {
-                                                        setShowDeleteModal(true);
-                                                        setUserIdToDelete(user._id);  // 👈 store the user ID to delete
-                                                    }}  // this is the MongoDB _id
-                                                    className="font-medium text-red-500 hover:underline bg-gray-200 py-1 px-4 rounded-lg hover:cursor-pointer">
-                                                    <Trash  className='size-4'/>
-                                                </button>
-
-                                            </td>
-                                        </tr>
-
-                                    </tbody>
-                                ))
-                            }
-                        </table>
-                    </div>
-
-                            {
-                                showDeleteModal && userIdToDelete && (
-                                    <DeleteUserModal
-                                        userId={userIdToDelete}
-                                        setShowDeleteModal={setShowDeleteModal}
-                                        />
-                                )
-                            }
                 </div>
+
+                {/* User Cards Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                    {filteredUsers?.map((userItem, idx) => (
+                        <div 
+                            key={userItem._id || idx} 
+                            className="group relative bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-gray-100 overflow-hidden"
+                            style={{
+                                animationDelay: `${idx * 100}ms`,
+                                animation: 'fadeInUp 0.6s ease-out forwards'
+                            }}
+                        >
+                            {/* Gradient Header */}
+                            <div className="h-32 bg-gradient-to-r from-blue-600 to-blue-800 relative overflow-hidden">
+                                <div className="absolute inset-0 bg-black bg-opacity-10"></div>
+                                
+                                <div className="absolute top-4 right-4">
+                                    <div className="bg-white bg-opacity-20 text-gray-700 px-3 py-1 rounded-full text-sm font-bold backdrop-blur-sm">
+                                        <UserCheck className="w-4 h-4 inline mr-1" />
+                                        faculty
+                                    </div>
+                                </div>
+                                <div className="absolute bottom-4 left-4 right-4">
+                                    <h3 className="text-white font-black text-3xl leading-tight line-clamp-2">
+                                        {userItem.name}
+                                    </h3>
+                                </div>
+                            </div>
+
+                            {/* Card Content */}
+                            <div className="p-6">
+                                {/* Role Badge */}
+                                <div className="flex items-center justify-center mb-4">
+                                    <div className="bg-gradient-to-r from-blue-50 to-blue-100 px-4 py-2 rounded-full border border-blue-200">
+                                        {roleMap[userItem?.roleId] ? (
+                                            <span className="text-sm font-bold text-blue-700 flex items-center">
+                                              
+                                                <Shield className="w-4 h-4 mr-2" />
+                                                {roleMap[userItem.roleId].name}
+                                            </span>
+                                        ) : (
+                                            <span className="text-sm font-bold text-red-500 flex items-center">
+                                                <AlertTriangle className="w-4 h-4 mr-2" />
+                                                No role assigned
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Batches Section */}
+                                <div className="mb-6">
+                                    <p className="text-sm font-semibold text-gray-600 mb-3">Assigned Batches:</p>
+                                    <div className="flex justify-center flex-wrap gap-2">
+                                        {userItem.batch?.length > 0 ? (
+                                            <>
+                                                {expandedUsers[userItem._id] ? (
+                                                    <>
+                                                        {userItem.batch.map((batch, batchIdx) => (
+                                                            <div key={batchIdx} className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-medium border border-blue-200">
+                                                                {batchMap[batch]?.name} - {batchMap[batch]?.year}
+                                                            </div>
+                                                        ))}
+                                                        {userItem.batch.length > 2 && (
+                                                            <button
+                                                                className="text-xs text-blue-600 hover:text-blue-800 font-medium underline"
+                                                                onClick={() => handleExpandedUsers(userItem._id)}
+                                                            >
+                                                                Show less
+                                                            </button>
+                                                        )}
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        {userItem.batch.slice(0, 2).map((batch, batchIdx) => (
+                                                            <div key={batchIdx} className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-medium border border-blue-200">
+                                                                {batchMap[batch]?.name} - {batchMap[batch]?.year}
+                                                            </div>
+                                                        ))}
+                                                        {userItem.batch.length > 2 && (
+                                                            <button
+                                                                className="text-xs text-blue-600 hover:text-blue-800 font-medium underline"
+                                                                onClick={() => handleExpandedUsers(userItem._id)}
+                                                            >
+                                                                +{userItem.batch.length - 2} more
+                                                            </button>
+                                                        )}
+                                                    </>
+                                                )}
+                                            </>
+                                        ) : (
+                                            <div className="text-gray-500 text-sm italic">No batches assigned</div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Action Buttons */}
+                                <div className="flex justify-center space-x-3">
+                                    <button
+                                        className="flex-1 z-10 cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 p-3 rounded-xl transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-2"
+                                        onClick={() => navigate('/institute/user-detail', { state: { userId: userItem._id } })}
+                                        title="View Details"
+                                    >
+                                        <Eye className="w-4 h-4" />
+                                        <span className="font-medium text-sm">View</span>
+                                    </button>
+                                    
+                                    <button
+                                        className="flex-1 z-10 cursor-pointer bg-blue-100 hover:bg-blue-200 text-blue-700 p-3 rounded-xl transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-2"
+                                        onClick={() => navigate(`/institute/user-edit/${userItem._id}`)}
+                                        title="Edit User"
+                                    >
+                                        <Edit className="w-4 h-4" />
+                                        <span className="font-medium text-sm">Edit</span>
+                                    </button>
+                                    
+                                    <button
+                                        className="bg-red-100 z-10 cursor-pointer hover:bg-red-200 text-red-700 p-3 rounded-xl transition-all duration-300 hover:scale-105"
+                                        onClick={() => {
+                                            setShowDeleteModal(true);
+                                            setUserIdToDelete(userItem._id);
+                                        }}
+                                        title="Delete User"
+                                    >
+                                        <Trash className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Hover Effect Overlay */}
+                            <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-800 opacity-0 group-hover:opacity-10 transition-opacity duration-300 rounded-3xl"></div>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Empty State */}
+                {filteredUsers?.length === 0 && (
+                    <div className="text-center py-20">
+                        <div className="w-32 h-32 mx-auto bg-gradient-to-r from-blue-100 to-blue-200 rounded-full flex items-center justify-center mb-8 animate-bounce">
+                            <Users className="w-12 h-12 text-blue-400" />
+                        </div>
+                        <h3 className="text-3xl font-black text-gray-800 mb-4">No users found</h3>
+                        <p className="text-xl text-gray-600 mb-8 max-w-md mx-auto">
+                            {selectedBatch ? "No users found for selected batch" : searchTerm ? `No users match "${searchTerm}"` : 'Get started by adding your first user'}
+                        </p>
+                        <button
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 rounded-2xl font-bold transition-all duration-300 hover:shadow-2xl hover:scale-105 inline-flex items-center space-x-3"
+                            onClick={() => navigate('/institute/create-user')}
+                        >
+                            <PlusSquare className="w-5 h-5" />
+                            <span>Add First User</span>
+                        </button>
+                    </div>
+                )}
             </div>
-        </>
+
+            {/* Delete Modal */}
+            {showDeleteModal && userIdToDelete && (
+                <DeleteUserModal
+                    userId={userIdToDelete}
+                    setShowDeleteModal={setShowDeleteModal}
+                />
+            )}
+
+            <style jsx>{`
+                @keyframes fadeInUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(30px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+                
+                .line-clamp-2 {
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                }
+            `}</style>
+        </div>
     )
 }
 

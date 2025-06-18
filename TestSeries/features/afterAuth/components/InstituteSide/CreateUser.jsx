@@ -174,286 +174,326 @@ const CreateUser = () => {
     };
 
     return (
-
-
-        <div className="max-w-6xl mx-auto px-6 py-10 space-y-8">
-            <div>
-                <HeadingUtil
-                    heading="Add User"
-                    description="you can add users to your institute and assign them specific roles"
-                />
-            </div>
-            <div className="bg-blue-50 p-8 rounded-2xl shadow-xl space-y-10">
-                <div className="flex flex-col md:flex-row gap-8  items-center">
-                    <div className="">
-                        <img
-                            src={profile || profileDefault} // fallback image if nothing is selected
-                            className="rounded-full w-20 h-20 border-blue-100 shadow-sm"
-                            alt="Profile"
-                        />
-                    </div>
-
-                    <div className="flex flex-col items-center md:items-start">
-                        <label className="bg-blue-900 text-white py-2 px-4 rounded-md cursor-pointer text-sm font-medium hover:bg-blue-800 transition">
-                            {profile ? "Change profile photo" : "Upload profile photo"}
-
-                            <input
-                                type="file"
-                                accept="image/*"
-                                className="hidden"
-                                onChange={(e) => {
-                                    const file = e.target.files[0];
-                                    if (file) {
-                                        const imageUrl = URL.createObjectURL(file);
-                                        setProfile(imageUrl); // show image
-                                        setFormData((prev) => ({
-                                            ...prev,
-                                            profilePhoto: file, // store file for upload
-                                        }));
-                                    }
-                                }}
-                            />
-                        </label>
-                        <span className="text-sm text-gray-500 mt-2">
-                            you may add the profile photo of the user.
-                        </span>
-                    </div>
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-indigo-50">
+            {/* Hero Header */}
+            <div className="relative overflow-hidden">
+                <div className="absolute inset-0 bg-gray-600"></div>
+                <div className="absolute inset-0 bg-black opacity-20"></div>
+                
+                <div className="relative z-10 px-6 py-16 text-center">
+                    <h1 className="text-6xl md:text-7xl font-black text-white tracking-tight mb-4">
+                        Add User
+                    </h1>
+                    <p className="text-xl text-white opacity-90 max-w-2xl mx-auto">
+                        Create new users and assign them specific roles in your institute
+                    </p>
                 </div>
-                <div className="grid lg:grid-cols-2 gap-x-10 mx-auto gap-y-8 mt-10 w-4/5 ">
-                    <div className="flex flex-col gap-2">
-                        <label
-                            htmlFor="firstName"
-                            className="text-sm font-semibold text-gray-700 "
-                        >
-                            First name<span className="text-red-600">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            id="firstName"
-                            name="firstName"
-                            value={formData.firstName || ""}
-                            onChange={(e) => onChangeHandler(e)}
-                            className="p-3 bg-gray-50 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="Enter first name"
-                        />
-                        {error.firstName && (
-                            <p className="text-red-500 text-sm">{error.firstName}</p>
-                        )}
-                    </div>
-                    <div className="flex flex-col gap-2">
-                        <label htmlFor="lastName" className=" text-sm font-semibold text-gray-700">
-                            Last name<span className="text-red-600">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            id="lastName"
-                            name="lastName"
-                            value={formData.lastName || ""}
-                            onChange={(e) => onChangeHandler(e)}
-                            className="p-3 bg-gray-50 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="Enter last name"
-                        />
-                        {error.lastName && (
-                            <p className="text-red-500 text-sm">{error.lastName}</p>
-                        )}
-                    </div>
-                    <div className="flex flex-col gap-2">
-                        <label htmlFor="email" className="text-sm font-semibold text-gray-700">
-                            Email<span className="text-red-600">*</span>
-                        </label>
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            value={formData.email || ""}
-                            onChange={(e) => onChangeHandler(e)}
-                            className="p-3 bg-gray-50 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="Enter email"
-                        />
-                        {error.email && (
-                            <p className="text-red-500 text-sm">{error.email}</p>
-                        )}
-                    </div>
-                    <div className="flex flex-col gap-2">
-                        <label
-                            htmlFor="password"
-                            className="text-sm font-semibold text-gray-700"
-                        >
-                            Password<span className="text-red-600">*</span>
-                        </label>
-                        <div className="flex gap-2">
-                            <div className="relative w-full">
-                                <input
-                                    type={showPassword ? "text" : "password"}
-                                    id="password"
-                                    name="password"
-                                    value={formData.password || ""}
-                                    onChange={(e) => onChangeHandler(e)}
-                                    className="p-3 bg-gray-50 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full pr-10"
-                                    placeholder="Enter password or Generate the password on click"
+            </div>
+
+            {/* Main Form Container */}
+            <div className="max-w-6xl mx-auto px-6 -mt-8 relative z-20 pb-12">
+                <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
+                    
+                    {/* Profile Section */}
+                    <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-8 border-b border-gray-100">
+                        <div className="flex flex-col md:flex-row gap-8 items-center">
+                            <div className="relative group">
+                                <img
+                                    src={profile || profileDefault}
+                                    className="rounded-full w-24 h-24 border-4 border-white shadow-xl group-hover:scale-105 transition-transform duration-300"
+                                    alt="Profile"
                                 />
-                                <div
-                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-600"
-                                    onClick={() => setShowPassword((prev) => !prev)}
-                                >
-                                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                                </div>
+                                <div className="absolute inset-0 rounded-full bg-black bg-opacity-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                             </div>
-                            <button
-                                onClick={generateRandomPassword}
-                                className="bg-white hover:cursor-pointer rounded-md px-2"
-                            >
-                                <RefreshCcw className="w-6 h-6" />
-                            </button>
-                        </div>
-                        {error.password && (
-                            <p className="text-red-500 text-sm">{error.password}</p>
-                        )}
-                    </div>
-                    <div className="flex flex-col gap-2">
-                        <label htmlFor="confirm_password" className="text-sm font-semibold text-gray-700">
-                            Confirm Password<span className="text-red-600">*</span>
-                        </label>
-                        <div className="relative w-full">
-                            <input
-                                type={showConfirmPassword ? "text" : "password"}
-                                id="confirm_password"
-                                name="confirm_password"
-                                value={formData.confirm_password || ""}
-                                onChange={(e) => onChangeHandler(e)}
-                                className="p-3 bg-gray-50 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md w-full pr-10"
-                                placeholder="Confirm password"
-                            />
-                            <div
-                                className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-600"
-                                onClick={() => setShowConfirmPassword((prev) => !prev)}
-                            >
-                                {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+
+                            <div className="flex flex-col items-center md:items-start">
+                                <label className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 px-6 rounded-2xl cursor-pointer text-sm font-bold hover:shadow-xl transition-all duration-300 hover:scale-105 transform">
+                                    {profile ? "Change Profile Photo" : "Upload Profile Photo"}
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        className="hidden"
+                                        onChange={(e) => {
+                                            const file = e.target.files[0];
+                                            if (file) {
+                                                const imageUrl = URL.createObjectURL(file);
+                                                setProfile(imageUrl);
+                                                setFormData((prev) => ({
+                                                    ...prev,
+                                                    profilePhoto: file,
+                                                }));
+                                            }
+                                        }}
+                                    />
+                                </label>
+                                <span className="text-sm text-gray-600 mt-2 text-center md:text-left">
+                                    Add a profile photo for the user (optional)
+                                </span>
                             </div>
                         </div>
-                        {error.confirm_password && (
-                            <p className="text-red-500 text-sm">{error.confirm_password}</p>
-                        )}
                     </div>
-                    <div className="flex flex-col gap-2">
-                        <label htmlFor="userId" className="text-sm font-semibold text-gray-700">
-                            User ID <span className="text-red-600">*</span>
-                        </label>
-                        <input
-                            type="test"
-                            id="userId"
-                            name="userId"
-                            value={formData.userId || ""}
-                            onChange={(e) => onChangeHandler(e)}
-                            className="p-3 bg-gray-50 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="Enter User ID provided by institute"
-                        />
-                    </div>
-                    <div className="flex flex-col gap-2">
-                        <label htmlFor="gender" className="text-sm font-semibold text-gray-700">
-                            Gender<span className="text-red-600">*</span>
-                        </label>
-                        <select
-                            id="gender"
-                            name="gender"
-                            value={formData.gender || ""}
-                            className="p-3 bg-gray-50 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            onChange={(e) => onChangeHandler(e)}
-                        >
-                            <option value={""}>--Select Gender--</option>
-                            <option value={"Male"}>Male</option>
-                            <option value={"Female"}>Female</option>
-                            <option value={"Others"}>Others</option>
-                        </select>
-                    </div>
-                    <div className="flex flex-col gap-2">
-                        <label htmlFor="roleId" className="text-sm font-semibold text-gray-700">
-                            Role group<span className="text-red-600">*</span>
-                        </label>
-                        <select
-                            name="roleId"
-                            value={formData.roleId || ""}
-                            onChange={(e) => onChangeHandler(e)}
-                            id="roleId"
-                            className="p-3 bg-gray-50 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                            <option value="">--select role--</option>
-                            {roleGroups.map((role, idx) => (
-                                <option key={idx} value={role._id}>
-                                    {role.name} - {role.description}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="flex flex-col gap-5  ">
 
+                    {/* Form Fields */}
+                    <div className="p-8">
+                        <div className="grid lg:grid-cols-2 gap-8">
+                            {/* First Name */}
+                            <div className="group">
+                                <label className="block text-sm font-bold text-gray-700 mb-2">
+                                    First Name <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    id="firstName"
+                                    name="firstName"
+                                    value={formData.firstName || ""}
+                                    onChange={onChangeHandler}
+                                    className="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 font-medium"
+                                    placeholder="Enter first name"
+                                />
+                                {error.firstName && (
+                                    <p className="text-red-500 text-sm mt-2 font-medium">{error.firstName}</p>
+                                )}
+                            </div>
 
-                        <div className="flex flex-col gap-2">
-                            <label htmlFor="batch" className="text-sm font-semibold text-gray-700 ">
-                                Assign batches
-                            </label>
-                            <button
-                                onClick={() => setBatchesVisible(!batchesVisible)}
-                                className="bg-blue-900 text-white px-6 py-2 rounded-md w-fit hover:bg-blue-800 transition cursor-pointer"
-                            >
-                                {batchesVisible ? "Hide all batches" : "Show all batches"}
-                            </button>
+                            {/* Last Name */}
+                            <div className="group">
+                                <label className="block text-sm font-bold text-gray-700 mb-2">
+                                    Last Name <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    id="lastName"
+                                    name="lastName"
+                                    value={formData.lastName || ""}
+                                    onChange={onChangeHandler}
+                                    className="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 font-medium"
+                                    placeholder="Enter last name"
+                                />
+                                {error.lastName && (
+                                    <p className="text-red-500 text-sm mt-2 font-medium">{error.lastName}</p>
+                                )}
+                            </div>
 
-                            {batchesVisible ? (
-                                <div className="flex gap-2 flex-wrap mt-2">
-                                    {showBatches.map((batch, idx) => (
-                                        <div
-                                            onClick={() => toggleBatch(batch)}
-                                            key={idx}
-                                            className={`hover:cursor-pointer rounded-full px-3 py-1 text-sm border ${selectedBatches.some((b) => b.id === batch.id)
-                                                    ? "bg-green-500 border-green-400"
-                                                    : "bg-gray-100 border-gray-300"
-                                                } py-1 px-4`}
+                            {/* Email */}
+                            <div className="group">
+                                <label className="block text-sm font-bold text-gray-700 mb-2">
+                                    Email <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    value={formData.email || ""}
+                                    onChange={onChangeHandler}
+                                    className="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 font-medium"
+                                    placeholder="Enter email address"
+                                />
+                                {error.email && (
+                                    <p className="text-red-500 text-sm mt-2 font-medium">{error.email}</p>
+                                )}
+                            </div>
+
+                            {/* Password */}
+                            <div className="group">
+                                <label className="block text-sm font-bold text-gray-700 mb-2">
+                                    Password <span className="text-red-500">*</span>
+                                </label>
+                                <div className="flex gap-3">
+                                    <div className="relative flex-1">
+                                        <input
+                                            type={showPassword ? "text" : "password"}
+                                            id="password"
+                                            name="password"
+                                            value={formData.password || ""}
+                                            onChange={onChangeHandler}
+                                            className="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 font-medium pr-12"
+                                            placeholder="Enter password or generate"
+                                        />
+                                        <button
+                                            type="button"
+                                            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+                                            onClick={() => setShowPassword(!showPassword)}
                                         >
-                                            {batch.name} - {batch.year}
-                                        </div>
-                                    ))}
+                                            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                        </button>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={generateRandomPassword}
+                                        className="bg-gradient-to-r from-indigo-100 to-purple-100 hover:from-indigo-200 hover:to-purple-200 p-4 rounded-2xl transition-all duration-300 hover:scale-105 transform"
+                                        title="Generate Random Password"
+                                    >
+                                        <RefreshCcw className="w-5 h-5 text-indigo-600" />
+                                    </button>
                                 </div>
-                            ) : (
-                                <>
-                                    <div className="flex gap-2 mt-3  flex-col">
-                                        {selectedBatches.length > 0 ? (
-                                            <div className="text-nowrap text-gray-800 text-sm font-semibold ">Assigned Batches</div>
-                                        ) : null}
-                                        <div className="flex gap-2 flex-wrap">
+                                {error.password && (
+                                    <p className="text-red-500 text-sm mt-2 font-medium">{error.password}</p>
+                                )}
+                            </div>
+
+                            {/* Confirm Password */}
+                            <div className="group">
+                                <label className="block text-sm font-bold text-gray-700 mb-2">
+                                    Confirm Password <span className="text-red-500">*</span>
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        type={showConfirmPassword ? "text" : "password"}
+                                        id="confirm_password"
+                                        name="confirm_password"
+                                        value={formData.confirm_password || ""}
+                                        onChange={onChangeHandler}
+                                        className="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 font-medium pr-12"
+                                        placeholder="Confirm password"
+                                    />
+                                    <button
+                                        type="button"
+                                        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                    >
+                                        {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                    </button>
+                                </div>
+                                {error.confirm_password && (
+                                    <p className="text-red-500 text-sm mt-2 font-medium">{error.confirm_password}</p>
+                                )}
+                            </div>
+
+                            {/* User ID */}
+                            <div className="group">
+                                <label className="block text-sm font-bold text-gray-700 mb-2">
+                                    User ID <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    id="userId"
+                                    name="userId"
+                                    value={formData.userId || ""}
+                                    onChange={onChangeHandler}
+                                    className="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 font-medium"
+                                    placeholder="Enter User ID provided by institute"
+                                />
+                                {error.userId && (
+                                    <p className="text-red-500 text-sm mt-2 font-medium">{error.userId}</p>
+                                )}
+                            </div>
+
+                            {/* Gender */}
+                            <div className="group">
+                                <label className="block text-sm font-bold text-gray-700 mb-2">
+                                    Gender <span className="text-red-500">*</span>
+                                </label>
+                                <select
+                                    id="gender"
+                                    name="gender"
+                                    value={formData.gender || ""}
+                                    onChange={onChangeHandler}
+                                    className="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 font-medium"
+                                >
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Others">Others</option>
+                                </select>
+                                {error.gender && (
+                                    <p className="text-red-500 text-sm mt-2 font-medium">{error.gender}</p>
+                                )}
+                            </div>
+
+                            {/* Role Group */}
+                            <div className="group">
+                                <label className="block text-sm font-bold text-gray-700 mb-2">
+                                    Role Group <span className="text-red-500">*</span>
+                                </label>
+                                <select
+                                    name="roleId"
+                                    value={formData.roleId || ""}
+                                    onChange={onChangeHandler}
+                                    id="roleId"
+                                    className="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 font-medium"
+                                >
+                                    <option value="">Select Role</option>
+                                    {roleGroups.map((role, idx) => (
+                                        <option key={idx} value={role._id}>
+                                            {role.name} - {role.description}
+                                        </option>
+                                    ))}
+                                </select>
+                                {error.roleId && (
+                                    <p className="text-red-500 text-sm mt-2 font-medium">{error.roleId}</p>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Batch Assignment */}
+                        <div className="mt-12">
+                            <div className="bg-gradient-to-r from-gray-50 to-indigo-50 rounded-3xl p-8 border-2 border-gray-100">
+                                <label className="block text-lg font-bold text-gray-800 mb-6">
+                                    Assign Batches
+                                </label>
+                                
+                                <button
+                                    type="button"
+                                    onClick={() => setBatchesVisible(!batchesVisible)}
+                                    className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-3 rounded-2xl font-bold hover:shadow-xl transition-all duration-300 hover:scale-105 transform mb-6"
+                                >
+                                    {batchesVisible ? "Hide All Batches" : "Show All Batches"}
+                                </button>
+
+                                {batchesVisible && (
+                                    <div className="flex gap-3 flex-wrap mb-6">
+                                        {showBatches.map((batch, idx) => (
+                                            <button
+                                                key={idx}
+                                                type="button"
+                                                onClick={() => toggleBatch(batch)}
+                                                className={`px-6 py-3 rounded-2xl text-sm font-bold transition-all duration-300 hover:scale-105 transform ${
+                                                    selectedBatches.some((b) => b.id === batch.id)
+                                                        ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg"
+                                                        : "bg-white border-2 border-gray-200 text-gray-700 hover:border-indigo-300 hover:shadow-md"
+                                                }`}
+                                            >
+                                                {batch.name} - {batch.year}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {selectedBatches.length > 0 && !batchesVisible && (
+                                    <div>
+                                        <h4 className="text-sm font-bold text-gray-700 mb-3">Assigned Batches:</h4>
+                                        <div className="flex gap-3 flex-wrap">
                                             {selectedBatches.map((batch, idx) => (
                                                 <div
                                                     key={idx}
-                                                    className={`rounded-full  className="rounded-full bg-blue-50 border border-blue-200 text-blue-900 font-medium shadow-sm py-1.5 px-4 text-sm hover:bg-blue-100 transition duration-200"
-                        >`}
+                                                    className="bg-gradient-to-r from-indigo-100 to-purple-100 border-2 border-indigo-200 text-indigo-800 px-4 py-2 rounded-2xl text-sm font-bold"
                                                 >
                                                     {batch.name} - {batch.year}
                                                 </div>
                                             ))}
                                         </div>
                                     </div>
-                                </>
-                            )}
-                        </div>
-                        <div className="flex flex-col gap-2 pt-4 cols-span-full justify-center w-fit ">
-                            <button
-                                className="bg-green-600 text-white px-6 py-3 rounded-lg  hover:bg-blue-800 transition cursor-pointer font-semibold"
-                                onClick={(e) => {
-                                    onsubmitForm();
-                                }}
-                            >
-                                Submit Form
-                            </button>
-                            {error.form && <p className="text-red-500 text-sm">{error.form}</p>}
+                                )}
+                            </div>
                         </div>
 
+                        {/* Submit Button */}
+                        <div className="mt-12 text-center">
+                            <button
+                                type="button"
+                                onClick={onsubmitForm}
+                                className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-12 py-4 rounded-2xl font-bold text-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 transform"
+                            >
+                                Create User
+                            </button>
+                            {error.form && (
+                                <p className="text-red-500 text-sm mt-4 font-medium">{error.form}</p>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
-
         </div>
-
-
     );
 };
 
