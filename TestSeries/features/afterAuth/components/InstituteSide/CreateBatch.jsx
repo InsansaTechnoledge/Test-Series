@@ -8,6 +8,7 @@ import { useCachedRoleGroup } from '../../../../hooks/useCachedRoleGroup';
 import { createBatch } from '../../../../utils/services/batchService';
 import { useQueryClient } from '@tanstack/react-query';
 import { useUser } from '../../../../contexts/currentUserContext';
+import Banner from "../../../../assests/Institute/create batch.svg"
 
 const CreateBatch = () => {
   const [formData, setFormData] = useState({ batchMode: 'only-subjects' });
@@ -182,17 +183,22 @@ const CreateBatch = () => {
       
       {/* Hero Header */}
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gray-600"></div>
-        <div className="absolute inset-0 bg-black opacity-20"></div>
+        <div className="absolute inset-0 "></div>
+        <div className="absolute inset-0 "></div>
         
-        <div className="relative z-10 px-6 py-16 text-center">
+        
+        <div
+          className="relative z-10 px-6 py-24 text-center bg-cover bg-center bg-no-repeat rounded-xl"
+          style={{ backgroundImage: `url(${Banner})` }}
+        >
           <div className="inline-flex items-center space-x-3 mb-4">
             <h1 className="text-6xl md:text-7xl font-black text-white tracking-tight">
-              Create Batch
+            Create Batch
             </h1>
-          </div>
+         
+          </div>  
           <p className="text-xl text-white/80 max-w-2xl mx-auto font-medium">
-            Set up a new batch with subjects, faculties, and syllabus information for your institute
+          Create batch with subjects, faculty, syllabus.
           </p>
         </div>
       </div>

@@ -10,7 +10,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useUser } from '../../../../contexts/currentUserContext'
 import { DeleteUser } from '../../../../utils/services/userService'
 import DeleteUserModal from '../../utility/DeleteUserModal'
-
+import Banner  from "../../../../assests/Institute/User.svg"
 const UserList = () => {
     const { user } = useUser();
     const { users, isLoading, isError } = useCachedUser();
@@ -71,22 +71,26 @@ const UserList = () => {
             
             {/* Hero Header */}
             <div className="relative overflow-hidden">
-                <div className="absolute inset-0 bg-gray-600"></div>
-                <div className="absolute inset-0 bg-black opacity-20"></div>
-                
-                <div className="relative z-10 px-6 py-16 text-center">
-                    <div className="inline-flex items-center space-x-3 mb-4">
-                        <h1 className="text-6xl md:text-7xl font-black text-white tracking-tight">
-                            All Users
-                        </h1>
-                    </div>
-                    <p className="text-xl text-blue-100 max-w-2xl mx-auto">
-                        Manage all users of your institute and filter them based on batches and roles
-                    </p>
+                <div className="absolute inset-0 "></div>
+                <div className="absolute inset-0"></div>
+                <div
+          className="relative z-10 px-6 py-24 text-center bg-cover bg-center bg-no-repeat rounded-xl"
+          style={{ backgroundImage: `url(${Banner})` }}
+        >
+               
+                <div className="inline-flex items-center space-x-3 mb-4">
+            <h1 className="text-6xl md:text-7xl font-black text-white tracking-tight">
+            All Users
+            </h1>
+         
+          </div>  
+          <p className="text-xl text-white/80 max-w-2xl mx-auto font-medium">
+          Manage all users of your institute and filter them based on batches roles
+          </p>
                 </div>
             </div>
 
-            {/* Stats Dashboard */}
+        {/* Stats Dashboard */}
             <div className="max-w-7xl mx-auto px-6 -mt-8 relative z-20">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <div className="bg-white rounded-3xl p-6 shadow-xl border-l-4 border-blue-600 transform hover:scale-105 transition-all duration-300">

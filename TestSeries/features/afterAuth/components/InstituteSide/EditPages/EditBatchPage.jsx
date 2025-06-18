@@ -145,11 +145,23 @@ const BatchPage = () => {
 
     return (
         <>
-            <div className="flex justify-between items-center mb-5">
+            <div className="flex justify-between items-center mb-5 max-w-3xl">
                 <BackButton />
             </div>
-            <div className="p-6">
-                <HeadingUtil heading=" Batch" description={`Update details for batch: ${batch.name}`} />
+            <div className="p-8 bg-gradient-to-r from-indigo-600 to-gray-600 text-white relative overflow-hidden rounded-t-2xl">
+            <div className="absolute inset-0 bg-black opacity-10"></div>
+            <div className="relative z-10">
+              <h2 className=" text-3xl font-black mb-1 flex items-center space-x-3">
+                Edit Batch 
+               
+            
+              </h2>
+              <p className="text-indigo-100 text-xl">Update details for batch: "<span className="font-semibold">{`${batch.name}`}</span>"</p>
+          
+            </div>
+          </div>
+            <div className="mx-auto">
+              
                 <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 rounded-md shadow-2xl">
 
                     <label className="block font-medium mb-1">Batch Name</label>
@@ -284,6 +296,9 @@ const BatchPage = () => {
                     </button>
                 </form>
             </div>
+
+
+            
         </>
     );
 };

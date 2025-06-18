@@ -10,7 +10,7 @@ import { useUser } from '../../../../contexts/currentUserContext';
 import DeleteBatchModal from '../../utility/DeleteBatchModal';
 import { useCachedUser } from '../../../../hooks/useCachedUser';
 import { useCachedStudents } from '../../../../hooks/useCachedStudents';
-import BatchBanner from '../../../../assests/Banners/BatchBanner.svg'
+import BatchBanner from '../../../../assests/Institute/Banner 1 1.svg'
 
 const BatchList = () => {
   const navigate = useNavigate();
@@ -84,19 +84,23 @@ const BatchList = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-indigo-50">
     
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-gray-600 to-gray-600"></div>
-        <div className="absolute inset-0 bg-black opacity-20"></div>
+        <div className="absolute inset-0 "></div>
+        <div className="absolute inset-0  opacity-20"></div>
         
         
         <div
-          className="relative z-10 px-6 py-24 text-center bg-cover bg-center bg-no-repeat"
+          className="relative z-10 px-6 py-24 text-center bg-cover bg-center bg-no-repeat rounded-xl"
           style={{ backgroundImage: `url(${BatchBanner})` }}
         >
           <div className="inline-flex items-center space-x-3 mb-4">
             <h1 className="text-6xl md:text-7xl font-black text-white tracking-tight">
               All Batches
             </h1>
+         
           </div>  
+          <p className="text-xl text-white/80 max-w-2xl mx-auto font-medium">
+            View details of all batches
+          </p>
         </div>
 
       </div>
