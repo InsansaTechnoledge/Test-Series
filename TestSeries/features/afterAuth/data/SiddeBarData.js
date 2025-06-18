@@ -8,7 +8,7 @@ import AddUser from '../../../assests/Navigator/User/add user/add user - nor.svg
 import AddUserActive from '../../../assests/Navigator/User/add user/add user - act.svg'
 
 import CreateBatch from '../../../assests/Navigator/batch/Create batch/create batch - normal.svg'
-import CreateBatchActive from '../../../assests/Navigator/batch/Create batch/create batch - normal.svg'
+import CreateBatchActive from '../../../assests/Navigator/batch/Create batch/create batch - act.svg'
 
 import RoloGroup from '../../../assests/Navigator/create role/create role - nor.svg'
 import RoloGroupActive from '../../../assests/Navigator/create role/create role - act.svg'
@@ -34,11 +34,11 @@ import VideoListActive from '../../../assests/Navigator/videos/list video/list v
 import CrerateContest from '../../../assests/Navigator/code contest/code contest - nor.svg'
 import CrerateContestActive from '../../../assests/Navigator/code contest/code contest - act.svg'
 
-import AllBatch from "../../../assests/Navigator/batch/All batch/all batch - normal.svg"
-import user from "../../../assests/Navigator/User/user list/user list - nor.svg"
-import  student from "../../../assests/Navigator/students/students list/students list - nor.svg"
-import  exam from "../../../assests/Navigator/exam/publish exam/publish exam - nor.svg"
-import video from "../../../assests/Navigator/videos/list video/list video - nor.svg"
+import AllBatch from "../../../assests/Navigator/batch/batch - normal.svg"
+import user from "../../../assests/Navigator/User/user - nor.svg"
+import  student from "../../../assests/Navigator/students/sttudent - nor.svg"
+import  exam from "../../../assests/Navigator/exam/exam - nor.svg"
+import video from "../../../assests/Navigator/videos/video - nor.svg"
 import  contest from "../../../assests/Navigator/code contest/code contest - nor.svg"
 import { User } from 'lucide-react';
 
