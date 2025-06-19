@@ -1,16 +1,17 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useCachedStudents } from '../../../../../hooks/useCachedStudents';
 import { useCachedBatches } from '../../../../../hooks/useCachedBatches';
 import BackButton from '../../../../constants/BackButton';
 import { User, Mail, Phone, Users, BookOpen, ArrowLeft, GraduationCap, UserCheck, } from 'lucide-react';
+
 
 const StudentViewPage = () => {
   const location = useLocation();
   const studentId = location.state?.studentId;
   const { studentMap } = useCachedStudents();
   const { batchMap } = useCachedBatches();
-
+  const navigate = useNavigate();
   const studentData = studentMap?.[studentId];
 
   const batchName = batchMap?.[studentData.batch?.currentBatch]?.name || 'N/A';
