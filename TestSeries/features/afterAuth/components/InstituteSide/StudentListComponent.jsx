@@ -7,8 +7,25 @@ import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useUser } from '../../../../contexts/currentUserContext';
 import Banner from "../../../../assests/Institute/student list.svg"
+import { usePageAccess } from '../../../../contexts/PageAccessContext';
 
 const StudentListPage = () => {
+
+  const canAccessPage  = usePageAccess();
+  
+     console.log("fsdv", canAccessPage)
+        
+          if (!canAccessPage) {
+            return (
+              <div className="flex items-center justify-center ">
+                <div className="text-center bg-red-100 px-4 py-3 my-auto">
+                  <h1 className="text-3xl font-bold text-red-600 mb-4">Access Denied</h1>
+                  <p className="text-gray-600">You do not have permission to view this page.</p>
+                </div>
+              </div>
+            );
+          }
+
   const { user } = useUser();
   const { students, isLoading, isError } = useCachedStudents();
   const [showStudents, setShowStudents] = useState([]);

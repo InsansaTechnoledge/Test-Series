@@ -8,10 +8,21 @@ import { usePageAccess } from "../../../../contexts/PageAccessContext";
 const ContestList = () => {
     const { contestList, isLoading } = useCachedContests();
     const [contest, setContest] = useState([]);
-    const canAccess=usePageAccess();
 
-    console.log(canAccess);
-
+     const canAccessPage  = usePageAccess();
+     
+        console.log("fsdv", canAccessPage)
+           
+             if (!canAccessPage) {
+               return (
+                 <div className="flex items-center justify-center ">
+                   <div className="text-center bg-red-100 px-4 py-3 my-auto">
+                     <h1 className="text-3xl font-bold text-red-600 mb-4">Access Denied</h1>
+                     <p className="text-gray-600">You do not have permission to view this page.</p>
+                   </div>
+                 </div>
+               );
+             }
     useEffect(() => {
         if (contestList && JSON.stringify(contest) !== JSON.stringify(contestList)) {
             setContest(contestList);

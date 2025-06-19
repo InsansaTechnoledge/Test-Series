@@ -5,6 +5,7 @@ import { useCachedBatches } from '../../../../../hooks/useCachedBatches';
 import { usePendingExams } from '../../../../../hooks/useExamData';
 import { useEffect } from 'react';
 import { updateExam } from '../../../../../utils/services/examService';
+import { usePageAccess } from '../../../../../contexts/PageAccessContext';
 
 
 const ExamForm = ({ onSubmit ,initialData={ name: '',
@@ -18,7 +19,7 @@ const ExamForm = ({ onSubmit ,initialData={ name: '',
 
   const { pendingExams, isLoading: pendingLoading } = usePendingExams();
   
-
+    const canAccessPage = usePageAccess()
 
   console.log(pendingExams)
   const [form, setForm] = useState(initialData);
@@ -129,7 +130,7 @@ const ExamForm = ({ onSubmit ,initialData={ name: '',
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Exam Name */}
               <div className="md:col-span-2">
-                <label className="block text-gray-800 font-semibold mb-2 flex items-center space-x-2">
+                <label className=" text-gray-800 font-semibold mb-2 flex items-center space-x-2">
                   <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h10l-1 12H8L7 7zm0 0V6a2 2 0 012-2h6a2 2 0 012 2v1" />
                   </svg>
@@ -147,7 +148,7 @@ const ExamForm = ({ onSubmit ,initialData={ name: '',
   
               {/* Date */}
               <div>
-                <label className="block text-gray-800 font-semibold mb-2 flex items-center space-x-2">
+                <label className=" text-gray-800 font-semibold mb-2 flex items-center space-x-2">
                   <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
@@ -165,7 +166,7 @@ const ExamForm = ({ onSubmit ,initialData={ name: '',
   
               {/* Total Marks */}
               <div>
-                <label className="block text-gray-800 font-semibold mb-2 flex items-center space-x-2">
+                <label className=" text-gray-800 font-semibold mb-2 flex items-center space-x-2">
                   <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
@@ -183,7 +184,7 @@ const ExamForm = ({ onSubmit ,initialData={ name: '',
   
               {/* Duration */}
               <div>
-                <label className="block text-gray-800 font-semibold mb-2 flex items-center space-x-2">
+                <label className=" text-gray-800 font-semibold mb-2 flex items-center space-x-2">
                   <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
@@ -201,7 +202,7 @@ const ExamForm = ({ onSubmit ,initialData={ name: '',
   
               {/* Batch Selection */}
               <div>
-                <label className="block text-gray-800 font-semibold mb-2 flex items-center space-x-2">
+                <label className=" text-gray-800 font-semibold mb-2 flex items-center space-x-2">
                   <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
@@ -226,7 +227,7 @@ const ExamForm = ({ onSubmit ,initialData={ name: '',
   
             {/* Reapplicable Checkbox */}
             <div className="bg-gray-50 p-6 rounded-xl border border-gray-200">
-              <label htmlFor="reapplicable" className="block text-gray-800 font-semibold mb-3 flex items-center space-x-2">
+              <label htmlFor="reapplicable" className=" text-gray-800 font-semibold mb-3 flex items-center space-x-2">
                 <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
@@ -249,15 +250,31 @@ const ExamForm = ({ onSubmit ,initialData={ name: '',
             <div className="pt-4">
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-4 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center space-x-2"
+                disabled={canAccessPage === false}
+                className={`w-full  text-white px-8 py-4 rounded-xl  transition-all duration-200 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center space-x-2
+                   ${canAccessPage === false
+                    ? 'bg-gray-300 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 hover:scale-105 hover:shadow-2xl'}
+                  `}
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {/* <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
+                </svg> */}
 
-                <span>{
-                  form.id ? 'Update Exam' : 'Create Exam'
-                  }</span>
+                <span className={`${!canAccessPage && "text-red-600"}`}>
+                  {canAccessPage ? (
+                    <>
+                      <svg className="w-5 h-5 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      {form.id ? 'Update Exam' : 'Create Exam'}
+                    </>
+                  ) : (
+                    'Access Denied'
+                  )}
+                </span>
+
+
               </button>
             </div>
           </form>

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useCachedBatches } from '../../hooks/useCachedBatches';
 import { DeleteVideoFromBatch } from '../../utils/services/batchService';
 import Banner from "../../assests/Institute/uploaded videos.svg"
+import { usePageAccess } from '../../contexts/PageAccessContext';
 
 
 const VideoListPageInstitute = () => {
