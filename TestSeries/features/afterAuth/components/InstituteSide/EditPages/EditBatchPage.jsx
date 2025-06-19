@@ -7,7 +7,7 @@ import { useCachedUser } from "../../../../../hooks/useCachedUser";
 import { updateBatch } from "../../../../../utils/services/batchService";
 import BackButton from "../../../../constants/BackButton";
 import HeadingUtil from "../../../utility/HeadingUtil";
-
+import { X, Upload, CheckCircle, PlusCircle, FileSpreadsheet, Users, Calendar, BookOpen, Zap, Target, Sparkles } from 'lucide-react';
 const BatchPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -145,9 +145,12 @@ const BatchPage = () => {
 
     return (
         <>
-            <div className="flex justify-between items-center mb-5 max-w-3xl">
+            <div className=" p-4 md:p-8">
                 <BackButton />
             </div>
+            <div className="max-w-4xl mx-auto py-2">
+
+          
             <div className="p-8 bg-gradient-to-r from-indigo-600 to-gray-600 text-white relative overflow-hidden rounded-t-2xl">
             <div className="absolute inset-0 bg-black opacity-10"></div>
             <div className="relative z-10">
@@ -160,142 +163,187 @@ const BatchPage = () => {
           
             </div>
           </div>
-            <div className="mx-auto">
+            <div className=" mx-auto">
               
-                <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 rounded-md shadow-2xl">
+         
+                <form onSubmit={handleSubmit} className="bg-white p-8 rounded-2xl shadow-2xl space-y-6">
 
-                    <label className="block font-medium mb-1">Batch Name</label>
-                    <input
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        className="w-full px-4 py-2 bg-gray-100 rounded-md"
-                        required
-                    />
-                    <label className="block font-medium mb-1">Year</label>
-                    <input
-                        name="year"
-                        value={formData.year}
-                        onChange={handleChange}
-                        type="number"
-                        className="w-full px-4 py-2 rounded-md bg-gray-100"
-                        required
-                    />
+  {/* Form Grid */}
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
 
-                    {/* Example: Subject input (basic comma separated) */}
+    {/* Left Column */}
+    <div className="space-y-6">
 
-                    <div>
-                        <label className="block font-medium mb-1">Subjects</label>
+      {/* Batch Name */}
+      <div>
+        <label htmlFor="name" className="flex items-center gap-2 text-gray-700 font-bold text-lg mb-2">
+          <Target className="w-5 h-5 text-indigo-600" />
+          Batch Name
+        </label>
+        <input
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          required
+          className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 text-lg font-medium bg-gray-50"
+        />
+      </div>
 
-                        {/* Subject Chips */}
-                        <div className="flex flex-wrap gap-2 mb-2">
-                            {formData.subjects.map((subject, index) => (
-                                <span
-                                    key={index}
-                                    className="flex items-center bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full"
-                                >
-                                    {subject}
-                                    <button
-                                        type="button"
-                                        className="ml-2 text-red-600 hover:text-red-800"
-                                        onClick={() =>
-                                            setFormData(prev => ({
-                                                ...prev,
-                                                subjects: prev.subjects.filter((_, i) => i !== index)
-                                            }))
-                                        }
-                                    >
-                                        ×
-                                    </button>
-                                </span>
-                            ))}
-                        </div>
+      {/* Year */}
+      <div>
+        <label className="flex items-center gap-2 text-gray-700 font-bold text-lg mb-2">
+          <Calendar className="w-5 h-5 text-indigo-600" />
+          Year
+        </label>
+        <input
+          name="year"
+          value={formData.year}
+          onChange={handleChange}
+          type="number"
+          required
+          className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 text-lg font-medium bg-gray-50"
+        />
+      </div>
+    </div>
 
-                        {/* Add Subject Input */}
-                        <input
-                            type="text"
-                            placeholder="Type a subject and press Enter"
-                            value={formData.inputValue || ""}
-                            onChange={(e) =>
-                                setFormData(prev => ({
-                                    ...prev,
-                                    inputValue: e.target.value
-                                }))
-                            }
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    e.preventDefault();
-                                    const newSubject = formData.inputValue?.trim();
-                                    if (
-                                        newSubject &&
-                                        !formData.subjects.includes(newSubject)
-                                    ) {
-                                        setFormData(prev => ({
-                                            ...prev,
-                                            subjects: [...prev.subjects, newSubject]
-                                        }));
-                                    }
-                                }
-                            }}
-                            className="w-full px-4 py-2 bg-gray-100 rounded-md"
-                        />
-                    </div>
+    {/* Right Column */}
+    <div className="space-y-6">
 
-                    <div>
+      {/* Subjects */}
+      <div>
+      <label className="flex items-center gap-2 text-gray-700 font-bold text-lg ">
+          <BookOpen className="w-5 h-5 text-indigo-600" />
+          Subjects
+        </label>
+      <input
+          type="text"
+          placeholder="Type subject & press Enter"
+          value={formData.inputValue || ""}
+          onChange={(e) =>
+            setFormData(prev => ({
+              ...prev,
+              inputValue: e.target.value
+            }))
+          }
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              const newSubject = formData.inputValue?.trim();
+              if (newSubject && !formData.subjects.includes(newSubject)) {
+                setFormData(prev => ({
+                  ...prev,
+                  subjects: [...prev.subjects, newSubject],
+                  inputValue: ""
+                }));
+              }
+            }
+          }}
+          className="flex-1 p-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 text-lg font-medium bg-gray-50 group-hover:bg-white w-full my-1"
+        />
+     
 
-                        <label className="block font-medium mb-1">Assigned Faculty</label>
 
-                        <div className="flex flex-wrap gap-2 mt-4">
-                            {selectedFaculty.map((facultyId) => {
-                                const faculty = users.find(user => user._id === facultyId);
-                                return (
-                                    <span
-                                        key={facultyId}
-                                        className="flex items-center bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full"
-                                    >
-                                        {faculty?.name || "Unknown"}
-                                        <button
-                                            type="button"
-                                            className="ml-2 text-red-500 hover:text-red-700"
-                                            onClick={() =>
-                                                setSelectedFaculty(prev => prev.filter(id => id !== facultyId))
-                                            }
-                                            title="Remove"
-                                        >
-                                            ×
-                                        </button>
-                                    </span>
-                                );
-                            })}
-                        </div>
-                    </div>
+        {/* Chips */}
+        <div className="flex flex-wrap gap-2 mt-3">
+          {formData.subjects.map((subject, index) => (
+            <span
+              key={index}
+              className="group flex items-center gap-3 bg-gradient-to-r from-indigo-100 to-indigo-200 text-indigo-800 rounded-2xl px-5 py-3 transition-all duration-300 hover:from-indigo-200 hover:to-indigo-300 hover:scale-105 shadow-md"
+            >
+              {subject}
+              <button
+                type="button"
+                className="text-indigo-700 hover:text-indigo-900 transition-all duration-300 hover:rotate-90 bg-white/50 rounded-full p-1"
+                onClick={() =>
+                  setFormData(prev => ({
+                    ...prev,
+                    subjects: prev.subjects.filter((_, i) => i !== index)
+                  }))
+                }
+              >
+                   <X size={16} />
+              </button>
+            </span>
+          ))}
+        </div>
 
-                    <select
-                        onChange={(e) => {
-                            const facultyId = e.target.value;
-                            if (facultyId && !selectedFaculty.includes(facultyId)) {
-                                setSelectedFaculty([...selectedFaculty, facultyId]);
-                            }
-                        }}
-                        className="w-full mt-2 bg-gray-100 px-4 py-2 rounded-md"
-                    >
-                        <option value="">-- Select Faculty --</option>
-                        {users
-                            .filter(user => !selectedFaculty.includes(user._id))
-                            .map(user => (
-                                <option key={user._id} value={user._id}>
-                                    {user.name}
-                                </option>
-                            ))}
-                    </select>
+        {/* Input */}
+  
+      </div>
 
-                    <button type="submit" disabled={!hasChanges}
-                        className={`px-4 py-2 rounded-md text-white ${hasChanges ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-400 cursor-not-allowed"
-                            }`}>
-                        {isSubmitting ? "Saving..." : "Save Changes"}
-                    </button>
-                </form>
-            </div>
+      {/* Faculties */}
+      <div>
+        <label htmlFor="faculties" className="flex items-center gap-2 text-gray-700 font-bold text-lg mb-2">
+          <Users className="w-5 h-5 text-indigo-600" />
+          Assigned Faculty
+        </label>
+        <select
+          onChange={(e) => {
+            const facultyId = e.target.value;
+            if (facultyId && !selectedFaculty.includes(facultyId)) {
+              setSelectedFaculty([...selectedFaculty, facultyId]);
+            }
+          }}
+          className="w-full pl-12 p-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 text-lg font-medium bg-gray-50 group-hover:bg-white"
+        >
+          <option value="">-- Select Faculty --</option>
+          {users
+            .filter(user => !selectedFaculty.includes(user._id))
+            .map(user => (
+              <option key={user._id} value={user._id}>
+                {user.name}
+              </option>
+            ))}
+        </select>
+        {/* Faculty Tags */}
+        <div className="flex flex-wrap gap-2 mt-3">
+          {selectedFaculty.map((facultyId) => {
+            const faculty = users.find(user => user._id === facultyId);
+            return (
+              <span
+                key={facultyId}
+                className="group flex items-center justify-between bg-gradient-to-r from-purple-100 to-purple-200 text-purple-800 rounded-2xl p-4 transition-all duration-300 hover:from-purple-200 hover:to-purple-300 hover:scale-102 shadow-md"
+              >
+                {faculty?.name || "Unknown"}
+                <button
+                  type="button"
+                  className="text-purple-700 hover:text-purple-900 transition-all duration-300 hover:rotate-90 bg-white/50 rounded-full p-2 ml-3"
+                  onClick={() =>
+                    setSelectedFaculty(prev => prev.filter(id => id !== facultyId))
+                  }
+                  title="Remove"
+                >
+                    <X size={16} />
+                </button>
+              </span>
+            );
+          })}
+        </div>
+
+        {/* Faculty Select */}
+      
+      </div>
+    </div>
+  </div>
+
+  {/* Submit Button (outside grid) */}
+  <div className="p-8 bg-gradient-to-r from-gray-50 to-indigo-50 border-t border-gray-100 flex justify-center">
+    <button
+      type="submit"
+      disabled={!hasChanges}
+      className={`group bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-12 py-4 rounded-3xl flex items-center gap-3 font-black text-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl transform ${
+        hasChanges
+          ? 'bg-indigo-600 hover:bg-indigo-700'
+          : 'bg-gray-400 cursor-not-allowed'
+      }`}
+    >
+             <CheckCircle size={24} className="group-hover:animate-pulse" />
+      {isSubmitting ? "Saving..." : "Save Changes"}
+    </button>
+  </div>
+</form>
+</div>
+        </div>
 
 
             

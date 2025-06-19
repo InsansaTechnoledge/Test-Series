@@ -1,8 +1,8 @@
+import { ArrowLeft } from 'lucide-react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
 
-const BackButton = () => {
+const tton = () => {
   const navigate = useNavigate();
 
   const handleBack = () => {
@@ -10,14 +10,19 @@ const BackButton = () => {
   };
 
   return (
-    <button
-      onClick={handleBack}
-      className="inline-flex items-center gap-2 text-white bg-blue-600 hover:bg-blue-700 font-medium px-4 py-2.5 rounded-lg transition"
-    >
-      <ArrowLeft size={18} />
-      Back
-    </button>
+<button
+  onClick={handleBack}
+  className="group inline-flex items-center space-x-3 px-5 py-2.5 rounded-2xl font-semibold text-white transition-all duration-300
+             bg-gradient-to-r from-indigo-500/60 to-indigo-600/60 backdrop-blur-md
+             shadow-md border border-white/20 hover:border-white/40
+             hover:scale-[1.04] hover:shadow-lg"
+>
+  <ArrowLeft size={18} className="text-white group-hover:-translate-x-1 transition-all duration-300" />
+  <span>Back</span>
+</button>
+
+  
   );
 };
 
-export default BackButton;
+export default tton;

@@ -63,18 +63,18 @@ const EditUserPage = () => {
 
   return (
     <>
-         <BackButton />
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 p-6">
+         <BackButton  />
+    <div className="min-h-screen p-6">
  
       <div className="max-w-2xl mx-auto">
-        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-blue-100 p-8">
+        <div className="  rounded-2xl shadow-xl  p-1">
           {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-blue-900 mb-2">Edit User</h1>
-            <div className="w-20 h-1 bg-gradient-to-r from-blue-500 to-blue-600 mx-auto rounded-full"></div>
+          <div className="text-center mb-8 py-5  bg-gradient-to-r from-indigo-600 to-gray-600 text-white relative overflow-hidden rounded-t-2xl ">
+            <h1 className="text-3xl font-bold text-white mb-2">Edit User</h1>
+            {/* <div className="w-20 h-1 bg-gradient-to-r from-blue-500 to-blue-600 mx-auto rounded-full"></div> */}
           </div>
 
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <form className="space-y-6 p-4" onSubmit={handleSubmit}>
             {/* Name Field */}
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-gray-700 uppercase tracking-wide">
@@ -85,7 +85,7 @@ const EditUserPage = () => {
                 placeholder="Enter user's name here"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 outline-none bg-white hover:border-gray-300"
+                className="w-full p-4  border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 group-hover:border-blue-300"
               />
             </div>
 
@@ -99,7 +99,7 @@ const EditUserPage = () => {
                 placeholder="Enter user's email here"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 outline-none bg-white hover:border-gray-300"
+                className="w-full p-4  border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 group-hover:border-blue-300"
               />
             </div>
 
@@ -113,7 +113,7 @@ const EditUserPage = () => {
                 placeholder="Enter organization ID"
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 outline-none bg-white hover:border-gray-300"
+                className="w-full p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 group-hover:border-blue-300"
               />
             </div>
 
@@ -125,7 +125,7 @@ const EditUserPage = () => {
               <select
                 value={gender}
                 onChange={(e) => setGender(e.target.value)}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 outline-none bg-white hover:border-gray-300 cursor-pointer"
+                className="w-full p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 group-hover:border-blue-300"
               >
                 <option value={gender} className="text-gray-700">{gender}</option>
                 {gender !== 'Male' && <option value="Male">Male</option>}
@@ -141,7 +141,7 @@ const EditUserPage = () => {
               <select
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 outline-none bg-white hover:border-gray-300 cursor-pointer"
+                className="w-full p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 group-hover:border-blue-300"
               >
                 <option value="" disabled className="text-gray-700">Select a Role</option>
                 {roleGroupsList}
@@ -157,7 +157,7 @@ const EditUserPage = () => {
                 multiple
                 value={batchArray}
                 onChange={handleBatchChange}
-                className="w-full px-3 py-2 min-h-32 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 outline-none bg-white hover:border-gray-300"
+                className="w-full p-4  border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 group-hover:border-blue-300"
               >
                 {batches.map(batch => (
                   <option 
@@ -173,10 +173,10 @@ const EditUserPage = () => {
             </div>
 
             {/* Submit Button */}
-            <div className="pt-4">
+            <div className="pt-4 flex justify-center">
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-300 uppercase tracking-wide"
+                className="group bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-12 py-4 rounded-3xl flex items-center gap-3 font-black text-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl transform"
               >
                 Update User
               </button>
