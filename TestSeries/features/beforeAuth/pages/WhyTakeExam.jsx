@@ -52,7 +52,7 @@ const WhyTakeExam = () => {
         
         {/* Header Section */}
         <div className="text-center mb-20"> 
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-violet-950 mb-6 leading-tight">
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-gray-800 mb-6 leading-tight">
             Why take Exam/Test on our{' '}
             <span className="bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent">
               Platform?

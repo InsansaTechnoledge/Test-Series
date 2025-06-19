@@ -1,80 +1,128 @@
-// import React from 'react';
-// import landingIllustration from '../../../assests/Landing/Hero/herobg2.png';
-
-// const LandingCover = () => {
-//   return (
-//     <div className="flex flex-col bg-white">
-//       {/* Hero Section */}
-//       <main className="flex flex-col-reverse md:flex-row items-center justify-between px-6 md:px-16 lg:px-24 py-12 h-full">
-//         {/* Left: Text Content */}
-//         <div className="w-full md:w-3/4 md:ml-10 space-y-8 text-center md:text-left pt-8 md:pt-0">
-//           <div className="space-y-4">
-//             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 leading-tight">
-//             Create.<br className=" md:block" />
-//             <span className='text-blue-700 text-bold'>Attempt.<br className=" md:block" /></span>
-//               Get Results and <span className='text-blue-700 text-bold'>Analytics</span>.
-//             </h1>
-//             <p className="text-gray-600 text-lg md:text-xl max-w-md mx-auto md:mx-0">
-//              <span className='border-b-2 border-blue-800'>Organizations</span> create tests effortlessly.  <span className='border-b-2 border-blue-800'>Students/Users</span>  take them seamlessly. Get instant results with powerful analytics to measure performance.
-//             </p>
-//           </div>         
-//         </div>
-
-//         {/* Right: Image Container */}
-//         <div className="w-full md:w-1/2 flex justify-center md:justify-end items-center">
-//           <div className="relative">
-           
-//             {/* Main illustration */}
-//             <img
-//               src={landingIllustration}
-//               alt="Creative thinking illustration"
-//               className="w-full max-w-xl md:mr-50 relative z-10"
-//             />
-//           </div>
-//         </div>
-//       </main>
-      
-     
-//       <div className="bg-white py-6 px-6 md:px-16">
-//         <div className="max-w-7xl mx-auto">
-//           <p className="text-gray-500 text-sm text-center mb-4">Trusted by innovative teams worldwide</p>
-//           <div className="flex justify-center space-x-12 opacity-60">
-//             <div className="h-8 w-24 bg-gray-300 rounded"></div>
-//             <div className="h-8 w-24 bg-gray-300 rounded"></div>
-//             <div className="h-8 w-24 bg-gray-300 rounded"></div>
-//             <div className="h-8 w-24 bg-gray-300 rounded"></div>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default LandingCover;
-
-import React from 'react'
+import React, { useRef, useState } from 'react';
+import video from '../../../assests/animation/animation 1.mp4';
+import shadow from '../../../assests/animation/Shadow.svg'
 
 const ImageComponent = () => {
+  const videoRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [isMuted, setIsMuted] = useState(true);
+  const [showControls, setShowControls] = useState(false);
+
+  const togglePlay = () => {
+    const video = videoRef.current;
+    if (video) {
+      if (video.paused) {
+        video.play();
+        setIsPlaying(true);
+      } else {
+        video.pause();
+        setIsPlaying(false);
+      }
+    }
+  };
+
+  const toggleMute = () => {
+    const video = videoRef.current;
+    if (video) {
+      video.muted = !video.muted;
+      setIsMuted(video.muted);
+    }
+  };
+
   return (
     <div className="mt-12 md:mt-16 px-4 sm:px-6 md:px-12 lg:px-20 xl:px-32">
-      <div className="bg-white rounded-2xl md:rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden min-h-[60vh] md:min-h-[70vh] border border-gray-100 relative group">
-        
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-indigo-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-        
-       
-        <div className="flex items-center justify-center h-full min-h-[60vh] md:min-h-[70vh] relative z-10">
-          <div className="text-center space-y-4 p-8">
-            <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl mx-auto flex items-center justify-center mb-6">
-              <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg"></div>
-            </div>
-            <p className="text-gray-400 text-lg md:text-xl font-light">Your analytics dashboard preview</p>
-            <div className="flex justify-center space-x-2 mt-6">
-              <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-              <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
-              <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
-            </div>
+      <div 
+        className="bg-white rounded-2xl md:rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden min-h-[60vh] md:min-h-[70vh] border-8 border-gray-300 relative group cursor-pointer"
+        onMouseEnter={() => setShowControls(true)}
+        onMouseLeave={() => setShowControls(false)}
+      >
+
+        {/* 🔹 Fullscreen Video */}
+        <video
+          ref={videoRef}
+          className="absolute inset-0 w-full h-full object-cover shadow-2xl z-0"
+          src={video}
+          autoPlay
+          loop
+          muted
+          playsInline
+        />
+
+        {/* Dark Overlay for Better Control Visibility */}
+        <div className={`absolute inset-0 bg-black/20 transition-opacity duration-300 z-10 ${showControls ? 'opacity-100' : 'opacity-0'}`} />
+
+        {/* Center Play/Pause Overlay */}
+        <div 
+          className={`absolute inset-0 flex items-center justify-center z-20 transition-all duration-300 ${showControls ? 'opacity-100' : 'opacity-0'}`}
+          onClick={togglePlay}
+        >
+          <div className="bg-white/90 backdrop-blur-sm rounded-full p-6 shadow-2xl hover:bg-white hover:scale-110 transition-all duration-200">
+            {isPlaying ? (
+              // Pause Icon
+              <svg className="w-12 h-12 text-gray-800" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+              </svg>
+            ) : (
+              // Play Icon
+              <svg className="w-12 h-12 text-gray-800 ml-1" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+            )}
           </div>
         </div>
+
+        {/* Bottom Controls Overlay */}
+        <div className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-6 z-20 transition-all duration-300 ${showControls ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          <div className="flex items-center justify-between">
+            
+            {/* Left Side - Play/Pause Button */}
+            <button
+              onClick={togglePlay}
+              className="bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/30 text-white px-4 py-2 rounded-lg shadow-lg transition-all duration-200 flex items-center space-x-2"
+            >
+              {isPlaying ? (
+                <>
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+                  </svg>
+                  <span>Pause</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                  <span>Play</span>
+                </>
+              )}
+            </button>
+
+            {/* Right Side - Mute Button */}
+            <button
+              onClick={toggleMute}
+              className="bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/30 text-white px-4 py-2 rounded-lg shadow-lg transition-all duration-200 flex items-center space-x-2"
+            >
+              {isMuted ? (
+                <>
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+                  </svg>
+                  <span>Unmute</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                  </svg>
+                  <span>Mute</span>
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Gradient Hover Overlay (Optional - keeping from original) */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/20 to-indigo-50/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-5" />
       </div>
     </div>
   );
@@ -86,11 +134,25 @@ const Hero = () => {
       <main className="pt-16 md:pt-20 lg:pt-24">
         
         <div className="px-4 sm:px-6 md:px-8">
-          <h1 className="text-center text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-8xl font-bold text-gray-800 leading-tight max-w-6xl mx-auto">
-            Unlock the Future with <span className='text-indigo-600'>Evalvo Tech</span>{' '}
+        <h1 className="text-center text-2xl  sm:text-3xl md:text-4xl lg:text-5xl xl:text-8xl font-bold text-gray-800 leading-tight max-w-6xl mx-auto">
+            Unlock the Future with{' '}
+            <span className="relative mt-4 inline-block text-gray-800 px-4 py-2 z-10">
+            <img
+                    src={shadow}
+                    alt="highlight"
+                    className="absolute left-0 top-1/2 w-full h-auto pointer-events-none transform -translate-y-1/2"
+                    style={{ 
+                      zIndex: -10,
+                      opacity: 1.7,
+                      filter: 'blur(1px)'
+                    }}
+                  />
+              Evalvo Tech
+            </span>
           </h1>
+
           
-          <div className="mt-6 md:px-22 md:mt-8 space-y-2 md:space-y-3">
+          <div className="mt-12 md:px-22 md:mt-12 space-y-2 md:space-y-3">
             <p className="text-center text-xl sm:text-2xl md:text-3xl lg:text-3xl text-gray-600 font-light">
               A comprehensive platform for analytics, testing, coding, and seamless learning.
             </p>
@@ -120,6 +182,3 @@ const Hero = () => {
 };
 
 export default Hero;
-
-
-
