@@ -87,7 +87,7 @@ const Hero = () => {
         
         <div className="px-4 sm:px-6 md:px-8">
           <h1 className="text-center text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-8xl font-bold text-gray-800 leading-tight max-w-6xl mx-auto">
-            Unlock the Future of Learning with Evalvo{' '}
+            Unlock the Future with <span className='text-indigo-600'>Evalvo Tech</span>{' '}
           </h1>
           
           <div className="mt-6 md:px-22 md:mt-8 space-y-2 md:space-y-3">
