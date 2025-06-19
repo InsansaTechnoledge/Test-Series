@@ -10,7 +10,7 @@ import RefreshButton from '../../utility/RefreshButton';
 import { useUser } from '../../../../contexts/currentUserContext';
 import { useCachedFeatures } from '../../../../hooks/useCachedFeatures';
 import DeleteRoleGroupModal from '../../../../components/roleGroup/deleteRolegroupModal';
-
+import Banner from "../../../../assests/Institute/create role.svg"
 
 export default function FeatureBasedRoleGroups() {
   const {user} = useUser();
@@ -177,7 +177,10 @@ export default function FeatureBasedRoleGroups() {
   // Function to render the edit form for a specific role group
   const renderEditForm = (group) => {
     return (
-      <div className="border-3 rounded-lg overflow-hidden bg-blue-50/40 mb-13 m-20 mt-12">
+      <>
+     
+      
+<div className="border-3 rounded-lg overflow-hidden bg-blue-50/40 mb-13 m-20 mt-12">
         <div className="p-4 bg-blue-100/40 border-b flex justify-between items-center">
           <h3 className="font-medium text-blue-800">
             Edit {newGroup.name}
@@ -342,6 +345,9 @@ export default function FeatureBasedRoleGroups() {
           </div>
         </div>
       </div>
+      
+      </>
+   
     );
   };
 
@@ -355,10 +361,37 @@ export default function FeatureBasedRoleGroups() {
       null
 
     }
-    <div className="w-full p-6 bg-white rounded-lg">
-      <HeadingUtil heading="Role Group" description="you can assing all the required roles into a single group"/>
+     
+     <div className="relative overflow-hidden rounded-xl h-80">
+    {/* // Background Image */}
+    <img 
+        src={Banner} 
+        alt="Upload Banner"
+        className="absolute  w-full h-full object-cover"
+    />
+    
+  
+    <div className="absolute "></div>
+    
+    {/* Content */}
+    <div className="relative z-10 flex items-center justify-center h-full px-6 text-center w-full">
+        <div>
+            <h1 className="text-5xl md:text-6xl font-black text-white tracking-tight mb-4 drop-shadow-lg">
+            Create Role Group
+            </h1>
+            <p className="text-xl text-white/90 max-w-2xl mx-auto drop-shadow-md">
+            you can assing all the required roles into a single group
+            </p>
+        </div>
+    </div>
+</div>
+    <div className=" flex flex-col  justify-center p-6 bg-white rounded-lg">
+    
+    <div  className=' mx-auto  -mt-12 relative z-20 w-[90%]'>
 
+ 
       <NeedHelpComponent heading="creating Roles ?" about="roles help users to access systems fucntionality" question={question} answer={answer}/>
+      </div>
       {/* Group List and Management */}
       <div className="mb-6">
         <div className="flex justify-between items-center mb-4">
@@ -443,6 +476,157 @@ export default function FeatureBasedRoleGroups() {
           )}
         </div>
       </div>
+      
+      
+      {/* Role Group Management */}
+<div className="mb-12">
+  {/* Header */}
+  <div className="flex justify-between items-center mb-6">
+    <h2 className="text-3xl font-extrabold bg-gradient-to-r from-blue-600 to-indigo-600 text-transparent bg-clip-text drop-shadow-sm">
+      Role Groups
+    </h2>
+    <div className="flex gap-3">
+      <RefreshButton refreshFunction={refreshFunction} />
+      {!isAddingGroup && (
+        <button
+          onClick={() => {
+            setIsAddingGroup(true);
+            setEditingGroupId(null);
+            setNewGroup({ name: '', description: '', features: [] });
+          }}
+          className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold px-4 py-2 rounded-xl shadow-md hover:scale-105 transition-transform duration-300"
+        >
+          <Plus size={16} />
+          <span>Create Role Group</span>
+        </button>
+      )}
+    </div>
+  </div>
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  {roleGroups.map(group => (
+    <div
+      key={group._id || group.id}
+      className="bg-white rounded-2xl p-6 shadow-xl border border-gray-200 transition hover:shadow-2xl"
+    >
+      <div className="flex justify-between items-center mb-3">
+        <div>
+          <h3 className="text-lg font-bold text-blue-700">{group.name}</h3>
+          <p className="text-sm text-gray-500">{group.description}</p>
+        </div>
+        <div className="flex gap-2">
+          <button
+            className="p-2 rounded hover:bg-gray-100 text-gray-600"
+            onClick={() => handleEditGroup(group)}
+          >
+            <Edit size={18} />
+          </button>
+          <button
+            className="p-2 rounded hover:bg-red-100 text-red-500"
+            onClick={() => {
+              setRoleGroupToDelete(group);
+              setShowDeleteRoleGroupModal(true);
+            }}
+          >
+            <Trash size={18} />
+          </button>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap gap-2 my-4">
+        {categories.filter(cat => cat !== 'All').map(category => {
+          const count = countFeaturesByCategory(group, category);
+          const total = features.filter(f => f.category === category).length;
+
+          return (
+            <span key={category} className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full shadow-sm">
+              {category}: {count}/{total}
+            </span>
+          );
+        })}
+      </div>
+
+      <div className="text-sm font-medium text-indigo-600">
+        {Array.isArray(group.features) ? group.features.length : 0} features assigned
+      </div>
+
+      {editingGroupId === (group._id || group.id) && (
+        <div className="mt-4">{renderEditForm(group)}</div>
+      )}
+    </div>
+  ))}
+</div>
+
+  {/* Group List */}
+  <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-2xl shadow-lg gap-2 flex">
+    {roleGroups.length === 0 ? (
+      <div className="p-8 text-center text-gray-500 text-base">
+        No role groups defined yet. Create your first role group!
+      </div>
+    ) : (
+      <div className="divide-y divide-gray-100">
+        {roleGroups.map((group) => (
+          <div
+            key={group._id || group.id}
+            className="p-6 transition-all duration-300 hover:bg-white/90"
+          >
+            {/* Title + Actions */}
+            <div className="flex justify-between items-start mb-3">
+              <div>
+                <h3 className="text-lg font-bold text-blue-800">{group.name}</h3>
+                <p className="text-sm text-gray-500">{group.description}</p>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  className="p-2 hover:bg-blue-100 rounded-md text-gray-600 hover:text-blue-700 transition"
+                  onClick={() => handleEditGroup(group)}
+                >
+                  <Edit size={18} />
+                </button>
+                <button
+                  className="p-2 hover:bg-red-100 rounded-md text-gray-600 hover:text-red-600 transition"
+                  onClick={() => {
+                    setRoleGroupToDelete(group);
+                    setShowDeleteRoleGroupModal(true);
+                  }}
+                >
+                  <Trash size={18} />
+                </button>
+              </div>
+            </div>
+
+            {/* Category Badges */}
+            <div className="flex flex-wrap gap-2 mt-3">
+              {categories
+                .filter((cat) => cat !== 'All')
+                .map((category) => {
+                  const count = countFeaturesByCategory(group, category);
+                  const total = features.filter((f) => f.category === category).length;
+
+                  return (
+                    <span
+                      key={category}
+                      className="text-xs px-3 py-1 rounded-full font-medium bg-blue-100 text-blue-800 shadow-sm"
+                    >
+                      {category}: {count}/{total}
+                    </span>
+                  );
+                })}
+            </div>
+
+            {/* Features Count */}
+            <div className="mt-2 text-sm text-indigo-600 font-medium">
+              {Array.isArray(group.features) ? group.features.length : 0} features assigned
+            </div>
+
+            {/* Inline Edit Form */}
+            {editingGroupId === (group._id || group.id) && renderEditForm(group)}
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+</div>
+
       
       {/* Add New Role Group Form */}
       {isAddingGroup && (
