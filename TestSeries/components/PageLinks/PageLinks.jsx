@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { Children, useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import BeforeAuthLanding from '../../features/beforeAuth/BeforeAuthLanding';
 import BeforeAuthLayout from '../../layouts/BeforeAuthLayout';
@@ -97,7 +97,7 @@ const PageLinks = () => {
         <Route element={<AuthRoutes />}>
           <Route element={<AfterAuthLayout />}>
             <Route element={
-              <PageAccessGuard>
+              <PageAccessGuard >
                 <InstituteRoutes />
               </PageAccessGuard>
 
