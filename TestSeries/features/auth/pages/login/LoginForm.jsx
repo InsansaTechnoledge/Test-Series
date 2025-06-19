@@ -1,7 +1,7 @@
 import { Eye, EyeOff, KeyRound, LogIn, Mail } from 'lucide-react';
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { orgLogin, studentLogin } from '../../../../utils/services/authService';
+import { checkAuth, orgLogin, studentLogin } from '../../../../utils/services/authService';
 import { useUser } from '../../../../contexts/currentUserContext';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
@@ -102,7 +102,10 @@ const LoginForm = () => {
           });
 
           console.log("😏", response.data.user);
-          setUser(response.data.user);
+          const user=await checkAuth();
+          if(user.status===200){
+          setUser(user.data.user);
+          }
 
         }
 
@@ -130,7 +133,11 @@ const LoginForm = () => {
           setErrors({});
         }
         console.log("😏", response);
-        setUser(response.data.user);
+        const user = await checkAuth();
+        if (user.status === 200) {
+
+        setUser(user.data.user);
+        }
       } catch (err) {
         console.log(err);
         setErrors(err.response.data.errors || "Something went wrong");

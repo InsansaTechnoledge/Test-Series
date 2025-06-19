@@ -9,7 +9,7 @@ const PageAccessGuard = ({ children }) => {
     const location = useLocation()  ;
     // when used in the pageguard nothing to pass when pass in action or button have to pass parameter
 
-    if(user?.planPurchased){
+    if(user?.planPurchased || user?.planFeatures){
 
     console.log("PageAccessGuard", location.pathname);
     const canAccess = hasPlanFeature({
