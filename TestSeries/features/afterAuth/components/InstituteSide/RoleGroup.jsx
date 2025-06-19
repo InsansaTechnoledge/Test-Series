@@ -10,6 +10,7 @@ import RefreshButton from '../../utility/RefreshButton';
 import { useUser } from '../../../../contexts/currentUserContext';
 import { useCachedFeatures } from '../../../../hooks/useCachedFeatures';
 import DeleteRoleGroupModal from '../../../../components/roleGroup/deleteRolegroupModal';
+import { usePageAccess } from '../../../../contexts/PageAccessContext';
 
 
 export default function FeatureBasedRoleGroups() {
@@ -18,6 +19,7 @@ export default function FeatureBasedRoleGroups() {
   const [showDeleteRoleGroupModal,setShowDeleteRoleGroupModal]=useState(false);
   const [roleGroupToDelete,setRoleGroupToDelete]=useState();
 
+  const canAccessPage = usePageAccess();
   const queryClient = useQueryClient();
 
   const{roleGroups,rolesLoading}=useCachedRoleGroup();
@@ -367,7 +369,13 @@ export default function FeatureBasedRoleGroups() {
               <RefreshButton refreshFunction={refreshFunction}/>
             {!isAddingGroup && (
               <button 
-                className="bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 flex items-center gap-1"
+                className={`bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 flex items-center gap-1
+                   ${canAccessPage === false
+                                        ? 'cursor-not-allowed'
+                                        : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 hover:scale-105 hover:shadow-2xl'}
+                                      
+                  `}
+                disabled={canAccessPage === false}
                 onClick={() => {
                   setIsAddingGroup(true);
                   setEditingGroupId(null);

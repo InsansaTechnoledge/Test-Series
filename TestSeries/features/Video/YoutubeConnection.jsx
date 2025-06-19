@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { callBack, register } from "../../utils/services/videoService";
 import Banner from "../../assests/Institute/upload videos.svg"
+import { usePageAccess } from "../../contexts/PageAccessContext";
 const Connection = () => {
     // const { user, setUser } = useUser();
     const navigate = useNavigate();
@@ -25,6 +26,7 @@ const Connection = () => {
         }
       };
       
+    const canAccessPage = usePageAccess();
 
     useEffect(() => {
         console.log("Connection mounted");
@@ -139,23 +141,36 @@ const Connection = () => {
                 {/* Action Button */}
                 <div className="text-center pt-4">
                     <button
-                        className="group relative bg-gradient-to-r from-indigo-600 via-indigo-700 to-slate-700 hover:from-indigo-700 hover:via-slate-700 hover:to-indigo-800 text-white font-bold px-10 py-5 rounded-2xl shadow-2xl hover:shadow-indigo-500/25 transform hover:-translate-y-1 hover:scale-105 transition-all duration-500 focus:outline-none focus:ring-4 focus:ring-indigo-300/50 backdrop-blur-sm overflow-hidden"
+                        disabled={canAccessPage === false}
                         onClick={handleClick}
+                        className={`group relative px-10 py-5 rounded-2xl font-bold shadow-2xl transform transition-all duration-500 backdrop-blur-sm overflow-hidden focus:outline-none 
+                        ${canAccessPage === false
+                            ? 'bg-gray-300 cursor-not-allowed text-red-600 focus:ring-0'
+                            : 'bg-gradient-to-r from-indigo-600 via-indigo-700 to-slate-700 hover:from-indigo-700 hover:via-slate-700 hover:to-indigo-800 text-white hover:scale-105 hover:-translate-y-1 focus:ring-4 focus:ring-indigo-300/50'}
+                        `}
                     >
-                        {/* Button background overlay */}
+                        {/* Shiny animated gradient on hover */}
                         <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
-                        
+
+                        {/* Button content */}
                         <div className="relative z-10 flex items-center justify-center">
-                            <svg className="w-6 h-6 mr-3 group-hover:rotate-12 transition-transform duration-300" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                            </svg>
-                            <span className="text-lg">Connect to Platform</span>
+                        <svg
+                            className="w-6 h-6 mr-3 group-hover:rotate-12 transition-transform duration-300"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                        </svg>
+                        <span>{canAccessPage === false ? 'Access Denied' : 'Connect to Platform'}</span>
                         </div>
                     </button>
-                    
+
+                    {/* Info below the button */}
                     <div className="mt-4 flex items-center justify-center space-x-2">
                         <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                        <p className="text-sm text-slate-500 font-medium">Secure OAuth 2.0 authentication</p>
+                        <p className="text-sm text-slate-500 font-medium">
+                        Secure OAuth 2.0 authentication
+                        </p>
                     </div>
                 </div>
             </div>

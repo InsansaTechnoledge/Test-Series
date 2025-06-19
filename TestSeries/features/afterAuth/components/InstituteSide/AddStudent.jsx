@@ -10,6 +10,7 @@ import { QueryClient } from '@tanstack/react-query'
 import { useUser } from '../../../../contexts/currentUserContext'
 import { useEffect } from 'react'
 import  Banner from "../../../../assests/Institute/add student.svg"
+import { usePageAccess } from '../../../../contexts/PageAccessContext'
 const AddStudent = () => {
   const { user } = useUser();
   const [batch, setBatch] = useState('')
@@ -22,6 +23,8 @@ const AddStudent = () => {
   const queryClient = new QueryClient();
   const [importBatch, setImportBatch] = useState('');
   const [importedStudents, setImportedStudents] = useState([]);
+
+  const canAccessPage = usePageAccess();
 
   // Generate empty student object
   function getEmptyStudent() {
@@ -757,12 +760,25 @@ const AddStudent = () => {
         <div className="text-center mb-12">
           <button
             onClick={handleSubmit}
-            disabled={!batch}
-            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 text-white py-6 px-12 rounded-3xl text-2xl font-black transition-all duration-300 hover:shadow-2xl hover:scale-105 disabled:cursor-not-allowed disabled:transform-none"
+            disabled={!batch || canAccessPage === false}
+            className={` text-white py-6 px-12 rounded-3xl text-2xl font-black transition-all duration-300 hover:shadow-2xl hover:scale-105 disabled:cursor-not-allowed disabled:transform-none
+              ${canAccessPage === false
+                ? 'bg-gray-300 cursor-not-allowed'
+                : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 hover:scale-105 hover:shadow-2xl'}
+              `}
           >
-            {activeTab === 'manual' && 'Add Students'}
-            {activeTab === 'bulk' && 'Upload Excel Data'}
-            {activeTab === 'import' && 'Import Students'}
+          {canAccessPage && activeTab === 'manual' ?(
+            <span>Add Students</span>
+          ) : <span className='text-red-600'>Access denied</span>}
+
+          {canAccessPage && activeTab === 'bulk' && (
+            <span>Upload Excel Data</span>
+          )}
+
+          {canAccessPage && activeTab === 'import' && (
+            <span>Import Students</span>
+          )}
+
           </button>
         </div>
       </div>

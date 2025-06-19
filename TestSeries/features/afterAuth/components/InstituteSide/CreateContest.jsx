@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import HeadingUtil from '../../utility/HeadingUtil';
 import NeedHelpComponent from './components/NeedHelpComponent';
 import { useCachedBatches } from '../../../../hooks/useCachedBatches';
-import { Calendar, Users, Trophy, FileText, Clock, Play } from 'lucide-react';
+import { Calendar, Users, Trophy, FileText, Clock, Play , CheckCircle } from 'lucide-react';
 import Select from 'react-select';
 import { useUser } from '../../../../contexts/currentUserContext';
 import { createContest } from '../../../../utils/services/contestService';
 import { useNavigate } from 'react-router-dom';
+import { usePageAccess } from '../../../../contexts/PageAccessContext';
 
 const CreateContest = () => {
   const [ContestType, setContestType] = useState('participation_based');
@@ -20,6 +21,9 @@ const CreateContest = () => {
     end: '',
   }); 
   const navigate=useNavigate();
+
+  const canAccessPage = usePageAccess();
+  
 
   const { batches } = useCachedBatches();
   const user = useUser();
@@ -243,9 +247,16 @@ const CreateContest = () => {
             <div className="flex justify-center pt-6">
               <button
                 onClick={handleSubmit}
-                className="bg-blue-500 text-white font-semibold py-4 px-12 rounded-lg shadow-lg transform transition-all duration-200 hover:scale-105 focus:ring-4 focus:ring-blue-200 outline-none"
-              >
-                Create Contest
+                disabled={canAccessPage === false}
+                className={`bg-blue-500 text-white font-semibold py-4 px-12 rounded-lg shadow-lg transform transition-all duration-200 hover:scale-105 focus:ring-4 focus:ring-blue-200 outline-none 
+                  ${canAccessPage === false
+                    ? 'bg-gray-300 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 hover:scale-105 hover:shadow-2xl'}
+                  `}
+                >
+                  {/* <CheckCircle size={24} className={`${canAccessPage !== false ? 'group-hover:animate-pulse' : ''}`} /> */}
+                  <span className={`${!canAccessPage && "text-red-600" }`}>{canAccessPage === false ? 'Access Denied' : 'Create Contest'}</span>
+               
               </button>
             </div>
           </div>

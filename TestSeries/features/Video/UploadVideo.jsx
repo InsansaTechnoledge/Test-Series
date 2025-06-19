@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { uploadVideo } from '../../utils/services/videoService';
 import { useCachedBatches } from '../../hooks/useCachedBatches';
 import {useNavigate} from 'react-router-dom'
+import { usePageAccess } from '../../contexts/PageAccessContext';
 
 const UploadVideo = () => {
     const [video, setVideo] = useState();
@@ -15,6 +16,12 @@ const UploadVideo = () => {
             [name]: value
         }))
     }
+
+    const canAccessPage = usePageAccess();
+
+    useEffect(() => {  
+        console.log("sdf",canAccessPage)
+    },[])
 
     const handleSubmit = async () => {
         console.log(formData);
@@ -122,16 +129,34 @@ const UploadVideo = () => {
                             {/* Submit Button */}
                             <div className="text-center pt-4">
                                 <button
-                                    className='bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-300'
+                                    disabled={canAccessPage === false}
                                     onClick={handleSubmit}
+                                    className={`font-semibold px-8 py-4 rounded-xl shadow-lg transition-all duration-300 focus:outline-none focus:ring-4
+                                    ${canAccessPage === false
+                                        ? 'bg-gray-300 cursor-not-allowed text-gray-600 focus:ring-0'
+                                        : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 hover:scale-105 hover:shadow-2xl text-white focus:ring-blue-300'}
+                                    `}
                                 >
-                                    <svg className="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                    <svg
+                                    className="w-5 h-5 inline-block mr-2"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                    >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                                    />
                                     </svg>
-                                    Upload Video
+                                    {canAccessPage === false ? 'Access Denied' : 'Upload Video'}
                                 </button>
-                                <p className="text-sm text-gray-500 mt-3">Your video will be processed and made available shortly</p>
+                                <p className="text-sm text-gray-500 mt-3">
+                                    Your video will be processed and made available shortly
+                                </p>
                             </div>
+
                         </div>
                     </div>
                 </div>

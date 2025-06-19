@@ -548,16 +548,16 @@ const CreateBatch = () => {
           {/* Submit Button */}
           <div className="p-8 bg-gradient-to-r from-gray-50 to-indigo-50 border-t border-gray-100 flex justify-center">
             <button
-              disabled={canAccessPage === false}
               onClick={handleSubmit}
+              disabled={canAccessPage === false}
               className={`group text-white px-12 py-4 rounded-3xl flex items-center gap-3 font-bold text-lg transition-all duration-300 transform
-      ${canAccessPage === false
+              ${canAccessPage === false
                   ? 'bg-gray-300 cursor-not-allowed'
                   : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 hover:scale-105 hover:shadow-2xl'}
-    `}
-            >
-              <CheckCircle size={24} className={`${canAccessPage !== false ? 'group-hover:animate-pulse' : ''}`} />
-              <span>{canAccessPage === false ? 'Access Denied' : 'Create Batch'}</span>
+                `}
+              >
+              {/* <CheckCircle size={24} className={`${canAccessPage !== false ? 'group-hover:animate-pulse' : ''}`} /> */}
+              <span className={`${!canAccessPage && "text-red-600 "}`}>{canAccessPage === false ? 'Access Denied' : 'Create Batch'}</span>
             </button>
           </div>
 
