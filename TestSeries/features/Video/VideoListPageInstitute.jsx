@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useCachedBatches } from '../../hooks/useCachedBatches';
 import { DeleteVideoFromBatch } from '../../utils/services/batchService';
 import Banner from "../../assests/Institute/uploaded videos.svg"
 import { usePageAccess } from '../../contexts/PageAccessContext';
-
 
 const VideoListPageInstitute = () => {
   const { batches } = useCachedBatches();
@@ -12,16 +11,21 @@ const VideoListPageInstitute = () => {
 
   const canAccessPage = usePageAccess();
 
+  // Memoize the selected batch to prevent unnecessary re-renders
+  const selectedBatch = useMemo(() => {
+    if (!selectedBatchId || !batches) return null;
+    return batches.find(b => b.id === selectedBatchId);
+  }, [selectedBatchId, batches]);
 
+  // Memoize video IDs to prevent infinite loops
+  const currentVideoIds = useMemo(() => {
+    return selectedBatch?.video_ids || [];
+  }, [selectedBatch]);
 
   useEffect(() => {
-    if (selectedBatchId && batches) {
-      const selectedBatch = batches.find(b => b.id === selectedBatchId);
-      setVideoIds(selectedBatch?.video_ids || []);
-    } else {
-      setVideoIds([]);
-    }
-  }, [selectedBatchId, batches]);
+    setVideoIds(currentVideoIds);
+  }, [currentVideoIds]);
+
   const handleDelete = async (videoId) => {
     try {
       await DeleteVideoFromBatch(selectedBatchId, videoId);
@@ -32,6 +36,7 @@ const VideoListPageInstitute = () => {
       alert('Error deleting video. Please try again.');
     }
   };
+
   if (!canAccessPage) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -44,19 +49,16 @@ const VideoListPageInstitute = () => {
   }
 
   return (
-  
     <>
-
       <div className="relative overflow-hidden rounded-xl h-80 bg-gradient-to-b from-indigo-600 to-indigo-300 pb-32">
-        {/* // Background Image */}
+        {/* Background Image */}
         <img
           src={Banner}
           alt="Upload Banner"
-          className="absolute  w-full h-full object-cover"
+          className="absolute w-full h-full object-cover"
         />
 
-
-        <div className="absolute "></div>
+        <div className="absolute"></div>
 
         {/* Content */}
         <div className="relative z-10 flex items-center justify-center h-full px-6 text-center">
@@ -88,7 +90,7 @@ const VideoListPageInstitute = () => {
             className="w-full py-3 px-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-gray-800 shadow-sm"
           >
             <option value="">Select Batch</option>
-            {batches.map((b) => (
+            {batches?.map((b) => (
               <option key={b.id} value={b.id}>
                 {b.name}
               </option>
@@ -116,7 +118,6 @@ const VideoListPageInstitute = () => {
                 ></iframe>
 
                 <div className="p-4 flex justify-center items-center bg-gray-50 border-t">
-                  {/* <span className="text-sm text-gray-600 font-medium">ID: {videoId}</span> */}
                   <button
                     onClick={() => handleDelete(videoId)}
                     className="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-1.5 text-sm font-semibold rounded-lg shadow hover:scale-105 transition-transform"
@@ -133,7 +134,6 @@ const VideoListPageInstitute = () => {
           )}
         </div>
       </div>
-
     </>
   );
 };
