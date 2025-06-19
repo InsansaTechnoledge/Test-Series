@@ -9,6 +9,7 @@ const VideoListPageInstitute = () => {
   const { batches } = useCachedBatches();
   const [selectedBatchId, setSelectedBatchId] = useState('');
   const [videoIds, setVideoIds] = useState([]);
+
   const canAccessPage = usePageAccess();
 
 
