@@ -10,7 +10,7 @@ import { fetchExamById } from '../../../../../utils/services/examService';
 import { useParams, useNavigate } from 'react-router-dom';
 import BackButton from '../../../../constants/BackButton';
 import DeleteExamModal from './DeleteExamModal';
-
+import Banner from "../../../../../assests/Institute/create exam.svg"
 
 const CreateExam = () => {
     const [examDetails, setExamDetails] = useState(null);
@@ -105,11 +105,37 @@ const CreateExam = () => {
       
    
     return (
-      <div className="p-6 max-w-6xl mx-auto ">
-        <BackButton />
-        {/* <h1 className="text-3xl font-bold mb-6">Create New Exam</h1> */}
-        <HeadingUtil heading="Create New Exam" description="there are 2 ways to create an exam , manually or bulk upload"/>
-        <NeedHelpComponent heading="want to create new exam ?" about="first download sample excel template to bulk upload" question="can i use both meathods to create exam ?" answer="users can use both meathods and all types of questions to create new exam"/>
+      <div className="p-6  mx-auto ">
+       
+        <div className="relative overflow-hidden rounded-xl h-80 mt-3">
+        {/* // Background Image */}
+        <img
+          src={Banner}
+          alt="Upload Banner"
+          className="absolute  w-full h-full object-cover"
+        />
+        <div className="absolute "></div>
+
+        <div className="relative z-10 flex items-center justify-center h-full px-6 text-center w-full">
+          <div>
+            <h1 className="text-5xl md:text-6xl font-black text-white tracking-tight mb-4 drop-shadow-lg">
+              Create Exam
+            </h1>
+            <p className="text-xl text-white/90 max-w-2xl mx-auto drop-shadow-md">
+            Easily manage and publish your exams
+            </p>
+          </div>
+        </div>
+      </div>
+      
+   
+
+{/* Need help */}
+<div className=' mx-auto  -mt-10 relative z-20 w-[90%]'>
+<NeedHelpComponent heading="want to create new exam ?" about="first download sample excel template to bulk upload" question="can i use both meathods to create exam ?" answer="users can use both meathods and all types of questions to create new exam"/>
+</div>
+      
+      
         
         {/* {!examDetails ? (
           <ExamForm onSubmit={handleNewExam} />
