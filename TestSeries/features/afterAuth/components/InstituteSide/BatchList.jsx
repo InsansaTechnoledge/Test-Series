@@ -11,15 +11,29 @@ import { useCachedUser } from '../../../../hooks/useCachedUser';
 import { useCachedStudents } from '../../../../hooks/useCachedStudents';
 import BatchBanner from '../../../../assests/Institute/Banner 1 1.svg'
 import { useNavigate } from 'react-router-dom';
+import { usePageAccess } from '../../../../contexts/PageAccessContext';
 
 
 const BatchList = () => {
+  const canAccessPage = usePageAccess();
+
+  if (!canAccessPage) {
+    return (
+      <div className="flex items-center justify-center ">
+        <div className="text-center bg-red-100 px-4 py-3 my-auto">
+          <h1 className="text-3xl font-bold text-red-600 mb-4">Access Denied</h1>
+          <p className="text-gray-600">You do not have permission to view this page.</p>
+        </div>
+      </div>
+    );
+  }
 
   const navigate = useNavigate();
   const { user } = useUser();
   const { batches, isloading, isError } = useCachedBatches();
   const { users } = useCachedUser();
   const { students } = useCachedStudents();
+
 
   const [selectedYear, setSelectedYear] = useState('');
   const queryClient = useQueryClient();

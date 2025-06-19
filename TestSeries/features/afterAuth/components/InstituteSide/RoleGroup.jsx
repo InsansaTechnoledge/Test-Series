@@ -10,6 +10,8 @@ import RefreshButton from '../../utility/RefreshButton';
 import { useUser } from '../../../../contexts/currentUserContext';
 import { useCachedFeatures } from '../../../../hooks/useCachedFeatures';
 import DeleteRoleGroupModal from '../../../../components/roleGroup/deleteRolegroupModal';
+import Banner from "../../../../assests/Institute/create role.svg"
+import { usePageAccess } from '../../../../contexts/PageAccessContext';
 
 
 export default function FeatureBasedRoleGroups() {
@@ -18,6 +20,7 @@ export default function FeatureBasedRoleGroups() {
   const [showDeleteRoleGroupModal,setShowDeleteRoleGroupModal]=useState(false);
   const [roleGroupToDelete,setRoleGroupToDelete]=useState();
 
+  const canAccessPage = usePageAccess();
   const queryClient = useQueryClient();
 
   const{roleGroups,rolesLoading}=useCachedRoleGroup();
@@ -177,7 +180,10 @@ export default function FeatureBasedRoleGroups() {
   // Function to render the edit form for a specific role group
   const renderEditForm = (group) => {
     return (
-      <div className="border-3 rounded-lg overflow-hidden bg-blue-50/40 mb-13 m-20 mt-12">
+      <>
+     
+      
+<div className="border-3 rounded-lg overflow-hidden bg-blue-50/40 mb-13 m-20 mt-12">
         <div className="p-4 bg-blue-100/40 border-b flex justify-between items-center">
           <h3 className="font-medium text-blue-800">
             Edit {newGroup.name}
@@ -342,6 +348,9 @@ export default function FeatureBasedRoleGroups() {
           </div>
         </div>
       </div>
+      
+      </>
+   
     );
   };
 
@@ -355,11 +364,38 @@ export default function FeatureBasedRoleGroups() {
       null
 
     }
-    <div className="w-full p-6 bg-white rounded-lg">
-      <HeadingUtil heading="Role Group" description="you can assing all the required roles into a single group"/>
+     
+     <div className="relative overflow-hidden rounded-xl h-80">
+    {/* // Background Image */}
+    <img 
+        src={Banner} 
+        alt="Upload Banner"
+        className="absolute  w-full h-full object-cover"
+    />
+    
+  
+    <div className="absolute "></div>
+    
+    {/* Content */}
+    <div className="relative z-10 flex items-center justify-center h-full px-6 text-center w-full">
+        <div>
+            <h1 className="text-5xl md:text-6xl font-black text-white tracking-tight mb-4 drop-shadow-lg">
+            Create Role Group
+            </h1>
+            <p className="text-xl text-white/90 max-w-2xl mx-auto drop-shadow-md">
+            you can assing all the required roles into a single group
+            </p>
+        </div>
+    </div>
+</div>
+    <div className=" flex flex-col  justify-center p-6 bg-white rounded-lg">
+    
+    <div  className=' mx-auto  -mt-12 relative z-20 w-[90%]'>
 
+ 
       <NeedHelpComponent heading="creating Roles ?" about="roles help users to access systems fucntionality" question={question} answer={answer}/>
-      {/* Group List and Management */}
+      </div>
+      {/*  old Group List and Management */}
       <div className="mb-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold text-gray-700">Existing Role Groups</h2>
@@ -367,7 +403,13 @@ export default function FeatureBasedRoleGroups() {
               <RefreshButton refreshFunction={refreshFunction}/>
             {!isAddingGroup && (
               <button 
-                className="bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 flex items-center gap-1"
+                className={`bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 flex items-center gap-1
+                   ${canAccessPage === false
+                                        ? 'cursor-not-allowed'
+                                        : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 hover:scale-105 hover:shadow-2xl'}
+                                      
+                  `}
+                disabled={canAccessPage === false}
                 onClick={() => {
                   setIsAddingGroup(true);
                   setEditingGroupId(null);
@@ -443,6 +485,104 @@ export default function FeatureBasedRoleGroups() {
           )}
         </div>
       </div>
+      
+      
+      {/* Role Group Management */}
+<div className="mb-12">
+  {/* Header */}
+  <div className="flex justify-between items-center mb-6">
+    <h2 className="text-3xl font-extrabold bg-gradient-to-r from-blue-600 to-indigo-600 text-transparent bg-clip-text drop-shadow-sm">
+    Existing Role Groups
+    </h2>
+    <div className="flex gap-3">
+      <RefreshButton refreshFunction={refreshFunction} />
+      {!isAddingGroup && (
+        <button
+          onClick={() => {
+            setIsAddingGroup(true);
+            setEditingGroupId(null);
+            setNewGroup({ name: '', description: '', features: [] });
+          }}
+          className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold px-4 py-2 rounded-xl shadow-md hover:scale-105 transition-transform duration-300"
+        >
+          <Plus size={16} />
+          <span>Create Role Group</span>
+        </button>
+      )}
+    </div>
+  </div>
+  
+
+  {/* Group List */}
+  <div className="w-full space-y-4">
+  {roleGroups.length === 0 ? (
+    <div className="p-10 text-center text-gray-500 text-base">
+      No role groups defined yet. Create your first role group!
+    </div>
+  ) : (
+    roleGroups.map((group) => (
+      <div
+        key={group._id || group.id}
+        className="bg-white/50 backdrop-blur-md border border-gray-200 rounded-2xl shadow-md p-6 transition-all duration-300 hover:scale-[1.01] hover:shadow-lg"
+      >
+        {/* Title + Actions */}
+        <div className="flex justify-between items-start mb-4">
+          <div>
+            <h3 className="text-lg font-bold text-blue-900">{group.name}</h3>
+            <p className="text-sm text-gray-500">{group.description}</p>
+          </div>
+          <div className="flex gap-2">
+            <button
+              className="p-2 hover:bg-blue-100 rounded-full text-gray-600 hover:text-blue-700 transition"
+              onClick={() => handleEditGroup(group)}
+            >
+              <Edit size={18} />
+            </button>
+            <button
+              className="p-2 hover:bg-red-100 rounded-full text-gray-600 hover:text-red-600 transition"
+              onClick={() => {
+                setRoleGroupToDelete(group);
+                setShowDeleteRoleGroupModal(true);
+              }}
+            >
+              <Trash size={18} />
+            </button>
+          </div>
+        </div>
+
+        {/* Category Badges */}
+        <div className="flex flex-wrap gap-2 mt-3">
+          {categories
+            .filter((cat) => cat !== 'All')
+            .map((category) => {
+              const count = countFeaturesByCategory(group, category);
+              const total = features.filter((f) => f.category === category).length;
+
+              return (
+                <span
+                  key={category}
+                  className="text-xs px-3 py-1 rounded-full font-medium bg-blue-100 text-blue-800 shadow-sm"
+                >
+                  {category}: {count}/{total}
+                </span>
+              );
+            })}
+        </div>
+
+        {/* Features Count */}
+        <div className="mt-3 text-sm text-indigo-600 font-semibold">
+          {Array.isArray(group.features) ? group.features.length : 0} features assigned
+        </div>
+
+        {/* Inline Edit Form */}
+        {editingGroupId === (group._id || group.id) && renderEditForm(group)}
+      </div>
+    ))
+  )}
+</div>
+
+</div>
+
       
       {/* Add New Role Group Form */}
       {isAddingGroup && (

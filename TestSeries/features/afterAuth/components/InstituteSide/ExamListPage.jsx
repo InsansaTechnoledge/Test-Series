@@ -7,7 +7,24 @@ import { useNavigate } from 'react-router-dom';
 import DeleteExamModal from './ExamFlow/DeleteExamModal';
 import { useExamManagement } from '../../../../hooks/UseExam';
 import Banner from "../../../../assests/Institute/exam list.svg"
+import { usePageAccess } from '../../../../contexts/PageAccessContext';
 const ExamListPage = () => {
+
+   const canAccessPage  = usePageAccess();
+
+   console.log("fsdv", canAccessPage)
+      
+        if (!canAccessPage) {
+          return (
+            <div className="flex items-center justify-center ">
+              <div className="text-center bg-red-100 px-4 py-3 my-auto">
+                <h1 className="text-3xl font-bold text-red-600 mb-4">Access Denied</h1>
+                <p className="text-gray-600">You do not have permission to view this page.</p>
+              </div>
+            </div>
+          );
+        }
+
   const [updatingId, setUpdatingId] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [examToDelete, setExamToDelete] = useState(null);

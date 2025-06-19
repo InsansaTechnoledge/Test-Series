@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import profileDefault from "../../../../assests/Institute/profile.png";
 import HeadingUtil from "../../utility/HeadingUtil";
 import { Eye, EyeOff, RefreshCcw } from "lucide-react";
@@ -9,6 +9,7 @@ import { useCachedRoleGroup } from "../../../../hooks/useCachedRoleGroup";
 import { useQueryClient } from "@tanstack/react-query";
 import { useUser } from "../../../../contexts/currentUserContext";
 import Banner from "../../../../assests/Institute/add user.svg"
+import { usePageAccess } from "../../../../contexts/PageAccessContext";
 
 const CreateUser = () => {
     const { batches, isLoading, isError } = useCachedBatches();
@@ -19,16 +20,28 @@ const CreateUser = () => {
     const [profile, setProfile] = useState(null);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [showBatches, setShowBatches] = useState(batches);
+    const [showBatches, setShowBatches] = useState([]);
     const [error, setError] = useState({});
     const queryClient = useQueryClient();
     const { user } = useUser();
 
-    useEffect(() => {
-        setShowBatches(batches);
+    const canAccessPage = usePageAccess();
+
+    // Memoize batches to prevent unnecessary re-renders
+    const memoizedBatches = useMemo(() => {
+        return Array.isArray(batches) ? batches : [];
     }, [batches]);
 
-    const validateField = (name, value, error) => {
+    // Fix the infinite loop by using memoized batches and proper dependency
+    useEffect(() => {
+        if (memoizedBatches.length > 0) {
+            setShowBatches(memoizedBatches);
+        }
+    }, [memoizedBatches]);
+
+    const validateField = (name, value, currentErrors) => {
+        const newErrors = { ...currentErrors };
+        
         switch (name) {
             case "firstName":
                 return value.length >= 3 && value.length <= 32
@@ -60,22 +73,13 @@ const CreateUser = () => {
                 ) {
                     return "Password must be at least 8 characters with uppercase, lowercase, number, and special character";
                 }
-                if (
-                    formData?.confirm_password &&
-                    formData?.confirm_password !== value
-                ) {
-                    return "Passwords do not match";
+                // Clear confirm password error if passwords now match
+                if (formData?.confirm_password && formData.confirm_password === value) {
+                    return "";
                 }
-
-                error.confirm_password = "";
                 return "";
             case "confirm_password":
-                if (value === formData?.password) {
-                    error.password = "";
-                    return "";
-                } else {
-                    return "Passwords do not match";
-                }
+                return value === formData?.password ? "" : "Passwords do not match";
             case "userId":
                 return value === "" ? "userId of institute is required" : "";
             case "gender":
@@ -87,17 +91,29 @@ const CreateUser = () => {
 
     const onChangeHandler = (e) => {
         const { name, value } = e.target;
-        const error2 = validateField(name, value, error);
+        const fieldError = validateField(name, value, error);
 
         setFormData((prev) => ({
             ...prev,
             [name]: value,
         }));
 
-        setError((prev) => ({
-            ...prev,
-            [name]: error2,
-        }));
+        setError((prev) => {
+            const newErrors = { ...prev, [name]: fieldError };
+            
+            // Handle password confirmation cross-validation
+            if (name === "password" && prev.confirm_password) {
+                const confirmError = validateField("confirm_password", prev.confirm_password || "", newErrors);
+                newErrors.confirm_password = confirmError;
+            } else if (name === "confirm_password" && prev.password) {
+                const passwordError = validateField("password", prev.password || "", newErrors);
+                if (value === formData.password) {
+                    newErrors.password = passwordError;
+                }
+            }
+            
+            return newErrors;
+        });
     };
 
     const toggleBatch = (batch) => {
@@ -113,6 +129,7 @@ const CreateUser = () => {
         });
     };
 
+    // Separate useEffect for batch selection
     useEffect(() => {
         setFormData((prev) => ({
             ...prev,
@@ -127,8 +144,13 @@ const CreateUser = () => {
             password: password,
             confirm_password: password,
         }));
-        document.getElementById("password").value = password;
-        document.getElementById("confirm_password").value = password;
+        
+        // Safely update DOM elements
+        const passwordInput = document.getElementById("password");
+        const confirmPasswordInput = document.getElementById("confirm_password");
+        
+        if (passwordInput) passwordInput.value = password;
+        if (confirmPasswordInput) confirmPasswordInput.value = password;
 
         setError((prev) => ({
             ...prev,
@@ -138,8 +160,26 @@ const CreateUser = () => {
     }
 
     const onsubmitForm = async () => {
+        // Validate all required fields before submission
+        const requiredFields = ['firstName', 'lastName', 'email', 'password', 'confirm_password', 'userId', 'gender'];
+        const validationErrors = {};
+        
+        requiredFields.forEach(field => {
+            const fieldValue = formData[field] || '';
+            const fieldError = validateField(field, fieldValue, error);
+            if (fieldError) {
+                validationErrors[field] = fieldError;
+            }
+        });
+
+        if (Object.keys(validationErrors).length > 0) {
+            setError(prev => ({ ...prev, ...validationErrors }));
+            return;
+        }
+
         const payload = new FormData();
         payload.append("name", `${formData.firstName} ${formData.lastName}`);
+        
         selectedBatches.forEach((batch) => {
             payload.append("batch[]", batch.id);
         });
@@ -149,59 +189,67 @@ const CreateUser = () => {
                 payload.append(key, formData[key]);
             }
         }
+        
         if (profile) {
             payload.append("profilePhoto", profile);
         }
+        
         try {
             const response = await createUser(payload);
             console.log(response);
             if (response.status === 200) {
                 console.log("User created successfully");
-                alert("successful!!");
+                alert("User created successfully!");
+                
+                // Reset form
                 setSelectedBatches([]);
                 setFormData({});
                 setError({});
+                setProfile(null);
+                
+                // Clear form inputs
+                const form = document.querySelector('form');
+                if (form) form.reset();
+                
                 await queryClient.invalidateQueries(["Users", user._id]);
             } else {
                 console.log("Error creating user");
+                setError(prev => ({ ...prev, form: "Error creating user" }));
             }
         } catch (error) {
             console.error("Error creating user:", error);
-            setError({
-                ...error,
-                form: error.response.data.errors[1] || error.message,
-            });
+            const errorMessage = error?.response?.data?.errors?.[1] || 
+                               error?.response?.data?.message || 
+                               error?.message || 
+                               "An unexpected error occurred";
+            setError(prev => ({ ...prev, form: errorMessage }));
         }
     };
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-indigo-50">
             {/* Hero Header */}
-        
             <div className="relative overflow-hidden rounded-xl h-80">
-   
-    <img 
-        src={Banner} 
-        alt="Upload Banner"
-        className="absolute  w-full h-full object-cover"
-    />
-    
-  
-    <div className="absolute "></div>
-    
-    {/* Content */}
-    <div className="relative z-10 flex items-center justify-center h-full px-6 text-center">
-        <div>
-            <h1 className="text-5xl md:text-6xl font-black text-white tracking-tight mb-4 drop-shadow-lg">
-            Add User
-            </h1>
-            <p className="text-xl text-white/90 max-w-2xl mx-auto drop-shadow-md">
-            Create new users and assign them specific roles in your institute
-            </p>
-        </div>
-    </div>
-</div>
-
+                <img 
+                    src={Banner} 
+                    alt="Upload Banner"
+                    className="absolute w-full h-full object-cover"
+                />
+                
+                <div className="absolute"></div>
+                
+                {/* Content */}
+                <div className="relative z-10 flex items-center justify-center h-full px-6 text-center">
+                    <div>
+                        <h1 className="text-5xl md:text-6xl font-black text-white tracking-tight mb-4 drop-shadow-lg">
+                            Add User
+                        </h1>
+                        <p className="text-xl text-white/90 max-w-2xl mx-auto drop-shadow-md">
+                            Create new users and assign them specific roles in your institute
+                        </p>
+                    </div>
+                </div>
+            </div>
 
             {/* Main Form Container */}
             <div className="max-w-6xl mx-auto px-6 -mt-8 relative z-20 pb-12">
@@ -426,7 +474,7 @@ const CreateUser = () => {
                                     className="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 font-medium"
                                 >
                                     <option value="">Select Role</option>
-                                    {roleGroups.map((role, idx) => (
+                                    {roleGroups && roleGroups.map((role, idx) => (
                                         <option key={idx} value={role._id}>
                                             {role.name} - {role.description}
                                         </option>
@@ -453,7 +501,7 @@ const CreateUser = () => {
                                     {batchesVisible ? "Hide All Batches" : "Show All Batches"}
                                 </button>
 
-                                {batchesVisible && (
+                                {batchesVisible && showBatches.length > 0 && (
                                     <div className="flex gap-3 flex-wrap mb-6">
                                         {showBatches.map((batch, idx) => (
                                             <button
@@ -495,9 +543,14 @@ const CreateUser = () => {
                             <button
                                 type="button"
                                 onClick={onsubmitForm}
-                                className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-12 py-4 rounded-2xl font-bold text-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 transform"
+                                disabled={canAccessPage === false}
+                                className={` text-white px-12 py-4 rounded-2xl font-bold text-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 transform
+                                    ${canAccessPage === false
+                                        ? 'bg-gray-300 cursor-not-allowed'
+                                        : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 hover:scale-105 hover:shadow-2xl'}
+                                      `}
                             >
-                                Create User
+                                <span className={`${!canAccessPage && "text-red-600 "}`}>{canAccessPage === false ? 'Access Denied' : 'Create User'}</span>
                             </button>
                             {error.form && (
                                 <p className="text-red-500 text-sm mt-4 font-medium">{error.form}</p>
