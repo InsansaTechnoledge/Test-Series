@@ -70,18 +70,19 @@ const StudentEditPage = () => {
   };
 
     return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 p-4 md:p-8">
+    <div className="min-h-screen  p-4 md:p-8">
         <BackButton />
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto py-2">
 
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full mb-4 shadow-lg">
-            <User className="w-8 h-8 text-white" />
-          </div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Edit Student Information</h1>
-          <p className="text-gray-600">Update student details and batch assignment</p>
+        <div className="text-center py-3  bg-gradient-to-r from-indigo-600 to-gray-600 text-white relative overflow-hidden rounded-t-2xl">
+          {/* <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-full mb-4 shadow-lg ">
+            <User className="w-8 h-8 " />
+          </div> */}
+          <h1 className="text-3xl font-bold text-white mb-2">Edit Student Information</h1>
+          <p className="text-white ">Update student details and batch assignment</p>
         </div>
+        
 
         {/* Main Form Container */}
         <div className="bg-white rounded-2xl shadow-2xl border border-blue-100 overflow-hidden">
@@ -131,7 +132,7 @@ const StudentEditPage = () => {
                       onChange={(e) => setName(e.target.value)}
                       className="w-full p-4 pl-12 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 group-hover:border-blue-300"
                     />
-                    <User className="absolute left-4 top-4 w-4 h-4 text-gray-400" />
+                    <User className="absolute left-4  w-5 h-5 text-gray-400 top-1/2 transform -translate-y-1/2" />
                   </div>
                 </div>
 
@@ -146,24 +147,27 @@ const StudentEditPage = () => {
                       onChange={(e) => setEmail(e.target.value)}
                       className="w-full p-4 pl-12 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 group-hover:border-blue-300"
                     />
-                    <Mail className="absolute left-4 top-4 w-4 h-4 text-gray-400" />
+                    <Mail className="absolute left-4  w-5 h-5 text-gray-400 top-1/2 transform -translate-y-1/2
+" />
                   </div>
                 </div>
 
                 {/* Phone */}
+          
                 <div className="group">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Phone Number</label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      placeholder="Enter phone number"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      className="w-full p-4 pl-12 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 group-hover:border-blue-300"
-                    />
-                    <Phone className="absolute left-4 top-4 w-4 h-4 text-gray-400" />
-                  </div>
-                </div>
+  <label className="block text-sm font-semibold text-gray-700 mb-2">Phone Number</label>
+  <div className="relative">
+    <Phone className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+    <input
+      type="text"
+      placeholder="Enter phone number"
+      value={phone}
+      onChange={(e) => setPhone(e.target.value)}
+      className="w-full pl-12 p-4 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 text-lg"
+    />
+  </div>
+</div>
+
 
                 {/* Gender */}
                 <div className="group">
@@ -200,7 +204,7 @@ const StudentEditPage = () => {
                       onChange={(e) => setparentEmail(e.target.value)}
                       className="w-full p-4 pl-12 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 group-hover:border-blue-300"
                     />
-                    <Mail className="absolute left-4 top-4 w-4 h-4 text-gray-400" />
+                    <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                   </div>
                 </div>
 
@@ -215,7 +219,7 @@ const StudentEditPage = () => {
                       onChange={(e) => setParentPhone(e.target.value)}
                       className="w-full p-4 pl-12 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 group-hover:border-blue-300"
                     />
-                    <Phone className="absolute left-4 top-4 w-4 h-4 text-gray-400" />
+                    <Phone className="absolute left-4  w-5 h-5 text-gray-400 top-1/2 transform -translate-y-1/2" />
                   </div>
                 </div>
 
@@ -241,12 +245,12 @@ const StudentEditPage = () => {
             </div>
 
             {/* Submit Button */}
-            <div className="mt-10 pt-6 border-t border-gray-100">
+            <div className="mt-10 pt-6 border-t border-gray-100 flex justify-center">
               <button
                 type="submit"
                 disabled={loading}
                 onClick={handleSubmit}
-                className={`w-full md:w-auto px-8 py-4 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-200 ${
+                className={`group bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-12 py-4 rounded-3xl flex items-center gap-3 font-black text-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl transform ${
                   loading 
                     ? 'bg-gray-400 cursor-not-allowed' 
                     : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 shadow-lg hover:shadow-xl'
