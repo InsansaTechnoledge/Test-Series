@@ -12,18 +12,22 @@ import Testimonials from './pages/Testimonials';
 import FAQSection from './pages/FAQSection';
 import { studentFAQs , teacherFAQs } from './data/FAQ';
 import { leftCapabilities , rightCapabilities , benefits } from './data/Capabilities';
+import ExamAnalyticsFeatures from './pages/AnalyticsCard';
+import FeaturesPage from './pages/FeatureManagement';
 
 const BeforeAuthLanding = () => {
   return (
     <>
       <Hero />
-      <WhyYourInstitute />
-      <WhyTakeExam />
       <TestTypes />
+      <WhyTakeExam />
+      <ExamAnalyticsFeatures/>
+      <FeaturesPage/>
+      {/* <WhyYourInstitute />   */}
       <AiBranding/>
-      <ProctoringWorking/>
-      <SoftwareCapabilities leftCapabilities={leftCapabilities} rightCapabilities={rightCapabilities} benefits={benefits} />
-      <RegisterCTA/>
+      {/* <ProctoringWorking/> */}
+      {/* <SoftwareCapabilities leftCapabilities={leftCapabilities} rightCapabilities={rightCapabilities} benefits={benefits} /> */}
+      {/* <RegisterCTA/> */}
       <FAQSection studentFAQs={studentFAQs} teacherFAQs={teacherFAQs} />
       <Testimonials />        
     </>

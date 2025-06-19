@@ -1,6 +1,5 @@
 import React from 'react';
 import { 
-  GraduationCap, 
   Mail, 
   Phone, 
   MapPin, 
@@ -8,106 +7,192 @@ import {
   Twitter, 
   Instagram, 
   Linkedin, 
-  Youtube, 
+  Github, 
   ArrowRight, 
-  Globe, 
-  Shield, 
-  Award
+  Zap,
+  Users,
+  Shield,
+  BarChart3
 } from 'lucide-react';
 
 const Footer = () => {
   return (
-    <footer className="bg-gradient-to-b from-blue-900 to-blue-950 text-white">
+    <footer className="bg-gray-800 text-white">
       
       {/* Main Footer Content */}
-      <div className="max-w-screen-xl mx-auto py-8 md:py-12 px-4 md:px-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-8">
+      <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          
           {/* Company Info */}
-          <div className="col-span-1 sm:col-span-2">
-            <div className="flex items-center space-x-2 mb-4 md:mb-6">
-              <div className="text-2xl font-bold bg-gradient-to-r from-blue-200 to-violet-200 bg-clip-text text-transparent">
-                myApp
+          <div className="lg:col-span-2">
+            <div className="flex items-center space-x-2 mb-6">
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
+                <Zap className="h-5 w-5 text-white" />
+              </div>
+              <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                SaaSPro
               </div>
             </div>
             
-            <p className="text-blue-200 mb-6 pr-0 md:pr-8">
-              The leading AI-powered proctoring solution trusted by educational institutions and certification providers worldwide. Ensuring integrity in online examinations with advanced technology and exceptional service.
+            <p className="text-gray-300 mb-6 max-w-md">
+              Streamline your business operations with our comprehensive SaaS platform. Built for modern teams who demand efficiency, security, and scalability.
             </p>
             
-            <div className="flex space-x-4 mb-8 md:mb-0">
-              <a href="#" className="bg-blue-800 hover:bg-blue-700 h-8 w-8 md:h-10 md:w-10 rounded-full flex items-center justify-center transition-colors duration-300">
-                <Facebook className="h-4 w-4 md:h-5 md:w-5" />
+            <div className="flex space-x-4">
+              <a href="#" className="bg-blue-600 hover:bg-blue-700 h-10 w-10 rounded-lg flex items-center justify-center transition-colors duration-300 group">
+                <Facebook className="h-5 w-5 group-hover:scale-110 transition-transform" />
               </a>
-              <a href="#" className="bg-blue-800 hover:bg-blue-700 h-8 w-8 md:h-10 md:w-10 rounded-full flex items-center justify-center transition-colors duration-300">
-                <Twitter className="h-4 w-4 md:h-5 md:w-5" />
+              <a href="#" className="bg-blue-600 hover:bg-blue-700 h-10 w-10 rounded-lg flex items-center justify-center transition-colors duration-300 group">
+                <Twitter className="h-5 w-5 group-hover:scale-110 transition-transform" />
               </a>
-              <a href="#" className="bg-blue-800 hover:bg-blue-700 h-8 w-8 md:h-10 md:w-10 rounded-full flex items-center justify-center transition-colors duration-300">
-                <Instagram className="h-4 w-4 md:h-5 md:w-5" />
+              <a href="#" className="bg-indigo-600 hover:bg-indigo-700 h-10 w-10 rounded-lg flex items-center justify-center transition-colors duration-300 group">
+                <Linkedin className="h-5 w-5 group-hover:scale-110 transition-transform" />
               </a>
-              <a href="#" className="bg-blue-800 hover:bg-blue-700 h-8 w-8 md:h-10 md:w-10 rounded-full flex items-center justify-center transition-colors duration-300">
-                <Linkedin className="h-4 w-4 md:h-5 md:w-5" />
-              </a>
-              <a href="#" className="bg-blue-800 hover:bg-blue-700 h-8 w-8 md:h-10 md:w-10 rounded-full flex items-center justify-center transition-colors duration-300">
-                <Youtube className="h-4 w-4 md:h-5 md:w-5" />
+              <a href="#" className="bg-indigo-600 hover:bg-indigo-700 h-10 w-10 rounded-lg flex items-center justify-center transition-colors duration-300 group">
+                <Github className="h-5 w-5 group-hover:scale-110 transition-transform" />
               </a>
             </div>
           </div>
           
-          {/* Quick Links */}
-          <div className="col-span-1">
-            <h3 className="text-lg font-bold mb-4 md:mb-6 border-b border-blue-700 pb-2">Quick Links</h3>
-            <ul className="space-y-2 md:space-y-3">
-              <li><a href="#" className="text-blue-200 hover:text-white flex items-center"><ArrowRight className="h-4 w-4 mr-2" /> Home</a></li>
-              <li><a href="#" className="text-blue-200 hover:text-white flex items-center"><ArrowRight className="h-4 w-4 mr-2" /> About Us</a></li>
-              <li><a href="#" className="text-blue-200 hover:text-white flex items-center"><ArrowRight className="h-4 w-4 mr-2" /> Features</a></li>
-              <li><a href="#" className="text-blue-200 hover:text-white flex items-center"><ArrowRight className="h-4 w-4 mr-2" /> Pricing</a></li>
-              <li><a href="#" className="text-blue-200 hover:text-white flex items-center"><ArrowRight className="h-4 w-4 mr-2" /> Contact</a></li>
+          {/* Product Links */}
+          <div>
+            <h3 className="text-lg font-semibold mb-6 text-blue-400">Product</h3>
+            <ul className="space-y-3">
+              <li>
+                <a href="#" className="text-gray-300 hover:text-white flex items-center group transition-colors duration-200">
+                  <ArrowRight className="h-4 w-4 mr-2 group-hover:translate-x-1 transition-transform" />
+                  Features
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-gray-300 hover:text-white flex items-center group transition-colors duration-200">
+                  <ArrowRight className="h-4 w-4 mr-2 group-hover:translate-x-1 transition-transform" />
+                  Pricing
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-gray-300 hover:text-white flex items-center group transition-colors duration-200">
+                  <ArrowRight className="h-4 w-4 mr-2 group-hover:translate-x-1 transition-transform" />
+                  Integrations
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-gray-300 hover:text-white flex items-center group transition-colors duration-200">
+                  <ArrowRight className="h-4 w-4 mr-2 group-hover:translate-x-1 transition-transform" />
+                  API
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-gray-300 hover:text-white flex items-center group transition-colors duration-200">
+                  <ArrowRight className="h-4 w-4 mr-2 group-hover:translate-x-1 transition-transform" />
+                  Changelog
+                </a>
+              </li>
             </ul>
           </div>
           
           {/* Resources */}
-          <div className="col-span-1">
-            <h3 className="text-lg font-bold mb-4 md:mb-6 border-b border-blue-700 pb-2">Resources</h3>
-            <ul className="space-y-2 md:space-y-3">
-              <li><a href="#" className="text-blue-200 hover:text-white flex items-center"><ArrowRight className="h-4 w-4 mr-2" /> Help Center</a></li>
-              <li><a href="#" className="text-blue-200 hover:text-white flex items-center"><ArrowRight className="h-4 w-4 mr-2" /> Blog</a></li>
-              <li><a href="#" className="text-blue-200 hover:text-white flex items-center"><ArrowRight className="h-4 w-4 mr-2" /> Webinars</a></li>
-              <li><a href="#" className="text-blue-200 hover:text-white flex items-center"><ArrowRight className="h-4 w-4 mr-2" /> Case Studies</a></li>
-              <li><a href="#" className="text-blue-200 hover:text-white flex items-center"><ArrowRight className="h-4 w-4 mr-2" /> API Documentation</a></li>
-            </ul>
-          </div>
-          
-          {/* Contact Info */}
-          <div className="col-span-1">
-            <h3 className="text-lg font-bold mb-4 md:mb-6 border-b border-blue-700 pb-2">Contact Us</h3>
-            <ul className="space-y-3 md:space-y-4">
-              <li className="flex items-start">
-                <MapPin className="h-5 w-5 text-blue-300 mr-3 mt-1 flex-shrink-0" />
-                <span className="text-blue-200">123 Education Lane, Learning City, ED 12345</span>
+          <div>
+            <h3 className="text-lg font-semibold mb-6 text-indigo-400">Resources</h3>
+            <ul className="space-y-3">
+              <li>
+                <a href="#" className="text-gray-300 hover:text-white flex items-center group transition-colors duration-200">
+                  <ArrowRight className="h-4 w-4 mr-2 group-hover:translate-x-1 transition-transform" />
+                  Documentation
+                </a>
               </li>
-              <li className="flex items-center">
-                <Phone className="h-5 w-5 text-blue-300 mr-3 flex-shrink-0" />
-                <span className="text-blue-200">+1 (555) 123-4567</span>
+              <li>
+                <a href="#" className="text-gray-300 hover:text-white flex items-center group transition-colors duration-200">
+                  <ArrowRight className="h-4 w-4 mr-2 group-hover:translate-x-1 transition-transform" />
+                  Help Center
+                </a>
               </li>
-              <li className="flex items-center">
-                <Mail className="h-5 w-5 text-blue-300 mr-3 flex-shrink-0" />
-                <span className="text-blue-200">support@proctoraiexample.com</span>
+              <li>
+                <a href="#" className="text-gray-300 hover:text-white flex items-center group transition-colors duration-200">
+                  <ArrowRight className="h-4 w-4 mr-2 group-hover:translate-x-1 transition-transform" />
+                  Blog
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-gray-300 hover:text-white flex items-center group transition-colors duration-200">
+                  <ArrowRight className="h-4 w-4 mr-2 group-hover:translate-x-1 transition-transform" />
+                  Case Studies
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-gray-300 hover:text-white flex items-center group transition-colors duration-200">
+                  <ArrowRight className="h-4 w-4 mr-2 group-hover:translate-x-1 transition-transform" />
+                  Status Page
+                </a>
               </li>
             </ul>
           </div>
         </div>
+
+        {/* Features Banner */}
+        <div className="mt-12 pt-8 border-t border-gray-700">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                <Users className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <h4 className="font-semibold text-white">Team Collaboration</h4>
+                <p className="text-sm text-gray-300">Built for teams of all sizes</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center">
+                <Shield className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <h4 className="font-semibold text-white">Enterprise Security</h4>
+                <p className="text-sm text-gray-300">SOC 2 Type II compliant</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
+                <BarChart3 className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <h4 className="font-semibold text-white">Advanced Analytics</h4>
+                <p className="text-sm text-gray-300">Real-time insights & reports</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       
-      {/* Copyright */}
-      <div className="bg-blue-950 py-4 md:py-6">
-        <div className="max-w-screen-xl mx-auto px-4 md:px-6 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-blue-300 text-sm mb-4 md:mb-0 text-center md:text-left">
-            © {new Date().getFullYear()} myapp. All rights reserved.
-          </p>
-          <div className="flex flex-wrap justify-center md:justify-end space-x-4 md:space-x-6">
-            <a href="#" className="text-blue-300 hover:text-white text-sm transition-colors duration-200">Privacy Policy</a>
-            <a href="#" className="text-blue-300 hover:text-white text-sm transition-colors duration-200">Terms of Service</a>
-            <a href="#" className="text-blue-300 hover:text-white text-sm transition-colors duration-200">Cookie Policy</a>
+      {/* Bottom Bar */}
+      <div className="bg-gray-900 py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-6 mb-4 md:mb-0">
+              <p className="text-gray-400 text-sm">
+                © {new Date().getFullYear()} SaaSPro. All rights reserved.
+              </p>
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
+                  <MapPin className="h-4 w-4 text-gray-500" />
+                  <span className="text-gray-400 text-sm">San Francisco, CA</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Mail className="h-4 w-4 text-gray-500" />
+                  <span className="text-gray-400 text-sm">hello@saaspro.com</span>
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-wrap justify-center md:justify-end space-x-6">
+              <a href="#" className="text-gray-400 hover:text-blue-400 text-sm transition-colors duration-200">
+                Privacy Policy
+              </a>
+              <a href="#" className="text-gray-400 hover:text-indigo-400 text-sm transition-colors duration-200">
+                Terms of Service
+              </a>
+              <a href="#" className="text-gray-400 hover:text-blue-400 text-sm transition-colors duration-200">
+                Cookie Policy
+              </a>
+            </div>
           </div>
         </div>
       </div>

@@ -2,7 +2,6 @@ import Heading from './Heading';
 import { Edit, Eye, PlusSquare, NotepadText, Search, Trash, AlertTriangle, Calendar, Users, BookOpen, Sparkles, Zap, Target } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import HeadingUtil from '../../utility/HeadingUtil';
-import { useNavigate } from 'react-router-dom';
 import { useCachedBatches } from '../../../../hooks/useCachedBatches';
 import RefreshButton from '../../utility/RefreshButton';
 import { useQueryClient } from '@tanstack/react-query';
@@ -11,8 +10,11 @@ import DeleteBatchModal from '../../utility/DeleteBatchModal';
 import { useCachedUser } from '../../../../hooks/useCachedUser';
 import { useCachedStudents } from '../../../../hooks/useCachedStudents';
 import BatchBanner from '../../../../assests/Institute/Banner 1 1.svg'
+import { useNavigate } from 'react-router-dom';
+
 
 const BatchList = () => {
+
   const navigate = useNavigate();
   const { user } = useUser();
   const { batches, isloading, isError } = useCachedBatches();

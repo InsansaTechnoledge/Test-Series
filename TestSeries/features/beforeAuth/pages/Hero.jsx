@@ -56,29 +56,70 @@ import React from 'react'
 
 const ImageComponent = () => {
   return (
-    <div className="mt-16 px-6 md:px-20 lg:px-32">
-      <div className="bg-[#ffffff] rounded-3xl shadow-2xl overflow-hidden min-h-screen border-2">
+    <div className="mt-12 md:mt-16 px-4 sm:px-6 md:px-12 lg:px-20 xl:px-32">
+      <div className="bg-white rounded-2xl md:rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden min-h-[60vh] md:min-h-[70vh] border border-gray-100 relative group">
         
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-indigo-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        
+       
+        <div className="flex items-center justify-center h-full min-h-[60vh] md:min-h-[70vh] relative z-10">
+          <div className="text-center space-y-4 p-8">
+            <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl mx-auto flex items-center justify-center mb-6">
+              <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg"></div>
+            </div>
+            <p className="text-gray-400 text-lg md:text-xl font-light">Your analytics dashboard preview</p>
+            <div className="flex justify-center space-x-2 mt-6">
+              <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+              <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
+              <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
 
-
 const Hero = () => {
   return (
-    <div className=' min-h-screen'>
-        <main className='mt-20'>
-          <h1 className='flex items-center justify-center pt-16 text-7xl text-gray-800 '>Scale your analytics without hiring</h1>
+    <div className="min-h-screen mb-24">
+      <main className="pt-16 md:pt-20 lg:pt-24">
         
-          <p className='text-center mt-8 text-4xl text-gray-600 '>The first data tool that you'll love.</p>
-          <p className='text-center mt-2 text-4xl text-gray-600 '> And a team of experts to <span className='text-blue-600'>get you started.</span> </p>
+        <div className="px-4 sm:px-6 md:px-8">
+          <h1 className="text-center text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-8xl font-bold text-gray-800 leading-tight max-w-6xl mx-auto">
+            Unlock the Future with <span className='text-indigo-600'>Evalvo Tech</span>{' '}
+          </h1>
+          
+          <div className="mt-6 md:px-22 md:mt-8 space-y-2 md:space-y-3">
+            <p className="text-center text-xl sm:text-2xl md:text-3xl lg:text-3xl text-gray-600 font-light">
+              A comprehensive platform for analytics, testing, coding, and seamless learning.
+            </p>
+            <p className="text-center text-xl sm:text-2xl md:text-3xl lg:text-4xl text-gray-600 font-light">
+              Empower your students, staff, and teams with{' '}
+              <span className="text-blue-600 font-medium bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text ">
+                instant results, hands-on coding events, and actionable insights.
+              </span>
+            </p>
+          </div>
+          
 
-         <ImageComponent/>
-        </main>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8 md:mt-12 mb-8">
+            <button className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-indigo-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl">
+              Start Free Trial
+            </button>
+            <button className="w-full sm:w-auto px-8 py-4 border-2 border-gray-300 text-gray-700 rounded-xl font-semibold text-lg hover:border-gray-400 hover:bg-gray-50 transition-all duration-200">
+              Request a Demo
+            </button>
+          </div>
+
+          <ImageComponent/>
+        </div>
+      </main>
     </div>
-  )
-}
+  );
+};
 
-export default Hero
+export default Hero;
+
+
 

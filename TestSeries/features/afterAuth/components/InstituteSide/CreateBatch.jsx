@@ -9,6 +9,7 @@ import { createBatch } from '../../../../utils/services/batchService';
 import { useQueryClient } from '@tanstack/react-query';
 import { useUser } from '../../../../contexts/currentUserContext';
 import Banner from "../../../../assests/Institute/create batch.svg"
+import { usePageAccess } from '../../../../contexts/PageAccessContext';
 
 const CreateBatch = () => {
   const [formData, setFormData] = useState({ batchMode: 'only-subjects' });
@@ -25,6 +26,9 @@ const CreateBatch = () => {
       setSelectedFaculties([]);
     }
   }, [users]);
+
+  const canAccess=usePageAccess();
+  console.log(canAccess);
 
   const onChangeHandler = (name, value) => {
     setFormData((prev) => ({

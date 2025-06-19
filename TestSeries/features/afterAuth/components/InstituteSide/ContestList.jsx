@@ -3,10 +3,14 @@ import ContestCard from "./components/ContestCard";
 import HeadingUtil from "../../utility/HeadingUtil";
 import NeedHelpComponent from "./components/NeedHelpComponent";
 import useCachedContests from "../../../../hooks/useCachedContests";
+import { usePageAccess } from "../../../../contexts/PageAccessContext";
 
 const ContestList = () => {
     const { contestList, isLoading } = useCachedContests();
     const [contest, setContest] = useState([]);
+    const canAccess=usePageAccess();
+
+    console.log(canAccess);
 
     useEffect(() => {
         if (contestList && JSON.stringify(contest) !== JSON.stringify(contestList)) {

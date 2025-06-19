@@ -161,5 +161,6 @@ export const studentLogin = async (req, res) => {
 };
 
 export const checkAuth = async (req, res) => {
+
     return new APIResponse(200, { user: req.user }, 'session found').send(res);
 };
