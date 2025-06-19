@@ -1,6 +1,7 @@
 import React, { cloneElement } from 'react';
 import { useUser } from '../../contexts/currentUserContext';
 import { useLocation } from 'react-router-dom';
+import PageAccessContext from '../../contexts/PageAccessContext';
 
 
 const PageAccessGuard = ({ children }) => {
@@ -18,7 +19,11 @@ const PageAccessGuard = ({ children }) => {
 
 
 
-      return cloneElement(children, { canAccess });
+      return (
+    <PageAccessContext.Provider value={canAccess}>
+      {children}
+    </PageAccessContext.Provider>
+  );    
 };
 
 export default PageAccessGuard;
