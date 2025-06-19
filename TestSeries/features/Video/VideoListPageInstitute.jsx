@@ -50,7 +50,7 @@ const VideoListPageInstitute = () => {
           onChange={(e) => setSelectedBatchId(e.target.value)}
           className='border-2 border-gray-400 w-full py-3 px-2 rounded-md focus:outline-none focus:border-black'
         >
-          <option value="">Select Batch</option>
+          <option value="">Select Batch </option>
           {batches.map((b) => (
             <option key={b.id} value={b.id}>
               {b.name}
