@@ -10,7 +10,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useUser } from '../../../../contexts/currentUserContext';
 import Banner from "../../../../assests/Institute/create batch.svg"
 
-const CreateBatch = () => {
+const CreateBatch = ({canAccess}) => {
   const [formData, setFormData] = useState({ batchMode: 'only-subjects' });
   const [selectedFaculties, setSelectedFaculties] = useState([]);
   const [faculty, setFaculty] = useState([])
@@ -18,7 +18,8 @@ const CreateBatch = () => {
   const { roleMap } = useCachedRoleGroup();
   const queryClient = useQueryClient();
   const { user } = useUser();
-
+  console.log("👤 Current User:", user.planFeatures);
+  console.log("👥 Users in CreateBatch:", canAccess);
   useEffect(() => {
     if (users) {
       setFaculty(users);
