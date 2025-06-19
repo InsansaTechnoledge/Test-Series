@@ -7,7 +7,7 @@ import FAQSection from '../../../../beforeAuth/pages/FAQSection'
 import { studentFAQs, teacherFAQs } from '../../../../beforeAuth/data/FAQ'
 const InstituteLandingPage = () => {
   const { user } = useUser();
-  console.log("YYYY", user);
+  
 
 
   if (!user) {
@@ -19,14 +19,25 @@ const InstituteLandingPage = () => {
   }
 
 
+  if(!user.planPurchased ){
+
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Plan Not Purchased</h1>
+          <p className="text-gray-600">Please purchase a plan to access this page.</p>
+        </div>
+      </div>
+    )
+
+  }
+
+
   return (
 
     user && user.role === 'organization' ?
       (
         <>
-
-
-
           <div className="h-[400px] flex flex-col ">
             <div className="relative flex items-center justify-center h-full bg-gradient-to-r from-blue-900 to-indigo-900 overflow-hidden rounded-lg  ">
               <div className="absolute inset-0 z-0 ">
