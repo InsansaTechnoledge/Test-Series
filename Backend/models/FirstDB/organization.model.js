@@ -160,6 +160,10 @@ const OrganizationSchema = new Schema({
       },
       subscription: subscriptionSchema,
       youtubeInfo: youtubeInfoSchema,
+      planPurchased:{
+        type: Types.ObjectId,
+        ref: 'Plan'
+      }
 }, 
 {
     timestamps: true

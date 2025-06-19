@@ -50,9 +50,10 @@ import VideoListPageInstitute from '../../features/Video/VideoListPageInstitute'
 import StudentClassroom from '../../features/afterAuth/components/StudentSide/Landing/StudentClassroom';
 import ContestInstructionWindow from '../../features/afterAuth/components/StudentSide/Coding-Contests/ContestInstructionWindow';
 import Analysis from '../../features/Analytics/Analysis';
+import PageAccessGuard from '../ProtectedRoute/PageAccessGuard';
 
 const PageLinks = () => {
-  const { user, setUser } = useUser();
+  const { user, setUser, hasPlanFeature } = useUser();
   const [loading, setLoading] = useState(true);
 
   const fetchUser = async () => {
@@ -95,7 +96,12 @@ const PageLinks = () => {
         {/* Authenticated Institute Routes */}
         <Route element={<AuthRoutes />}>
           <Route element={<AfterAuthLayout />}>
-            <Route element={<InstituteRoutes />}>
+            <Route element={
+              <PageAccessGuard>
+                <InstituteRoutes />
+              </PageAccessGuard>
+
+            }>
               <Route path='/institute' element={<OrganizationLayout />}>
                 <Route path='batch-list' element={<BatchList />} />
                 <Route path='user-list' element={<UserList />} />
@@ -114,10 +120,12 @@ const PageLinks = () => {
                 <Route path='batch-details' element={<BatchViewPage />} />
                 <Route path='edit-batch' element={<EditBatchPage />} />
                 <Route path='video' element={<YoutubeConnection />} />
-                <Route path='video-list' element={<VideoListPageInstitute/>}/>
-                <Route path='create-contest/:contestId?' element={<CreateContest/>}/>
-                <Route path='contest-list' element={<ContestList/>} />
-                <Route path='code-create' element={<QuestionCreator/>}/>
+                <Route path='video-list' element={<VideoListPageInstitute />} />
+                <Route path='create-contest/:contestId?' element={<CreateContest />} />
+
+                {/* <Route path='contest-list' element={hasPlanFeature('code_feature')?<ContestList/>:(<div>hurrreehhhhh😁</div>)} /> */}
+                <Route path='contest-list' element={<ContestList />} />
+                <Route path='code-create' element={<QuestionCreator />} />
                 <Route path='*' element={<div>Invalid path</div>} />
               </Route>
             </Route>
@@ -127,14 +135,14 @@ const PageLinks = () => {
               <Route path='/student' element={<StudentLayout />}>
                 <Route path='student-landing' element={<StudentLanding />} />
                 <Route path='upcoming-exams' element={<UpcomingExam />} />
-                <Route path='completed-exams' element={ <ResultsPage />} />
+                <Route path='completed-exams' element={<ResultsPage />} />
                 <Route path='result/:examId' element={<ResultDetailPage />} />
                 <Route path='test' element={<TestWindow />} />
-                <Route path='coding-contests' element={<ContestListPage />}/>
-                <Route path='classroom' element={<StudentClassroom/>}/>
-                <Route path='contest/:contestId' element={<ContestInstructionWindow/>} />
+                <Route path='coding-contests' element={<ContestListPage />} />
+                <Route path='classroom' element={<StudentClassroom />} />
+                <Route path='contest/:contestId' element={<ContestInstructionWindow />} />
                 <Route path='code/:contestId' element={<CodingPlatform />} />
-                <Route path='analysis' element={<Analysis/>}/>
+                <Route path='analysis' element={<Analysis />} />
               </Route>
             </Route>
           </Route>
@@ -150,10 +158,10 @@ const PageLinks = () => {
         <Route path='video/upload' element={<UploadVideo />} />
         <Route path='session-expired' element={<SessionExpireError />} />
         {/* <Route path='code' element={<CodingPlatform/>} /> */}
-        <Route path='certificate-creation' element={<CertificateCreation/>}/>
-           <Route path='syllabus/:syllabusId' element={<SyllabusViewPage />} />
+        <Route path='certificate-creation' element={<CertificateCreation />} />
+        <Route path='syllabus/:syllabusId' element={<SyllabusViewPage />} />
 
-        
+
       </Routes>
     </Router>
   );

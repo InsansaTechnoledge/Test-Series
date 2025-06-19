@@ -12,6 +12,7 @@ const ContestListPage = () => {
     const [enrolledContests, setEnrolledContests] = useState([]);
     const [loading, setLoading] = useState(false);
 
+
     useEffect(() => {
         if (!contestList || contestList.length === 0) {
             console.log("No contests available or contestList is empty.");

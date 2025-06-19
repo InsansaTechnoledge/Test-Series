@@ -4,9 +4,11 @@ import HeadingUtil from "../../utility/HeadingUtil";
 import NeedHelpComponent from "./components/NeedHelpComponent";
 import useCachedContests from "../../../../hooks/useCachedContests";
 
-const ContestList = () => {
+const ContestList = ({canAccesss}) => {
     const { contestList, isLoading } = useCachedContests();
     const [contest, setContest] = useState([]);
+
+    console.log("🎀🥲😏🩷", canAccesss);
 
     useEffect(() => {
         if (contestList && JSON.stringify(contest) !== JSON.stringify(contestList)) {
