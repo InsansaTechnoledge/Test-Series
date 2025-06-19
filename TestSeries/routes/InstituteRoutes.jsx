@@ -1,17 +1,15 @@
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { useUser } from "../contexts/currentUserContext";
 import { useEffect, useState } from "react";
+import { usePageAccess } from "../contexts/PageAccessContext";
 
 
 
-const InstituteRoutes = ({ canAccess }) => {
+const InstituteRoutes = () => {
     const { user } = useUser();
     const navigate = useNavigate();
     const [isAccessDenied, setIsAccessDenied] = useState(false);
-
-    const location = useLocation()
-
-    console.log(location.pathname)
+    const canAccessPage=usePageAccess();
 
     useEffect(() => {
         if (!user || user.role === 'student') {
@@ -20,7 +18,7 @@ const InstituteRoutes = ({ canAccess }) => {
     }, [user, navigate]);
 
     useEffect(() => {
-        if (!canAccess) {
+        if (!canAccessPage) {
            
             if (location.pathname === '/institute/institute-landing') {
                 setIsAccessDenied(false); // Allow access to 'institute-landing' even if they don't have access
@@ -30,7 +28,7 @@ const InstituteRoutes = ({ canAccess }) => {
         } else {
             setIsAccessDenied(false);
         }
-    }, [canAccess, location.pathname]); 
+    }, [location.pathname]); 
     
     if (!user) {
         return <div>Loading...</div>;
@@ -44,7 +42,7 @@ const InstituteRoutes = ({ canAccess }) => {
                 </div>
             )}
 
-            <Outlet context={{ canAccess }} />
+            <Outlet />
         </div>
     );
 };

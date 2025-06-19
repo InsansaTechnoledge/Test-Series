@@ -19,6 +19,7 @@ const CreateBatch = () => {
   const { roleMap } = useCachedRoleGroup();
   const queryClient = useQueryClient();
   const { user } = useUser();
+  const canAccessPage = usePageAccess();
 
   useEffect(() => {
     if (users) {
@@ -27,8 +28,8 @@ const CreateBatch = () => {
     }
   }, [users]);
 
-  const canAccess=usePageAccess();
-  console.log(canAccess);
+
+
 
   const onChangeHandler = (name, value) => {
     setFormData((prev) => ({
@@ -134,26 +135,27 @@ const CreateBatch = () => {
     };
 
     console.log("✅ Final JSON payload to submit:", payload);
-    try{
-    const response = await createBatch(payload);
-    if (response.status === 200) {
-      alert('Batch created successfully!');
-      setFormData({ "batchMode": "only-subjects" });
-      setSelectedFaculties([]);
-      setFaculty(prev => ([...prev, ...selectedFaculties]));
+    try {
+      const response = await createBatch(payload);
+      if (response.status === 200) {
+        alert('Batch created successfully!');
+        setFormData({ "batchMode": "only-subjects" });
+        setSelectedFaculties([]);
+        setFaculty(prev => ([...prev, ...selectedFaculties]));
 
-    }
-   }catch (error) {
+      }
+    } catch (error) {
 
       if (error.response?.status === 400) {
         alert('Batch with this name already exists. Please choose a different name.');
         return;
-      }else{
-      alert('Failed to create batch. Please try again.');
-      console.error('Error creating batch:',error.response);}
+      } else {
+        alert('Failed to create batch. Please try again.');
+        console.error('Error creating batch:', error.response);
+      }
     }
-    finally{
-            await queryClient.invalidateQueries(['batches', user._id]);
+    finally {
+      await queryClient.invalidateQueries(['batches', user._id]);
     }
   };
 
@@ -184,25 +186,25 @@ const CreateBatch = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-indigo-50">
-      
+
       {/* Hero Header */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 "></div>
         <div className="absolute inset-0 "></div>
-        
-        
+
+
         <div
           className="relative z-10 px-6 py-24 text-center bg-cover bg-center bg-no-repeat rounded-xl"
           style={{ backgroundImage: `url(${Banner})` }}
         >
           <div className="inline-flex items-center space-x-3 mb-4">
             <h1 className="text-6xl md:text-7xl font-black text-white tracking-tight">
-            Create Batch
+              Create Batch
             </h1>
-         
-          </div>  
+
+          </div>
           <p className="text-xl text-white/80 max-w-2xl mx-auto font-medium">
-          Create batch with subjects, faculty, syllabus.
+            Create batch with subjects, faculty, syllabus.
           </p>
         </div>
       </div>
@@ -221,7 +223,7 @@ const CreateBatch = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-3xl p-6 shadow-xl border-l-4 border-gray-600 transform hover:scale-105 transition-all duration-300">
             <div className="flex items-center justify-between">
               <div>
@@ -233,7 +235,7 @@ const CreateBatch = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-3xl p-6 shadow-xl border-l-4 border-indigo-600 transform hover:scale-105 transition-all duration-300">
             <div className="flex items-center justify-between">
               <div>
@@ -249,16 +251,16 @@ const CreateBatch = () => {
 
         {/* Need Help Component */}
         <div className="mb-8">
-          <NeedHelpComponent 
-            heading="Creating Batch ?" 
-            question="Want to create new Batch" 
-            answer="Batches can be created with subjects and with subjects plus chapters , choose as per your requirement" 
+          <NeedHelpComponent
+            heading="Creating Batch ?"
+            question="Want to create new Batch"
+            answer="Batches can be created with subjects and with subjects plus chapters , choose as per your requirement"
           />
         </div>
 
         {/* Main Form Card */}
         <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
-          
+
           {/* Batch Type Selection */}
           <div className="p-8 bg-gradient-to-r from-indigo-600 to-gray-600 text-white relative overflow-hidden">
             <div className="absolute inset-0 bg-black opacity-10"></div>
@@ -331,10 +333,10 @@ const CreateBatch = () => {
           {/* Form Content */}
           <div className="p-8">
             <div className="grid lg:grid-cols-2 gap-12">
-              
+
               {/* Left Column */}
               <div className="space-y-8">
-                
+
                 {/* Batch Name */}
                 <div className="group">
                   <label htmlFor="name" className="flex items-center gap-2 text-gray-700 font-bold mb-3 text-lg">
@@ -382,11 +384,10 @@ const CreateBatch = () => {
                     <div className="w-full">
                       <label
                         htmlFor="dropzone-file"
-                        className={`flex flex-col items-center justify-center w-full h-40 border-3 border-dashed rounded-3xl cursor-pointer transition-all duration-300 ${
-                          formData.syllabus?.name 
-                            ? 'bg-green-50 border-green-300 hover:bg-green-100' 
+                        className={`flex flex-col items-center justify-center w-full h-40 border-3 border-dashed rounded-3xl cursor-pointer transition-all duration-300 ${formData.syllabus?.name
+                            ? 'bg-green-50 border-green-300 hover:bg-green-100'
                             : 'bg-gray-50 border-gray-300 hover:bg-gray-100 hover:border-indigo-400'
-                        }`}
+                          }`}
                       >
                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
                           {formData.syllabus?.name ? (
@@ -438,7 +439,7 @@ const CreateBatch = () => {
 
               {/* Right Column */}
               <div className="space-y-8">
-                
+
                 {/* Subjects */}
                 <div className="group">
                   <label htmlFor="subjects" className="flex items-center gap-2 text-gray-700 font-bold mb-3 text-lg">
@@ -468,8 +469,8 @@ const CreateBatch = () => {
                       <div className="text-sm font-bold text-gray-600 mb-3 uppercase tracking-wide">Added subjects:</div>
                       <div className="flex flex-wrap gap-3">
                         {formData.subjects.map((subject, idx) => (
-                          <div 
-                            key={idx} 
+                          <div
+                            key={idx}
                             className="group flex items-center gap-3 bg-gradient-to-r from-indigo-100 to-indigo-200 text-indigo-800 rounded-2xl px-5 py-3 transition-all duration-300 hover:from-indigo-200 hover:to-indigo-300 hover:scale-105 shadow-md"
                           >
                             <span className="font-bold">{subject}</span>
@@ -517,8 +518,8 @@ const CreateBatch = () => {
                       <div className="text-sm font-bold text-gray-600 mb-3 uppercase tracking-wide">Selected faculty members:</div>
                       <div className="space-y-3">
                         {selectedFaculties.map((user, idx) => (
-                          <div 
-                            key={idx} 
+                          <div
+                            key={idx}
                             className="group flex items-center justify-between bg-gradient-to-r from-purple-100 to-purple-200 text-purple-800 rounded-2xl p-4 transition-all duration-300 hover:from-purple-200 hover:to-purple-300 hover:scale-102 shadow-md"
                           >
                             <div className="flex-1">
@@ -547,14 +548,19 @@ const CreateBatch = () => {
           {/* Submit Button */}
           <div className="p-8 bg-gradient-to-r from-gray-50 to-indigo-50 border-t border-gray-100 flex justify-center">
             <button
+              disabled={canAccessPage === false}
               onClick={handleSubmit}
-              className="group bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-12 py-4 rounded-3xl flex items-center gap-3 font-black text-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl transform"
+              className={`group text-white px-12 py-4 rounded-3xl flex items-center gap-3 font-bold text-lg transition-all duration-300 transform
+      ${canAccessPage === false
+                  ? 'bg-gray-300 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 hover:scale-105 hover:shadow-2xl'}
+    `}
             >
-              <CheckCircle size={24} className="group-hover:animate-pulse" />
-              <span>Create Batch</span>
-              {/* <Sparkles size={24} className="group-hover:animate-spin" /> */}
+              <CheckCircle size={24} className={`${canAccessPage !== false ? 'group-hover:animate-pulse' : ''}`} />
+              <span>{canAccessPage === false ? 'Access Denied' : 'Create Batch'}</span>
             </button>
           </div>
+
         </div>
       </div>
 

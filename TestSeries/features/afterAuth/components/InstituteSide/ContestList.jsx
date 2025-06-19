@@ -8,9 +8,6 @@ import { usePageAccess } from "../../../../contexts/PageAccessContext";
 const ContestList = () => {
     const { contestList, isLoading } = useCachedContests();
     const [contest, setContest] = useState([]);
-    const canAccess=usePageAccess();
-
-    console.log(canAccess);
 
     useEffect(() => {
         if (contestList && JSON.stringify(contest) !== JSON.stringify(contestList)) {
