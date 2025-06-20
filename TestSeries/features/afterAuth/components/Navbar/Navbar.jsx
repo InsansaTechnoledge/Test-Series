@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Search, Settings, ChevronDown, Menu, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { categories } from '../../data/SiddeBarData';
@@ -12,8 +12,153 @@ const Navbar = ({setShowLogoutModal}) => {
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showDesktopSearch, setShowDesktopSearch] = useState(false);
+  
+  // New search-related states
+  const [searchResults, setSearchResults] = useState([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const [selectedResultIndex, setSelectedResultIndex] = useState(-1);
+  
+  const searchInputRef = useRef(null);
+  const searchResultsRef = useRef(null);
   const { user } = useUser();
   const navigate = useNavigate();
+
+  // Search functionality
+  const performSearch = (query) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      setShowSearchResults(false);
+      return;
+    }
+
+    const results = [];
+    const queryLower = query.toLowerCase();
+
+    // Search through all features/controls
+    controls.forEach(control => {
+      const nameMatch = control.name.toLowerCase().includes(queryLower);
+      const pathMatch = control.path.toLowerCase().includes(queryLower);
+      
+      if (nameMatch || pathMatch) {
+        // Find which category this feature belongs to
+        const category = categories.find(cat => 
+          cat.features.includes(control.name)
+        );
+        
+        results.push({
+          type: 'feature',
+          name: control.name,
+          path: control.path,
+          icon: control.icon,
+          category: category?.name || 'Other',
+          matchType: nameMatch ? 'name' : 'path'
+        });
+      }
+    });
+
+    // Search through categories
+    categories.forEach(category => {
+      if (category.name.toLowerCase().includes(queryLower)) {
+        results.push({
+          type: 'category',
+          name: category.name,
+          icon: category.icon,
+          features: category.features,
+          matchType: 'category'
+        });
+      }
+    });
+
+    // Sort results by relevance
+    results.sort((a, b) => {
+      // Exact matches first
+      const aExact = a.name.toLowerCase() === queryLower;
+      const bExact = b.name.toLowerCase() === queryLower;
+      if (aExact && !bExact) return -1;
+      if (!aExact && bExact) return 1;
+      
+      // Features before categories
+      if (a.type === 'feature' && b.type === 'category') return -1;
+      if (a.type === 'category' && b.type === 'feature') return 1;
+      
+      // Alphabetical order
+      return a.name.localeCompare(b.name);
+    });
+
+    setSearchResults(results.slice(0, 8)); // Limit to 8 results
+    setShowSearchResults(true);
+    setSelectedResultIndex(-1);
+  };
+
+  // Handle search input change with debouncing
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      performSearch(searchQuery);
+    }, 150); // Debounce search by 150ms
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery]);
+
+  // Handle keyboard navigation in search results
+  const handleSearchKeyDown = (e) => {
+    if (!showSearchResults || searchResults.length === 0) return;
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setSelectedResultIndex(prev => 
+          prev < searchResults.length - 1 ? prev + 1 : 0
+        );
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setSelectedResultIndex(prev => 
+          prev > 0 ? prev - 1 : searchResults.length - 1
+        );
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (selectedResultIndex >= 0 && searchResults[selectedResultIndex]) {
+          handleResultClick(searchResults[selectedResultIndex]);
+        }
+        break;
+      case 'Escape':
+        setShowSearchResults(false);
+        setSelectedResultIndex(-1);
+        searchInputRef.current?.blur();
+        break;
+    }
+  };
+
+  // Handle result click
+  const handleResultClick = (result) => {
+    if (result.type === 'feature') {
+      navigate(`/institute/${result.path}`);
+    } else if (result.type === 'category') {
+      // Open category dropdown
+      setActiveCategory(result.name);
+      setShowDesktopSearch(false);
+    }
+    
+    setSearchQuery('');
+    setShowSearchResults(false);
+    setShowMobileMenu(false);
+    setSelectedResultIndex(-1);
+  };
+
+  // Close search results when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchResultsRef.current && !searchResultsRef.current.contains(event.target) &&
+          searchInputRef.current && !searchInputRef.current.contains(event.target)) {
+        setShowSearchResults(false);
+        setSelectedResultIndex(-1);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleCategoryClick = (categoryName) => {
     setActiveCategory(activeCategory === categoryName ? '' : categoryName);
@@ -28,6 +173,11 @@ const Navbar = ({setShowLogoutModal}) => {
     setShowDesktopSearch(!showDesktopSearch);
     if (!showDesktopSearch) {
       setActiveCategory(''); // Close any open dropdowns when opening search
+      // Focus search input after state update
+      setTimeout(() => searchInputRef.current?.focus(), 100);
+    } else {
+      setSearchQuery('');
+      setShowSearchResults(false);
     }
   };
 
@@ -36,216 +186,328 @@ const Navbar = ({setShowLogoutModal}) => {
     setShowMobileMenu(false); 
   };
 
-  return (
-    <div className="w-full relative bg-transparent">
-      {/* Main Navigation - Single Line */}
-      <div className="py-1">
-        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
-          <div className="flex items-center justify-between gap-4">
-            {/* Mobile Menu Button */}
+  // Search Results Component
+  const SearchResults = ({ isMobile = false }) => {
+    if (!showSearchResults || searchResults.length === 0) return null;
+
+    return (
+      <div 
+        ref={searchResultsRef}
+        className={`absolute bg-white rounded-lg shadow-xl border border-gray-200 z-[9999] ${
+          isMobile 
+            ? 'top-full left-0 right-0 mt-2' 
+            : 'top-full left-0 right-0 mt-1 max-w-2xl mx-auto'
+        }`}
+      >
+        <div className="py-2 max-h-80 overflow-y-auto">
+          {searchResults.map((result, index) => (
             <button
-              onClick={toggleMobileMenu}
-              className="md:hidden w-10 h-10 bg-gray-100 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-200 transition-all duration-200 flex-shrink-0"
+              key={`${result.type}-${result.name}-${index}`}
+              onClick={() => handleResultClick(result)}
+              className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors ${
+                selectedResultIndex === index ? 'bg-indigo-50 border-l-2 border-indigo-500' : ''
+              }`}
             >
-              {showMobileMenu ? <X className="h-5 w-5 text-gray-800" /> : <Menu className="h-5 w-5 text-gray-800" />}
-            </button>
-
-          
-           
-              <div className="flex items-center space-x-2 sm:space-x-3">
-
-                  <img src={logo} alt="Logo" className="w-40 h-full  rounded-full" />
-
-                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center">
-                  {/* <img src={user.logoUrl} alt="Logo" className="w-full h-full rounded-full" /> */}
+              <div className="flex items-center space-x-3">
+                <div className="w-6 h-6 flex items-center justify-center">
+                  {result.type === 'feature' ? (
+                    <img 
+                      src={result.icon} 
+                      alt={result.name} 
+                      className="w-5 h-5"
+                    />
+                  ) : (
+                    <img 
+                      src={result.icon} 
+                      alt={result.name} 
+                      className="w-5 h-5" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center space-x-2">
+                      <span className="font-medium text-gray-900 truncate">
+                        {result.name}
+                      </span>
+                      {result.type === 'feature' && (
+                        <span className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full">
+                          {result.category}
+                        </span>
+                      )}
+                    </div>
+                    {result.type === 'category' && (
+                      <p className="text-sm text-gray-500 mt-1">
+                        {result.features.length} features available
+                      </p>
+                    )}
+                  </div>
                 </div>
-                {/* <span className="text-gray-800 font-semibold text-sm md:text-lg hidden sm:block">{user.name}</span> */}
-              </div>
-            
-
-            {/* Desktop Categories and Search */}
-            {!showDesktopSearch ? (
-              // Show Categories
-              <div className="hidden lg:flex items-center space-x-1 flex-1 justify-center">
-                {categories.map((category) => {
-                  const isActive = activeCategory === category.name;
-                  return (
-                    <div key={category.name} className="relative">
+              </button>
+            ))}
+          </div>
+        </div>
+      );
+    };
+  
+    return (
+      <nav className="bg-white shadow-sm border-b border-gray-200 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            {/* Left side - Logo */}
+            <div className="flex items-center">
+              <img 
+                src={logo} 
+                alt="Evalvo" 
+                className="h-8 w-auto cursor-pointer"
+                onClick={() => navigate('/institute')}
+              />
+            </div>
+  
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-4">
+              {/* Categories Dropdown - Hidden when search is active */}
+              {!showDesktopSearch && (
+                <div className="relative">
+                  {categories.map((category) => (
+                    <div key={category.name} className="relative inline-block">
                       <button
                         onClick={() => handleCategoryClick(category.name)}
-                        className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all ${
-                          isActive ? 'bg-gray-100 text-gray-800 shadow-sm' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-800'
+                        className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                          activeCategory === category.name
+                            ? 'bg-indigo-50 text-indigo-700'
+                            : 'text-gray-700 hover:bg-gray-50'
                         }`}
                       >
                         <img 
                           src={category.icon} 
-                          alt={category.name}  
-                          className='h-4 w-4'
+                          alt={category.name} 
+                          className="w-4 h-4 mr-2"
                         />
-                        <span className="font-medium text-sm whitespace-nowrap">{category.name}</span>
-                        <ChevronDown className={`h-4 w-4 transition-transform ${isActive ? 'rotate-180' : ''}`} />
+                        {category.name}
+                        <ChevronDown className="ml-1 h-4 w-4" />
                       </button>
-                      {isActive && (
-                        <div className="absolute top-full left-0 mt-1 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-[9999]">
-                          <div className="py-2">
-                            {category.features.map((feature, i) => {
-                              const control = controls.find(
-                                (control) => control.name === feature
-                              );
-                              return (
+  
+                      {/* Category Dropdown */}
+                      {activeCategory === category.name && (
+                        <div className="absolute top-full left-0 mt-1 w-56 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
+                          <div className="py-1">
+                            {category.features.map((featureName) => {
+                              const control = controls.find(c => c.name === featureName);
+                              return control ? (
                                 <button
-                                  key={i}
+                                  key={control.name}
                                   onClick={() => handleFeatureClick(control.path)}
-                                  className="w-full px-4 py-2 text-left text-gray-600 hover:bg-indigo-50 hover:text-indigo-700"
+                                  className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                                 >
-                                  {feature}
+                                  <img 
+                                    src={control.icon} 
+                                    alt={control.name} 
+                                    className="w-4 h-4 mr-3"
+                                  />
+                                  {control.name}
                                 </button>
-                              );
+                              ) : null;
                             })}
                           </div>
                         </div>
                       )}
                     </div>
-                  );
-                })}
-              </div>
-            ) : (
-              // Show Search Bar
-              <div className="hidden lg:flex flex-1 mx-4">
-                <div className="relative w-full max-w-2xl mx-auto">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Search className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-12 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                    placeholder="Search features, settings, or content..."
-                    autoFocus
-                  />
+                  ))}
                 </div>
-              </div>
-            )}
-
-            {/* Desktop Search Button */}
-            <button
-              onClick={toggleDesktopSearch}
-              className="hidden lg:flex w-10 h-10 bg-gray-100 rounded-full border border-gray-200 items-center justify-center hover:bg-gray-200 transition-all duration-200 flex-shrink-0"
-            >
-              {showDesktopSearch ? (
-                <X className="h-5 w-5 text-gray-800" />
-              ) : (
-                <Search className="h-5 w-5 text-gray-800" />
               )}
-            </button>
-
-            {/* Mobile Search Button */}
-            <button
-              onClick={toggleDesktopSearch}
-              className="md:lg:hidden w-10 h-10 bg-gray-100 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-200 transition-all duration-200 flex-shrink-0"
-            >
-              <Search className="h-5 w-5 text-gray-800" />
-            </button>
-
-            {/* Profile */}
-            <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
+  
+              {/* Desktop Search - Expanded when active */}
+              <div className="relative">
+                {showDesktopSearch ? (
+                  <div className="relative">
+                    <div className="flex items-center">
+                      <div className="relative flex-1">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <input
+                          ref={searchInputRef}
+                          type="text"
+                          placeholder="Search features..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          onKeyDown={handleSearchKeyDown}
+                          onFocus={() => searchQuery && setShowSearchResults(true)}
+                          className="w-96 pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300"
+                        />
+                      </div>
+                      <button
+                        onClick={toggleDesktopSearch}
+                        className="ml-2 p-2 text-gray-400 hover:text-gray-600"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <SearchResults />
+                  </div>
+                ) : (
+                  <button
+                    onClick={toggleDesktopSearch}
+                    className="p-2 text-gray-400 hover:text-gray-600 rounded-md"
+                  >
+                    <Search className="h-5 w-5" />
+                  </button>
+                )}
+              </div>
+  
+             
+  
+              {/* Profile Dropdown */}
               <div className="relative">
                 <button
                   onClick={() => setShowProfileDropdown(!showProfileDropdown)}
-                  className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center hover:scale-105 transition-all"
+                  className="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
-                  <img src={user.logoUrl} alt="User" className="w-full h-full rounded-full" />
+                  <div className="w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center">
+                    <span className="text-white font-medium">
+                      {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                    </span>
+                  </div>
+                  <ChevronDown className="ml-1 h-4 w-4 text-gray-400" />
                 </button>
-
-                {/* Profile Dropdown */}
+  
                 {showProfileDropdown && (
-                  <div className="absolute top-full right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl border border-gray-200 z-[9999]">
-                    <div className="bg-indigo-800 px-4 py-3 rounded-t-xl">
-                      <div className="text-white font-semibold">{user.name}</div>
-                      <div className="text-gray-100 text-sm">{user.email}</div>
-                    </div>
-                    <div className="py-2">
-                      <button className="w-full px-4 py-2 text-left text-gray-600 hover:bg-gray-50 transition-colors">Profile Settings</button>
-                      <button className="w-full px-4 py-2 text-left text-gray-600 hover:bg-gray-50 transition-colors">Account</button>
-                      <button className="w-full px-4 py-2 text-left text-gray-600 hover:bg-gray-50 transition-colors">Preferences</button>
-                      <hr className="my-2" />
-                      <button onClick={() => setShowLogoutModal(true)} className="w-full px-4 py-2 text-left text-red-600 hover:bg-gray-50 transition-colors">Sign Out</button>
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
+                    <div className="py-1">
+                      <div className="px-4 py-2 text-sm text-gray-700 border-b">
+                        <div className="font-medium">{user?.name || 'User'}</div>
+                        <div className="text-gray-500">{user?.email || 'user@example.com'}</div>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setShowLogoutModal(true);
+                          setShowProfileDropdown(false);
+                        }}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      >
+                        Sign out
+                      </button>
                     </div>
                   </div>
                 )}
               </div>
             </div>
-          </div>
-
-          {/* Mobile Search Bar */}
-          {showDesktopSearch && (
-            <div className="lg:hidden mt-4">
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Search className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                  placeholder="Search features, settings, or content..."
-                />
-              </div>
+  
+            {/* Mobile menu button */}
+            <div className="md:hidden flex items-center">
+              <button
+                onClick={toggleMobileMenu}
+                className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
+              >
+                {showMobileMenu ? (
+                  <X className="h-6 w-6" />
+                ) : (
+                  <Menu className="h-6 w-6" />
+                )}
+              </button>
             </div>
-          )}
-
+          </div>
+  
           {/* Mobile Menu */}
           {showMobileMenu && (
-            <div className="md:hidden fixed inset-0 top-[72px] bg-white z-[9999] overflow-y-auto">
-              <div className="px-4 py-6">
-                <div className="space-y-1">
-                  {categories.map((category) => {
-                    const isActive = activeCategory === category.name;
-                    return (
-                      <div key={category.name}>
-                        <button
-                          onClick={() => handleCategoryClick(category.name)}
-                          className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors ${
-                            isActive ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50'
-                          }`}
-                        >
-                          <div className="flex items-center space-x-3">
-                            <img src={category.icon} alt={category.name} className="w-5 h-5" />
-                            <span className="font-medium">{category.name}</span>
-                          </div>
-                          <ChevronDown className={`h-5 w-5 transition-transform ${isActive ? 'rotate-180' : ''}`} />
-                        </button>
-                        {isActive && (
-                          <div className="mt-2 ml-8 space-y-1">
-                            {category.features.map((feature, i) => {
-                              const control = controls.find(
-                                (control) => control.name === feature
-                              );
-                              return (
-                                <button
-                                  key={i}
-                                  onClick={() => handleFeatureClick(control.path)}
-                                  className="w-full text-left px-4 py-2 text-gray-600 hover:bg-indigo-50 hover:text-indigo-700 rounded-md transition-colors"
-                                >
-                                  {feature}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        )}
+            <div className="md:hidden">
+              <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                {/* Mobile Search */}
+                <div className="relative mb-4">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search features..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={handleSearchKeyDown}
+                    onFocus={() => searchQuery && setShowSearchResults(true)}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  />
+                  <SearchResults isMobile={true} />
+                </div>
+  
+                {/* Mobile Categories */}
+                {categories.map((category) => (
+                  <div key={category.name}>
+                    <button
+                      onClick={() => handleCategoryClick(category.name)}
+                      className={`flex items-center justify-between w-full px-3 py-2 text-base font-medium rounded-md ${
+                        activeCategory === category.name
+                          ? 'bg-indigo-50 text-indigo-700'
+                          : 'text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      <div className="flex items-center">
+                        <img 
+                          src={category.icon} 
+                          alt={category.name} 
+                          className="w-5 h-5 mr-3"
+                        />
+                        {category.name}
                       </div>
-                    );
-                  })}
+                      <ChevronDown 
+                        className={`h-4 w-4 transition-transform ${
+                          activeCategory === category.name ? 'rotate-180' : ''
+                        }`} 
+                      />
+                    </button>
+  
+                    {/* Mobile Category Features */}
+                    {activeCategory === category.name && (
+                      <div className="mt-1 ml-8 space-y-1">
+                        {category.features.map((featureName) => {
+                          const control = controls.find(c => c.name === featureName);
+                          return control ? (
+                            <button
+                              key={control.name}
+                              onClick={() => handleFeatureClick(control.path)}
+                              className="flex items-center w-full px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md"
+                            >
+                              <img 
+                                src={control.icon} 
+                                alt={control.name} 
+                                className="w-4 h-4 mr-3"
+                              />
+                              {control.name}
+                            </button>
+                          ) : null;
+                        })}
+                      </div>
+                    )}
+                  </div>
+                ))}
+  
+                {/* Mobile Profile Section */}
+                <div className="border-t border-gray-200 pt-4 mt-4">
+                  <div className="flex items-center px-3 py-2">
+                    <div className="w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center">
+                      <span className="text-white font-medium">
+                        {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                      </span>
+                    </div>
+                    <div className="ml-3">
+                      <div className="text-base font-medium text-gray-800">
+                        {user?.name || 'User'}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {user?.email || 'user@example.com'}
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setShowLogoutModal(true);
+                      setShowMobileMenu(false);
+                    }}
+                    className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-md"
+                  >
+                    Sign out
+                  </button>
                 </div>
               </div>
             </div>
           )}
         </div>
-      </div>
-    </div>
-  );
-};
-
-export default Navbar;
+      </nav>
+    );
+  };
+  
+  export default Navbar;

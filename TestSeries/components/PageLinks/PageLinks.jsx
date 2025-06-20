@@ -51,6 +51,7 @@ import StudentClassroom from '../../features/afterAuth/components/StudentSide/La
 import ContestInstructionWindow from '../../features/afterAuth/components/StudentSide/Coding-Contests/ContestInstructionWindow';
 import Analysis from '../../features/Analytics/Analysis';
 import PageAccessGuard from '../ProtectedRoute/PageAccessGuard';
+import FallBackPage from '../../features/auth/pages/FallBackPage';
 
 const PageLinks = () => {
   const { user, setUser, hasPlanFeature } = useUser();
@@ -91,6 +92,7 @@ const PageLinks = () => {
         <Route element={<AuthLayout />}>
           <Route path='/institute-registration' element={<InstituteRegistrationPage />} />
           <Route path='/login' element={<LoginMainPage />} />
+          <Route path='*' element={<FallBackPage/>} />
         </Route>
 
         {/* Authenticated Institute Routes */}
@@ -143,6 +145,8 @@ const PageLinks = () => {
                 <Route path='contest/:contestId' element={<ContestInstructionWindow />} />
                 <Route path='code/:contestId' element={<CodingPlatform />} />
                 <Route path='analysis' element={<Analysis />} />
+                <Route path='*' element={<div>Invalid path</div>} />
+
               </Route>
             </Route>
           </Route>

@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; // Assuming you're using React Router
+import { Link, useNavigate } from 'react-router-dom'; // Assuming you're using React Router
 import logo from "../../assests/Landing/Navbar/evalvo logo blue 2.svg"
 import { ArrowRight } from 'lucide-react';
+
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
+  const navigate = useNavigate();
+
   return (
     <nav className="flex justify-between items-center px-6 md:px-22 py-6  bg-transparent backdrop-blur-xl sticky top-0 z-50">
       {/* Logo */}
@@ -19,10 +21,10 @@ const Navbar = () => {
 
      
       <div className="hidden md:flex space-x-8 text-gray-700">
-      <Link to="/" className="px-4 py-2 rounded-md hover:bg-indigo-100 hover:text-blue-600 transition duration-200"> Home</Link>
-        <Link to="/about" className="px-4 py-2 rounded-md hover:bg-indigo-100 hover:text-blue-600 transition duration-200">About</Link>
-        <Link to="/services" className="px-4 py-2 rounded-md hover:bg-indigo-100 hover:text-blue-600 transition duration-200">Services</Link>
-        <Link to="/contact" className="px-4 py-2 rounded-md hover:bg-indigo-100 hover:text-blue-600 transition duration-200">Contact</Link>
+        <button onClick={() => navigate('/')} className="px-4 py-2 rounded-md hover:bg-indigo-100 hover:text-blue-600 transition duration-200">Home</button> 
+        <button disabled onClick={() => navigate('/about')} className="px-4 py-2 rounded-md cursor-not-allowed hover:bg-indigo-100 hover:text-blue-600 transition duration-200">About</button>        
+        <button disabled onClick={() => navigate('/contact')} className="px-4 py-2 cursor-not-allowed rounded-md hover:bg-indigo-100 hover:text-blue-600 transition duration-200">Contact</button>        
+        
       </div>
 
       {/* Authentication Section */}
@@ -61,10 +63,9 @@ const Navbar = () => {
       {isMobileMenuOpen && (
         <div className="md:hidden absolute top-14 left-0 right-0 bg-white shadow-md z-50">
           <div className="flex flex-col p-4">
-            <Link to="/" className="py-2 text-gray-700 hover:text-indigo-600">Home</Link>
-            <Link to="/about" className="py-2 text-gray-700 hover:text-indigo-600">About</Link>
-            <Link to="/services" className="py-2 text-gray-700 hover:text-indigo-600">Services</Link>
-            <Link to="/contact" className="py-2 text-gray-700 hover:text-indigo-600">Contact</Link>
+            <button onClick={() => navigate('/')} className="px-4 py-2 rounded-md hover:bg-indigo-100 hover:text-blue-600 transition duration-200">Home</button> 
+            <button disabled onClick={() => navigate('/about')} className="px-4 py-2 rounded-md  hover:bg-indigo-100 hover:text-blue-600 transition duration-200">About</button>        
+            <button disabled onClick={() => navigate('/contact')} className="px-4 py-2 rounded-md hover:bg-indigo-100 hover:text-blue-600 transition duration-200">Contact</button>   
             
             <div className="border-t border-gray-200 my-2 pt-2">
               <div className="flex justify-between items-center">
