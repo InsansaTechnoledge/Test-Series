@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
-import { useUser } from '../contexts/currentUserContext'
+// import { useUser } from '../contexts/currentUserContext'
+import { useUser } from '../contexts/currentUserContext';
 import { Outlet, useNavigate } from 'react-router-dom';
 
 const AuthRoutes = () => {
