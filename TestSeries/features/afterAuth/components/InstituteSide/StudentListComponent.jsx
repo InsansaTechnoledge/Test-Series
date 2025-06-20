@@ -13,8 +13,7 @@ const StudentListPage = () => {
 
   const canAccessPage  = usePageAccess();
   
-     console.log("fsdv", canAccessPage)
-        
+  
           if (!canAccessPage) {
             return (
               <div className="flex items-center justify-center ">
@@ -331,30 +330,43 @@ const StudentListPage = () => {
               }}
             >
               {/* Gradient Header */}
-              <div className="h-32 relative overflow-hidden">
-                <div className=" -z-10 absolute inset-0 bg-black bg-opacity-10"></div>
+        
+<div className="h-16 bg-gradient-to-r from-indigo-500 to-indigo-400 rounded-t-2xl relative overflow-hidden shadow-md">
 
-                <div className=" z-20 absolute top-4 left-4">
+<div className="inset-0 bg-indigo-100 bg-opacity-5 backdrop-blur-sm -z-10 absolute  bg-opacity-10"></div>
+
+
+<div className='flex justify-between items-center p-6  '>
+<div className="flex gap-2 justify-center items-center ">
                   <input
                     type="checkbox"
                     checked={selectedStudents.includes(student._id)}
                     onChange={() => toggleStudentSelection(student._id)}
                     className="w-5 h-5 z-10 cursor-pointer rounded-lg text-white bg-white bg-opacity-20 border-2 border-white focus:ring-white"
                   />
+                    <h3 className="text-white font-bold text-xl leading-snug line-clamp-2">
+  {student.name}
+  </h3>
                 </div>
+<div className="">
 
-                <div className="absolute top-4 right-4">
-                  <span className="bg-gray-700 bg-opacity-20 text-white px-3 py-1 rounded-full text-sm font-bold backdrop-blur-sm">
-                    {batchMap[student.batch?.currentBatch]?.name || 'No Batch'}
-                  </span>
-                </div>
-                <div className="absolute bottom-4 left-4 right-4">
-                  <h3 className="text-white font-black text-2xl leading-tight line-clamp-2">
-                    {student.name}
-                  </h3>
-                </div>
-              </div>
+</div>
 
+<div className="">
+  <div className="bg-white text-indigo-700 text-xs font-bold px-3 py-1 rounded-full shadow backdrop-blur-md border border-white border-opacity-30 flex items-center gap-1">
+  {batchMap[student.batch?.currentBatch]?.name || 'No Batch'}
+  </div>
+</div>
+
+
+
+
+
+</div>
+
+
+
+</div>
               {/* Card Content */}
               <div className="p-6">
                 <div className="flex items-center justify-between mb-4">

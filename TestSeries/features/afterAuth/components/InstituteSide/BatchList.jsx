@@ -211,20 +211,32 @@ const BatchList = () => {
               }}
             >
               {/* Gradient Header */}
-              <div className="h-32 bg-gradient-to-r from-indigo-600 to-gray-600 relative overflow-hidden">
-                <div className="absolute inset-0 bg-black bg-opacity-10"></div>
-               
-                <div className="absolute top-4 right-4">
-                  <span className="bg-white bg-opacity-20 text-gray-700 px-3 py-1 rounded-full text-sm font-bold backdrop-blur-sm">
-                    {batch.year}
-                  </span>
-                </div>
-                <div className="absolute bottom-4 left-4 right-4">
-                  <h3 className="text-white font-black text-3xl leading-tight line-clamp-2">
-                    {batch.name}
-                  </h3>
-                </div>
-              </div>
+             
+              <div className="h-16 bg-gradient-to-r from-indigo-500 to-indigo-400 rounded-t-2xl relative overflow-hidden shadow-md">
+
+  <div className="inset-0 bg-indigo-100 bg-opacity-5 backdrop-blur-sm"></div>
+<div className='flex justify-between items-center p-6 '>
+<div className="">
+    <h3 className="text-white font-bold text-xl leading-snug line-clamp-2">
+    {batch.name}
+    </h3>
+  </div>
+
+  <div className="">
+    <div className="bg-white text-indigo-700 text-xs font-bold px-3 py-1 rounded-full shadow backdrop-blur-md border border-white border-opacity-30 flex items-center gap-1">
+      {batch.year}
+    </div>
+  </div>
+
+  
+  
+
+
+</div>
+
+
+
+</div>
 
               {/* Card Content */}
               <div className="p-6">

@@ -12,7 +12,7 @@ const ContestList = () => {
 
      const canAccessPage  = usePageAccess();
      
-        console.log("fsdv", canAccessPage)
+  
            
              if (!canAccessPage) {
                return (
