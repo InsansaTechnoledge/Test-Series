@@ -257,8 +257,8 @@ const Navbar = ({setShowLogoutModal}) => {
               <img 
                 src={logo} 
                 alt="Evalvo" 
-                className="h-8 w-auto cursor-pointer"
-                onClick={() => navigate('/institute')}
+                className="h-8 w-auto"
+                // onClick={() => navigate('/institute')}
               />
             </div>
   
