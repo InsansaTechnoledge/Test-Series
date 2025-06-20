@@ -14,12 +14,10 @@ export const getFeatureValueForOrganization = async(orgId, featureKey) => {
        
     });
 
-    console.log(org.planPurchased.features.map(f => f.key));
 
     if (!org || !org.planPurchased) {
         return null;
     };
-    console.log(featureKey,"🥲");
 
 const matchedFeature = org.planPurchased?.features?.find(
   f => f.key === featureKey && f.featureId?.isActive
