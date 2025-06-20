@@ -5,6 +5,7 @@ import { MapPin, Mail, Phone, Globe } from 'lucide-react'
 import { features, stepsToFollow } from "../../../data/InstituteLandingPageData"
 import FAQSection from '../../../../beforeAuth/pages/FAQSection'
 import { studentFAQs, teacherFAQs } from '../../../../beforeAuth/data/FAQ'
+import Loader from '../InstituteLoader/Loader'
 const InstituteLandingPage = () => {
   const { user } = useUser();
   
@@ -12,9 +13,7 @@ const InstituteLandingPage = () => {
 
   if (!user) {
     return (
-      <div>
-        Loading...
-      </div>
+      <Loader/>
     )
   }
 

@@ -25,7 +25,7 @@ const CreateBatch = () => {
   const canCreateMoreBatches = useLimitAccess(getFeatureKeyFromLocation(location.pathname), "totalBatches");
 
   console.log("CreateBatch", canAccessPage, canCreateMoreBatches, getFeatureKeyFromLocation(location.pathname), location.pathname);
-
+  console.log("test" , user.planFeatures?.batch_feature.value)
   useEffect(() => {
     if (users) {
       setFaculty(users);
@@ -35,6 +35,9 @@ const CreateBatch = () => {
 
 
 
+  const Creation_Limit = user?.planFeatures?.batch_feature.value 
+  const Total_Batch = user?.metaData?.totalBatches 
+  const Available_limit = Creation_Limit - Total_Batch
 
   const onChangeHandler = (name, value) => {
     setFormData((prev) => ({
@@ -216,7 +219,23 @@ const CreateBatch = () => {
 
       {/* Stats Dashboard */}
       <div className="max-w-7xl mx-auto px-6 -mt-8 relative z-20">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+
+          {/* limits section */}
+
+          <div className="bg-white rounded-3xl p-6 shadow-xl border-l-4 border-indigo-600 transform hover:scale-105 transition-all duration-300">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Available Limit</p>
+                <p className={`text-2xl font-black ${Available_limit > 0 ? "text-green-500" : "text-red-500"} capitalize`}>{Available_limit}</p>
+              </div>
+              <div className="bg-indigo-100 p-3 rounded-2xl">
+                {/* <Target className="w-8 h-8 text-indigo-600" /> */}
+              </div>
+            </div>
+          </div>
+
+
           <div className="bg-white rounded-3xl p-6 shadow-xl border-l-4 border-indigo-600 transform hover:scale-105 transition-all duration-300">
             <div className="flex items-center justify-between">
               <div>
@@ -554,7 +573,7 @@ const CreateBatch = () => {
           <div className="p-8 bg-gradient-to-r from-gray-50 to-indigo-50 border-t border-gray-100 flex justify-center">
             <button
               onClick={handleSubmit}
-              disabled={canAccessPage === false}
+              disabled={canAccessPage === false || Available_limit <= 0}
               className={`group text-white px-12 py-4 rounded-3xl flex items-center gap-3 font-bold text-lg transition-all duration-300 transform
               ${canAccessPage === false
                   ? 'bg-gray-300 cursor-not-allowed'

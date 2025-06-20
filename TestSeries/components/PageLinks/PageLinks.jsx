@@ -52,6 +52,7 @@ import ContestInstructionWindow from '../../features/afterAuth/components/Studen
 import Analysis from '../../features/Analytics/Analysis';
 import PageAccessGuard from '../ProtectedRoute/PageAccessGuard';
 import FallBackPage from '../../features/auth/pages/FallBackPage';
+import FallBackPageForOrg from '../../features/afterAuth/pages/FallBackPageForOrg';
 
 const PageLinks = () => {
   const { user, setUser, hasPlanFeature } = useUser();
@@ -128,7 +129,7 @@ const PageLinks = () => {
                 {/* <Route path='contest-list' element={hasPlanFeature('code_feature')?<ContestList/>:(<div>hurrreehhhhh😁</div>)} /> */}
                 <Route path='contest-list' element={<ContestList />} />
                 <Route path='code-create' element={<QuestionCreator />} />
-                <Route path='*' element={<div>Invalid path</div>} />
+                <Route path='*' element={<FallBackPageForOrg/>} />
               </Route>
             </Route>
 
