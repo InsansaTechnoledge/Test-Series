@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { X, Upload, CheckCircle, PlusCircle, FileSpreadsheet, Users, Calendar, BookOpen, Zap, Target, Sparkles } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import NeedHelpComponent from './components/NeedHelpComponent';
-import HeadingUtil from '../../utility/HeadingUtil';
 import { useCachedUser } from '../../../../hooks/useCachedUser';
 import { useCachedRoleGroup } from '../../../../hooks/useCachedRoleGroup';
 import { createBatch } from '../../../../utils/services/batchService';
@@ -10,6 +9,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useUser } from '../../../../contexts/currentUserContext';
 import Banner from "../../../../assests/Institute/create batch.svg"
 import { usePageAccess } from '../../../../contexts/PageAccessContext';
+import useLimitAccess from '../../../../hooks/useLimitAccess';
+import { useLocation } from 'react-router-dom';
 
 const CreateBatch = () => {
   const [formData, setFormData] = useState({ batchMode: 'only-subjects' });
@@ -18,8 +19,12 @@ const CreateBatch = () => {
   const { users, isLoading } = useCachedUser();
   const { roleMap } = useCachedRoleGroup();
   const queryClient = useQueryClient();
-  const { user } = useUser();
+  const { user, getFeatureKeyFromLocation } = useUser();
+  const location = useLocation();
   const canAccessPage = usePageAccess();
+  const canCreateMoreBatches = useLimitAccess(getFeatureKeyFromLocation(location.pathname), "totalBatches");
+
+  console.log("CreateBatch", canAccessPage, canCreateMoreBatches, getFeatureKeyFromLocation(location.pathname), location.pathname);
 
   useEffect(() => {
     if (users) {
@@ -385,8 +390,8 @@ const CreateBatch = () => {
                       <label
                         htmlFor="dropzone-file"
                         className={`flex flex-col items-center justify-center w-full h-40 border-3 border-dashed rounded-3xl cursor-pointer transition-all duration-300 ${formData.syllabus?.name
-                            ? 'bg-green-50 border-green-300 hover:bg-green-100'
-                            : 'bg-gray-50 border-gray-300 hover:bg-gray-100 hover:border-indigo-400'
+                          ? 'bg-green-50 border-green-300 hover:bg-green-100'
+                          : 'bg-gray-50 border-gray-300 hover:bg-gray-100 hover:border-indigo-400'
                           }`}
                       >
                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
@@ -555,11 +560,18 @@ const CreateBatch = () => {
                   ? 'bg-gray-300 cursor-not-allowed'
                   : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 hover:scale-105 hover:shadow-2xl'}
                 `}
-              >
+            >
               {/* <CheckCircle size={24} className={`${canAccessPage !== false ? 'group-hover:animate-pulse' : ''}`} /> */}
-              <span className={`${!canAccessPage && "text-red-600 "}`}>{canAccessPage === false ? 'Access Denied' : 'Create Batch'}</span>
+              <span className={`${!canAccessPage && "text-red-600 "}`}>{canAccessPage === false ? 'Access Denied' : (canCreateMoreBatches ? 'Create Batch' : 'Limit Exceeded')}</span>
             </button>
           </div>
+
+          {!canCreateMoreBatches && (
+            <p className="text-sm text-red-500 mt-2 text-center">
+              You've reached your batch creation limit. Upgrade your plan to continue.
+            </p>
+          )}
+
 
         </div>
       </div>

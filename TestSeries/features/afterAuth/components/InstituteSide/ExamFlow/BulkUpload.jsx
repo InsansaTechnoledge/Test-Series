@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import * as XLSX from 'xlsx';
 import { v4 as uuidv4 } from 'uuid';
 import { generateSampleExcel } from './SampleExcel';
+import { Upload, FileSpreadsheet, Download, CheckCircle, AlertCircle, Info } from 'lucide-react';
 const BulkUpload = ({ setQuestions, organizationId }) => {
   const [isUploading, setIsUploading] = useState(false);
     const [uploadResult, setUploadResult] = useState(null);
@@ -195,58 +196,81 @@ const BulkUpload = ({ setQuestions, organizationId }) => {
       };
       
     return (
-      <div className="space-y-4">
-        <input 
-          type="file" 
-          accept=".xlsx, .xls" 
-          onChange={handleFile} 
-          disabled={isUploading}
-          className="block w-full text-sm text-gray-500
-            file:mr-4 file:py-2 file:px-4
-            file:rounded file:border-0
-            file:text-sm file:font-semibold
-            file:bg-blue-50 file:text-blue-700
-            hover:file:bg-blue-100"
-        />
-        
-        {isUploading && (
-          <div className="mt-2 text-blue-600">
-            <p>Processing file...</p>
-          </div>
-        )}
-        
-        {uploadResult && (
-          <div className={`mt-2 p-2 rounded ${uploadResult.success ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
-            {uploadResult.message}
-          </div>
-        )}
-        
-        <div className="mt-4 bg-yellow-50 p-3 rounded text-sm">
-          <p className="font-medium">Excel File Format Requirements:</p>
-          <ul className="list-disc list-inside mt-1 space-y-1 text-gray-700">
-            <li>Required columns: type, question_text</li>
-            <li>For MCQs: Add options as JSON array ["Option 1", "Option 2", ...]</li>
-            <li>Add correct_option index (0-based) for MCQs</li>
-            <li>Optional: subject, chapter, difficulty, marks</li>
-            <li>For Match the Following: add left_items and right_items as JSON arrays, and correct_pairs as JSON object (e.g., ("1": "A", "2": "C"))</li>
-            <li>For Comprehension: add <code>passage</code> as text, and <code>sub_question_ids</code> as JSON array of sub-questions</li>
+  
+      <div className="bg-white/70 backdrop-blur-md shadow-md rounded-2xl p-6 space-y-6 border border-gray-200">
+  {/* Header with Icon */}
+  <div className="flex items-start space-x-4">
+    <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
+      <Upload className="w-6 h-6 text-white" />
+    </div>
+    <div>
+      <h3 className="text-xl font-semibold text-gray-900">Upload Excel File</h3>
+      <p className="text-sm text-gray-600">
+        Upload multiple questions at once using an Excel spreadsheet.
+      </p>
+    </div>
+  </div>
 
+  {/* File Upload */}
+  <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-indigo-400 transition">
+    <input
+      type="file"
+      accept=".xlsx, .xls"
+      onChange={handleFile}
+      disabled={isUploading}
+      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+    />
+    <p className="text-gray-500 text-sm">Click to select a file or drag it here</p>
+  </div>
 
+  {/* Uploading Indicator */}
+  {isUploading && (
+    <div className="text-sm text-blue-600">
+      <p>Processing file...</p>
+    </div>
+  )}
 
-          </ul>
+  {/* Upload Result */}
+  {uploadResult && (
+    <div
+      className={`mt-1 p-3 rounded-lg text-sm font-medium ${
+        uploadResult.success
+          ? 'bg-green-50 text-green-700 border border-green-200'
+          : 'bg-red-50 text-red-700 border border-red-200'
+      }`}
+    >
+      {uploadResult.message}
+    </div>
+  )}
 
-        </div>
-          <div>Sample Excel format Dwonload </div>
-          <p>Download the excel , fill the questions in it and then upload it </p>
+  {/* Format Guidelines */}
+  <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-4 text-sm text-gray-700 space-y-2">
+    <p className="font-semibold text-yellow-800">Excel File Format Requirements:</p>
+    <ul className="list-disc list-inside space-y-1">
+      <li>Required columns: <code>type</code>, <code>question_text</code></li>
+      <li>For MCQs: options as JSON array <code>["Option 1", "Option 2", ...]</code></li>
+      <li>Correct MCQ index: <code>correct_option</code> (0-based)</li>
+      <li>Optional: <code>subject</code>, <code>chapter</code>, <code>difficulty</code>, <code>marks</code></li>
+      <li>For Match the Following: use <code>left_items</code>, <code>right_items</code>, and <code>correct_pairs</code> (e.g., {"{\"1\":\"A\",\"2\":\"C\"}"})</li>
+      <li>For Comprehension: add <code>passage</code> as text, and <code>sub_question_ids</code> as JSON array</li>
+    </ul>
+  </div>
 
-          <button
-            onClick={generateSampleExcel}
-            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
-            Download Sample Excel
-          </button>
+  {/* Sample Download */}
+  <div className="space-y-2">
+    <p className="text-sm text-gray-700">Download the Excel file, fill in the questions, and upload it.</p>
+    <button
+      onClick={generateSampleExcel}
+      className="inline-flex items-center space-x-2 px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-lg shadow-md hover:from-indigo-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-200"
+    >
+      <Download className="w-4 h-4" />
+      <span>Download Sample Excel</span>
+    </button>
+  </div>
+</div>
 
-      </div>
+      
+      
     );
   };
   

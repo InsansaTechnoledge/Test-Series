@@ -102,3 +102,14 @@ export const deleteVideoFromBatch = async (batchId, videoIdToDelete) => {
 
   return updatedVideos;
 };
+
+export const getBatchCount = async (organizationId) => {
+  const { count, error } = await supabase
+    .from('organization_batch')
+    .select('*', { count: 'exact' ,head: true })
+    .eq('organization_id', organizationId);
+
+  if (error) throw error;
+
+  return count ?? 0;
+};
