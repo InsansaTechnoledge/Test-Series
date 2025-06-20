@@ -26,12 +26,9 @@ const CreateBatch = () => {
   const canCreateMoreBatches = useLimitAccess(getFeatureKeyFromLocation(location.pathname), "totalBatches");
 const organization =
   user.role !== 'organization'
-    ? useCachedOrganization({ userId: user._id, orgId: user.organizationId })?.organization
+    ? useCachedOrganization({ userId: user._id, orgId: user.organizationId._id })?.organization
     : null;
 
-
-  console.log("CreateBatch", canAccessPage, canCreateMoreBatches, getFeatureKeyFromLocation(location.pathname), location.pathname);
-  console.log("test" , user.planFeatures?.batch_feature.value)
   useEffect(() => {
     if (users) {
       setFaculty(users);
