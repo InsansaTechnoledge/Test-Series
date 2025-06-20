@@ -390,7 +390,18 @@ export default function FeatureBasedRoleGroups() {
               you can assing all the required roles into a single group
             </p>
 
-            <p className="mt-8 text-indigo-500 bg-gray-200 px-3 py-4 rounded-2xl text-2xl flex "> <AlertTriangle/>For current plan you have Available Limit of <span className={`${Available_limit > 0 ? "text-green-500" : "text-red-500"} mx-2`}>{Available_limit}</span> to Add more Users</p>
+            <div className="flex items-center justify-center">
+  <p className="mt-8 text-indigo-700 bg-indigo-50 border border-indigo-100 px-5 py-4 rounded-2xl text-base flex items-center gap-3 shadow-sm backdrop-blur-sm">
+    <AlertTriangle className="w-5 h-5 text-indigo-400" />
+    <span>
+      <span className="font-semibold">Note:</span> For your current plan, you have an available limit of
+      <span className={`font-bold ${Available_limit > 0 ? "text-green-600" : "text-red-600"} mx-1`}>
+        {Available_limit}
+      </span>
+      to add more users.
+    </span>
+  </p>
+</div>
 
           </div>
         </div>
