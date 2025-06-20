@@ -9,7 +9,7 @@ const app = express();
 
 // ✅ CORS setup for cross-origin cookie sharing
 app.use(cors({
-  origin: process.env.CLIENT_URL, // e.g., https://your-frontend.onrender.com
+  origin: process.env.CLIENT_URL, 
   credentials: true
 }));
 
