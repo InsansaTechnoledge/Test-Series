@@ -70,94 +70,98 @@ const QuestionPreview = ({ questions, setQuestions, examDetails }) => {
 
 
   return (
-    <div className="mt-6 border-t pt-6">
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Question Preview ({filteredQuestions.length})</h2>
-          <div className="text-sm mx-30 text-gray-700 space-x-4">
-            <span>Total Marks: <strong>{totalMarks}</strong></span>
-            <span>Out of: <strong>{examTotalMarks}</strong></span>
-            <span className={` ${percentage > 100 ? "text-red-600" : "text-gray-800"}`}>Coverage: <strong className='text-green-600'>{percentage}%</strong></span>
-          </div>
-
-        </div>
-
-        <div className="flex space-x-2">
-          <select
-            className="border rounded px-3 py-1 text-sm"
-            value={filterType}
-            onChange={(e) => setFilterType(e.target.value)}
-          >
-            <option value="all">All Types</option>
-            <option value="mcq">Multiple Choice</option>
-            <option value="msq">Multiple Select</option>
-            <option value="fill">Fill in the Blank</option>
-            <option value="tf">True/False</option>
-            <option value="numerical">Numerical</option>
-            <option value="match">Match</option>
-            <option value="comprehension">Comprehension</option>
-            <option value="code">Coding</option>
-          </select>
-
-          <input
-            type="text"
-            placeholder="Search questions..."
-            className="border rounded px-3 py-1 text-sm"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
+    <>
+  
+ 
+<div className="mt-6 border-t pt-6">
+  <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+    <div>
+      <h2 className="text-xl font-semibold text-gray-800">Questions ({filteredQuestions.length})</h2>
+      <div className="text-sm text-gray-600 space-x-4 mt-1">
+        <span>Total Marks: <strong>{totalMarks}</strong></span>
+        <span>Out of: <strong>{examTotalMarks}</strong></span>
+        <span className={percentage > 100 ? "text-red-600" : "text-gray-800"}>
+          Coverage: <strong className='text-green-600'>{percentage}%</strong>
+        </span>
       </div>
+    </div>
 
-      {questions.length > 0 ? (
-        <div className="space-y-4">
-          {filteredQuestions.length > 0 ? (
-            filteredQuestions.map((q, index) => (
+    <div className="flex flex-col sm:flex-row gap-3">
+      <select
+        className="bg-white border border-gray-300 rounded-md px-3 py-2 shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        value={filterType}
+        onChange={(e) => setFilterType(e.target.value)}
+      >
+        <option value="all">All Types</option>
+        <option value="mcq">Multiple Choice</option>
+        <option value="msq">Multiple Select</option>
+        <option value="fill">Fill in the Blank</option>
+        <option value="tf">True/False</option>
+        <option value="numerical">Numerical</option>
+        <option value="match">Match</option>
+        <option value="comprehension">Comprehension</option>
+        <option value="code">Coding</option>
+      </select>
 
-              <div key={q.id} className="border rounded-lg overflow-hidden bg-white">
-                <div
-                  className="p-4 bg-gray-50 border-b flex justify-between items-center cursor-pointer"
-                  onClick={() => toggleExpand(q.id)}
-                >
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-gray-500 font-medium">#{index + 1}</span>
-                      <span className="px-2 py-0.5 rounded text-xs uppercase font-medium bg-blue-100 text-blue-800">
-                        {getQuestionTypeLabel(q.type)}
-                      </span>
-                      <span className={`px-2 py-0.5 rounded text-xs uppercase font-medium ${getDifficultyBadgeClass(q.difficulty)}`}>
-                        {q.difficulty}
-                      </span>
-                      <span className="text-gray-500 text-sm">
-                        +{q.positive_marks} {q.negative_marks > 0 ? `/ -${q.negative_marks}` : ''} {q.positive_marks === 1 ? 'mark' : 'marks'}
-                      </span>
+      <input
+        type="text"
+        placeholder="Search questions..."
+        className="bg-white border border-gray-300 rounded-md px-3 py-2 shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+    </div>
+  </div>
 
-                    </div>
-                    <div className="mt-1 font-medium line-clamp-1">
-                      {q.question_text}
-                    </div>
-                    {q.subject && (
-                      <div className="mt-1 text-sm text-gray-500">
-                        {q.subject} {q.chapter ? `• ${q.chapter}` : ''}
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <button className="text-blue-600 hover:text-blue-800">
-                      {expandedQuestion === q.id ? (
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                        </svg>
-                      ) : (
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                        </svg>
-                      )}
-                    </button>
-                  </div>
+  {questions.length > 0 ? (
+    <div className="space-y-4">
+      {filteredQuestions.length > 0 ? (
+        filteredQuestions.map((q, index) => (
+          <div
+            key={q.id}
+            className="rounded-xl border border-gray-200 bg-white shadow-sm hover:shadow-md transition duration-200 overflow-hidden"
+          >
+            <div
+              className="p-4 bg-gradient-to-r from-indigo-50 to-purple-50 border-b flex justify-between items-center cursor-pointer"
+              onClick={() => toggleExpand(q.id)}
+            >
+              <div className="flex-1">
+                <div className="flex items-center gap-3 flex-wrap">
+                  <span className="text-gray-500 font-medium">#{index + 1}</span>
+                  <span className="px-2 py-0.5 rounded text-xs uppercase font-medium bg-indigo-100 text-indigo-700">
+                    {getQuestionTypeLabel(q.type)}
+                  </span>
+                  <span className={`px-2 py-0.5 rounded text-xs uppercase font-medium ${getDifficultyBadgeClass(q.difficulty)}`}>
+                    {q.difficulty}
+                  </span>
+                  <span className="text-gray-500 text-sm">
+                    +{q.positive_marks} {q.negative_marks > 0 ? `/ -${q.negative_marks}` : ''} mark{q.positive_marks !== 1 ? 's' : ''}
+                  </span>
                 </div>
+                <div className="mt-2 font-medium text-gray-800 line-clamp-1">
+                  {q.question_text}
+                </div>
+                {q.subject && (
+                  <div className="mt-1 text-sm text-gray-500">
+                    {q.subject} {q.chapter ? `• ${q.chapter}` : ''}
+                  </div>
+                )}
+              </div>
+              <button className="text-indigo-600 hover:text-indigo-800">
+                {expandedQuestion === q.id ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                  </svg>
+                )}
+              </button>
+            </div>
 
-                {expandedQuestion === q.id && (
+      
+            {expandedQuestion === q.id && (
                   <div className="p-4">
                     <div className="mb-4">
                       <h3 className="font-medium text-gray-700 mb-2">Question:</h3>
@@ -461,20 +465,23 @@ const QuestionPreview = ({ questions, setQuestions, examDetails }) => {
                     </div>
                   </div>
                 )}
-              </div>
-            ))
-          ) : (
-            <div className="bg-gray-100 p-6 rounded text-gray-500 text-center">
-              No matching questions found. Try adjusting your search or filters.
-            </div>
-          )}
-        </div>
+          </div>
+        ))
       ) : (
-        <div className="bg-gray-100 p-6 rounded text-gray-500 text-center">
-          No questions added yet. Add questions manually or upload via Excel.
+        <div className="bg-yellow-50 text-yellow-800 p-6 rounded text-center shadow">
+          No matching questions found. Try adjusting your search or filters.
         </div>
       )}
     </div>
+  ) : (
+    <div className="bg-yellow-50 text-yellow-800 p-6 rounded text-center shadow">
+      No questions added yet. Add questions manually or upload via Excel.
+    </div>
+  )}
+</div>
+</>
+
+
   );
 };
 

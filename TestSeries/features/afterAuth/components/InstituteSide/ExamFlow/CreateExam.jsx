@@ -179,9 +179,9 @@ const CreateExam = () => {
   }} // for edit form
   />
 ) : (
-  <div className="bg-blue-50 p-4 rounded mb-6 ">
-    <div className="flex justify-between items-center">
-      <div>
+  <div className="bg-blue-50 p-6 rounded-3xl mb-6 shadow-lg ">
+    <div className="flex justify-between items-center ">
+      <div className=''>
         <h2 className="text-xl font-semibold">{examDetails.name}</h2>
         <p className="text-gray-600">
           Date: {examDetails.date} | 
@@ -207,7 +207,7 @@ const CreateExam = () => {
               
               <div className="bg-gray-50 p-6 rounded-lg mb-6">
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                  <div className="flex-1 border rounded-lg p-6 bg-white hover:shadow-md transition">
+                  <div className="flex-1 shadow-lg rounded-xl p-6 bg-white hover:shadow-md transition">
                     <h3 className="text-lg font-medium mb-2">Option 1: Manual Entry</h3>
                     <p className="text-gray-600 mb-4">Create questions one by one with full control over each question's details.</p>
                     <ManualQuestionForm
@@ -217,7 +217,7 @@ const CreateExam = () => {
 
                   </div>
                   
-                  <div className="flex-1 border rounded-lg p-6 bg-white hover:shadow-md transition">
+                  <div className="flex-1 shadow-lg rounded-xl rounded-lg p-6 bg-white hover:shadow-md transition">
                     <h3 className="text-lg font-medium mb-2">Option 2: Bulk Upload</h3>
                     <p className="text-gray-600 mb-4">Upload multiple questions at once using an Excel spreadsheet.</p>
                     <BulkUpload setQuestions={setQuestions} organizationId={examDetails.organization_id} />
@@ -227,11 +227,15 @@ const CreateExam = () => {
             </div>
             
             <QuestionPreview questions={questions} setQuestions={setQuestions} examDetails={examDetails}/>
-            
+            <div className='flex justify-center flex-col gap-2 max-w-2l items-center'>
+
+
+         
+
             <button
               onClick={handleSubmitExam}
               disabled={isSubmitting}
-              className={`mt-6 ${isSubmitting ? 'bg-purple-500' : 'bg-purple-700 hover:bg-purple-800'} text-white px-6 py-3 rounded transition w-full md:w-auto flex items-center justify-center`}
+              className={`mt-6 font-semibold ${isSubmitting ? 'bg-gray-300 cursor-not-allowed' :'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 hover:scale-105 hover:shadow-2x p-2'} text-white px-6 py-3 rounded transition w-full md:w-auto flex items-center justify-center`}
             >
               {isSubmitting ? (
                 <>
@@ -251,11 +255,11 @@ const CreateExam = () => {
                   setShowDeleteModal(true);
                   console.log(`deleting exam : ${examDetails.id}`)
                 }}
-                className="bg-red-600 text-white px-4 py-2 mt-4 rounded hover:bg-red-700 transition"
+                className="text-red-600 border-red-600 border px-4 py-2 mt-4 rounded hover:bg-red-700 transition hover:text-white font-semibold"
               >
                 Delete exam 
             </button>
-         
+            </div>
           </>
           
         )}
