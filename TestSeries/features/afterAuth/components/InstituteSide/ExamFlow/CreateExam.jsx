@@ -7,13 +7,14 @@ import HeadingUtil from '../../../utility/HeadingUtil';
 import NeedHelpComponent from '../components/NeedHelpComponent';
 import { uploadExamQuestions } from '../../../../../utils/services/questionUploadService';
 import { fetchExamById } from '../../../../../utils/services/examService';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import BackButton from '../../../../constants/BackButton';
 import DeleteExamModal from './DeleteExamModal';
 import Banner from "../../../../../assests/Institute/create exam.svg"
 import { AlertTriangle } from 'lucide-react';
 import useLimitAccess from '../../../../../hooks/useLimitAccess';
 import { useUser } from '../../../../../contexts/currentUserContext';
+import { useCachedOrganization } from '../../../../../hooks/useCachedOrganization';
 
 const CreateExam = () => {
     const [examDetails, setExamDetails] = useState(null);
@@ -24,9 +25,21 @@ const CreateExam = () => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [editingExam, setEditingExam] = useState(false);
     const {user ,getFeatureKeyFromLocation} = useUser();
+    const location=useLocation();
 
-    const canCreateMoreExams = useLimitAccess(getFeatureKeyFromLocation(location.path), "totalExams")
-    const Total_Exams = user?.metaData?.totalExams
+    const canCreateMoreExams = useLimitAccess(getFeatureKeyFromLocation(location.pathname), "totalExams");
+
+const organization =
+  user.role !== 'organization'
+    ? useCachedOrganization({ userId: user._id, orgId: user.organizationId._id })?.organization
+    : null;
+
+    const Total_Exams = user?.role === 'organization' 
+    ? user.metaData?.totalBatches 
+    :  (  
+      organization?.metaData?.totalBatches
+    );
+    
     const Creation_Limit = user?.planFeatures?.exam_feature?.value
 
     const Available_Limit = Creation_Limit - Total_Exams
