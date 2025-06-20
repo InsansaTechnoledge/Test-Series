@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, X, Save, Edit, UserPlus, Users, Shield, Check, Trash } from 'lucide-react';
+import { Plus, X, Save, Edit, UserPlus, Users, Shield, Check, Trash, AlertTriangle } from 'lucide-react';
 import HeadingUtil from '../../utility/HeadingUtil';
 import { postRoleGroup, deleteRoleGroup, updateRoleGroup } from '../../../../utils/services/RoleGroupService';
 import { useQueryClient } from '@tanstack/react-query';
@@ -13,10 +13,12 @@ import DeleteRoleGroupModal from '../../../../components/roleGroup/deleteRolegro
 import Banner from "../../../../assests/Institute/create role.svg"
 
 import { usePageAccess } from '../../../../contexts/PageAccessContext';
+import useLimitAccess from '../../../../hooks/useLimitAccess';
+import { useLocation } from 'react-router-dom';
 
 
 export default function FeatureBasedRoleGroups() {
-  const { user } = useUser();
+  const { user , getFeatureKeyFromLocation } = useUser();
   const { featuresData, isLoading } = useCachedFeatures();
   const [showDeleteRoleGroupModal, setShowDeleteRoleGroupModal] = useState(false);
   const [roleGroupToDelete, setRoleGroupToDelete] = useState();
@@ -34,6 +36,14 @@ export default function FeatureBasedRoleGroups() {
   const features = Array.isArray(featuresData) ? featuresData : [];
 
   const categories = ['All', ...new Set(features.map(feature => feature.category))];
+
+  const location = useLocation();
+
+  const canAddMoreRoles = useLimitAccess(getFeatureKeyFromLocation(location.pathname) , "totalRoleGroups")
+  const Total_Role = user?.metaData?.totalRoleGroups
+  const Creation_limit = user?.planFeatures?.role_feature?.value
+  const Available_limit = Creation_limit - Total_Role
+  console.log(canAddMoreRoles , Creation_limit , Total_Role)
 
   const filteredFeatures = features.filter(feature => {
     const matchesSearch = feature.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -180,11 +190,6 @@ export default function FeatureBasedRoleGroups() {
   const renderEditForm = (group) => {
     return (
       <>
-
-
-
-
-
         <div className="rounded-2xl overflow-hidden bg-white/60 backdrop-blur-md border border-blue-200 shadow-xl mx-6 mt-12 mb-16">
           <div className="p-4 bg-blue-100/40 border-b flex justify-between items-center">
             <h3 className="font-semibold text-blue-900">
@@ -384,6 +389,9 @@ export default function FeatureBasedRoleGroups() {
             <p className="text-xl text-white/90 max-w-2xl mx-auto drop-shadow-md">
               you can assing all the required roles into a single group
             </p>
+
+            <p className="mt-8 text-indigo-500 bg-gray-200 px-3 py-4 rounded-2xl text-2xl flex "> <AlertTriangle/>For current plan you have Available Limit of <span className={`${Available_limit > 0 ? "text-green-500" : "text-red-500"} mx-2`}>{Available_limit}</span> to Add more Users</p>
+
           </div>
         </div>
       </div>
@@ -409,18 +417,25 @@ export default function FeatureBasedRoleGroups() {
             </h2>
             <div className="flex gap-3">
               <RefreshButton refreshFunction={refreshFunction} />
+              
               {!isAddingGroup && (
-                <button
-                  onClick={() => {
-                    setIsAddingGroup(true);
-                    setEditingGroupId(null);
-                    setNewGroup({ name: '', description: '', features: [] });
-                  }}
-                  className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold px-4 py-2 rounded-xl shadow-md hover:scale-105 transition-transform duration-300"
-                >
-                  <Plus size={16} />
-                  <span>Create Role Group</span>
-                </button>
+               <button
+               disabled={canAccessPage === false || canAddMoreRoles === false}
+               onClick={() => {
+                 setIsAddingGroup(true);
+                 setEditingGroupId(null);
+                 setNewGroup({ name: '', description: '', features: [] });
+               }}
+               className={`inline-flex items-center gap-2 font-semibold px-4 py-2 rounded-xl shadow-md transition-transform duration-300
+                 ${canAccessPage && canAddMoreRoles 
+                   ? 'bg-green-500 text-white hover:scale-105' 
+                   : 'bg-red-500 text-gray-100 cursor-not-allowed'}
+               `}
+             >
+               {canAccessPage && canAddMoreRoles && <Plus size={16} />}
+               <span>{!canAddMoreRoles ? "Limit Exceeded " : "Create Role Group"}</span>
+             </button>
+             
               )}
             </div>
 
@@ -432,7 +447,10 @@ export default function FeatureBasedRoleGroups() {
                   Create New Role Group
                 </h3>
                 <button
-                  className="text-gray-500 hover:text-gray-700 transition"
+                 className={`inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold px-4 py-2 rounded-xl shadow-md hover:scale-105 transition-transform duration-300
+                  ${canAddMoreRoles === false && "bg-gray-500"}
+                `}
+                  disabled= {canAccessPage === false || canAddMoreRoles === false}
                   onClick={() => {
                     setIsAddingGroup(false);
                     setNewGroup({ name: '', description: '', features: [] });
