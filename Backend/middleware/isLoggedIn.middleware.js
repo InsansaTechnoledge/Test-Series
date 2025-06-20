@@ -36,6 +36,7 @@ export const isOrgAndUserAndStudentAuthenticated = async (req, res, next) => {
     if (req.user?.role === 'user') {
       if (!req.query.id && req.user?.batch) {
         req.mergedQuery.id = Array.isArray(req.user.batch) ? req.user.batch : [req.user.batch];
+
       }
     } else{
       if (!req.query.id && req.user?.batch.currentBatch) {
@@ -46,7 +47,7 @@ export const isOrgAndUserAndStudentAuthenticated = async (req, res, next) => {
     }
 
     if (!req.mergedQuery.organization_id && req.user?.organizationId) {
-      req.mergedQuery.organization_id = req.user.organizationId;
+      req.mergedQuery.organization_id = req.user.organizationId._id || req.user.organizationId;
     }
 
     return next();

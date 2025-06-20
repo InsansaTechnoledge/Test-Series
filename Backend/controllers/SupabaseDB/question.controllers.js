@@ -23,13 +23,13 @@ export const updateQuestionById = async (req, res) => {
 
 export const getAllQuestionsSelectively = async (req, res) => {
     const condition = req.query;
-    console.log("Condition for fetching questions:", condition);
+
 
     try {
         const result=await Result.find({examId: condition.exam_id,studentId:req.user._id}).lean();
         if(result.length>0){
             condition.already_given_exam= true;
-            console.log("User has already given the exam, setting condition.already_given_exam to true",condition);
+
         }
         const data = await fetchQuestionsSelectively(condition);
         return new APIResponse(200, data, "Questions fetched successfully!").send(res);

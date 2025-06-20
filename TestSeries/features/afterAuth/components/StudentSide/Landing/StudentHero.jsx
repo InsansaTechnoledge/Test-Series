@@ -7,7 +7,7 @@ import { useCachedOrganization } from '../../../../../hooks/useCachedOrganizatio
 const StudentHero = () => {
     const {user} = useUser();
     const {batches,isloading,isError,batchMap} = useCachedBatches();
-    const {organization} = useCachedOrganization({userId:user._id,orgId:user.organizationId});
+    const {organization} = useCachedOrganization({userId:user._id,orgId:(user.organizationId._id || user.organizationId)});
 
 
     return (

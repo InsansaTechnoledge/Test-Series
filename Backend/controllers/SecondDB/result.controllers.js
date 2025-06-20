@@ -9,7 +9,7 @@ import { fetchQuestionsSelectively } from "../../utils/SqlQueries/questions.quer
 export const addResult = async (req, res) => {
     try {
         const resultData = req.body;
-        console.log(resultData);
+
         const result = await Result.create(resultData);
 
         // await updateRanksForExam(resultData.examId);
@@ -57,10 +57,10 @@ export const fetchStudentResults = async (req, res) => {
       (examData || []).forEach(exam => {
         examMap[exam.id] = exam.name;
       });
-      console.log("Exam Map:", examMap);
+
 
       const completeResults = studentResults.map(result => {
-        console.log("Result:", result);
+
         const examName = examMap[result.examId.toString()] || "Unknown Exam";
         return {
           ...result._doc,
@@ -169,7 +169,7 @@ export const fetchAllResultsForExam = async (req, res) => {
       // ✅ Fetch questions from Supabase
       const questions = await fetchQuestionsSelectively({ exam_id: examId });
 
-      console.log("Questions fetched:", questions);
+
   
       // ✅ Return result + questions + exam name
       return new APIResponse(
@@ -241,9 +241,9 @@ export const updateRanksForExam = async (examId) => {
 
     if (bulkOps.length > 0) {
       await Result.bulkWrite(bulkOps);
-      console.log(`Ranks updated for exam ${examId}`);
+
     } else {
-      console.log(`No rank changes needed for exam ${examId}`);
+      // console.log(`No rank changes needed for exam ${examId}`);
     }
   } catch (err) {
     console.error(`Failed to update ranks for exam ${examId}:`, err);

@@ -19,7 +19,7 @@ export const getPlanFeaturesMap = async (planId) => {
         }
     }
 
-    console.log("Plan Features Map:", featuresMap);
+
 
     return featuresMap;
 };
