@@ -78,18 +78,10 @@ export const getOrganizationById = async (req, res) => {
       return new APIError(404, ['org not found']).send(res);
     }
 
-    await org.populate('totalStudents totalUsers');
+    const metaData = await org.getFullMetadata();
 
-    org.metadata = {
-      totalStudents: org.totalStudents,
-      totalUsers: org.totalUsers
-    };
+    return new APIResponse(200, { ...org.toObject(), metaData }, 'org fetched').send(res);
 
-    org.metadata.totalBatches = await getTotalBatches(org._id);
-
-    console.log(org.metadata);
-
-    return new APIResponse(200, org, 'org fetched').send(res);
 
   } catch (err) {
     new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while fetching organization Data", err.message || ""]).send(res);
