@@ -26,7 +26,7 @@ app.use(session({
   cookie: {
     secure: process.env.NODE_ENV !== 'development',
     sameSite: process.env.NODE_ENV === 'development' ? 'lax' : 'none',
-    domain: process.env.NODE_ENV === 'development' ? 'localhost' : undefined,
+    domain: process.env.NODE_ENV === 'development' ? 'localhost' : 'evalvotech.com',
     maxAge: 24 * 60 * 60 * 1000
   },
   store: MongoStore.create({
