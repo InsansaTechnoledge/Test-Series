@@ -58,6 +58,7 @@ export const getOrgBatches = async (req, res) => {
     //here id would be array of ids , so always pass the is
     const { id, organization_id, year } = req.mergedQuery || req.query;
     const batches = await getOrganizationBacthes({ id, organization_id, year });
+
     return new APIResponse(200, batches, 'Batch(s) fetched successfully').send(res);
 
   } catch (err) {

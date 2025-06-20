@@ -9,7 +9,7 @@ export const createOneStudent = async (req, res) => {
   try {
     const data = req.body;
 
-    data.organizationId = req.user.role === "organization" ? req.user._id : req.user.organizationId;
+    data.organizationId = req.user.role === "organization" ? req.user._id : (req.user.organizationId._id || req.user.organizationId);
     data.batch = {
       currentBatch: data.batchId,
     }
@@ -30,7 +30,7 @@ export const createOneStudent = async (req, res) => {
 export const bulkCreateStudents = async (req, res) => {
   try {
     const students = req.body;
-    const orgId = req.user.role === "organization" ? req.user._id : req.user.organizationId;
+    const orgId = req.user.role === "organization" ? req.user._id : (req.user.organizationId._id || req.user.organizationId);
     if (!Array.isArray(students) || students.length === 0) {
       return new APIError(400, 'No student data provided or invalid format').send(res);
     }
@@ -74,7 +74,7 @@ export const uploadStudentExcel = async (req, res) => {
     }
 
     // console.log(req.body.batchId);
-    const orgId = req.user.role === "organization" ? req.user._id : req.user.organizationId;
+    const orgId = req.user.role === "organization" ? req.user._id : (req.user.organizationId._id || req.user.organizationId);
 
 
     const workbook = xlsx.readFile(req.file.path);
@@ -161,7 +161,7 @@ export const uploadStudentExcel = async (req, res) => {
 
 export const getAllStudents = async (req, res) => {
   try {
-    const orgId = req.user.role === "organization" ? req.user._id : req.user.organizationId;
+    const orgId = req.user.role === "organization" ? req.user._id : (req.user.organizationId._id || req.user.organizationId);
     const { batchId } = req.query;
 
         const data = await Student.find({

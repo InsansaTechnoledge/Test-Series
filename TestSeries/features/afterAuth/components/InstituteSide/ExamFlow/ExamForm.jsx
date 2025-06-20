@@ -43,7 +43,7 @@ const ExamForm = ({ onSubmit ,initialData={ name: '',
 
     const payload = {
       ...form,
-      organization_id: user.role==='organization'?user._id :user.organizationId,
+      organization_id: user.role==='organization'?user._id :(user.organizationId._id || user.organizationId), // Ensure orgId is set correctly
       date: new Date(form.date).toISOString().split('T')[0],
       // organization_id: user?.user?._id   // ✅ Inject orgId here reliably
     };

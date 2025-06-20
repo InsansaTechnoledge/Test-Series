@@ -18,6 +18,7 @@ export const getOrganizationBacthes = async ({ id, organization_id, year }) => {
   let query = supabase.from('organization_batch').select('*');
 
   if (id && Array.isArray(id)) {
+
     query = query.in('id', id);
   }
 
@@ -26,8 +27,8 @@ export const getOrganizationBacthes = async ({ id, organization_id, year }) => {
 
   query = query.order('created_at', { ascending: false });
 
-
   const { data, error } = await query;
+
   if (error) throw error;
   return data;
 };

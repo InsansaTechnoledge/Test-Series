@@ -1,4 +1,4 @@
-import { createExam, deleteExam, fetchSelective, updateExam, setExamLive, fetchNonLiveExams , fetchExamsWithoutQuestionsQuery , fetchExamNameById, getExamCountForOrg} from '../../utils/SqlQueries/exam.queries.js';
+import { createExam, deleteExam, fetchSelective, updateExam, setExamLive, fetchNonLiveExams, fetchExamsWithoutQuestionsQuery, fetchExamNameById, getExamCountForOrg } from '../../utils/SqlQueries/exam.queries.js';
 import { APIError } from '../../utils/ResponseAndError/ApiError.utils.js'
 import { APIResponse } from '../../utils/ResponseAndError/ApiResponse.utils.js'
 import Result from '../../models/SecondDB/result.model.js';
@@ -9,7 +9,7 @@ export const addExam = async (req, res) => {
 
     // Ensure organization_id is present!
     if (!examData.organization_id) {
-      examData.organization_id = req.user.role === 'organization' ? req.user._id : req.user.organizationId;
+      examData.organization_id = req.user.role === 'organization' ? req.user._id : (req.user.organizationId._id || req.user.organizationId);
     }
 
     const examDataWithUpdateMetaData = {
@@ -63,7 +63,7 @@ export const fetchExamBasedOnCondition = async (req, res) => {
 
     let baseQuery = {
       ...req.query,
-      organization_id: req.user.role === 'organization' ? req.user._id : req.user.organizationId,
+      organization_id: req.user.role === 'organization' ? req.user._id : (req.user.organizationId._id || req.user.organizationId),
     };
     if (req.user.role === 'student') {
       baseQuery = {
@@ -99,7 +99,7 @@ export const fetchExamBasedOnCondition = async (req, res) => {
 export const deleteExamById = async (req, res) => {
   try {
     const { id } = req.params;
-    const exam = await deleteExam(id,null);
+    const exam = await deleteExam(id, null);
 
     return new APIResponse(200, exam, "Deleted successfully").send(res);
   }
@@ -109,8 +109,8 @@ export const deleteExamById = async (req, res) => {
   }
 }
 
-export const deleteExamByBatchId = async (batchId)=>{
-  const exams=await deleteExam(null, batchId);
+export const deleteExamByBatchId = async (batchId) => {
+  const exams = await deleteExam(null, batchId);
   return exams;
 }
 
@@ -118,15 +118,15 @@ export const deleteExamByBatchId = async (batchId)=>{
 export const goLiveExamById = async (req, res) => {
   try {
     const { id } = req.params;
-    const {status } = req.body;
+    const { status } = req.body;
 
-    const orgId = req.user?.role === 'organization' ? req.user._id : req.user.organizationId || req.user.orgId;
+    const orgId = req.user?.role === 'organization' ? req.user._id : (req.user.organizationId._id || req.user.organizationId) || req.user.orgId;
 
     if (!orgId) {
       return new APIError(400, ['Missing organization ID in auth context']).send(res);
     }
 
-    const exam = await setExamLive(id, orgId,status);
+    const exam = await setExamLive(id, orgId, status);
 
     return new APIResponse(200, exam, "Exam is now live").send(res);
   } catch (err) {
@@ -173,7 +173,7 @@ export const getUpcomingExams = async (req, res) => {
 
 export const fetchExamsWithoutQuestions = async (req, res) => {
   try {
-    const orgId = req.user.role === 'organization' ? req.user._id : req.user.organizationId || req.user.orgId;
+    const orgId = req.user.role === 'organization' ? req.user._id : (req.user.organizationId._id || req.user.organizationId) || req.user.orgId;
 
     if (!orgId) {
       return new APIError(400, ['Organization ID not found']).send(res);
@@ -191,7 +191,7 @@ export const fetchExamsWithoutQuestions = async (req, res) => {
   }
 };
 
-export const getTotalExamsForOrg=async(orgId)=>{
+export const getTotalExamsForOrg = async (orgId) => {
   try {
     const exams = await getExamCountForOrg(orgId);
     return exams;

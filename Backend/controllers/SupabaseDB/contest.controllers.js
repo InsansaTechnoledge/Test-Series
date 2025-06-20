@@ -1,12 +1,12 @@
 import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
 import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
 // import { createContestQuery, deleteContest, fetchContest } from "../../utils/SqlQueries/contest.queries.js";
-import { createContestQuery, enrollStudentToContestQuery, fetchContest , deleteContest} from "../../utils/SqlQueries/contest.queries.js";
+import { createContestQuery, enrollStudentToContestQuery, fetchContest, deleteContest } from "../../utils/SqlQueries/contest.queries.js";
 
 export const createContest = async (req, res) => {
     const payload = req.body;
     try {
-        const orgId = req.user?.role === 'organization' ? req.user._id : req.user.organizationId;
+        const orgId = req.user?.role === 'organization' ? req.user._id : (req.user.organizationId._id || req.user.organizationId);
         if (!orgId) {
             return new APIError(400, ['Missing organization ID in auth context']).send(res);
         }
@@ -38,7 +38,7 @@ export const FetchContest = async (req, res) => {
             return new APIError(400, 'OrgId not found, try after login again').send(res);
         }
 
-        const data = await fetchContest(organizationId, batchId,userId);
+        const data = await fetchContest(organizationId, batchId, userId);
 
         if (!data || data.length === 0) {
             return new APIResponse(400, [], 'No contests found').send(res);
@@ -49,35 +49,35 @@ export const FetchContest = async (req, res) => {
         console.error("Error Fetching Contest:", e.message, e.stack);
         return new APIError(500, ['There was an error in fetching contest details', e.message]).send(res);
     }
-  };
+};
 
-export const DeleteContest = async (req , res) => {
-    try{
+export const DeleteContest = async (req, res) => {
+    try {
 
         const id = req.params.id
 
         const deleteData = await deleteContest(id)
 
-        if(!deleteData) return new APIError(400 , "could not delete contest").send(res);
+        if (!deleteData) return new APIError(400, "could not delete contest").send(res);
 
-        return new APIResponse(200 , 'contest deleted successfully').send(res);
+        return new APIResponse(200, 'contest deleted successfully').send(res);
 
     } catch (e) {
-        return new APIError(500 , 'something went wrong while deleting contest').send(res);
-};
+        return new APIError(500, 'something went wrong while deleting contest').send(res);
+    };
 }
 
-export const enrollStudentToContest=async(req, res) => {
+export const enrollStudentToContest = async (req, res) => {
     const { contestId } = req.body;
 
-    if (!contestId ) {
+    if (!contestId) {
         return new APIError(400, 'Contest ID and User ID are required').send(res);
     }
 
     try {
         // Assuming you have a function to enroll the student to the contest
         const result = await enrollStudentToContestQuery(contestId, req.user._id);
-        
+
         if (result.error) {
             throw new Error(result.error.message);
         }
@@ -89,7 +89,7 @@ export const enrollStudentToContest=async(req, res) => {
     }
 }
 
-export const getenrolledContest=async (req, res) => {
+export const getenrolledContest = async (req, res) => {
     const userId = req.user._id;
 
     if (!userId) {
@@ -97,7 +97,7 @@ export const getenrolledContest=async (req, res) => {
     }
 
     try {
-        const contests = await fetchContest(req.user.organizationId,null, userId);
+        const contests = await fetchContest((req.user.organizationId._id || req.user.organizationId), null, userId);
 
         if (!contests || contests.length === 0) {
             return new APIError(404, 'No enrolled contests found').send(res);
