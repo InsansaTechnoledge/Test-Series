@@ -52,40 +52,48 @@ const LoginForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = {};
-
+  
     Object.entries(formData).forEach(([field, value]) => {
       const error = validateField(field, value);
       if (error) newErrors[field] = error;
     });
-
+  
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-
+  
+    setLoading(true);
     try {
-      setLoading(true);
-
+      let response;
+  
       if (role === 'Institute') {
-        const response = await orgLogin(formData);
-        if (response.status === 200) {
-          const userResponse = await checkAuth();
-          if (userResponse.status === 200) {
-            setUser(userResponse.data.user);
-            navigate('/institute/institute-landing');
-          }
-        }
+        response = await orgLogin(formData);
       } else if (role === 'Student') {
-        const response = await studentLogin(formData);
-        if (response.status === 200) {
-          const userResponse = await checkAuth();
-          if (userResponse.status === 200) {
-            setUser(userResponse.data.user);
-            navigate('/student/student-landing');
-          }
-        }
+        response = await studentLogin(formData);
       }
-
+  
+      if (response?.status === 200) {
+        const waitForUser = async (retries = 10) => {
+          for (let i = 0; i < retries; i++) {
+            const userResponse = await checkAuth();
+            if (userResponse?.status === 200) {
+              setUser(userResponse.data.user);
+              if (role === 'Institute') {
+                navigate('/institute/institute-landing');
+              } else {
+                navigate('/student/student-landing');
+              }
+              return;
+            }
+            await new Promise((res) => setTimeout(res, 500)); // wait 500ms
+          }
+          alert("Login session expired or not set. Please try again.");
+        };
+  
+        await waitForUser();
+      }
+  
       setFormData({ email: '', password: '' });
       setErrors({});
     } catch (err) {
@@ -96,6 +104,7 @@ const LoginForm = () => {
       setLoading(false);
     }
   };
+  
 
   return (
     <div className="bg-white rounded-xl shadow-md p-8 border border-blue-100">
