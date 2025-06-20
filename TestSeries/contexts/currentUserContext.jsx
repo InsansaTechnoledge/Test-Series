@@ -1,59 +1,63 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
 
 const currentUserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-    const [user, setUser] = useState();
-    const [isUserLoggedOut, setIsUserLoggedOut] = useState(true);
-    useEffect(() => {
-        if (user) {
-            setIsUserLoggedOut(false)
-        }
-    }, [user])
+  const [user, setUser] = useState();
+  const [isUserLoggedOut, setIsUserLoggedOut] = useState(true);
+  useEffect(() => {
+    if (user) {
+      setIsUserLoggedOut(false)
+    }
+  }, [user])
 
-    const hasPlanFeature = ({keyFromPageOrAction,location}) => {
+  const hasPlanFeature = ({ keyFromPageOrAction, location }) => {
 
-        const rawMap=JSON.parse(import.meta.env.VITE_PLAN_FEATURE_MAP || '{}');
-        console.log("rawMap", rawMap);
-               
-        const featureKeys = location
-    ? rawMap[location] // e.g. "/institute/batch-list"
-    : rawMap[keyFromPageOrAction];
+    const rawMap = JSON.parse(import.meta.env.VITE_PLAN_FEATURE_MAP || '{}');
+    console.log("rawMap", rawMap);
 
-  if (!featureKeys) return false; // no mapping exists
+    const featureKeys = location
+      ? rawMap[location] // e.g. "/institute/batch-list"
+      : rawMap[keyFromPageOrAction];
 
-  const features = Array.isArray(featureKeys) ? featureKeys : [featureKeys];
+    if (!featureKeys) return false; // no mapping exists
 
-  console.log("features", features);
+    const features = Array.isArray(featureKeys) ? featureKeys : [featureKeys];
 
-for (const feature of features) {
-  const value = user?.planFeatures?.[feature]?.value;
+    console.log("features", features);
 
-  if (
-    (typeof value === 'boolean' && value !== true) ||
-    (typeof value === 'number' && value <= 0) ||
-    value === undefined
-  ) {
-    return false; 
-  }
-}
+    for (const feature of features) {
+      const value = user?.planFeatures?.[feature]?.value;
 
-return true; // all features are valid
-
-
-
+      if (
+        (typeof value === 'boolean' && value !== true) ||
+        (typeof value === 'number' && value <= 0) ||
+        value === undefined
+      ) {
+        return false;
+      }
     }
 
+    return true; // all features are valid
 
 
-    return (
-        <currentUserContext.Provider value={{ user, setUser, isUserLoggedOut, setIsUserLoggedOut ,hasPlanFeature}}>
-            {children}
-        </currentUserContext.Provider>
-    );
+
+  }
+
+   const getFeatureKeyFromLocation = (location) => {
+    const rawMap = JSON.parse(import.meta.env.VITE_PLAN_FEATURE_MAP || '{}');
+    return rawMap[location] || null;
+  };
+
+
+
+  return (
+    <currentUserContext.Provider value={{ user, setUser, isUserLoggedOut, setIsUserLoggedOut, hasPlanFeature,getFeatureKeyFromLocation }}>
+      {children}
+    </currentUserContext.Provider>
+  );
 };
 
 export const useUser = () => {
-    return useContext(currentUserContext);
+  return useContext(currentUserContext);
 };
