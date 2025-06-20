@@ -36,7 +36,7 @@ export const CreateOrganization = async (req, res) => {
 
     if (req.file) {
       data.logoUrl = req.file.path || req.file.secure_url || '';
-      console.log('Uploaded file info:', req.file);
+      
     }
 
     const existing = await Organization.findOne({
