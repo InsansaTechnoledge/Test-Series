@@ -12,7 +12,6 @@ import Banner from "../../../../assests/Institute/add user.svg"
 import { usePageAccess } from "../../../../contexts/PageAccessContext";
 import useLimitAccess from "../../../../hooks/useLimitAccess";
 import { useLocation } from "react-router-dom";
-import { useCachedOrganization } from "../../../../hooks/useCachedOrganization";
 
 const CreateUser = () => {
     const { batches, isLoading, isError } = useCachedBatches();
@@ -29,16 +28,11 @@ const CreateUser = () => {
    
     const { user, getFeatureKeyFromLocation } = useUser();
     const location = useLocation();
-    const organization =
-      user.role !== 'organization'
-        ? useCachedOrganization({ userId: user._id, orgId: user.organizationId._id })?.organization
-        : null;
+
 
     const canAddMoreUsers = useLimitAccess(getFeatureKeyFromLocation(location.pathname) , "totalUsers")
     const Creation_limit = user?.planFeatures?.user_feature.value
-    const Total_user = user?.role === 'organization' 
-    ? user.metaData?.totalBatches 
-    : organization?.metaData?.totalBatches;
+    const Total_user = user?.metaData?.totalUsers
 
     const Available_limit = Creation_limit - Total_user
     console.log("ff", canAddMoreUsers , Creation_limit , Total_user)
@@ -265,17 +259,20 @@ const CreateUser = () => {
                         <p className="text-xl text-white/90 max-w-2xl mx-auto drop-shadow-md">
                             Create new users and assign them specific roles in your institute
                         </p>
-                    
-                        <p className="mt-8 text-indigo-700 bg-indigo-50 border border-indigo-100 px-6 py-4 rounded-2xl text-base flex items-start gap-3 shadow-sm backdrop-blur-sm">
-  <AlertTriangle className="w-6 h-6 text-indigo-400 mt-1" />
-  <span>
-    <span className="font-semibold">Note:</span> For your current plan, you have an available limit of
-    <span className={`font-bold ${Available_limit > 0 ? "text-green-600" : "text-red-600"} mx-1`}>
-      {Available_limit}
+         
+<div className="flex items-center justify-center">
+  <p className="mt-8 text-indigo-700 bg-indigo-50 border border-indigo-100 px-5 py-4 rounded-2xl text-base flex items-center gap-3 shadow-sm backdrop-blur-sm">
+    <AlertTriangle className="w-5 h-5 text-indigo-400" />
+    <span>
+      <span className="font-semibold">Note:</span> For your current plan, you have an available limit of
+      <span className={`font-bold ${Available_limit > 0 ? "text-green-600" : "text-red-600"} mx-1`}>
+        {Available_limit}
+      </span>
+      to add more users.
     </span>
-    to add more users.
-  </span>
-</p>
+  </p>
+</div>
+
 
                     </div>
                 </div>
