@@ -117,14 +117,6 @@ const WhyTakeExam = () => {
                   </div>
                 </div>
 
-                {/* Action Button */}
-                <div className={`flex items-center justify-between mt-6 transition-all duration-300 ${
-                  isHovered || isActive ? 'transform translate-x-0 opacity-100' : 'transform translate-x-4 opacity-0'
-                }`}>
-                  <span className="text-sm font-medium text-indigo-600">Learn More</span>
-                  <ArrowRight className="w-4 h-4 text-indigo-600" />
-                </div>
-
                 {/* Active Indicator */}
                 {isActive && (
                   <div className="absolute top-4 right-4">

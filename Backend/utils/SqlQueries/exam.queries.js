@@ -176,3 +176,13 @@ export const fetchExamsWithoutQuestionsQuery = async (organization_id) => {
   return data;
 };
 
+export const getExamCountForOrg=async (organization_id) => {
+  const { count, error } = await supabase
+    .from('batch_exam')
+    .select('id', { count: 'exact',head: true })
+    .eq('organization_id', organization_id);
+
+  if (error) throw error;
+  return count;
+}
+

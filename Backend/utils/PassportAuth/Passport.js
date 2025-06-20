@@ -4,6 +4,7 @@ import User from '../../models/FirstDB/user.model.js';
 import Student from '../../models/FirstDB/student.model.js';
 import {Organization} from '../../models/FirstDB/organization.model.js';
 import { getPlanFeaturesMap } from '../accessCheckerForPlan/getPlanFeature.js';
+import { getTotalBatches } from '../../controllers/SupabaseDB/batch.controllers.js';
 
 const LocalStrategy = local.Strategy; 
 
@@ -83,31 +84,46 @@ passport.use('institute-local',
     { usernameField: 'email', passwordField: 'password' },
     async (email, password, done) => {
       try {
-        // Try Organization first
-        const org = await Organization.findOne({ email }).select('+password planPurchased' );
+        // First, try logging in as an Organization
+        const org = await Organization.findOne({ email })
+        .select('+password planPurchased')
+
         if (org) {
           const isMatch = await org.comparePassword(password);
-          if (isMatch) {
-            const planFeatures=await getPlanFeaturesMap(org.planPurchased);  
-            return done(null, { ...org.toObject(), role: 'organization',planFeatures: planFeatures });
-          } else {
+          if (!isMatch) {
             return done(null, false, { message: 'Incorrect password.' });
           }
+
+          const planFeatures = await getPlanFeaturesMap(org.planPurchased);
+const metaData = await org.getFullMetadata();
+
+          return done(null, {
+            ...org.toObject(),
+            role: 'organization',
+            planFeatures,
+            metaData
+          });
         }
 
-        // If not org, try User
+        // Then, try logging in as a User
         const user = await User.findOne({ email }).select('+password').populate('organizationId', 'planPurchased');
         if (user) {
           const isMatch = await user.comparePassword(password);
-          if (isMatch) {
-            const planFeatures = user.organizationId ? await getPlanFeaturesMap(user.organizationId.planPurchased) : null;
-            return done(null, { ...user.toObject(), role: 'user' , planFeatures : planFeatures });
-          } else {
+          if (!isMatch) {
             return done(null, false, { message: 'Incorrect password.' });
           }
+
+          const planId = user.organizationId?.planPurchased || null;
+          const planFeatures = planId ? await getPlanFeaturesMap(planId) : {};
+          
+          return done(null, {
+            ...user.toObject(),
+            role: 'user',
+            planFeatures
+          });
         }
 
-        // If neither found
+        // No matching user/org found
         return done(null, false, { message: 'No user or organization found with this email.' });
 
       } catch (err) {
@@ -116,8 +132,6 @@ passport.use('institute-local',
     }
   )
 );
-
-
 
 passport.serializeUser((user, done) => {
     // done(null,{id:user._id,role:user.roleId} );
@@ -135,13 +149,16 @@ passport.deserializeUser(async (object, done) => {
             done(null, student?{...student.toObject(), role: 'student',planFeatures:planFeatures} : false);
         }
         else if(object.role === 'organization') {
-            const org = await Organization.findById(object.id);
+            const org = await Organization.findById(object.id)
+
             if (!org) {
                 return done(null, false, { message: 'Organization not found.' });
             }
             const planFeatures = await getPlanFeaturesMap(org.planPurchased) ;
 
-            done(null, org?{...org.toObject(), role: 'organization',planFeatures:planFeatures} : false);
+            const metaData=await org.getFullMetadata();
+
+            done(null, org ?{...org.toObject(), role: 'organization',planFeatures:planFeatures,metaData:metaData} : false);
         }
         else {
             const user = await User.findById(object.id).populate('organizationId', 'planPurchased');

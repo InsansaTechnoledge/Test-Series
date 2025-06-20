@@ -3,9 +3,9 @@ import { getOrganizationById } from "../utils/services/organizationService";
 
 export const useCachedOrganization = (ids) => {
     const { userId, orgId } = ids;
+
     const fetchOrganization = async (id) => {
   
-        console.log("Fetching organization with ID:", id);
         try {
             const response = await getOrganizationById(id);
             if (response.status !== 200) {
