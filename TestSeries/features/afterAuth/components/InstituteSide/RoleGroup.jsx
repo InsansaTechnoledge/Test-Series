@@ -15,6 +15,7 @@ import Banner from "../../../../assests/Institute/create role.svg"
 import { usePageAccess } from '../../../../contexts/PageAccessContext';
 import useLimitAccess from '../../../../hooks/useLimitAccess';
 import { useLocation } from 'react-router-dom';
+import { useCachedOrganization } from '../../../../hooks/useCachedOrganization';
 
 
 export default function FeatureBasedRoleGroups() {
@@ -39,8 +40,19 @@ export default function FeatureBasedRoleGroups() {
 
   const location = useLocation();
 
-  const canAddMoreRoles = useLimitAccess(getFeatureKeyFromLocation(location.pathname) , "totalRoleGroups")
-  const Total_Role = user?.metaData?.totalRoleGroups
+  const canAddMoreRoles = useLimitAccess(getFeatureKeyFromLocation(location.pathname) , "totalRoleGroups");
+
+  const organization =
+  user.role !== 'organization'
+    ? useCachedOrganization({ userId: user._id, orgId: user.organizationId._id })?.organization
+    : null;
+
+  const Total_Role = user?.role === 'organization' 
+    ? user.metaData?.totalBatches 
+    :  (  
+      organization?.metaData?.totalBatches
+    );
+
   const Creation_limit = user?.planFeatures?.role_feature?.value
   const Available_limit = Creation_limit - Total_Role
   console.log(canAddMoreRoles , Creation_limit , Total_Role)
