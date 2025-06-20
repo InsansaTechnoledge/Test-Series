@@ -34,23 +34,18 @@ const StudentViewPage = () => {
         <div className='relative'>
 
 
-          <div className="relative overflow-hidden  shadow-xl mb-10 bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 text-white h-sc">
+          <div className="relative overflow-hidden  mb-10 text-indigo-600">
             {/* Background Blobs */}
             <div className="absolute inset-0 opacity-40">
-              <div className="absolute top-10 left-10 w-60 h-60 bg-white rounded-full blur-[100px]"></div>
-              <div className="absolute bottom-10 right-10 w-72 h-72 bg-purple-400 rounded-full blur-[100px]"></div>
+              <div className="absolute top-10 left-10 w-60 h-60 rounded-full blur-[100px]"></div>
+              <div className="absolute bottom-10 right-10 w-72 h-72  rounded-full blur-[100px]"></div>
             </div>
 
             {/* Header Buttons */}
             <div className="relative z-10 px-8 pt-6 pb-12">
               <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                <button
-                  onClick={() => navigate(-1)}
-                  className="group inline-flex items-center space-x-3 bg-white/20 hover:bg-white/30 text-white px-6 py-3 rounded-2xl font-semibold transition-all duration-300 backdrop-blur-md border border-white/20 hover:border-white/40 hover:scale-105"
-                >
-                  <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-                  <span>Back</span>
-                </button>
+              
+                <BackButton/>
 
 
               </div>
@@ -68,8 +63,12 @@ const StudentViewPage = () => {
 
                 <h1 className="text-4xl font-extrabold mt-4">{studentData.name}</h1>
                 <p className='my-1'>{studentData.email}</p>
-                <p className="text-yellow-300 font-medium text-lg mt-1">
-                  {studentData.name}&apos;s Complete Profile Overview
+                <p className="text-indigo-600 font-medium text-lg mt-1">
+                  <span className='font-extrabold pr-1'>
+
+                  {studentData.name}&apos;s 
+                  </span>
+                    Complete Profile Overview
                 </p>
               </div>
             </div>
@@ -92,7 +91,7 @@ const StudentViewPage = () => {
 
               <div className="p-8 space-y-6">
                 <div className="flex items-center space-x-4">
-                  <div className="p-3 bg-gradient-to-br from-indigo-500 to-blue-500 rounded-xl text-white shadow-lg">
+                  <div className="p-3 rounded-xl text-indigo-600">
                     <User className="w-5 h-5" />
                   </div>
                   <div>
@@ -102,7 +101,7 @@ const StudentViewPage = () => {
                 </div>
 
                 <div className="flex items-center space-x-4">
-                  <div className="p-3 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl text-white shadow-lg">
+                  <div className="p-3 rounded-xl text-indigo-600">
                     <Mail className="w-5 h-5" />
                   </div>
                   <div>
@@ -112,7 +111,7 @@ const StudentViewPage = () => {
                 </div>
 
                 <div className="flex items-center space-x-4">
-                  <div className="p-3 bg-gradient-to-br from-pink-400 to-pink-500 rounded-xl text-white shadow-lg">
+                  <div className="p-3 bg-gradient-to-br text-indigo-600">
                     <Phone className="w-5 h-5" />
                   </div>
                   <div>
@@ -122,7 +121,7 @@ const StudentViewPage = () => {
                 </div>
 
                 <div className="flex items-center space-x-4">
-                  <div className="p-3 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl text-white shadow-lg">
+                  <div className="p-3 rounded-xl text-indigo-600">
                     <UserCheck className="w-5 h-5" />
                   </div>
                   <div>
@@ -135,7 +134,7 @@ const StudentViewPage = () => {
 
             {/* Parent Details */}
             <div className="rounded-[24px] overflow-hidden shadow-2xl border border-gray-200 bg-white/90 backdrop-blur-xl">
-              <div className="bg-gradient-to-r from-pink-500 to-fuchsia-600 px-6 py-5 flex items-center space-x-4">
+              <div className="bg-gradient-to-r from-indigo-600 to-indigo-400 px-6 py-5 flex items-center space-x-4">
                 <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
                   <Users className="w-5 h-5 text-white" />
                 </div>
@@ -144,7 +143,7 @@ const StudentViewPage = () => {
 
               <div className="p-8 space-y-6">
                 <div className="flex items-center space-x-4">
-                  <div className="p-3 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl text-white shadow-lg">
+                  <div className="p-3 text-indigo-500">
                     <Mail className="w-5 h-5" />
                   </div>
                   <div>
@@ -154,7 +153,7 @@ const StudentViewPage = () => {
                 </div>
 
                 <div className="flex items-center space-x-4">
-                  <div className="p-3 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl text-white shadow-lg">
+                  <div className="p-3 text-indigo-500">
                     <Phone className="w-5 h-5" />
                   </div>
                   <div>
@@ -184,9 +183,7 @@ const StudentViewPage = () => {
             {/* Header */}
             <div className="bg-gradient-to-r from-indigo-500 to-blue-600 px-6 py-5 flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-                  <BookOpen className="w-6 h-6 text-white" />
-                </div>
+             
                 <h2 className="text-xl font-bold text-white">Batch Information</h2>
               </div>
               <div className="bg-white/20 px-4 py-1 rounded-full text-white text-sm font-semibold">
@@ -197,14 +194,12 @@ const StudentViewPage = () => {
             {/* Body */}
             <div className="p-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-2xl p-5 shadow-lg hover:scale-[1.02] transition-all">
+                <div className="border-indigo-600 text-indigo-600 rounded-2xl p-5 border hover:scale-[1.02] transition-all hover:shadow-2xl">
                   <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                      <Users className="w-5 h-5 text-white" />
-                    </div>
+                   
                     <div>
                       <p className="font-bold capitalize">{batchName}</p>
-                      <p className="text-sm text-blue-100">Active Batch</p>
+                      <p className="text-sm text-indigo-600">Active Batch</p>
                     </div>
                   </div>
                 </div>
