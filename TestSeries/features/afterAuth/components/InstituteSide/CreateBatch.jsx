@@ -297,11 +297,11 @@ const organization =
         <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
 
           {/* Batch Type Selection */}
-          <div className="p-8 bg-gradient-to-r from-indigo-600 to-gray-600 text-white relative overflow-hidden">
+          <div className="p-6  bg-gradient-to-r from-indigo-500 to-indigo-400 text-white relative overflow-hidden">
             <div className="absolute inset-0 bg-black opacity-10"></div>
-            <div className="relative z-10">
+            <div className="relative z-10 flex justify-between">
               <h2 className="text-3xl font-black mb-6 flex items-center space-x-3">
-                <Target className="w-8 h-8" />
+                {/* <Target className="w-8 h-8" /> */}
                 <span>Select Batch Type</span>
               </h2>
               <div className="flex gap-6">
@@ -316,7 +316,7 @@ const organization =
                     className="w-5 h-5 accent-white"
                   />
                   <span className="text-lg font-bold">Only Subjects</span>
-                  <BookOpen className="w-5 h-5 group-hover:animate-pulse" />
+                  {/* <BookOpen className="w-5 h-5 group-hover:animate-pulse" /> */}
                 </label>
                 <label className="group flex items-center gap-3 cursor-pointer bg-white/20 backdrop-blur-sm px-6 py-4 rounded-2xl hover:bg-white/30 transition-all duration-300 hover:scale-105">
                   <input
@@ -328,7 +328,7 @@ const organization =
                     className="w-5 h-5 accent-white"
                   />
                   <span className="text-lg font-bold">Subjects & Chapters</span>
-                  <FileSpreadsheet className="w-5 h-5 group-hover:animate-pulse" />
+                  {/* <FileSpreadsheet className="w-5 h-5 group-hover:animate-pulse" /> */}
                 </label>
               </div>
             </div>
@@ -340,9 +340,7 @@ const organization =
               <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-indigo-600/5"></div>
               <div className="relative z-10 flex items-center justify-between">
                 <div className="flex items-center gap-4 text-indigo-800">
-                  <div className="bg-indigo-100 p-3 rounded-2xl">
-                    <FileSpreadsheet className="w-6 h-6" />
-                  </div>
+                
                   <div>
                     <h3 className="font-bold text-lg">Excel Template Required</h3>
                     <p className="text-indigo-600">Download the template, fill it with chapter information, and upload it back</p>
@@ -358,7 +356,7 @@ const organization =
                     }
                   }}
                 >
-                  <Download size={20} />
+                  {/* <Download size={20} /> */}
                   <span>Download Template</span>
                 </button>
               </div>
@@ -375,7 +373,7 @@ const organization =
                 {/* Batch Name */}
                 <div className="group">
                   <label htmlFor="name" className="flex items-center gap-2 text-gray-700 font-bold mb-3 text-lg">
-                    <Target className="w-5 h-5 text-indigo-600" />
+                    {/* <Target className="w-5 h-5 text-indigo-600" /> */}
                     Batch Name <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -392,7 +390,7 @@ const organization =
                 {/* Year */}
                 <div className="group">
                   <label htmlFor="year" className="flex items-center gap-2 text-gray-700 font-bold mb-3 text-lg">
-                    <Calendar className="w-5 h-5 text-indigo-600" />
+                    {/* <Calendar className="w-5 h-5 text-indigo-600" /> */}
                     Academic Year <span className="text-red-500">*</span>
                   </label>
                   <select
@@ -433,7 +431,7 @@ const organization =
                             </div>
                           ) : (
                             <div className="flex flex-col items-center text-gray-500">
-                              <Upload size={40} className="mb-3 animate-bounce" />
+                              {/* <Upload size={40} className="mb-3 animate-bounce" /> */}
                               <p className="text-lg font-bold mb-2">
                                 <span className="text-indigo-600">Click to upload</span> or drag and drop
                               </p>
@@ -478,7 +476,7 @@ const organization =
                 {/* Subjects */}
                 <div className="group">
                   <label htmlFor="subjects" className="flex items-center gap-2 text-gray-700 font-bold mb-3 text-lg">
-                    <BookOpen className="w-5 h-5 text-indigo-600" />
+                    {/* <BookOpen className="w-5 h-5 text-indigo-600" /> */}
                     Subjects <span className="text-red-500">*</span>
                   </label>
                   <div className="flex gap-3">
@@ -493,7 +491,7 @@ const organization =
                       onClick={addSubject}
                       className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl px-6 flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-xl font-bold"
                     >
-                      <PlusCircle size={20} />
+                      {/* <PlusCircle size={20} /> */}
                       <span>Add</span>
                     </button>
                   </div>
@@ -525,12 +523,12 @@ const organization =
                 {/* Faculties */}
                 <div className="group">
                   <label htmlFor="faculties" className="flex items-center gap-2 text-gray-700 font-bold mb-3 text-lg">
-                    <Users className="w-5 h-5 text-indigo-600" />
+                    {/* <Users className="w-5 h-5 text-indigo-600" /> */}
                     Faculties <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-                      <Users size={20} className="text-gray-500" />
+                      {/* <Users size={20} className="text-gray-500" /> */}
                     </div>
                     <select
                       id="faculties"
@@ -568,7 +566,7 @@ const organization =
                               onClick={() => handleFacultyRemove(user._id)}
                               className="text-purple-700 hover:text-purple-900 transition-all duration-300 hover:rotate-90 bg-white/50 rounded-full p-2 ml-3"
                             >
-                              <X size={18} />
+                              {/* <X size={18} /> */}
                             </button>
                           </div>
                         ))}
@@ -581,14 +579,14 @@ const organization =
           </div>
 
           {/* Submit Button */}
-          <div className="p-8 bg-gradient-to-r from-gray-50 to-indigo-50 border-t border-gray-100 flex justify-center">
+          <div className="p-8 flex justify-center">
             <button
               onClick={handleSubmit}
               disabled={canAccessPage === false || Available_limit <= 0}
               className={`group text-white px-12 py-4 rounded-3xl flex items-center gap-3 font-bold text-lg transition-all duration-300 transform
               ${canAccessPage === false
                   ? 'bg-gray-300 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 hover:scale-105 hover:shadow-2xl'}
+                  : 'bg-green-600 hover:scale-105 hover:shadow-2xl'}
                 `}
             >
               {/* <CheckCircle size={24} className={`${canAccessPage !== false ? 'group-hover:animate-pulse' : ''}`} /> */}

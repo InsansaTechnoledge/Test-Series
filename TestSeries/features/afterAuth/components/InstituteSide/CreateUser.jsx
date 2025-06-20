@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import profileDefault from "../../../../assests/Institute/profile.png";
 import HeadingUtil from "../../utility/HeadingUtil";
-import { Eye, EyeOff, RefreshCcw } from "lucide-react";
+import { AlertTriangle, Eye, EyeOff, RefreshCcw } from "lucide-react";
 import { generatePassword } from "../../utility/GenerateRandomPassword";
 import { createUser } from "../../../../utils/services/userService";
 import { useCachedBatches } from "../../../../hooks/useCachedBatches";
@@ -10,6 +10,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useUser } from "../../../../contexts/currentUserContext";
 import Banner from "../../../../assests/Institute/add user.svg"
 import { usePageAccess } from "../../../../contexts/PageAccessContext";
+import useLimitAccess from "../../../../hooks/useLimitAccess";
+import { useLocation } from "react-router-dom";
 
 const CreateUser = () => {
     const { batches, isLoading, isError } = useCachedBatches();
@@ -23,7 +25,16 @@ const CreateUser = () => {
     const [showBatches, setShowBatches] = useState([]);
     const [error, setError] = useState({});
     const queryClient = useQueryClient();
-    const { user } = useUser();
+    const { user, getFeatureKeyFromLocation } = useUser();
+    const location = useLocation();
+
+
+    const canAddMoreUsers = useLimitAccess(getFeatureKeyFromLocation(location.pathname) , "totalUsers")
+    const Creation_limit = user?.planFeatures?.user_feature.value
+    const Total_user = user?.metaData?.totalUsers
+
+    const Available_limit = Creation_limit - Total_user
+    console.log("ff", canAddMoreUsers , Creation_limit , Total_user)
 
     const canAccessPage = usePageAccess();
 
@@ -247,6 +258,8 @@ const CreateUser = () => {
                         <p className="text-xl text-white/90 max-w-2xl mx-auto drop-shadow-md">
                             Create new users and assign them specific roles in your institute
                         </p>
+                       
+                        <p className="mt-8 text-indigo-500 bg-gray-200 px-3 py-4 rounded-2xl text-2xl flex "> <AlertTriangle/>For current plan you have Available Limit of <span className={`${Available_limit > 0 ? "text-green-500" : "text-red-500"} mx-2`}>{Available_limit}</span> to Add more Users</p>
                     </div>
                 </div>
             </div>
@@ -543,14 +556,16 @@ const CreateUser = () => {
                             <button
                                 type="button"
                                 onClick={onsubmitForm}
-                                disabled={canAccessPage === false}
+                                disabled={canAccessPage === false || canAddMoreUsers === false}
                                 className={` text-white px-12 py-4 rounded-2xl font-bold text-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 transform
-                                    ${canAccessPage === false
+                                    ${canAccessPage === false || canAddMoreUsers === false
                                         ? 'bg-gray-300 cursor-not-allowed'
                                         : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 hover:scale-105 hover:shadow-2xl'}
                                       `}
                             >
-                                <span className={`${!canAccessPage && "text-red-600 "}`}>{canAccessPage === false ? 'Access Denied' : 'Create User'}</span>
+                                {/* <span className={`${!canAccessPage && "text-red-600 "}`}>{canAccessPage === false ? 'Access Denied' : 'Create User'}</span> */}
+                                <span className={`${!canAccessPage || !canAddMoreUsers && "text-red-600 "}`}>{canAccessPage === false ? 'Access Denied' : (canAddMoreUsers ? 'Create Batch' : 'Limit Exceeded')}</span>
+
                             </button>
                             {error.form && (
                                 <p className="text-red-500 text-sm mt-4 font-medium">{error.form}</p>
