@@ -17,6 +17,9 @@ const CreateBatch = () => {
   const [formData, setFormData] = useState({ batchMode: 'only-subjects' });
   const [selectedFaculties, setSelectedFaculties] = useState([]);
   const [faculty, setFaculty] = useState([])
+  // Add state for dynamic batch count tracking
+  const [createdBatchesCount, setCreatedBatchesCount] = useState(0);
+  
   const { users, isLoading } = useCachedUser();
   const { roleMap } = useCachedRoleGroup();
   const queryClient = useQueryClient();
@@ -24,8 +27,8 @@ const CreateBatch = () => {
   const location = useLocation();
   const canAccessPage = usePageAccess();
   const canCreateMoreBatches = useLimitAccess(getFeatureKeyFromLocation(location.pathname), "totalBatches");
-const organization =
-  user.role !== 'organization'
+  
+  const organization = user.role !== 'organization'
     ? useCachedOrganization({ userId: user._id, orgId: user.organizationId._id })?.organization
     : null;
 
@@ -36,16 +39,14 @@ const organization =
     }
   }, [users]);
 
-
-
-  const Creation_Limit = user?.planFeatures?.batch_feature.value 
+  // Calculate dynamic available limit
+  const Creation_Limit = user?.planFeatures?.batch_feature.value;
   const Total_Batch = user?.role === 'organization' 
     ? user.metaData?.totalBatches 
-    :  (  
-
-      organization?.metaData?.totalBatches
-    );
-  const Available_limit = Creation_Limit - Total_Batch
+    : organization?.metaData?.totalBatches;
+  
+  // Dynamic calculation that includes newly created batches in current session
+  const Available_limit = Creation_Limit - (Total_Batch + createdBatchesCount);
 
   const onChangeHandler = (name, value) => {
     setFormData((prev) => ({
@@ -96,7 +97,6 @@ const organization =
     if (!selectedUser) return;
 
     setSelectedFaculties((prev) => [...prev, selectedUser]);
-
     setFaculty((prev) => prev.filter((faculty) => faculty._id !== selectedId));
     e.target.value = '';
   };
@@ -139,7 +139,6 @@ const organization =
     const payload = {
       name: formData.name,
       year: formData.year,
-      // batchMode: formData.batchMode,
       subjects: formData.subjects,
       faculties: selectedFaculties.map(f => f._id),
       syllabus: processedSyllabus,
@@ -149,13 +148,16 @@ const organization =
       const response = await createBatch(payload);
       if (response.status === 200) {
         alert('Batch created successfully!');
+        
+        // Increment the created batches count for dynamic limit calculation
+        setCreatedBatchesCount(prev => prev + 1);
+        
+        // Reset form
         setFormData({ "batchMode": "only-subjects" });
         setSelectedFaculties([]);
         setFaculty(prev => ([...prev, ...selectedFaculties]));
-
       }
     } catch (error) {
-
       if (error.response?.status === 400) {
         alert('Batch with this name already exists. Please choose a different name.');
         return;
@@ -202,7 +204,6 @@ const organization =
         <div className="absolute inset-0 "></div>
         <div className="absolute inset-0 "></div>
 
-
         <div
           className="relative z-10 px-6 py-24 text-center bg-cover bg-center bg-no-repeat rounded-xl"
           style={{ backgroundImage: `url(${Banner})` }}
@@ -211,7 +212,6 @@ const organization =
             <h1 className="text-6xl md:text-7xl font-black text-white tracking-tight">
               Create Batch
             </h1>
-
           </div>
           <p className="text-xl text-white/80 max-w-2xl mx-auto font-medium">
             Create batch with subjects, faculty, syllabus.
@@ -224,19 +224,25 @@ const organization =
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
 
           {/* limits section */}
-
           <div className="bg-white rounded-3xl p-6 shadow-xl border-l-4 border-indigo-600 transform hover:scale-105 transition-all duration-300">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Available Limit</p>
-                <p className={`text-2xl font-black ${Available_limit > 0 ? "text-green-500" : "text-red-500"} capitalize`}>{Available_limit}</p>
+                <p className={`text-2xl font-black ${Available_limit > 0 ? "text-green-500" : "text-red-500"} capitalize`}>
+                  {Available_limit}
+                </p>
+                {/* Optional: Show session progress */}
+                {createdBatchesCount > 0 && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    +{createdBatchesCount} created this session
+                  </p>
+                )}
               </div>
               <div className="bg-indigo-100 p-3 rounded-2xl">
                 {/* <Target className="w-8 h-8 text-indigo-600" /> */}
               </div>
             </div>
           </div>
-
 
           <div className="bg-white rounded-3xl p-6 shadow-xl border-l-4 border-indigo-600 transform hover:scale-105 transition-all duration-300">
             <div className="flex items-center justify-between">
@@ -283,13 +289,15 @@ const organization =
             answer="Batches can be created with subjects and with subjects plus chapters , choose as per your requirement"
           />
         </div>
-        {!canCreateMoreBatches && (
+        
+        {/* Dynamic limit warning */}
+        {Available_limit <= 0 && (
            <p className="mt-4 text-center text-sm text-red-600 bg-red-100 border border-red-200 px-4 py-2 rounded-xl shadow-sm backdrop-blur-sm">
           You've reached your batch creation limit. <br className="sm:hidden" />
            <span className="font-medium">Upgrade your plan</span> to continue.
          </p>
-         
-          )}
+        )}
+        
         {/* Main Form Card */}
         <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100 mt-5">
 
@@ -337,7 +345,6 @@ const organization =
               <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-indigo-600/5"></div>
               <div className="relative z-10 flex items-center justify-between">
                 <div className="flex items-center gap-4 text-indigo-800">
-                
                   <div>
                     <h3 className="font-bold text-lg">Excel Template Required</h3>
                     <p className="text-indigo-600">Download the template, fill it with chapter information, and upload it back</p>
@@ -581,42 +588,19 @@ const organization =
               onClick={handleSubmit}
               disabled={canAccessPage === false || Available_limit <= 0}
               className={`group text-white px-12 py-4 rounded-3xl flex items-center gap-3 font-bold text-lg transition-all duration-300 transform
-              ${canAccessPage === false
+              ${canAccessPage === false || Available_limit <= 0
                   ? 'bg-gray-300 cursor-not-allowed'
                   : 'bg-green-600 hover:scale-105 hover:shadow-2xl'}
                 `}
             >
-              {/* <CheckCircle size={24} className={`${canAccessPage !== false ? 'group-hover:animate-pulse' : ''}`} /> */}
-              <span className={`${!canAccessPage && "text-red-600 "}`}>{canAccessPage === false ? 'Access Denied' : (canCreateMoreBatches ? 'Create Batch' : 'Limit Exceeded')}</span>
+              {/* <CheckCircle size={24} className={`${canAccessPage !== false && Available_limit > 0 ? 'group-hover:animate-pulse' : ''}`} /> */}
+              <span className={`${(!canAccessPage || Available_limit <= 0) ? 'opacity-50' : ''}`}>
+                {canAccessPage === false ? 'Access Denied' : Available_limit <= 0 ? 'Limit Reached' : 'Create Batch'}
+              </span>
             </button>
           </div>
-
-       
-
-
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        .hover\\:scale-102:hover {
-          transform: scale(1.02);
-        }
-        
-        .border-3 {
-          border-width: 3px;
-        }
-      `}</style>
     </div>
   );
 };

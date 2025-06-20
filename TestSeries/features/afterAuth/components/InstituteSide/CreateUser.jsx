@@ -25,27 +25,32 @@ const CreateUser = () => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [showBatches, setShowBatches] = useState([]);
     const [error, setError] = useState({});
+    
+    // Add state for dynamic user count tracking
+    const [createdUsersCount, setCreatedUsersCount] = useState(0);
+    
     const queryClient = useQueryClient();
    
     const { user, getFeatureKeyFromLocation } = useUser();
     const location = useLocation();
 
+    const canAddMoreUsers = useLimitAccess(getFeatureKeyFromLocation(location.pathname), "totalUsers");
+    const Creation_limit = user?.planFeatures?.user_feature.value;
 
-    const canAddMoreUsers = useLimitAccess(getFeatureKeyFromLocation(location.pathname) , "totalUsers")
-    const Creation_limit = user?.planFeatures?.user_feature.value
+    const organization = user.role !== 'organization'
+        ? useCachedOrganization({ userId: user._id, orgId: user.organizationId._id })?.organization
+        : null;
 
-    const organization =
-  user.role !== 'organization'
-    ? useCachedOrganization({ userId: user._id, orgId: user.organizationId._id })?.organization
-    : null;
+    // Get current total users from the actual source (user or organization metadata)
+    const currentTotalUsers = user?.role === 'organization' 
+        ? user.metaData?.totalUsers || 0 
+        : organization?.metaData?.totalUsers || 0;
 
-    const Total_user = user?.role === 'organization' 
-    ? user.metaData?.totalBatches 
-    :  (  
-      organization?.metaData?.totalBatches
-    );
+    // Dynamic calculation that includes newly created users in current session
+    const Available_limit = Math.max(0, Creation_limit - (currentTotalUsers + createdUsersCount));
 
-    const Available_limit = Creation_limit - Total_user;
+    // Check if limit is exceeded dynamically
+    const isLimitExceeded = (currentTotalUsers + createdUsersCount) >= Creation_limit;
 
     const canAccessPage = usePageAccess();
 
@@ -182,6 +187,12 @@ const CreateUser = () => {
     }
 
     const onsubmitForm = async () => {
+        // Check if limit is exceeded before processing
+        if (isLimitExceeded) {
+            setError(prev => ({ ...prev, form: "User creation limit exceeded. Please upgrade your plan." }));
+            return;
+        }
+
         // Validate all required fields before submission
         const requiredFields = ['firstName', 'lastName', 'email', 'password', 'confirm_password', 'userId', 'gender'];
         const validationErrors = {};
@@ -223,6 +234,9 @@ const CreateUser = () => {
                
                 alert("User created successfully!");
                 
+                // Increment the created users count for dynamic limit calculation
+                setCreatedUsersCount(prev => prev + 1);
+                
                 // Reset form
                 setSelectedBatches([]);
                 setFormData({});
@@ -233,7 +247,15 @@ const CreateUser = () => {
                 const form = document.querySelector('form');
                 if (form) form.reset();
                 
+                // Invalidate queries to refresh the data from server
                 await queryClient.invalidateQueries(["Users", user._id]);
+                
+                // If using organization context, also invalidate organization data
+                if (user.role !== 'organization') {
+                    await queryClient.invalidateQueries(["organization", user.organizationId._id]);
+                } else {
+                    await queryClient.invalidateQueries(["user", user._id]);
+                }
             } else {
                 console.log("Error creating user");
                 setError(prev => ({ ...prev, form: "Error creating user" }));
@@ -270,20 +292,18 @@ const CreateUser = () => {
                             Create new users and assign them specific roles in your institute
                         </p>
          
-<div className="flex items-center justify-center">
-  <p className="mt-8 text-indigo-700 bg-indigo-50 border border-indigo-100 px-5 py-4 rounded-2xl text-base flex items-center gap-3 shadow-sm backdrop-blur-sm">
-    <AlertTriangle className="w-5 h-5 text-indigo-400" />
-    <span>
-      <span className="font-semibold">Note:</span> For your current plan, you have an available limit of
-      <span className={`font-bold ${Available_limit > 0 ? "text-green-600" : "text-red-600"} mx-1`}>
-        {Available_limit}
-      </span>
-      to add more users.
-    </span>
-  </p>
-</div>
-
-
+                        <div className="flex items-center justify-center">
+                            <p className="mt-8 text-indigo-700 bg-indigo-50 border border-indigo-100 px-5 py-4 rounded-2xl text-base flex items-center gap-3 shadow-sm backdrop-blur-sm">
+                                <AlertTriangle className="w-5 h-5 text-indigo-400" />
+                                <span>
+                                    <span className="font-semibold">Note:</span> For your current plan, you have an available limit of
+                                    <span className={`font-bold ${Available_limit > 0 ? "text-green-600" : "text-red-600"} mx-1`}>
+                                        {Available_limit}
+                                    </span>
+                                    users.
+                                </span>
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -305,13 +325,19 @@ const CreateUser = () => {
                             </div>
 
                             <div className="flex flex-col items-center md:items-start">
-                                <label className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 px-6 rounded-2xl cursor-pointer text-sm font-bold hover:shadow-xl transition-all duration-300 hover:scale-105 transform">
+                                <label className={`py-3 px-6 rounded-2xl cursor-pointer text-sm font-bold transition-all duration-300 ${
+                                    isLimitExceeded 
+                                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                                        : 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:shadow-xl hover:scale-105 transform'
+                                }`}>
                                     {profile ? "Change Profile Photo" : "Upload Profile Photo"}
                                     <input
                                         type="file"
                                         accept="image/*"
                                         className="hidden"
+                                        disabled={isLimitExceeded}
                                         onChange={(e) => {
+                                            if (isLimitExceeded) return;
                                             const file = e.target.files[0];
                                             if (file) {
                                                 const imageUrl = URL.createObjectURL(file);
@@ -330,13 +356,16 @@ const CreateUser = () => {
                             </div>
                         </div>
                     </div>
-                    {!canAddMoreUsers && (
-           <p className="mt-4 text-center text-sm text-red-600 bg-red-100 border border-red-200 px-4 py-2 rounded-xl shadow-sm backdrop-blur-sm">
-          You've reached your batch creation limit. <br className="sm:hidden" />
-           <span className="font-medium">Upgrade your plan</span> to continue.
-         </p>
-         
-          )}
+                    
+                    {isLimitExceeded && (
+                        <div className="mx-8 mt-6">
+                            <p className="text-center text-sm text-red-600 bg-red-100 border border-red-200 px-4 py-2 rounded-xl shadow-sm backdrop-blur-sm">
+                                You've reached your user creation limit. <br className="sm:hidden" />
+                                <span className="font-medium">Upgrade your plan</span> to continue.
+                            </p>
+                        </div>
+                    )}
+
                     {/* Form Fields */}
                     <div className="p-8">
                         <div className="grid lg:grid-cols-2 gap-8">
@@ -351,7 +380,12 @@ const CreateUser = () => {
                                     name="firstName"
                                     value={formData.firstName || ""}
                                     onChange={onChangeHandler}
-                                    className="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 font-medium"
+                                    disabled={isLimitExceeded}
+                                    className={`w-full p-4 rounded-2xl border-2 transition-all duration-300 font-medium ${
+                                        isLimitExceeded 
+                                            ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed' 
+                                            : 'bg-gray-50 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400'
+                                    }`}
                                     placeholder="Enter first name"
                                 />
                                 {error.firstName && (
@@ -370,7 +404,12 @@ const CreateUser = () => {
                                     name="lastName"
                                     value={formData.lastName || ""}
                                     onChange={onChangeHandler}
-                                    className="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 font-medium"
+                                    disabled={isLimitExceeded}
+                                    className={`w-full p-4 rounded-2xl border-2 transition-all duration-300 font-medium ${
+                                        isLimitExceeded 
+                                            ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed' 
+                                            : 'bg-gray-50 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400'
+                                    }`}
                                     placeholder="Enter last name"
                                 />
                                 {error.lastName && (
@@ -389,7 +428,12 @@ const CreateUser = () => {
                                     name="email"
                                     value={formData.email || ""}
                                     onChange={onChangeHandler}
-                                    className="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 font-medium"
+                                    disabled={isLimitExceeded}
+                                    className={`w-full p-4 rounded-2xl border-2 transition-all duration-300 font-medium ${
+                                        isLimitExceeded 
+                                            ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed' 
+                                            : 'bg-gray-50 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400'
+                                    }`}
                                     placeholder="Enter email address"
                                 />
                                 {error.email && (
@@ -410,13 +454,23 @@ const CreateUser = () => {
                                             name="password"
                                             value={formData.password || ""}
                                             onChange={onChangeHandler}
-                                            className="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 font-medium pr-12"
+                                            disabled={isLimitExceeded}
+                                            className={`w-full p-4 rounded-2xl border-2 transition-all duration-300 font-medium pr-12 ${
+                                                isLimitExceeded 
+                                                    ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed' 
+                                                    : 'bg-gray-50 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400'
+                                            }`}
                                             placeholder="Enter password or generate"
                                         />
                                         <button
                                             type="button"
-                                            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
-                                            onClick={() => setShowPassword(!showPassword)}
+                                            className={`absolute right-4 top-1/2 transform -translate-y-1/2 transition-colors ${
+                                                isLimitExceeded 
+                                                    ? 'text-gray-400 cursor-not-allowed' 
+                                                    : 'text-gray-500 hover:text-gray-700'
+                                            }`}
+                                            disabled={isLimitExceeded}
+                                            onClick={() => !isLimitExceeded && setShowPassword(!showPassword)}
                                         >
                                             {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                                         </button>
@@ -424,10 +478,15 @@ const CreateUser = () => {
                                     <button
                                         type="button"
                                         onClick={generateRandomPassword}
-                                        className="bg-gradient-to-r from-indigo-100 to-purple-100 hover:from-indigo-200 hover:to-purple-200 p-4 rounded-2xl transition-all duration-300 hover:scale-105 transform"
+                                        disabled={isLimitExceeded}
+                                        className={`p-4 rounded-2xl transition-all duration-300 ${
+                                            isLimitExceeded 
+                                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                                                : 'bg-gradient-to-r from-indigo-100 to-purple-100 hover:from-indigo-200 hover:to-purple-200 hover:scale-105 transform'
+                                        }`}
                                         title="Generate Random Password"
                                     >
-                                        <RefreshCcw className="w-5 h-5 text-indigo-600" />
+                                        <RefreshCcw className={`w-5 h-5 ${isLimitExceeded ? 'text-gray-400' : 'text-indigo-600'}`} />
                                     </button>
                                 </div>
                                 {error.password && (
@@ -447,13 +506,23 @@ const CreateUser = () => {
                                         name="confirm_password"
                                         value={formData.confirm_password || ""}
                                         onChange={onChangeHandler}
-                                        className="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 font-medium pr-12"
+                                        disabled={isLimitExceeded}
+                                        className={`w-full p-4 rounded-2xl border-2 transition-all duration-300 font-medium pr-12 ${
+                                            isLimitExceeded 
+                                                ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed' 
+                                                : 'bg-gray-50 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400'
+                                        }`}
                                         placeholder="Confirm password"
                                     />
                                     <button
                                         type="button"
-                                        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
-                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        className={`absolute right-4 top-1/2 transform -translate-y-1/2 transition-colors ${
+                                            isLimitExceeded 
+                                                ? 'text-gray-400 cursor-not-allowed' 
+                                                : 'text-gray-500 hover:text-gray-700'
+                                        }`}
+                                        disabled={isLimitExceeded}
+                                        onClick={() => !isLimitExceeded && setShowConfirmPassword(!showConfirmPassword)}
                                     >
                                         {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                                     </button>
@@ -474,7 +543,12 @@ const CreateUser = () => {
                                     name="userId"
                                     value={formData.userId || ""}
                                     onChange={onChangeHandler}
-                                    className="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 font-medium"
+                                    disabled={isLimitExceeded}
+                                    className={`w-full p-4 rounded-2xl border-2 transition-all duration-300 font-medium ${
+                                        isLimitExceeded 
+                                            ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed' 
+                                            : 'bg-gray-50 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400'
+                                    }`}
                                     placeholder="Enter User ID provided by institute"
                                 />
                                 {error.userId && (
@@ -492,7 +566,12 @@ const CreateUser = () => {
                                     name="gender"
                                     value={formData.gender || ""}
                                     onChange={onChangeHandler}
-                                    className="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 font-medium"
+                                    disabled={isLimitExceeded}
+                                    className={`w-full p-4 rounded-2xl border-2 transition-all duration-300 font-medium ${
+                                        isLimitExceeded 
+                                            ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed' 
+                                            : 'bg-gray-50 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400'
+                                    }`}
                                 >
                                     <option value="">Select Gender</option>
                                     <option value="Male">Male</option>
@@ -514,7 +593,12 @@ const CreateUser = () => {
                                     value={formData.roleId || ""}
                                     onChange={onChangeHandler}
                                     id="roleId"
-                                    className="w-full p-4 bg-gray-50 rounded-2xl border-2 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 font-medium"
+                                    disabled={isLimitExceeded}
+                                    className={`w-full p-4 rounded-2xl border-2 transition-all duration-300 font-medium ${
+                                        isLimitExceeded 
+                                            ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed' 
+                                            : 'bg-gray-50 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400'
+                                    }`}
                                 >
                                     <option value="">Select Role</option>
                                     {roleGroups && roleGroups.map((role, idx) => (
@@ -538,8 +622,13 @@ const CreateUser = () => {
                                 
                                 <button
                                     type="button"
-                                    onClick={() => setBatchesVisible(!batchesVisible)}
-                                    className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-3 rounded-2xl font-bold hover:shadow-xl transition-all duration-300 hover:scale-105 transform mb-6"
+                                    onClick={() => !isLimitExceeded && setBatchesVisible(!batchesVisible)}
+                                    disabled={isLimitExceeded}
+                                    className={`py-3 px-8 rounded-2xl font-bold transition-all duration-300 mb-6 ${
+                                        isLimitExceeded 
+                                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                                            : 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:shadow-xl hover:scale-105 transform'
+                                    }`}
                                 >
                                     {batchesVisible ? "Hide All Batches" : "Show All Batches"}
                                 </button>
@@ -550,30 +639,36 @@ const CreateUser = () => {
                                             <button
                                                 key={idx}
                                                 type="button"
-                                                onClick={() => toggleBatch(batch)}
-                                                className={`px-6 py-3 rounded-2xl text-sm font-bold transition-all duration-300 hover:scale-105 transform ${
+                                                onClick={() => !isLimitExceeded && toggleBatch(batch)}
+                                                disabled={isLimitExceeded}
+                                                className={`px-6 py-3 rounded-2xl font-bold transition-all duration-300 ${
                                                     selectedBatches.some((b) => b.id === batch.id)
-                                                        ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg"
-                                                        : "bg-white border-2 border-gray-200 text-gray-700 hover:border-indigo-300 hover:shadow-md"
+                                                        ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg'
+                                                        : isLimitExceeded
+                                                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                                        : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-indigo-300 hover:shadow-md'
                                                 }`}
                                             >
-                                                {batch.name} - {batch.year}
+                                                {batch.name}
                                             </button>
                                         ))}
                                     </div>
                                 )}
 
-                                {selectedBatches.length > 0 && !batchesVisible && (
-                                    <div>
-                                        <h4 className="text-sm font-bold text-gray-700 mb-3">Assigned Batches:</h4>
-                                        <div className="flex gap-3 flex-wrap">
+                                {/* Selected Batches Display */}
+                                {selectedBatches.length > 0 && (
+                                    <div className="bg-white rounded-2xl p-6 border-2 border-green-200">
+                                        <h4 className="text-sm font-bold text-gray-700 mb-4">
+                                            Selected Batches ({selectedBatches.length})
+                                        </h4>
+                                        <div className="flex gap-2 flex-wrap">
                                             {selectedBatches.map((batch, idx) => (
-                                                <div
+                                                <span
                                                     key={idx}
-                                                    className="bg-gradient-to-r from-indigo-100 to-purple-100 border-2 border-indigo-200 text-indigo-800 px-4 py-2 rounded-2xl text-sm font-bold"
+                                                    className="bg-gradient-to-r from-green-100 to-green-200 text-green-800 px-4 py-2 rounded-xl text-sm font-medium border border-green-300"
                                                 >
-                                                    {batch.name} - {batch.year}
-                                                </div>
+                                                    {batch.name}
+                                                </span>
                                             ))}
                                         </div>
                                     </div>
@@ -581,25 +676,29 @@ const CreateUser = () => {
                             </div>
                         </div>
 
+                        {/* Form Error Display */}
+                        {error.form && (
+                            <div className="mt-6">
+                                <p className="text-red-600 bg-red-50 border border-red-200 px-4 py-3 rounded-xl text-center font-medium">
+                                    {error.form}
+                                </p>
+                            </div>
+                        )}
+
                         {/* Submit Button */}
                         <div className="mt-12 text-center">
                             <button
                                 type="button"
                                 onClick={onsubmitForm}
-                                disabled={canAccessPage === false || canAddMoreUsers === false}
-                                className={` text-white px-12 py-4 rounded-2xl font-bold text-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 transform
-                                    ${canAccessPage === false || canAddMoreUsers === false
-                                        ? 'bg-gray-300 cursor-not-allowed'
-                                        : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 hover:scale-105 hover:shadow-2xl'}
-                                      `}
+                                disabled={isLimitExceeded}
+                                className={`py-4 px-12 rounded-2xl font-black text-lg transition-all duration-300 ${
+                                    isLimitExceeded 
+                                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                                        : 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:shadow-2xl hover:scale-105 transform'
+                                }`}
                             >
-                                {/* <span className={`${!canAccessPage && "text-red-600 "}`}>{canAccessPage === false ? 'Access Denied' : 'Create User'}</span> */}
-                                <span className={`${!canAccessPage || !canAddMoreUsers && "text-red-600 "}`}>{canAccessPage === false ? 'Access Denied' : (canAddMoreUsers ? 'Create Batch' : 'Limit Exceeded')}</span>
-
+                                {isLimitExceeded ? 'Limit Exceeded' : 'Create User'}
                             </button>
-                            {error.form && (
-                                <p className="text-red-500 text-sm mt-4 font-medium">{error.form}</p>
-                            )}
                         </div>
                     </div>
                 </div>

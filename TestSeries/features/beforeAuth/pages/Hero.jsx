@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import video from '../../../assests/animation/animation 1.mp4';
+import video from '../../../assests/animation/animation 4.mp4';
 import shadow from '../../../assests/animation/Shadow.svg'
 
 const ImageComponent = () => {
