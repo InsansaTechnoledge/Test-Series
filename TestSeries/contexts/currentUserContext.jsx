@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { match } from 'path-to-regexp';
 
 const currentUserContext = createContext();
 
@@ -14,14 +15,22 @@ export const UserProvider = ({ children }) => {
   const hasPlanFeature = ({ keyFromPageOrAction, location }) => {
 
     const rawMap = JSON.parse(import.meta.env.VITE_PLAN_FEATURE_MAP || '{}');
-    console.log("rawMap", rawMap);
+    let matchedKey = null;
 
-    const featureKeys = location
-      ? rawMap[location] // e.g. "/institute/batch-list"
+    for (const routePattern in rawMap) {
+      const matcher = match(routePattern, { decode: decodeURIComponent });
+      const matched = matcher(location) || matcher(keyFromPageOrAction);
+      if (matched) {
+        matchedKey = routePattern;
+        break;
+      }
+    }
+
+    const featureKeys = matchedKey
+      ? rawMap[matchedKey] 
       : rawMap[keyFromPageOrAction];
 
-    if (!featureKeys) return false; // no mapping exists
-
+    if (!featureKeys) return false;
     const features = Array.isArray(featureKeys) ? featureKeys : [featureKeys];
 
     console.log("features", features);
@@ -44,7 +53,7 @@ export const UserProvider = ({ children }) => {
 
   }
 
-   const getFeatureKeyFromLocation = (location) => {
+  const getFeatureKeyFromLocation = (location) => {
     const rawMap = JSON.parse(import.meta.env.VITE_PLAN_FEATURE_MAP || '{}');
     return rawMap[location] || null;
   };
@@ -52,7 +61,7 @@ export const UserProvider = ({ children }) => {
 
 
   return (
-    <currentUserContext.Provider value={{ user, setUser, isUserLoggedOut, setIsUserLoggedOut, hasPlanFeature,getFeatureKeyFromLocation }}>
+    <currentUserContext.Provider value={{ user, setUser, isUserLoggedOut, setIsUserLoggedOut, hasPlanFeature, getFeatureKeyFromLocation }}>
       {children}
     </currentUserContext.Provider>
   );
