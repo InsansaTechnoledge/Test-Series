@@ -4,15 +4,17 @@ import { generatePassword } from '../../utility/GenerateRandomPassword'
 import * as XLSX from 'xlsx'
 import { addSingleStudent, fetchStudents, updateStudentsBatch, uploadStudentExcel } from '../../../../utils/services/studentService'
 import { useCachedBatches } from '../../../../hooks/useCachedBatches'
-import { RefreshCcw, Upload, Download, Plus, Trash2, Eye, EyeOff, Users, FileSpreadsheet, CheckCircle, FileDown, Sparkles, Zap, Target } from 'lucide-react'
+import { RefreshCcw, Upload, Download, Plus, Trash2, Eye, EyeOff, Users, FileSpreadsheet, CheckCircle, FileDown, Sparkles, Zap, Target, AlertTriangle } from 'lucide-react'
 import NeedHelpComponent from './components/NeedHelpComponent'
 import { QueryClient } from '@tanstack/react-query'
 import { useUser } from '../../../../contexts/currentUserContext'
 import { useEffect } from 'react'
 import  Banner from "../../../../assests/Institute/add student.svg"
 import { usePageAccess } from '../../../../contexts/PageAccessContext'
+import useLimitAccess from '../../../../hooks/useLimitAccess'
+import { useLocation } from 'react-router-dom'
 const AddStudent = () => {
-  const { user } = useUser();
+  const { user , getFeatureKeyFromLocation } = useUser();
   const [batch, setBatch] = useState('')
   const [students, setStudents] = useState([getEmptyStudent()])
   const [showPassword, setShowPassword] = useState({})
@@ -23,6 +25,13 @@ const AddStudent = () => {
   const queryClient = new QueryClient();
   const [importBatch, setImportBatch] = useState('');
   const [importedStudents, setImportedStudents] = useState([]);
+  const location = useLocation();
+
+  const canAddMoreStudents = useLimitAccess(getFeatureKeyFromLocation(location.pathname), "totalStudents")
+  const Total_students = user?.metaData?.totalStudents
+  const Creation_limit = user?.planFeatures?.student_feature?.value
+  const Available_limit = Creation_limit - Total_students
+  console.log(canAddMoreStudents , Total_students , Creation_limit , Available_limit)
 
   const canAccessPage = usePageAccess();
 
@@ -301,6 +310,9 @@ const AddStudent = () => {
             <p className="text-xl text-white/90 max-w-2xl mx-auto drop-shadow-md">
             Create students and assign them to batches with our powerful management system
             </p>
+
+            <p className="mt-8 text-indigo-500 bg-gray-200 px-3 py-4 rounded-2xl text-2xl flex "> <AlertTriangle/>For current plan you have Available Limit of <span className={`${Available_limit > 0 ? "text-green-500" : "text-red-500"} mx-2`}>{Available_limit}</span>Students</p>
+
         </div>
     </div>
 </div>
@@ -760,16 +772,16 @@ const AddStudent = () => {
         <div className="text-center mb-12">
           <button
             onClick={handleSubmit}
-            disabled={!batch || canAccessPage === false}
+            disabled={!batch || canAccessPage === false || canAddMoreStudents === false}
             className={` text-white py-6 px-12 rounded-3xl text-2xl font-black transition-all duration-300 hover:shadow-2xl hover:scale-105 disabled:cursor-not-allowed disabled:transform-none
-              ${canAccessPage === false
+              ${canAccessPage === false || canAddMoreStudents === false
                 ? 'bg-gray-300 cursor-not-allowed'
                 : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 hover:scale-105 hover:shadow-2xl'}
               `}
           >
-          {canAccessPage && activeTab === 'manual' ?(
+          {canAddMoreStudents === false || canAccessPage && activeTab === 'manual' ?(
             <span>Add Students</span>
-          ) : <span className='text-red-600'>Access denied</span>}
+          ) : <span className='text-red-600'>{canAddMoreStudents ? "Limit exceeded" : "Access denied"}</span>}
 
           {canAccessPage && activeTab === 'bulk' && (
             <span>Upload Excel Data</span>
