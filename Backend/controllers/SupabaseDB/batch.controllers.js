@@ -194,9 +194,8 @@ export const handleDeleteVideo = async (req, res) => {
 
 export const getTotalBatches=async(orgId)=>{
   try{
-    console.log("Fetching total batches for organization ID:", orgId);
+
     const totalBatches = await getBatchCount(orgId);
-    console.log("Total batches fetched:", totalBatches);
     return totalBatches;
 
   }catch(error){

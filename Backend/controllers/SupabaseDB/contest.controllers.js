@@ -43,7 +43,7 @@ export const FetchContest = async (req, res) => {
         if (!data || data.length === 0) {
             return new APIResponse(400, [], 'No contests found').send(res);
         }
-        console.log("Contest Data:", data);
+
         return new APIResponse(200, data, 'Contest fetching successful').send(res);
     } catch (e) {
         console.error("Error Fetching Contest:", e.message, e.stack);

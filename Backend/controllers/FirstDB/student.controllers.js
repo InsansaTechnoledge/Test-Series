@@ -170,8 +170,6 @@ export const getAllStudents = async (req, res) => {
 
         });
 
-        console.log(data);
-
     if (data.length === 0) return new APIError(404, 'no students found').send(res)
 
     return new APIResponse(200, data, 'Students fetched successfully').send(res);

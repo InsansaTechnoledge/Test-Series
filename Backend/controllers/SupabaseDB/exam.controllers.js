@@ -19,7 +19,7 @@ export const addExam = async (req, res) => {
       updated_at: new Date(),
       updated_by: req.user._id,
     };
-    console.log("Exam data with update metadata:", examDataWithUpdateMetaData);
+
 
     const exam = await createExam(examDataWithUpdateMetaData);
 
@@ -47,7 +47,7 @@ export const updateExamById = async (req, res) => {
       updated_at: new Date(),
       updated_by: req.user._id
     }
-    console.log("Exam data with update metadata:", examDataWithUpdateMetaData);
+
     const exam = await updateExam(examDataWithUpdateMetaData, id);
 
     return new APIResponse(200, exam, 'Exam Updated successfully').send(res);
@@ -85,8 +85,6 @@ export const fetchExamBasedOnCondition = async (req, res) => {
       return new APIResponse(200, examList, "Exams fetched successfully!").send(res);
     }
 
-    // Non-student roles
-    console.log("✅ Final API data:", exams);
 
     return new APIResponse(200, exams, "Exams fetched successfully!").send(res);
   } catch (err) {

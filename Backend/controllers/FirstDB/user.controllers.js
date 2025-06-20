@@ -212,7 +212,6 @@ export const getUser = async (req, res) => {
             } else{
 
                 user = await User.find({ organizationId: orgId }).lean();
-                console.log("user", user);
             }
         }
 
