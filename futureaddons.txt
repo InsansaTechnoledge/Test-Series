@@ -15,4 +15,27 @@ URGENT: CHANGE MATCH CORRECT RESPONSE STORED IN DB
 -add the email and phone direct contact on the student landing page
 
 
+
+
+
+
+
+
+
+<div className="p-8 flex justify-center">
+            <button
+              onClick={handleSubmit}
+              disabled={canAccessPage === false || Available_limit <= 0}
+              className={`group text-white px-12 py-4 rounded-3xl flex items-center gap-3 font-bold text-lg transition-all duration-300 transform
+              ${canAccessPage === false
+                  ? 'bg-gray-300 cursor-not-allowed'
+                  : 'bg-green-600 hover:scale-105 hover:shadow-2xl'}
+                `}
+            >
+              {/* <CheckCircle size={24} className={`${canAccessPage !== false ? 'group-hover:animate-pulse' : ''}`} /> */}
+              <span className={`${!canAccessPage && "text-red-600 "}`}>{canAccessPage === false ? 'Access Denied' : (canCreateMoreBatches ? 'Create Batch' : 'Limit Exceeded')}</span>
+            </button>
+          </div>
+
+
  

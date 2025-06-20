@@ -292,9 +292,15 @@ const organization =
             answer="Batches can be created with subjects and with subjects plus chapters , choose as per your requirement"
           />
         </div>
-
+        {!canCreateMoreBatches && (
+           <p className="mt-4 text-center text-sm text-red-600 bg-red-100 border border-red-200 px-4 py-2 rounded-xl shadow-sm backdrop-blur-sm">
+          You've reached your batch creation limit. <br className="sm:hidden" />
+           <span className="font-medium">Upgrade your plan</span> to continue.
+         </p>
+         
+          )}
         {/* Main Form Card */}
-        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
+        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100 mt-5">
 
           {/* Batch Type Selection */}
           <div className="p-6  bg-gradient-to-r from-indigo-500 to-indigo-400 text-white relative overflow-hidden">
@@ -411,7 +417,7 @@ const organization =
                 {formData.batchMode === 'subjects-chapters' && (
                   <div className="group">
                     <label className="flex items-center gap-2 text-gray-700 font-bold mb-3 text-lg">
-                      <FileSpreadsheet className="w-5 h-5 text-indigo-600" />
+                      {/* <FileSpreadsheet className="w-5 h-5 text-indigo-600" /> */}
                       Syllabus File <span className="text-red-500">*</span>
                     </label>
                     <div className="w-full">
@@ -594,11 +600,7 @@ const organization =
             </button>
           </div>
 
-          {!canCreateMoreBatches && (
-            <p className="text-sm text-red-500 mt-2 text-center">
-              You've reached your batch creation limit. Upgrade your plan to continue.
-            </p>
-          )}
+       
 
 
         </div>
