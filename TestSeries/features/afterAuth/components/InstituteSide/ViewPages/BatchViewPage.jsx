@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { ChevronDown, Edit, Trash, ArrowLeft, RefreshCw, Sparkles, Zap, Users, BookOpen, Calendar, User } from "lucide-react";
+import { BookOpen, Calendar, ChevronDown, Edit, RefreshCw, Trash, User, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useUser } from "../../../../../contexts/currentUserContext";
@@ -7,10 +7,8 @@ import { useCachedBatches } from "../../../../../hooks/useCachedBatches";
 import { useCachedStudents } from "../../../../../hooks/useCachedStudents";
 import { useCachedUser } from "../../../../../hooks/useCachedUser";
 import dateFormatter from "../../../../../utils/dateFormatter";
+
 import BackButton from "../../../../constants/BackButton";
-import DeleteBatchModal from "../../../utility/DeleteBatchModal";
-import HeadingUtil from "../../../utility/HeadingUtil";
-import RefreshButton from "../../../utility/RefreshButton";
 
 const Page = () => {
     const location = useLocation();
@@ -69,34 +67,35 @@ const Page = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-indigo-50">
+        <div className="min-h-screen ">
             {/* Animated Header */}
             <div className="relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-gray-600"></div>
-                <div className="absolute inset-0 bg-black opacity-20"></div>
+                <div className="absolute inset-0 "></div>
+                <div className="absolute inset-0 "></div>
                 
              
                 
                 <div className="relative z-10 px-6 py-16">
                     <div className="max-w-7xl mx-auto">
                         {/* Back Button */}
-                        <button
+                        {/* <button
                             onClick={() => navigate(-1)}
                             className="mb-6 inline-flex items-center space-x-2 bg-white bg-opacity-20 text-gray-700 px-6 py-3 rounded-2xl font-medium transition-all duration-300 hover:bg-opacity-30 backdrop-blur-sm"
                         >
                             <ArrowLeft className="w-5 h-5" />
                             <span>Back</span>
-                        </button>
+                        </button> */}
+                        <BackButton/>
 
                         <div className="text-center">
                             <div className="inline-flex items-center space-x-3 mb-4">
                               
-                                <h1 className="text-5xl md:text-6xl font-black text-white tracking-tight">
+                                <h1 className="text-5xl md:text-6xl font-black text-indigo-600 tracking-tight">
                                     Batch Information
                                 </h1>
                                
                             </div>
-                            <p className="text-indigo-200 text-xl">
+                            <p className="text-indigo-400 text-xl">
                                 This is the detailed information of batch {batch.name}
                             </p>
                         </div>
@@ -122,7 +121,7 @@ const Page = () => {
                                 className="inline-flex items-center space-x-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-xl font-medium transition-all duration-300 hover:scale-105"
                             >
                                 <RefreshCw className="w-4 h-4" />
-                                <span>Refresh</span>
+                            
                             </button>
                             
                             <button
@@ -226,7 +225,7 @@ const Page = () => {
                             className="inline-flex items-center space-x-3 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-2xl font-medium transition-all duration-300 hover:scale-105 mb-6"
                             onClick={() => setHideFaculty(!hideFaculty)}
                         >
-                            <Users className="w-5 h-5" />
+                           
                             <span>
                                 {hideFaculty ? "Show Assigned Faculties" : "Hide Assigned Faculties"}
                             </span>
@@ -283,7 +282,7 @@ const Page = () => {
                             className="inline-flex items-center space-x-3 bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-2xl font-medium transition-all duration-300 hover:scale-105 mb-6"
                             onClick={() => setHideStudents(!hideStudents)}
                         >
-                            <Users className="w-5 h-5" />
+                         
                             <span>
                                 {hideStudents ? "Show Assigned Students" : "Hide Assigned Students"}
                             </span>
