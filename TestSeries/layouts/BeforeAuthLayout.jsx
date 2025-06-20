@@ -13,7 +13,7 @@ const BeforeAuthLayout = ({ children }) => {
         {children || <Outlet />} {/* supports both routing and direct nesting */}
       </main>
      
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 };
