@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { fetchUserList } from '../utils/services/userService';
 import { useUser } from '../contexts/currentUserContext';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
 
 export const useCachedUser = () => {
@@ -26,13 +26,17 @@ export const useCachedUser = () => {
     const { data: users = [], isLoading, isError } = useQuery({
         queryKey: ['Users', user._id],
         queryFn: () => fetchUserListFunction(),
+         enabled: !!user?._id, 
         refetchOnWindowFocus: false,
         refetchOnMount: false,
         staleTime: Infinity,
         cacheTime: 24 * 60 * 60 * 1000,
         retry: 0,
     });
-    const userMap=Object.fromEntries(users.map((user) => [user._id, user]));
+    const userMap = useMemo(() => {
+  return Object.fromEntries(users.map((user) => [user._id, user]));
+}, [users]);
+
 
     return {
         users,

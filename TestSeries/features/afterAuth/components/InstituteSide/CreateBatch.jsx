@@ -11,6 +11,7 @@ import Banner from "../../../../assests/Institute/create batch.svg"
 import { usePageAccess } from '../../../../contexts/PageAccessContext';
 import useLimitAccess from '../../../../hooks/useLimitAccess';
 import { useLocation } from 'react-router-dom';
+import { useCachedOrganization } from '../../../../hooks/useCachedOrganization';
 
 const CreateBatch = () => {
   const [formData, setFormData] = useState({ batchMode: 'only-subjects' });
@@ -23,6 +24,11 @@ const CreateBatch = () => {
   const location = useLocation();
   const canAccessPage = usePageAccess();
   const canCreateMoreBatches = useLimitAccess(getFeatureKeyFromLocation(location.pathname), "totalBatches");
+const organization =
+  user.role !== 'organization'
+    ? useCachedOrganization({ userId: user._id, orgId: user.organizationId })?.organization
+    : null;
+
 
   console.log("CreateBatch", canAccessPage, canCreateMoreBatches, getFeatureKeyFromLocation(location.pathname), location.pathname);
   console.log("test" , user.planFeatures?.batch_feature.value)
@@ -36,7 +42,12 @@ const CreateBatch = () => {
 
 
   const Creation_Limit = user?.planFeatures?.batch_feature.value 
-  const Total_Batch = user?.metaData?.totalBatches 
+  const Total_Batch = user?.role === 'organization' 
+    ? user.metaData?.totalBatches 
+    :  (  
+
+      organization?.metaData?.totalBatches
+    );
   const Available_limit = Creation_Limit - Total_Batch
 
   const onChangeHandler = (name, value) => {
