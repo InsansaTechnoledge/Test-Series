@@ -77,6 +77,8 @@ const BatchList = () => {
       // Close modal
       setShowDeleteModal(false);
       setBatchId(null);
+
+      queryClient.invalidateQueries(['batches', user._id]);
     } catch (error) {
       console.error('Error deleting batch:', error);
     }
