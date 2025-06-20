@@ -9,13 +9,27 @@ export default function BottomNavigator({ setShowLogoutModal }) {
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [showLayoutOptions, setShowLayoutOptions] = useState(false);
   const [layoutPosition, setLayoutPosition] = useState('bottom');
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if device is mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
-    const savedLayout = localStorage.getItem('navigationLayout');
-    if (savedLayout && ['left', 'right', 'bottom'].includes(savedLayout)) {
-      setLayoutPosition(savedLayout);
+    if (!isMobile) {
+      const savedLayout = localStorage.getItem('navigationLayout');
+      if (savedLayout && ['left', 'right', 'bottom'].includes(savedLayout)) {
+        setLayoutPosition(savedLayout);
+      }
     }
-  }, []);
+  }, [isMobile]);
 
   const handleLayoutChange = (position) => {
     setLayoutPosition(position);
@@ -36,6 +50,128 @@ export default function BottomNavigator({ setShowLogoutModal }) {
     }
   }, [showLayoutOptions]);
 
+  // Mobile Navigation Component
+  if (isMobile) {
+    return (
+      <div className="fixed bottom-0 left-0 right-0 z-[9999] bg-white border-t border-gray-200 shadow-lg">
+        <div className="safe-area-inset-bottom">
+          {/* Scrollable Navigation Container */}
+          <div className="overflow-x-auto scrollbar-hide">
+            <div className="flex items-center px-2 py-2 min-w-max">
+              
+              {/* Main Navigation Items */}
+              {controls.map((control, idx) => {
+                const isActive = location.pathname.includes(control.path);
+                const isHovered = hoveredIndex === idx;
+
+                return (
+                  <div key={idx} className="relative flex-shrink-0 mx-1">
+                    <button
+                      onTouchStart={() => setHoveredIndex(idx)}
+                      onTouchEnd={() => setHoveredIndex(null)}
+                      onClick={() => {
+                        if (location.pathname.includes(control.path)) {
+                          navigate('/', { replace: true });
+                          setTimeout(() => navigate(control.path), 0);
+                        } else {
+                          navigate(control.path);
+                        }
+                      }}
+                      className={`
+                        relative flex flex-col items-center justify-center py-2 px-2 rounded-lg
+                        transition-all duration-200 ease-out min-h-[60px] w-[60px]
+                        ${isActive 
+                          ? 'text-blue-600' 
+                          : 'text-gray-500 active:bg-gray-100'
+                        }
+                      `}
+                    >
+                      <div className={`
+                        flex items-center justify-center w-7 h-7 rounded-lg mb-1
+                        transition-all duration-200
+                        ${isActive 
+                          ? 'bg-blue-100 scale-110' 
+                          : 'hover:bg-gray-100'
+                        }
+                      `}>
+                        <img 
+                          src={isActive || isHovered ? control.activeIcon : control.icon} 
+                          alt={control.name} 
+                          className="w-4 h-4 transition-all duration-200" 
+                        />
+                      </div>
+                      
+                      {/* Label - Truncated for space */}
+                      <span className={`
+                        text-[10px] font-medium leading-tight text-center truncate w-full
+                        ${isActive ? 'text-blue-600' : 'text-gray-500'}
+                      `}>
+                        {control.name.length > 6 ? control.name.substring(0, 6) + '...' : control.name}
+                      </span>
+                      
+                      {/* Active Indicator */}
+                      {isActive && (
+                        <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-blue-600 rounded-full" />
+                      )}
+                    </button>
+                  </div>
+                );
+              })}
+
+              {/* Separator */}
+              <div className="flex-shrink-0 w-px h-8 bg-gray-200 mx-2" />
+
+              {/* About Button */}
+              <div className="relative flex-shrink-0 mx-1">
+                <button
+                  onTouchStart={() => setHoveredIndex('about')}
+                  onTouchEnd={() => setHoveredIndex(null)}
+                  onClick={() => navigate('/institute/institute-landing')}
+                  className="
+                    flex flex-col items-center justify-center py-2 px-2 rounded-lg
+                    text-gray-500 active:bg-gray-100 transition-all duration-200 
+                    min-h-[60px] w-[60px]
+                  "
+                >
+                  <div className="flex items-center justify-center w-7 h-7 rounded-lg mb-1 hover:bg-gray-100 transition-all duration-200">
+                    <Info className="w-4 h-4" />
+                  </div>
+                  <span className="text-[10px] font-medium leading-tight text-center text-gray-500">
+                    About
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Scroll Indicator Dots */}
+          <div className="flex justify-center pb-1">
+            <div className="flex space-x-1">
+              {Array.from({ length: Math.ceil((controls.length + 1) / 4) }).map((_, idx) => (
+                <div
+                  key={idx}
+                  className="w-1 h-1 rounded-full bg-gray-300"
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Custom styles for hiding scrollbar */}
+        <style jsx>{`
+          .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+          }
+          .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+          }
+        `}</style>
+      </div>
+    );
+  }
+
+  // Desktop Navigation Component
   const isVertical = layoutPosition === 'left' || layoutPosition === 'right';
 
   return (
@@ -286,4 +422,4 @@ export default function BottomNavigator({ setShowLogoutModal }) {
       </div>
     </div>
   );
-}
+} 
