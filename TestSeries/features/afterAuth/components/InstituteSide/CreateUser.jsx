@@ -12,6 +12,7 @@ import Banner from "../../../../assests/Institute/add user.svg"
 import { usePageAccess } from "../../../../contexts/PageAccessContext";
 import useLimitAccess from "../../../../hooks/useLimitAccess";
 import { useLocation } from "react-router-dom";
+import { useCachedOrganization } from "../../../../hooks/useCachedOrganization";
 
 const CreateUser = () => {
     const { batches, isLoading, isError } = useCachedBatches();
@@ -25,13 +26,19 @@ const CreateUser = () => {
     const [showBatches, setShowBatches] = useState([]);
     const [error, setError] = useState({});
     const queryClient = useQueryClient();
+   
     const { user, getFeatureKeyFromLocation } = useUser();
     const location = useLocation();
-
+    const organization =
+      user.role !== 'organization'
+        ? useCachedOrganization({ userId: user._id, orgId: user.organizationId._id })?.organization
+        : null;
 
     const canAddMoreUsers = useLimitAccess(getFeatureKeyFromLocation(location.pathname) , "totalUsers")
     const Creation_limit = user?.planFeatures?.user_feature.value
-    const Total_user = user?.metaData?.totalUsers
+    const Total_user = user?.role === 'organization' 
+    ? user.metaData?.totalBatches 
+    : organization?.metaData?.totalBatches;
 
     const Available_limit = Creation_limit - Total_user
     console.log("ff", canAddMoreUsers , Creation_limit , Total_user)
@@ -258,8 +265,18 @@ const CreateUser = () => {
                         <p className="text-xl text-white/90 max-w-2xl mx-auto drop-shadow-md">
                             Create new users and assign them specific roles in your institute
                         </p>
-                       
-                        <p className="mt-8 text-indigo-500 bg-gray-200 px-3 py-4 rounded-2xl text-2xl flex "> <AlertTriangle/>For current plan you have Available Limit of <span className={`${Available_limit > 0 ? "text-green-500" : "text-red-500"} mx-2`}>{Available_limit}</span> to Add more Users</p>
+                    
+                        <p className="mt-8 text-indigo-700 bg-indigo-50 border border-indigo-100 px-6 py-4 rounded-2xl text-base flex items-start gap-3 shadow-sm backdrop-blur-sm">
+  <AlertTriangle className="w-6 h-6 text-indigo-400 mt-1" />
+  <span>
+    <span className="font-semibold">Note:</span> For your current plan, you have an available limit of
+    <span className={`font-bold ${Available_limit > 0 ? "text-green-600" : "text-red-600"} mx-1`}>
+      {Available_limit}
+    </span>
+    to add more users.
+  </span>
+</p>
+
                     </div>
                 </div>
             </div>
@@ -267,7 +284,7 @@ const CreateUser = () => {
             {/* Main Form Container */}
             <div className="max-w-6xl mx-auto px-6 -mt-8 relative z-20 pb-12">
                 <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
-                    
+           
                     {/* Profile Section */}
                     <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-8 border-b border-gray-100">
                         <div className="flex flex-col md:flex-row gap-8 items-center">
@@ -306,7 +323,13 @@ const CreateUser = () => {
                             </div>
                         </div>
                     </div>
-
+                    {!canAddMoreUsers && (
+           <p className="mt-4 text-center text-sm text-red-600 bg-red-100 border border-red-200 px-4 py-2 rounded-xl shadow-sm backdrop-blur-sm">
+          You've reached your batch creation limit. <br className="sm:hidden" />
+           <span className="font-medium">Upgrade your plan</span> to continue.
+         </p>
+         
+          )}
                     {/* Form Fields */}
                     <div className="p-8">
                         <div className="grid lg:grid-cols-2 gap-8">
