@@ -11,6 +11,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import BackButton from '../../../../constants/BackButton';
 import DeleteExamModal from './DeleteExamModal';
 import Banner from "../../../../../assests/Institute/create exam.svg"
+import { AlertTriangle } from 'lucide-react';
+import useLimitAccess from '../../../../../hooks/useLimitAccess';
+import { useUser } from '../../../../../contexts/currentUserContext';
 
 const CreateExam = () => {
     const [examDetails, setExamDetails] = useState(null);
@@ -20,6 +23,15 @@ const CreateExam = () => {
     const navigate = useNavigate(); 
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [editingExam, setEditingExam] = useState(false);
+    const {user ,getFeatureKeyFromLocation} = useUser();
+
+    const canCreateMoreExams = useLimitAccess(getFeatureKeyFromLocation(location.path), "totalExams")
+    const Total_Exams = user?.metaData?.totalExams
+    const Creation_Limit = user?.planFeatures?.exam_feature?.value
+
+    const Available_Limit = Creation_Limit - Total_Exams
+    console.log("ds",canCreateMoreExams, Total_Exams, Creation_Limit);
+    
 
 
     // console.log(examDetails)
@@ -124,6 +136,9 @@ const CreateExam = () => {
             <p className="text-xl text-white/90 max-w-2xl mx-auto drop-shadow-md">
             Easily manage and publish your exams
             </p>
+
+            <p className="mt-8 text-indigo-500 bg-gray-200 px-3 py-4 rounded-2xl text-2xl flex "> <AlertTriangle/>For current plan you have Available Limit of <span className={`${Available_Limit > 0 ? "text-green-500" : "text-red-500"} mx-2`}>{Available_Limit}</span>Exams</p>
+
           </div>
         </div>
       </div>
