@@ -12,6 +12,7 @@ import Banner from "../../../../assests/Institute/add user.svg"
 import { usePageAccess } from "../../../../contexts/PageAccessContext";
 import useLimitAccess from "../../../../hooks/useLimitAccess";
 import { useLocation } from "react-router-dom";
+import { useCachedOrganization } from "../../../../hooks/useCachedOrganization";
 
 const CreateUser = () => {
     const { batches, isLoading, isError } = useCachedBatches();
@@ -28,11 +29,16 @@ const CreateUser = () => {
    
     const { user, getFeatureKeyFromLocation } = useUser();
     const location = useLocation();
-
+    const organization =
+      user.role !== 'organization'
+        ? useCachedOrganization({ userId: user._id, orgId: user.organizationId._id })?.organization
+        : null;
 
     const canAddMoreUsers = useLimitAccess(getFeatureKeyFromLocation(location.pathname) , "totalUsers")
     const Creation_limit = user?.planFeatures?.user_feature.value
-    const Total_user = user?.metaData?.totalUsers
+    const Total_user = user?.role === 'organization' 
+    ? user.metaData?.totalBatches 
+    : organization?.metaData?.totalBatches;
 
     const Available_limit = Creation_limit - Total_user
     console.log("ff", canAddMoreUsers , Creation_limit , Total_user)
