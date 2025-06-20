@@ -197,11 +197,18 @@ OrganizationSchema.virtual('totalUsers',{
   localField: '_id',
   foreignField: 'organizationId',
   count: true
+});
+
+OrganizationSchema.virtual('totalRoleGroups',{
+  ref: 'Role',
+  localField: '_id',
+  foreignField: 'organizationId',
+  count: true
 })
 
 
 OrganizationSchema.methods.getFullMetadata = async function () {
-  this.populate('totalStudents totalUsers');
+  this.populate('totalStudents totalUsers totalRoleGroups');
   const totalBatches = await getTotalBatches(this._id.toString());
   const totalExams=await getTotalExamsForOrg(this._id.toString());
 
@@ -209,7 +216,8 @@ OrganizationSchema.methods.getFullMetadata = async function () {
     totalStudents: this.totalStudents ?? 0,
     totalUsers: this.totalUsers ?? 0,
     totalBatches: totalBatches ?? 0,
-    totalExams: totalExams ?? 0
+    totalExams: totalExams ?? 0,
+    totalRoleGroups: this.totalRoleGroups ?? 0
   };
 };
 
