@@ -19,13 +19,13 @@ app.use(cookieParser());
 
 // ✅ Secure session configuration (for Render/HTTPS)
 app.use(session({
-  secret:"Hi_there",
+  secret:process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: true,        // ⬅️ required for HTTPS
-    sameSite: 'none',    // ⬅️ required for cross-origin
-    httpOnly: true,
+    secure: process.env.NODE_ENV !== 'development',        // ⬅️ required for HTTPS
+    sameSite: process.env.NODE_ENV === 'development' ? 'lax' : 'none', 
+    dimain: process.env.NODE_ENV === 'development' ? 'localhost' : 'auto',    
     maxAge: 24 * 60 * 60 * 1000 // optional: 1 day
   }
 }));
