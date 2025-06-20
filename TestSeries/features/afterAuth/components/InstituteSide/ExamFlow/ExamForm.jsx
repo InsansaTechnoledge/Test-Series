@@ -8,18 +8,23 @@ import { updateExam } from '../../../../../utils/services/examService';
 import { usePageAccess } from '../../../../../contexts/PageAccessContext';
 
 
-const ExamForm = ({ onSubmit ,initialData={ name: '',
+const ExamForm = ({canCreateMoreExams, onSubmit ,initialData={ name: '',
     date: '',
     total_marks: '',
     duration: '',
     batch_id: '',
   }}) => {
+
+  console.log("df", canCreateMoreExams);
+  
   const { user } = useUser();
   const { batches = [] , batchMap } = useCachedBatches();
 
   const { pendingExams, isLoading: pendingLoading } = usePendingExams();
   
     const canAccessPage = usePageAccess()
+
+    console.log("fbgd", canAccessPage)
 
   console.log(pendingExams)
   const [form, setForm] = useState(initialData);
@@ -246,28 +251,24 @@ const ExamForm = ({ onSubmit ,initialData={ name: '',
   </div>
 
   {/* Submit Button */}
-  <div className="pt-4 flex justify-center">
-    <button
-      type="submit"
-      disabled={canAccessPage === false}
-      className={`group text-white px-12 py-4 rounded-3xl flex items-center gap-3 font-bold text-lg transition-all duration-300 transform
-        ${canAccessPage === false
-          ? 'bg-gray-300 cursor-not-allowed'
-          : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 hover:scale-105 hover:shadow-2xl'}
-      `}
-    >
-      <span className={`${!canAccessPage && "text-red-600"}`}>
-        {canAccessPage ? (
-          <>
-          
-            {form.id ? 'Update Exam' : 'Create Exam'}
-          </>
-        ) : (
-          'Access Denied'
-        )}
-      </span>
-    </button>
-  </div>
+  <button
+  type="submit"
+  disabled={canAccessPage === false || canCreateMoreExams === false}
+  className={`group text-white px-12 py-4 rounded-3xl flex items-center gap-3 font-bold text-lg transition-all duration-300 transform
+    ${canAccessPage === false || canCreateMoreExams === false
+      ? 'bg-gray-300 cursor-not-allowed'
+      : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 hover:scale-105 hover:shadow-2xl'}
+  `}
+>
+  <span className={`text-center ${canAccessPage === false || canCreateMoreExams === false ? "text-red-600" : ""}`}>
+    {!canAccessPage 
+      ? 'Access Denied'
+      : !canCreateMoreExams 
+        ? 'Limit Exceeded'
+        : (form.id ? 'Update Exam' : 'Create Exam')
+    }
+  </span>
+</button>
 </form>
 
         </div>
@@ -337,13 +338,20 @@ const ExamForm = ({ onSubmit ,initialData={ name: '',
                 </div>
 
                 <button
-                  onClick={() => exam?.id ? onSubmit(exam) : console.error('Exam ID is missing')}
-                  className="bg-gradient-to-r from-indigo-600 to-blue-600 text-white px-6 py-3 rounded-xl hover:from-indigo-700 hover:to-blue-700 transition-all duration-200 font-semibold shadow-md hover:shadow-xl transform hover:-translate-y-0.5 flex items-center space-x-2"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                  <span>Add Questions</span>
+                    onClick={() => exam?.id ? onSubmit(exam) : console.error('Exam ID is missing')}
+                    disabled={canCreateMoreExams === false}
+                    className={`px-6 py-3 rounded-xl transition-all duration-200 font-semibold shadow-md hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center space-x-2
+                      ${canCreateMoreExams === false
+                        ? 'bg-gray-300 cursor-not-allowed text-gray-600'
+                        : 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white hover:from-indigo-700 hover:to-blue-700'}
+                    `}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    <span className="text-center">
+                      {canCreateMoreExams === false ? 'Limit Exceeded' : 'Add Questions'}
+                    </span>
                 </button>
               </div>
             </div>
