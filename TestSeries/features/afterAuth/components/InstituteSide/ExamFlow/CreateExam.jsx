@@ -42,12 +42,8 @@ const organization =
     
     const Creation_Limit = user?.planFeatures?.exam_feature?.value
 
-    const Available_Limit = Creation_Limit - Total_Exams
-    console.log("ds",canCreateMoreExams, Total_Exams, Creation_Limit);
+    const Available_Limit = Creation_Limit - Total_Exams;
     
-
-
-    // console.log(examDetails)
     const handleNewExam = (newExam) => {
       setExamDetails(newExam);
       navigate(`/institute/create-exam/${newExam.id}`, { replace: true }); 
@@ -55,19 +51,17 @@ const organization =
 
     useEffect(() => {
       const loadExamIfNeeded = async () => {
-        console.log('🔥 Checking if we need to load exam...');
+
         if (examId) {
           try {
             const res = await fetchExamById(examId);
-            console.log('✅ Raw API response:', res.data);
     
             const matchedExam = res.data.find(e => e.id === examId);
-            console.log('✅ Matched exam:', matchedExam);
     
             if (!matchedExam) {
               console.warn('⚠️ No matching exam found!');
             } else {
-              console.log('✅ organization_id:', matchedExam.organization_id);
+              // console.log('✅ organization_id:', matchedExam.organization_id);
             }
     
             setExamDetails(matchedExam);
@@ -104,7 +98,6 @@ const organization =
           questions: enrichedQuestions
         });
     
-        console.log("✅ Uploaded Successfully:", res);
         alert('✅ Questions submitted successfully!');
         navigate('/institute/exam-list');
       } catch (err) {
@@ -114,19 +107,6 @@ const organization =
         setIsSubmitting(false);
       }
     };
-    
-    // const handleDeleteExam = async () => {
-    //   console.log(`deleting exam : ${examDetails.id}`)
-    //   const id = examDetails.id
-    //   try{
-    //     const res = await deleteExam(id)
-    //     console.log(`deleted` , res)
-    //     navigate('/institute/institute-landing')
-
-    //   } catch(e) {
-    //     console.log('error creating exam ', e)
-    //   }
-    // }
       
    
     return (
@@ -301,7 +281,6 @@ const organization =
             <button
                 onClick={() =>{
                   setShowDeleteModal(true);
-                  console.log(`deleting exam : ${examDetails.id}`)
                 }}
                 className="text-red-600 border-red-600 border px-4 py-2 mt-4 rounded hover:bg-red-700 transition hover:text-white font-semibold"
               >

@@ -115,10 +115,10 @@ const StudentListPage = () => {
   // Delete students
   const deleteStudents = async () => {
     try {
-      console.log("Deleting students:", studentsToDelete);
+
       const response = await deleteStudentById(studentsToDelete);
       if (response.status === 200) {
-        console.log("Students deleted successfully:", response.data);
+
         await queryClient.invalidateQueries(["Students", user._id]);
       }
     } catch (error) {

@@ -2,7 +2,6 @@ import { useNavigate } from 'react-router-dom';
 
 export default function ExamLinksComponent({ Data, grid }) {
   const navigate = useNavigate();
-  console.log(grid)
   return (
     <div className="px-4 py-8">
       <div className="max-w-6xl mx-auto">

@@ -21,7 +21,7 @@ export const register = async (req, res) => {
       prompt: "consent",
     });
 
-    console.log("Generated auth URL:", authUrl);
+
     return new APIResponse(200, authUrl).send(res);
   } catch (error) {
     console.error("Error generating auth URL:", error);
@@ -59,7 +59,6 @@ export const callback = async (req, res) => {
       }
     };
 
-    console.log("Fetched user data from Google:", userData);
 
     const savedUser = await saveUserData(userData, req.user._id, req.user.role);
 
@@ -80,7 +79,7 @@ const saveUserData = async (userData, userId, role) => {
         ? await Organization.findByIdAndUpdate(userId, update, { new: true })
         : await User.findByIdAndUpdate(userId, update, { new: true });
 
-    console.log("YouTube info saved to DB:", updatedUser);
+
     return updatedUser;
   } catch (err) {
     console.error("Error saving user data:", err);
@@ -96,7 +95,7 @@ export const uploadVideo = async (req, res) => {
 
     
     // const batchId = "d894fdf4-94f6-4f51-b070-46bbba57a86d";
-console.log("Batch ID:", batchId);
+
     const videoId = await uploadToYouTube(filePath, title, description, req.user);
     if (!videoId) {
       return new APIResponse(200, { message: "Video URL not found" }).send(res);

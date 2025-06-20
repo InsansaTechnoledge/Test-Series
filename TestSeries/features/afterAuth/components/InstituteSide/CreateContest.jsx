@@ -44,12 +44,11 @@ const CreateContest = () => {
       schedule,
       validity,
     }
-    console.log('Form submitted:', formData);
+
 
     try{
       const response=await createContest(formData);
       if(response.status === 200){
-        console.log('Contest created successfully:', response.data);
         navigate('/institute/code-create/?contestId=' + response.data.id);
       }
     } catch (error) {

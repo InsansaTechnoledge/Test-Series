@@ -20,29 +20,22 @@ const TestInstructions = () => {
   const eventId = queryParams.get("eventId");
   const userId = queryParams.get('userId');
 
-  console.log(examId, eventId, userId);
   
   useEffect(() => {
-    console.log("🚀 TestInstructions mounted!");
-
-    
-
     const isElectron = navigator.userAgent.includes('Electron');
-    console.log('🧪 isElectron?', isElectron);
-    console.log('✅ electronAPI:', window.electronAPI);
-    
+
     const fetchEvent = async () => {
       setLoading(true);
       try {
         const response = await getEventDetails(eventId);
         if (response.status === 200) {
           setExamDetails(response.data);
-          console.log(response.data);
+
         }
       } catch (err) {
         const errorMessage = err.response?.data?.errors?.[0] || err.message;
         setError(errorMessage);
-        console.log(errorMessage);
+
       } finally {
         setLoading(false);
       }
@@ -57,13 +50,10 @@ const TestInstructions = () => {
 
   useEffect(() => {
     const handleProctorEvent = (data) => {
-      console.log("📥 Proctor Event in TestInstructions:", data);
     
       if (data?.eventType === "session_start" || data?.details?.includes("Face detection normalized")) {
         setProctorStatus('ready');
         if (timeoutId) clearTimeout(timeoutId);
-    
-        console.log("✅ Session Started! Navigating to TestWindow...");
     
         navigate(`/test-page?userId=${userId}&examId=${examId}&eventId=${eventId}`);
       }
@@ -85,13 +75,13 @@ const TestInstructions = () => {
 const handleStartTest = async () => {
   try {
     if (window.electronAPI && userId && examId && eventId) {
-      console.log("🔥  Launching Proctor Engine...");
+
       window.electronAPI.startProctorEngine(userId, examId, eventId);
       setProctorStatus('starting');
 
       const updatedAttempt = await updateEventAttempsByUser(eventId, userId);
       if (updatedAttempt.status === 200) {
-        console.log(updatedAttempt.data);
+
       }
 
       const id = setTimeout(() => {
@@ -109,15 +99,12 @@ const handleStartTest = async () => {
 
 useEffect(() => {
   const handleProctorEvent = (data) => {
-    console.log("📥 Proctor Event in TestInstructions:", data);
     if (data?.eventType === "session_start") {
       setProctorStatus('ready');
 
       if (timeoutId) {
         clearTimeout(timeoutId); // ✅ clear timeout when session starts
       }
-
-      console.log("✅ Session Started! Navigating to TestWindow...");
       navigate(`/test?userId=${userId}&examId=${examId}&eventId=${eventId}`);
     }
   };

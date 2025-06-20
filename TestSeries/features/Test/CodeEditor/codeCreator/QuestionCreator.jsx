@@ -8,8 +8,6 @@ export default function QuestionCreator() {
 
   const [searchParams]=useSearchParams();
   const contestId= searchParams.get("contestId");
-
-console.log("contestId", contestId);
   const [formData, setFormData] = useState({
     title: '',
     difficulty: 'easy',
@@ -39,8 +37,6 @@ console.log("contestId", contestId);
 
     const questionData = formData;
 
-    console.log('New Question Data:', JSON.stringify(questionData, null, 2));
-
     //have to add the contest id in the question data 
 
     questionData.contest_id = contestId;
@@ -48,7 +44,7 @@ console.log("contestId", contestId);
 
     try {
       const response = await saveContestQuestion(questionData);
-      console.log(response.data);
+
       if(response.status === 200) {
         alert("Question created successfully!");
         setFormData({

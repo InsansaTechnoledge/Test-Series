@@ -19,15 +19,10 @@ const UploadVideo = () => {
 
     const canAccessPage = usePageAccess();
 
-    useEffect(() => {  
-        console.log("sdf",canAccessPage)
-    },[])
-
     const handleSubmit = async () => {
-        console.log(formData);
+
         const response = await uploadVideo(formData);
         if (response.status == 200) {
-            console.log(response.data);
             alert("Video uploaded successfully");
             navigate('/institute/institute-landing');
         }

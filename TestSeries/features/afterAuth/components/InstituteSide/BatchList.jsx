@@ -54,7 +54,7 @@ const BatchList = () => {
 
   // Handle Edit Button Click
   const handleEditBatch = (batchId) => {
-    console.log("edit clicked")
+
     navigate(`/institute/edit-batch`, { state: { batchId: batchId } });
   };
 
@@ -69,7 +69,6 @@ const BatchList = () => {
     try {
       // Add your delete API call here
       // await deleteBatch(batchId);
-      console.log('Deleting batch:', batchId);
       
       // Refresh data after deletion
       await refreshFunction();

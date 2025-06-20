@@ -45,9 +45,7 @@ const TestWindow = () => {
           }
         }
       const subjectSet = new Set(questions.map(q => q.subject));
-      console.log("Exam details:", exam);
-      console.log("Questions loaded:", questions);
-      console.log("Subjects found:", Array.from(subjectSet));
+
 
 
       setEventDetails(prev => ({
@@ -77,12 +75,10 @@ const TestWindow = () => {
           return acc;
         }, {});
 
-        console.log("Reduced subject-specific questions:", reduced);
         setSubjectSpecificQuestions(reduced);
       } else {
         const bytes = CryptoJS.AES.decrypt(cached, secretKey);
         const decrypted = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-        console.log("Decrypted subject-specific questions:", decrypted);
         setSubjectSpecificQuestions(decrypted);
       }
 
@@ -90,15 +86,6 @@ const TestWindow = () => {
       setSelectedSubject(eventDetails.subjects[0] || "Unspecified");
     }
   }, [eventDetails]);
-
-
-
-
-  useEffect(() => {
-    if (subjectSpecificQuestions) {
-      console.log("subjectspecific", subjectSpecificQuestions);
-    }
-  }, [subjectSpecificQuestions]);
 
 
   useEffect(() => {
@@ -189,12 +176,7 @@ const TestWindow = () => {
         return [...acc, ...objs];
       }, []);
 
-      // await deleteEventAttemptsByUser(eventId, userId);
-      // const response = await checkUsersAnswers(answers, userId, eventDetails.exam_id, eventDetails.id);
-      // if (response.status === 200) {
-      //   console.log('✅ Test submitted successfully.');
-      // }
-
+      
       const result = calculateResult(answers);
 
       const payload = {
@@ -207,8 +189,6 @@ const TestWindow = () => {
 
       }
 
-      console.log(payload);
-
 
       const response = await submitResult(payload);
       if (response.status == 200) {
@@ -217,7 +197,7 @@ const TestWindow = () => {
       }
 
     } catch (err) {
-      console.log(err);
+      
     }
 
     if (window?.electronAPI?.stopProctorEngine) window.electronAPI.stopProctorEngine();
@@ -239,10 +219,7 @@ const TestWindow = () => {
 
   if (isExamLoading || isQuestionLoading) {
     return <div>Loading...🥲
-      <>
-        {console.log("Loading exam details or questions...", isQuestionLoading)}
-        {console.log("Exam details:", isExamLoading)}
-      </>
+      
     </div>
   }
 

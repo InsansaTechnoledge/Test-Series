@@ -115,7 +115,6 @@ export const fetchContest = async (organizationId, batchId,userId) => {
 };
 
 export const enrollStudentToContestQuery = async (contestId, userId) => {
-  console.log("Enrolling user:", userId, "to contest:", contestId);
     const { data, error } = await supabase
         .from("contestxparticipant")
         .insert([{ contest_id: contestId, participant_id: userId ,status: 'enrolled'}])

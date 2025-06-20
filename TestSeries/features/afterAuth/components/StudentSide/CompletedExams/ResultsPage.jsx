@@ -16,8 +16,6 @@ const ResultsPage = () => {
     const [loading, setLoading] = useState(true);
     const [selectedResult, setSelectedResult] = useState(null);
     const navigate = useNavigate();
-
-    console.log(results)
     const question = ""
     const answer = ""
 

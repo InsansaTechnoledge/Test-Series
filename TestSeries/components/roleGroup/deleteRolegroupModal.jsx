@@ -15,13 +15,12 @@ const DeleteRoleGroupModal = ({ setShowDeleteRoleGroupModal, role }) => {
     const handleCancle = async () => {
         setShowDeleteRoleGroupModal(false);
         setShowConfirmation(false);
-        console.log("cancle")
 
     }
 
 
     const handleDelete = async (withUsers) => {
-        console.log("delete users", withUsers);
+
         try{
             const response=await deleteRoleGroup(role._id,withUsers);
             if(response.status===200){

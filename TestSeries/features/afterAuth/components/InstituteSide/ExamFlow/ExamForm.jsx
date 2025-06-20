@@ -15,7 +15,6 @@ const ExamForm = ({canCreateMoreExams, onSubmit ,initialData={ name: '',
     batch_id: '',
   }}) => {
 
-  console.log("df", canCreateMoreExams);
   
   const { user } = useUser();
   const { batches = [] , batchMap } = useCachedBatches();
@@ -24,14 +23,11 @@ const ExamForm = ({canCreateMoreExams, onSubmit ,initialData={ name: '',
   
     const canAccessPage = usePageAccess()
 
-    console.log("fbgd", canAccessPage)
-
-  console.log(pendingExams)
   const [form, setForm] = useState(initialData);
 
     useEffect(() => {
     setForm(initialData);
-    console.log("Initial data set in form:", initialData);
+
   }, [initialData]);
 
   const handleChange = (e) => {
@@ -62,12 +58,10 @@ const ExamForm = ({canCreateMoreExams, onSubmit ,initialData={ name: '',
       let response = {};
 
       if(form.id){
-        console.log("Updating existing exam with ID:", form.id);
-        console.log("Payload for update:", payload);
+
         const {batch,...examData}=payload;
-        console.log("Exam data to update:", examData);
+      
        response = await updateExam(form.id, examData);
-        console.log("Exam updated successfully:", response.data);
       
       }
       else{

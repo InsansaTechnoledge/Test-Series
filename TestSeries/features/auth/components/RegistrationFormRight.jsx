@@ -258,9 +258,6 @@ const OrganizationRegistrationForm = () => {
     }
 
     try {
-    //   console.log('Form data:', formData);
-    //   formData.logoUrl = logoFile ? previewUrl : '';
-    //   const response=await createOrganization(formData);
         
         const form = new FormData();
 
@@ -276,10 +273,7 @@ const OrganizationRegistrationForm = () => {
             form.append('logoUrl' , logoFile)
         }
 
-        const response = await createOrganization(form);
-
-        console.log("✅ Server response:", response); 
-        console.log("✅ Uploaded logo URL:", response?.data?.logoUrl); 
+        const response = await createOrganization(form);; 
 
 
       setMsg(`✅ Institute created successfully by the name ${response.data.name}!`);
@@ -544,7 +538,6 @@ const OrganizationRegistrationForm = () => {
             <select 
             onChange={(e) => {
               setSelectedCountryCode(e.target.value);
-              console.log(e.target);
               handleChange(e, 'country', 'address');
             }}
             className='w-full px-4 py-3 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all'>
@@ -561,8 +554,7 @@ const OrganizationRegistrationForm = () => {
           <div>
             <label className="block text-gray-700 text-sm font-medium mb-1">State/Province*</label>
              <select 
-            onChange={(e) =>{setSelectedStateCode(e.target.value)
-              console.log(e.target.key);  
+            onChange={(e) =>{setSelectedStateCode(e.target.value) 
               handleChange(e, 'state', 'address');
             }}
             className='w-full px-4 py-3 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all'>

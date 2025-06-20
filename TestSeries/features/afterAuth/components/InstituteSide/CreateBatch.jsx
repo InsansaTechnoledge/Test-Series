@@ -54,11 +54,6 @@ const organization =
     }));
   };
 
-  useEffect(() => {
-    if (formData) {
-      console.log(formData);
-    }
-  }, [formData])
 
   const deleteSubject = (indexToDelete) => {
     setFormData((prev) => ({
@@ -139,7 +134,7 @@ const organization =
         processedSyllabus[subject] = chaptersArray;
       }
     }
-    console.log("📊 Processed Syllabus:", processedSyllabus);
+
 
     const payload = {
       name: formData.name,
@@ -150,7 +145,6 @@ const organization =
       syllabus: processedSyllabus,
     };
 
-    console.log("✅ Final JSON payload to submit:", payload);
     try {
       const response = await createBatch(payload);
       if (response.status === 200) {

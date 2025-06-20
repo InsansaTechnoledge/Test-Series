@@ -65,8 +65,6 @@ const ContestCard = ({ contest , handleParticipate ,notParticipated}) => {
         {contest.go_live && (
           <button 
           onClick={()=>{
-            console.log("clicked");
-            //encrypt the contest id
 
             const contestId = CryptoJS.AES.encrypt(contest.id,SECRET_KEY).toString();
             const safeId=encodeURIComponent(contestId);

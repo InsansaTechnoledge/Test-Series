@@ -117,7 +117,7 @@ const BatchPage = () => {
         try {
             const response = await updateBatch(batchId, updatedBatch);
             if (response.status === 200) {
-                console.log("Batch updated successfully:", response.data);
+               
                 alert("Batch updated successfully!");
                 await queryClient.invalidateQueries(['batches', user._id]);
                 await queryClient.invalidateQueries(['Users', user._id])// Invalidate batches cache

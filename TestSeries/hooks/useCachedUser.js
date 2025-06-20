@@ -14,10 +14,8 @@ export const useCachedUser = () => {
             if (response.status !== 200) {
                 throw new Error('Network response was not ok');
             }
-            console.log(response.data);
             return response.data;
         } catch (err) {
-            console.log(err);
             return [];
             // setbatchError(
         }

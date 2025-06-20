@@ -15,7 +15,6 @@ const ContestListPage = () => {
 
     useEffect(() => {
         if (!contestList || contestList.length === 0) {
-            console.log("No contests available or contestList is empty.");
             setLoading(true);
             return;
         }
@@ -28,39 +27,22 @@ const ContestListPage = () => {
 
     const handleParticipate = async (contestId) => {
         try {
-            console.log("Participating in contest with ID:", contestId);
-
 
 
             const response=await enrollContest(contestId);
-            if (response.status === 200) {
-                console.log("Successfully enrolled in contest:", response.data);
-            }
-            else {
+            if (response.status !== 200) {
+          
                 console.error("Failed to enroll in contest:", response.data);
             }
-            console.log("Enrolled Contest Response:", response.data);
 
             setEnrolledContests(prev => [...prev, contests.find(contest => contest.id === contestId)]);
-            console.log("Enrolled Contests:", enrolledContests);
             setContests(prev => prev.filter(contest => contest.id !== contestId));
-
-            console.log("Updated Contest List:", contests);
-
 
         } catch (error) {
             console.error("Error participating in contest:", error);
         }
 
     };
-
-    useEffect(() => {
-        try {
-            console.log("Enrolled Contests:", enrolledContests);
-        } catch (error) {
-            console.error("Error in enrolled contests:", error);
-        }
-    }, [contests, enrolledContests]);
 
     {loading && <div className="text-center text-gray-500">Loading contests...</div>}
 

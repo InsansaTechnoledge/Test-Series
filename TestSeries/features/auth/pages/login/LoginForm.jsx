@@ -23,7 +23,7 @@ const LoginForm = () => {
 
   useEffect(() => {
     if (user && role === 'Institute') {
-      console.log("loginForm", user);
+
       navigate('/institute/institute-landing');
     } else if (user && role === 'Student') {
       navigate('/student/student-landing');
@@ -84,24 +84,18 @@ const LoginForm = () => {
       return; // Don't submit if errors exist
     }
 
-    // Proceed with login logic here (e.g. API call)
-    console.log('Logging in with:', formData);
-
     if (role === 'Institute') {
-      // Call the API for Institute login
-      console.log('Logging in as Institute');
+
       try {
         const response = await orgLogin(formData);
-        console.log(response);
         if (response.status === 200) {
 
-          console.log("institute logged in successfully!!")
+        
           setFormData({
             email: '',
             password: ''
           });
 
-          console.log("😏", response.data.user);
           const user=await checkAuth();
           if(user.status===200){
           setUser(user.data.user);
@@ -118,8 +112,7 @@ const LoginForm = () => {
 
     }
     else if (role === 'Student') {
-      // Call the API for Student login
-      console.log('Logging in as Student');
+
       try {
         const response = await studentLogin(formData);
         if (response.status === 200) {
@@ -128,11 +121,9 @@ const LoginForm = () => {
             password: ''
           });
 
-
-          console.log("student logged in successfully!!")
           setErrors({});
         }
-        console.log("😏", response);
+
         const user = await checkAuth();
         if (user.status === 200) {
 

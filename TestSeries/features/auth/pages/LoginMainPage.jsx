@@ -18,8 +18,7 @@ const LoginMainPage = () => {
             navigate('/login?role=Institute');
         }
     }, [role])
-
-    // console.log(role);
+    
     return (
         <div>
             <LoginHeader loginFor={loginFor} />

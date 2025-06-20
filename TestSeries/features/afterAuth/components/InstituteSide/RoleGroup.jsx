@@ -54,8 +54,7 @@ export default function FeatureBasedRoleGroups() {
     );
 
   const Creation_limit = user?.planFeatures?.role_feature?.value
-  const Available_limit = Creation_limit - Total_Role
-  console.log(canAddMoreRoles , Creation_limit , Total_Role)
+  const Available_limit = Creation_limit - Total_Role;
 
   const filteredFeatures = features.filter(feature => {
     const matchesSearch = feature.name.toLowerCase().includes(searchTerm.toLowerCase());

@@ -12,7 +12,6 @@ const useCachedContests = () => {
         try {
             const response = await FetchContest(batchId);
             if (response.status === 200) {
-                console.log("Contest List:", response.data);
                 return response.data;
             }
             else return [];

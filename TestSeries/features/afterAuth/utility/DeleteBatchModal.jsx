@@ -13,7 +13,6 @@ const DeleteBatchModal = ({ batchId, faculties,students, setShowDeleteModal }) =
   const handleDelete = async () => {
     try {
       setLoading(true);
-      console.log(faculties,students);
       const response= await deleteBatch(batchId, faculties,students);
       if (response.status === 200) {
         alert('Batch deleted successfully.');

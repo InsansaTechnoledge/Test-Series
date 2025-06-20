@@ -11,15 +11,10 @@ const PageAccessGuard = ({ children }) => {
 
     if(user?.planPurchased || user?.planFeatures){
 
-    console.log("PageAccessGuard", location.pathname);
     const canAccess = hasPlanFeature({
         keyFromPageOrAction:null,
         location: location.pathname 
     });
-
-    console.log("canAccess", canAccess);
-
-
 
       return (
     <PageAccessContext.Provider value={canAccess}>

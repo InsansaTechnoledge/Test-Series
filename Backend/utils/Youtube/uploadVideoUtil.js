@@ -58,12 +58,8 @@ const youtube = google.youtube({
 
 export const uploadToYouTube = async (filePath, title, description, user) => {
 
-
-  console.log('OAuth2 credentials:', oauth2Client.credentials);
-
   const isExpired = await isTokenExpired(user.youtubeInfo.tokens.expiry);
   if (isExpired) {
-    console.log("Token expired, updating tokens...");
     await updateTokens(user);
   }
 

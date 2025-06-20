@@ -41,13 +41,13 @@ export const useGoLiveExam = () => {
 
   return useMutation({
     mutationFn: async ({ examId, goLive }) => {
-      console.log('🔄 Calling goLiveExam with:', { examId, goLive });
+
       const response = await goLiveExam(examId, goLive);
-      console.log('✅ goLiveExam response:', response);
+
       return response.data;
     },
     onSuccess: (data, variables) => {
-      console.log('✅ Go live mutation successful:', { data, variables });
+
       // Invalidate and refetch exams after successful update
       queryClient.invalidateQueries(['exams', user?._id]);
     },

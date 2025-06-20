@@ -59,7 +59,7 @@ const StudentEditPage = () => {
 
     try {
         const response = await updateStudentById(studentId, formdata);
-        console.log('Updated student data:', response);
+
         alert("student data updated")
       } catch (err) {
         console.error('Error updating student:', err);

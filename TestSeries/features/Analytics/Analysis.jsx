@@ -31,7 +31,6 @@ const Analysis = () => {
         setError('')
         try {
           const response = await getAllStudentData(exam)
-          console.log('Exam Data Response:', response.data)
           const results = response.data.enrichedResults|| response || []
           setExamData(results);
           setExamQuestions(response.data.questionMap || [])

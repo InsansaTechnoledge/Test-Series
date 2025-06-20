@@ -41,8 +41,7 @@ const AddStudent = () => {
 
 
   const Creation_limit = user?.planFeatures?.student_feature?.value
-  const Available_limit = Creation_limit - Total_students
-  console.log(canAddMoreStudents , Total_students , Creation_limit , Available_limit)
+  const Available_limit = Creation_limit - Total_students;
 
   const canAccessPage = usePageAccess();
 
@@ -124,9 +123,9 @@ const AddStudent = () => {
   const handleImportedStudents = async () => {
     try{
     const response = await fetchStudents(importBatch);
-    console.log(response);
+
     if (response.status === 200) {
-      console.log(response.data);
+
       setImportedStudents(response.data);
     }
   }catch(error){
@@ -250,7 +249,6 @@ const AddStudent = () => {
 
         const res = await addSingleStudent(preparedStudents);
         alert('Students added successfully!');
-        console.log(res);
         setStudents([getEmptyStudent()]);
         setErrors('')
         queryClient.invalidateQueries(['Students', user._id])
@@ -264,7 +262,6 @@ const AddStudent = () => {
   
         const res = await uploadStudentExcel(fileInput.files[0], batch);
         alert('Excel uploaded successfully!');
-        console.log(res);
       }
 
       if (activeTab === 'import') {
@@ -278,7 +275,7 @@ const AddStudent = () => {
           currentBatchId,
           previousBatchId
         })
-        console.log(response);
+        
         if(response.status === 200) {
           alert('Students imported successfully!');
           setImportedStudents([]);

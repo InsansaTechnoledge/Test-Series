@@ -173,9 +173,6 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
       newQuestion.starter_code = codeData.starter_code;
       newQuestion.difficulty = codeData.difficulty;
 
-      console.log("Code Question Data:", JSON.stringify(newQuestion, null, 2));
-
-
     }
 
     setQuestions(prev => [...prev, newQuestion]);

@@ -8,16 +8,10 @@ import BackButton from '../../../../constants/BackButton';
 
 const EditUserPage = () => {
   const { id } = useParams();
-
   const { userMap, isLoading, isError } = useCachedUser();
-  console.log("User Map:", userMap);
   const { roleGroups, roleMap } = useCachedRoleGroup();
   const { batches, batchMap } = useCachedBatches();
-
   const userData = userMap?.[id];
-  console.log("User Data:", userData);
-
-
   const [name, setName] = useState(userData?.name || '');
   const [email, setEmail] = useState(userData?.email || '');
   const [userId, setUserId] = useState(userData?.userId || '');
@@ -48,14 +42,12 @@ const EditUserPage = () => {
       batch: batchArray
     };
 
-    console.log("Updated user data:", updatedUserData);
-
     try {
       const response = await UpdateUser({
         userId: id,
         Data: updatedUserData
       });
-      console.log("User updated:", response);
+
       alert("User updated successfully!");
     } catch (err) {
       console.error(err);

@@ -29,8 +29,6 @@ const Page = () => {
         users?.filter(user => Array.isArray(user.batch) && user.batch.includes(batchId)) || []
     );
 
-    console.log("b", batch);
-
     useEffect(() => {
         if (students && batchId) {
             const filteredStudents = students.filter(student =>
@@ -365,7 +363,6 @@ const Page = () => {
                                     <button
                                         className="flex-1 bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl font-medium transition-colors"
                                         onClick={() => {
-                                            console.log('Deleting batch:', batchId);
                                             setShowDeleteModal(false);
                                         }}
                                     >

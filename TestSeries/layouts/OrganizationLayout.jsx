@@ -10,7 +10,7 @@ export default function OrganizationLayout() {
   const location = useLocation();
 
   useEffect(() => {
-    console.log('Current location changed:', location.pathname);
+
   }, [location.pathname]);
 
   return (

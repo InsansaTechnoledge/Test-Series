@@ -20,13 +20,11 @@ const UserViewPage = () => {
 
     const userData = userMap[userId]
 
-    console.log(userData)
     const batchNames = userData.batch.map((batchId) => {
         const batch = batchMap[batchId];
         return batch ? batch.name : "Unknown Batch";
     })
 
-    console.log(userMap[userId])
     return (
         <div className="min-h-screen ">
             {/* Enhanced Header Section */}

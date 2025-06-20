@@ -4,21 +4,13 @@ import { callBack, register } from "../../utils/services/videoService";
 import Banner from "../../assests/Institute/upload videos.svg"
 import { usePageAccess } from "../../contexts/PageAccessContext";
 const Connection = () => {
-    // const { user, setUser } = useUser();
-    const navigate = useNavigate();
 
-    // useEffect(() => {
-    //     console.log("User in Connection:", user);
-    //     if (user?.Info) {
-    //         navigate('/institute/video/upload'); // Make sure this path is correct
-    //     }
-    // }, [user]);
+    const navigate = useNavigate();
 
     const callbackUrl = async (code) => {
         try {
           const callbackResponse = await callBack(code);
-          console.log("Callback Response:", callbackResponse);
-          console.log("Efsxc")
+
           // Navigate to video upload, absolute path
           navigate('/video/upload');
         } catch (error) {
@@ -28,9 +20,6 @@ const Connection = () => {
       
     const canAccessPage = usePageAccess();
 
-    useEffect(() => {
-        console.log("Connection mounted");
-      }, []);
       
 
     useEffect(() => {
@@ -50,7 +39,7 @@ const Connection = () => {
         try {
             const response = await register();
             const authUrl = response.data;
-            console.log('Redirecting to:', authUrl);
+
             window.location.href = authUrl;
         } catch (error) {
             console.error('Error during registration or redirect:', error);

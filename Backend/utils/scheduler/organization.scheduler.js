@@ -29,7 +29,6 @@ const AutoInactive = async () => {
     }
   });
 
-  console.log('[Scheduler] Cron job scheduled for midnight daily');
 };
 
 export default AutoInactive;

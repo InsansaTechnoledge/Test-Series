@@ -33,8 +33,6 @@ export const UserProvider = ({ children }) => {
     if (!featureKeys) return false;
     const features = Array.isArray(featureKeys) ? featureKeys : [featureKeys];
 
-    console.log("features", features);
-
     for (const feature of features) {
       const value = user?.planFeatures?.[feature]?.value;
 

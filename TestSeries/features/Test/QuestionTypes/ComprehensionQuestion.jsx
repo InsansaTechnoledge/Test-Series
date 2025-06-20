@@ -28,10 +28,6 @@ const ComprehensionQuestion = ({ selectedQuestion, option, setOption }) => {
         }));
     };
 
-    useEffect(()=>{
-        console.log("option of comp",option);
-    },[option]);
-
     if(isLoading){
         return <div>Loading...</div>
     }

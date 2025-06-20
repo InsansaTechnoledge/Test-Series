@@ -39,8 +39,6 @@ const ContestInstructionWindow = () => {
 
         if (contestData) {
             setContest(contestData);
-            console.log("Contest ID:", contest_id);
-            console.log("Contest Data:", contestData);
         }
 
         setLoading(false);

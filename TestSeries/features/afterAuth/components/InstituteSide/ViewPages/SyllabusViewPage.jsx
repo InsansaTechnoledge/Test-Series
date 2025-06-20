@@ -13,7 +13,6 @@ const SyllabusViewPage = () => {
     const fetchData = async () => {
       try {
         const res = await fetchSyllabusById(syllabusId);
-        console.log(res.data);
         setSyllabusData(res.data);
       } catch (e) {
         console.log('Something went wrong', e);

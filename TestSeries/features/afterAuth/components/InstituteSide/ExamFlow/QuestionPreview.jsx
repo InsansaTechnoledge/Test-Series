@@ -341,7 +341,6 @@ const QuestionPreview = ({ questions, setQuestions, examDetails }) => {
 
                         {q.correct_pairs && typeof q.correct_pairs === 'object' ? (
                           <div className="mt-4">
-                            {console.log('Correct Pairs Preview:', q.correct_pairs, typeof q.correct_pairs)}
 
                             <h4 className="font-semibold text-sm mb-1 text-green-700">Correct Pairs:</h4>
                             <div className="text-sm text-gray-800 bg-green-50 border border-green-200 p-2 rounded space-y-1">

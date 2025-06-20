@@ -15,7 +15,6 @@ const storage = multer.diskStorage({
     },
     filename: (req, file, cb) => {
 
-        console.log(file);
         // Unique filename: timestamp-originalname
         const uniqueSuffix = Date.now() + '-' + file.originalname;
         cb(null, uniqueSuffix);

@@ -12,8 +12,6 @@ import { usePageAccess } from '../../../../contexts/PageAccessContext';
 const ExamListPage = () => {
 
    const canAccessPage  = usePageAccess();
-
-   console.log("fsdv", canAccessPage)
       
         if (!canAccessPage) {
           return (
@@ -48,15 +46,12 @@ const ExamListPage = () => {
   const handleGoLive = async (examId, currentGoLiveStatus) => {
     try {
       setUpdatingId(examId);
-      console.log('🔄 Attempting to update exam:', { examId, currentStatus: currentGoLiveStatus, newStatus: !currentGoLiveStatus });
       
       // Call the go live mutation
       await goLive({ 
         examId, 
         goLive: !currentGoLiveStatus 
       });
-      
-      console.log('✅ Exam status updated successfully');
     } catch (err) {
       console.error('❌ Failed to update exam status:', err);
       // Show error message to user

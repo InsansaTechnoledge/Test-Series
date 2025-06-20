@@ -10,7 +10,7 @@ export const useCachedStudents = () => {
             if (response.status !== 200) {
                 throw new Error("Network response was not ok");
             }
-            console.log(response.data);
+
             return response.data;
         }catch (error) {
             if(error.response && error.response.status === 404) {

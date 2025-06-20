@@ -34,7 +34,6 @@ const ContestCard = ({ contest , setContest }) => {
   };
 
   const handleDelete = async (id) => {
-    console.log('deleting contest of id:' , id);
 
     const deleteData = await deleteContest(id);
 

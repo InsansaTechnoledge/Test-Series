@@ -45,8 +45,7 @@ const CreateUser = () => {
       organization?.metaData?.totalBatches
     );
 
-    const Available_limit = Creation_limit - Total_user
-    console.log("ff", canAddMoreUsers , Creation_limit , Total_user)
+    const Available_limit = Creation_limit - Total_user;
 
     const canAccessPage = usePageAccess();
 
@@ -219,9 +218,9 @@ const CreateUser = () => {
         
         try {
             const response = await createUser(payload);
-            console.log(response);
+
             if (response.status === 200) {
-                console.log("User created successfully");
+               
                 alert("User created successfully!");
                 
                 // Reset form

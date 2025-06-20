@@ -13,7 +13,6 @@ const FacultySection = () => {
   useEffect(() => {
     if (users) {
       setFacultyData(users);
-      console.log("faculty data", users);
     }
   }, [users]);
 
