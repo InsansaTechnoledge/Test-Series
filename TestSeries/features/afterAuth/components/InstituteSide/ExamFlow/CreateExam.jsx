@@ -209,6 +209,7 @@ const organization =
 
         {!examDetails || editingExam ? (
   <ExamForm
+    canCreateMoreExams={canCreateMoreExams}
     onSubmit={(updatedExam) => {
 
       setExamDetails(updatedExam);
