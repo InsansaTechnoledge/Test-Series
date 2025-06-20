@@ -412,8 +412,15 @@ export default function FeatureBasedRoleGroups() {
 
 
           <NeedHelpComponent heading="creating Roles ?" about="roles help users to access systems fucntionality" question={question} answer={answer} />
+          
+        {!canAddMoreRoles && (
+           <p className="mt-4 text-center text-sm text-red-600 bg-red-100 border border-red-200 px-4 py-2 rounded-xl shadow-sm backdrop-blur-sm">
+          You've reached your batch creation limit. <br className="sm:hidden" />
+           <span className="font-medium">Upgrade your plan</span> to continue.
+         </p>
+         
+          )}
         </div>
-
 
 
 
