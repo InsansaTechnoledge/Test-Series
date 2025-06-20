@@ -13,6 +13,7 @@ import  Banner from "../../../../assests/Institute/add student.svg"
 import { usePageAccess } from '../../../../contexts/PageAccessContext'
 import useLimitAccess from '../../../../hooks/useLimitAccess'
 import { useLocation } from 'react-router-dom'
+import { useCachedOrganization } from '../../../../hooks/useCachedOrganization'
 const AddStudent = () => {
   const { user , getFeatureKeyFromLocation } = useUser();
   const [batch, setBatch] = useState('')
@@ -26,9 +27,19 @@ const AddStudent = () => {
   const [importBatch, setImportBatch] = useState('');
   const [importedStudents, setImportedStudents] = useState([]);
   const location = useLocation();
+  const organization = user.role !== 'organization'
+    ? useCachedOrganization({ userId: user._id, orgId: user.organizationId._id })?.organization
+    : null;
 
   const canAddMoreStudents = useLimitAccess(getFeatureKeyFromLocation(location.pathname), "totalStudents")
-  const Total_students = user?.metaData?.totalStudents
+  
+  const Total_students =  user?.role === 'organization' 
+    ? user.metaData?.totalBatches 
+    :  (    
+      organization?.metaData?.totalBatches
+    );
+
+
   const Creation_limit = user?.planFeatures?.student_feature?.value
   const Available_limit = Creation_limit - Total_students
   console.log(canAddMoreStudents , Total_students , Creation_limit , Available_limit)
