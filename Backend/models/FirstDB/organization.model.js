@@ -2,6 +2,8 @@ import {Schema , Types } from 'mongoose'
 import validator from 'validator';
 import bcrypt from 'bcrypt';
 import { connOne } from '../../database/MongoDB.js';
+import { getTotalBatches } from '../../controllers/SupabaseDB/batch.controllers.js';
+import { getTotalExamsForOrg } from '../../controllers/SupabaseDB/exam.controllers.js';
 
 
 const addressSchema = new Schema({
@@ -182,6 +184,38 @@ OrganizationSchema.pre('save', async function (next) {
 OrganizationSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
+
+OrganizationSchema.virtual('totalStudents',{
+  ref: 'Student',
+  localField: '_id',
+  foreignField: 'organizationId',
+  count: true
+});
+
+OrganizationSchema.virtual('totalUsers',{
+  ref: 'User',
+  localField: '_id',
+  foreignField: 'organizationId',
+  count: true
+})
+
+
+OrganizationSchema.methods.getFullMetadata = async function () {
+  this.populate('totalStudents totalUsers');
+  const totalBatches = await getTotalBatches(this._id.toString());
+  const totalExams=await getTotalExamsForOrg(this._id.toString());
+
+  return {
+    totalStudents: this.totalStudents ?? 0,
+    totalUsers: this.totalUsers ?? 0,
+    totalBatches: totalBatches ?? 0,
+    totalExams: totalExams ?? 0
+  };
+};
+
+OrganizationSchema.set('toObject', { virtuals: true });
+OrganizationSchema.set('toJSON', { virtuals: true });
+
 
 export const Organization = connOne.model('Organization' , OrganizationSchema)
 

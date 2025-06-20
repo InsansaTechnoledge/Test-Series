@@ -1,4 +1,4 @@
-import { createExam, deleteExam, fetchSelective, updateExam, setExamLive, fetchNonLiveExams , fetchExamsWithoutQuestionsQuery , fetchExamNameById} from '../../utils/SqlQueries/exam.queries.js';
+import { createExam, deleteExam, fetchSelective, updateExam, setExamLive, fetchNonLiveExams , fetchExamsWithoutQuestionsQuery , fetchExamNameById, getExamCountForOrg} from '../../utils/SqlQueries/exam.queries.js';
 import { APIError } from '../../utils/ResponseAndError/ApiError.utils.js'
 import { APIResponse } from '../../utils/ResponseAndError/ApiResponse.utils.js'
 import Result from '../../models/SecondDB/result.model.js';
@@ -188,5 +188,18 @@ export const fetchExamsWithoutQuestions = async (req, res) => {
       err?.status || 500,
       ["Something went wrong while fetching exams without questions", err.message]
     ).send(res);
+  }
+};
+
+export const getTotalExamsForOrg=async(orgId)=>{
+  try {
+    const exams = await getExamCountForOrg(orgId);
+    return exams;
+  } catch (err) {
+    console.error("❌ Error fetching total exams for organization:", err);
+    throw new APIError(
+      err?.status || 500,
+      ["Something went wrong while fetching total exams", err.message]
+    );
   }
 };
