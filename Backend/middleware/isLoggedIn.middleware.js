@@ -1,14 +1,19 @@
 import { APIError } from '../utils/ResponseAndError/ApiError.utils.js';
 
 export const isLoggedInMiddleware = async (req, res, next) => {
+  console.log('Session ID:', req.sessionID);
+  console.log('Session data:', req.session);
+  console.log('User from req.user:', req.user);
+  console.log('Is authenticated:', req.isAuthenticated ? req.isAuthenticated() : 'no isAuthenticated method');
+  
   if (req.user) {
     next();
   } else {
-    return new APIError(400, ['session expired , please login again']).send(
-      res
-    );
+    console.log('No user found in session');
+    return new APIError(400, ['session expired , please login again']).send(res);
   }
 };
+
 
 export const isOrganizationAuthenticated = async (req, res, next) => {
   if (req.isAuthenticated() && req.user?.role === 'organization') return next();
