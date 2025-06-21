@@ -19,6 +19,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+// IMPORTANT: Session must be configured BEFORE passport initialization
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
@@ -34,6 +35,7 @@ app.use(session({
   })
 }));
 
+// Initialize Passport AFTER session configuration
 app.use(passport.initialize());
 app.use(passport.session());
 
