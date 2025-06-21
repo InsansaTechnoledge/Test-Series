@@ -1,7 +1,22 @@
 import axios from 'axios';
 
+// Dynamic baseURL based on environment
+const getBaseURL = () => {
+  // Use environment variable if available, otherwise fallback to location-based detection
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  
+  // Fallback: Check if we're in development (localhost)
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return "http://localhost:8000/api";
+  }
+  // Production URL
+  return "https://test-series-1new.onrender.com/api";
+};
+
 const api = axios.create({
-  baseURL: "https://test-series-1new.onrender.com/api",
+  baseURL: getBaseURL(),
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json'
@@ -11,7 +26,10 @@ const api = axios.create({
 
 // Optional: request interceptor (can be omitted)
 api.interceptors.request.use(
-  (config) => config,
+  (config) => {
+    console.log('Making request to:', config.baseURL + config.url);
+    return config;
+  },
   (error) => {
     console.error('[Request Error]', error);
     return Promise.reject(error);
@@ -42,7 +60,7 @@ api.interceptors.response.use(
         case 500:
           console.error('Server Error:', data?.message);
           break;
-        case 409:
+        case 509:
           console.warn('Conflict:', data?.message);
           break;
         default:
