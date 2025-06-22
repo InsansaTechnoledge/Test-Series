@@ -90,7 +90,7 @@ const LoginForm = () => {
               }
               return;
             }
-            await new Promise((resolve) => setTimeout(resolve, 500)); // wait 500ms between retries
+            await new Promise((resolve) => setTimeout(resolve, 2000)); 
           }
           alert("Login session expired or not set. Please try again.");
         };
