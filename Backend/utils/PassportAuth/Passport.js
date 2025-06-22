@@ -290,20 +290,18 @@ passport.use('institute-local', new LocalStrategy(
     }
 ));
 
-// FIX 1: Enhanced serializeUser with logging
 passport.serializeUser((user, done) => {
-    console.log('Serializing user:', user._id, 'Role:', user.role);
+    console.log('Serializing user:', user._id, 'Role:', user.role); // Log serialization
     done(null, { id: user._id, role: user.role });
 });
 
-// FIX 2: Enhanced deserializeUser with better error handling
+
 passport.deserializeUser(async (object, done) => {
     try {
-        console.log('Deserializing user:', object);
-        
+        console.log('Deserializing user with object:', object);
         if (!object || !object.id || !object.role) {
             console.log('Invalid session object:', object);
-            return done(null, false);
+            return done(null, false); // Return false if session object is invalid
         }
 
         let user = null;
@@ -315,27 +313,26 @@ passport.deserializeUser(async (object, done) => {
                 user = await Student.findById(object.id).populate('organizationId', 'planPurchased');
                 if (!user) {
                     console.log('Student not found for ID:', object.id);
-                    return done(null, false);
+                    return done(null, false); // No user found for student
                 }
                 planFeatures = user.organizationId ? await getPlanFeaturesMap(user.organizationId.planPurchased) : {};
                 return done(null, { ...user.toObject(), role: 'student', planFeatures });
             }
             
             case 'organization': {
-                user = await Organization.findById(object.id);
+                user = await Organization.findById(object.id); // Fetch the organization
                 if (!user) {
                     console.log('Organization not found for ID:', object.id);
-                    return done(null, false);
+                    return done(null, false); // No organization found
                 }
                 
-                // FIX 3: Add error handling for async operations
+                // Fetch the plan features and metadata for the organization
                 try {
                     planFeatures = await getPlanFeaturesMap(user.planPurchased);
                     metaData = await user.getFullMetadata();
                 } catch (asyncError) {
                     console.error('Error getting plan features or metadata:', asyncError);
-                    // Continue without failing - provide defaults
-                    planFeatures = {};
+                    planFeatures = {};  // Provide default values if async errors happen
                     metaData = {};
                 }
                 
@@ -352,19 +349,18 @@ passport.deserializeUser(async (object, done) => {
                 user = await User.findById(object.id).populate('organizationId', 'planPurchased');
                 if (!user) {
                     console.log('User not found for ID:', object.id);
-                    return done(null, false);
+                    return done(null, false); // No user found
                 }
                 planFeatures = user.organizationId ? await getPlanFeaturesMap(user.organizationId.planPurchased) : {};
                 return done(null, { ...user.toObject(), role: 'user', planFeatures });
             }
         }
-
     } catch (error) {
-        console.error('Deserialization error:', error);
-        // FIX 4: Don't fail authentication on deserialization errors
-        // Instead, log the error and return false to force re-authentication
-        return done(null, false);
+        console.error('Deserialization error:', error); // Log the error
+        return done(error); // Pass the error to done
     }
 });
+
+
 
 export default passport;
