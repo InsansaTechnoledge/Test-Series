@@ -25,21 +25,22 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Session configuration
+// Session configuration
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   name: 'connect.sid',
   cookie: {
-    secure: process.env.NODE_ENV === 'production',  // Set secure cookies in production
+    secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
-    sameSite: 'lax',
-    maxAge: 24 * 60 * 60 * 1000  // Session expiration time (24 hours)
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    maxAge: 24 * 60 * 60 * 1000
   },
   store: MongoStore.create({
-    mongoUrl: process.env.MONGODB1_URL,  // Ensure MongoDB URL is correct
-    ttl: 24 * 60 * 60,  // Session TTL (Time To Live)
-    touchAfter: 24 * 3600,  // Avoid updating the session if it has not been modified
+    mongoUrl: process.env.MONGODB1_URL,
+    ttl: 24 * 60 * 60,
+    touchAfter: 24 * 3600,
   })
 }));
 
