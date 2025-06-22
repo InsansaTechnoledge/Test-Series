@@ -26,20 +26,46 @@ app.use(cookieParser());
 
 // Session configuration
 app.use(session({
-    secret: process.env.SESSION_SECRET,  // Ensure this is a strong secret in production
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     name: 'connect.sid',
+    
     cookie: {
-        secure: process.env.NODE_ENV === 'production', // Use secure cookies in production (HTTPS only)
-        httpOnly: true, // Prevent client-side access to the cookie
-        sameSite: 'lax', // Allow cookies to be sent in cross-origin requests (adjust as needed)
-        maxAge: 24 * 60 * 60 * 1000, // Session expiration (24 hours)
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // Important for cross-origin in production
+        maxAge: 24 * 60 * 60 * 1000, // 24 hours
+        // Add domain if you're using subdomains
+        // domain: process.env.NODE_ENV === 'production' ? '.yourdomain.com' : undefined
     },
+    
     store: MongoStore.create({
-        mongoUrl: process.env.MONGODB1_URL, // Ensure this is correct
-        touchAfter: 24 * 3600, // Reduce the frequency of MongoDB writes
-        ttl: 24 * 60 * 60 // 24 hours in seconds
+        mongoUrl: process.env.MONGODB1_URL,
+        touchAfter: 24 * 3600,
+        ttl: 24 * 60 * 60,
+        
+        // Add these important options for production
+        autoRemove: 'native', // Let MongoDB handle TTL
+        autoRemoveInterval: 10, // Check every 10 minutes
+        
+        // Connection options for better reliability
+        mongoOptions: {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            serverSelectionTimeoutMS: 10000, // 10 seconds
+            socketTimeoutMS: 45000, // 45 seconds
+            maxPoolSize: 10, // Maintain up to 10 socket connections
+            minPoolSize: 5, // Maintain a minimum of 5 socket connections
+            bufferMaxEntries: 0,
+            retryWrites: true,
+            w: 'majority'
+        },
+        
+        // Error handling
+        errorHandler: (error) => {
+            console.error('MongoDB session store error:', error);
+        }
     })
 }));
 

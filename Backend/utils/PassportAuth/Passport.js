@@ -298,66 +298,185 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (object, done) => {
     try {
-        console.log('Deserializing user with object:', object);
-        if (!object || !object.id || !object.role) {
-            console.log('Invalid session object:', object);
-            return done(null, false); // Return false if session object is invalid
+        console.log('=== DESERIALIZATION START ===');
+        console.log('Session object received:', JSON.stringify(object));
+        console.log('Environment:', process.env.NODE_ENV);
+        
+        // Validate session object
+        if (!object || typeof object !== 'object') {
+            console.error('Invalid session object - not an object:', typeof object);
+            return done(null, false);
+        }
+        
+        if (!object.id || !object.role) {
+            console.error('Missing required fields in session object:', {
+                hasId: !!object.id,
+                hasRole: !!object.role,
+                id: object.id,
+                role: object.role
+            });
+            return done(null, false);
+        }
+
+        // Validate MongoDB ObjectId format
+        const mongoose = require('mongoose');
+        if (!mongoose.Types.ObjectId.isValid(object.id)) {
+            console.error('Invalid ObjectId format:', object.id);
+            return done(null, false);
         }
 
         let user = null;
-        let planFeatures = null;
-        let metaData = null;
+        let planFeatures = {};
+        let metaData = {};
+
+        console.log(`Attempting to deserialize ${object.role} with ID: ${object.id}`);
 
         switch (object.role) {
             case 'student': {
-                user = await Student.findById(object.id).populate('organizationId', 'planPurchased');
-                if (!user) {
-                    console.log('Student not found for ID:', object.id);
-                    return done(null, false); // No user found for student
+                console.log('Deserializing student...');
+                try {
+                    user = await Student.findById(object.id)
+                        .populate('organizationId', 'planPurchased')
+                        .lean(); // Use lean() for better performance
+                    
+                    if (!user) {
+                        console.error('Student not found for ID:', object.id);
+                        return done(null, false);
+                    }
+                    
+                    console.log('Student found:', {
+                        id: user._id,
+                        email: user.email,
+                        hasOrganization: !!user.organizationId
+                    });
+                    
+                    if (user.organizationId && user.organizationId.planPurchased) {
+                        try {
+                            planFeatures = await getPlanFeaturesMap(user.organizationId.planPurchased);
+                        } catch (planError) {
+                            console.error('Error getting plan features for student:', planError);
+                            planFeatures = {};
+                        }
+                    }
+                    
+                    return done(null, { 
+                        ...user, 
+                        role: 'student', 
+                        planFeatures 
+                    });
+                    
+                } catch (studentError) {
+                    console.error('Error finding student:', studentError);
+                    return done(null, false);
                 }
-                planFeatures = user.organizationId ? await getPlanFeaturesMap(user.organizationId.planPurchased) : {};
-                return done(null, { ...user.toObject(), role: 'student', planFeatures });
             }
             
             case 'organization': {
-                user = await Organization.findById(object.id); // Fetch the organization
-                if (!user) {
-                    console.log('Organization not found for ID:', object.id);
-                    return done(null, false); // No organization found
-                }
-                
-                // Fetch the plan features and metadata for the organization
+                console.log('Deserializing organization...');
                 try {
-                    planFeatures = await getPlanFeaturesMap(user.planPurchased);
-                    metaData = await user.getFullMetadata();
-                } catch (asyncError) {
-                    console.error('Error getting plan features or metadata:', asyncError);
-                    planFeatures = {};  // Provide default values if async errors happen
-                    metaData = {};
+                    user = await Organization.findById(object.id).lean();
+                    
+                    if (!user) {
+                        console.error('Organization not found for ID:', object.id);
+                        return done(null, false);
+                    }
+                    
+                    console.log('Organization found:', {
+                        id: user._id,
+                        email: user.email,
+                        planPurchased: user.planPurchased
+                    });
+                    
+                    // Fetch plan features
+                    if (user.planPurchased) {
+                        try {
+                            planFeatures = await getPlanFeaturesMap(user.planPurchased);
+                        } catch (planError) {
+                            console.error('Error getting plan features for organization:', planError);
+                            planFeatures = {};
+                        }
+                    }
+                    
+                    // Fetch metadata - need to get the full document for methods
+                    try {
+                        const fullOrgDoc = await Organization.findById(object.id);
+                        if (fullOrgDoc && typeof fullOrgDoc.getFullMetadata === 'function') {
+                            metaData = await fullOrgDoc.getFullMetadata();
+                        }
+                    } catch (metaError) {
+                        console.error('Error getting metadata for organization:', metaError);
+                        metaData = {};
+                    }
+                    
+                    return done(null, { 
+                        ...user, 
+                        role: 'organization', 
+                        planFeatures, 
+                        metaData 
+                    });
+                    
+                } catch (orgError) {
+                    console.error('Error finding organization:', orgError);
+                    return done(null, false);
                 }
-                
-                return done(null, { 
-                    ...user.toObject(), 
-                    role: 'organization', 
-                    planFeatures, 
-                    metaData 
-                });
             }
             
-            case 'user': 
+            case 'user':
             default: {
-                user = await User.findById(object.id).populate('organizationId', 'planPurchased');
-                if (!user) {
-                    console.log('User not found for ID:', object.id);
-                    return done(null, false); // No user found
+                console.log('Deserializing user...');
+                try {
+                    user = await User.findById(object.id)
+                        .populate('organizationId', 'planPurchased')
+                        .lean();
+                    
+                    if (!user) {
+                        console.error('User not found for ID:', object.id);
+                        return done(null, false);
+                    }
+                    
+                    console.log('User found:', {
+                        id: user._id,
+                        email: user.email,
+                        hasOrganization: !!user.organizationId
+                    });
+                    
+                    if (user.organizationId && user.organizationId.planPurchased) {
+                        try {
+                            planFeatures = await getPlanFeaturesMap(user.organizationId.planPurchased);
+                        } catch (planError) {
+                            console.error('Error getting plan features for user:', planError);
+                            planFeatures = {};
+                        }
+                    }
+                    
+                    return done(null, { 
+                        ...user, 
+                        role: 'user', 
+                        planFeatures 
+                    });
+                    
+                } catch (userError) {
+                    console.error('Error finding user:', userError);
+                    return done(null, false);
                 }
-                planFeatures = user.organizationId ? await getPlanFeaturesMap(user.organizationId.planPurchased) : {};
-                return done(null, { ...user.toObject(), role: 'user', planFeatures });
             }
         }
     } catch (error) {
-        console.error('Deserialization error:', error); // Log the error
-        return done(error); // Pass the error to done
+        console.error('=== DESERIALIZATION ERROR ===');
+        console.error('Error details:', {
+            message: error.message,
+            stack: error.stack,
+            name: error.name
+        });
+        
+        // Check for specific database connection issues
+        if (error.name === 'MongoNetworkError' || error.name === 'MongooseServerSelectionError') {
+            console.error('Database connection issue detected');
+        }
+        
+        return done(error);
+    } finally {
+        console.log('=== DESERIALIZATION END ===');
     }
 });
 
