@@ -30,44 +30,39 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     name: 'connect.sid',
-    
     cookie: {
-        secure: process.env.NODE_ENV === 'production',
-        httpOnly: true,
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // Important for cross-origin in production
-        maxAge: 24 * 60 * 60 * 1000, // 24 hours
-        // Add domain if you're using subdomains
-        // domain: process.env.NODE_ENV === 'production' ? '.yourdomain.com' : undefined
+      secure: false, // Set to false for now to test
+      httpOnly: true,
+      sameSite: 'lax',
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
     },
-    
     store: MongoStore.create({
-        mongoUrl: process.env.MONGODB1_URL,
-        touchAfter: 24 * 3600,
-        ttl: 24 * 60 * 60,
-        
-        // Add these important options for production
-        autoRemove: 'native', // Let MongoDB handle TTL
-        autoRemoveInterval: 10, // Check every 10 minutes
-        
-        // Connection options for better reliability
-        mongoOptions: {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            serverSelectionTimeoutMS: 10000, // 10 seconds
-            socketTimeoutMS: 45000, // 45 seconds
-            maxPoolSize: 10, // Maintain up to 10 socket connections
-            minPoolSize: 5, // Maintain a minimum of 5 socket connections
-            bufferMaxEntries: 0,
-            retryWrites: true,
-            w: 'majority'
-        },
-        
-        // Error handling
-        errorHandler: (error) => {
-            console.error('MongoDB session store error:', error);
-        }
+      // FIX 1: Clean the connection string by removing unsupported options
+      mongoUrl: process.env.MONGODB1_URL
+        .replace(/[?&]bufferMaxEntries=\d+/g, '')
+        .replace(/[?&]bufferCommands=(true|false)/g, '')
+        .replace(/[?&]useNewUrlParser=(true|false)/g, '')
+        .replace(/[?&]useUnifiedTopology=(true|false)/g, '')
+        .replace(/[?&]useFindAndModify=(true|false)/g, '')
+        .replace(/[?&]useCreateIndex=(true|false)/g, ''),
+      
+      // Session store options
+      touchAfter: 24 * 3600,
+      ttl: 24 * 60 * 60, // 24 hours in seconds
+      
+      // Additional options for better reliability
+      autoRemove: 'native', // Use MongoDB TTL
+      stringify: false, // Don't stringify session data
+      serialize: (session) => {
+        // Custom serialization if needed
+        return session;
+      },
+      unserialize: (session) => {
+        // Custom deserialization if needed
+        return session;
+      }
     })
-}));
+  }));
 
 // Enhanced session debugging middleware
 app.use((req, res, next) => {
