@@ -26,43 +26,22 @@ app.use(cookieParser());
 
 // Session configuration
 app.use(session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    name: 'connect.sid',
-    cookie: {
-      secure: false, // Set to false for now to test
-      httpOnly: true,
-      sameSite: 'lax',
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    },
-    store: MongoStore.create({
-      // FIX 1: Clean the connection string by removing unsupported options
-      mongoUrl: process.env.MONGODB1_URL
-        .replace(/[?&]bufferMaxEntries=\d+/g, '')
-        .replace(/[?&]bufferCommands=(true|false)/g, '')
-        .replace(/[?&]useNewUrlParser=(true|false)/g, '')
-        .replace(/[?&]useUnifiedTopology=(true|false)/g, '')
-        .replace(/[?&]useFindAndModify=(true|false)/g, '')
-        .replace(/[?&]useCreateIndex=(true|false)/g, ''),
-      
-      // Session store options
-      touchAfter: 24 * 3600,
-      ttl: 24 * 60 * 60, // 24 hours in seconds
-      
-      // Additional options for better reliability
-      autoRemove: 'native', // Use MongoDB TTL
-      stringify: false, // Don't stringify session data
-      serialize: (session) => {
-        // Custom serialization if needed
-        return session;
-      },
-      unserialize: (session) => {
-        // Custom deserialization if needed
-        return session;
-      }
-    })
-  }));
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  name: 'connect.sid',
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',  // Set secure cookies in production
+    httpOnly: true,
+    sameSite: 'lax',
+    maxAge: 24 * 60 * 60 * 1000  // Session expiration time (24 hours)
+  },
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGODB1_URL,  // Ensure MongoDB URL is correct
+    ttl: 24 * 60 * 60,  // Session TTL (Time To Live)
+    touchAfter: 24 * 3600,  // Avoid updating the session if it has not been modified
+  })
+}));
 
 // Enhanced session debugging middleware
 app.use((req, res, next) => {
