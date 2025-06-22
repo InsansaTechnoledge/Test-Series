@@ -52,33 +52,37 @@ const LoginForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = {};
-  
+
+    // Validate the form data
     Object.entries(formData).forEach(([field, value]) => {
       const error = validateField(field, value);
       if (error) newErrors[field] = error;
     });
-  
+
+    // If there are errors, do not submit the form
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-  
-    setLoading(true);
+
+    setLoading(true); // Start loading state
     try {
       let response;
-  
+
+      // Login based on role
       if (role === 'Institute') {
         response = await orgLogin(formData);
       } else if (role === 'Student') {
         response = await studentLogin(formData);
       }
-  
+
       if (response?.status === 200) {
         const waitForUser = async (retries = 10) => {
           for (let i = 0; i < retries; i++) {
             const userResponse = await checkAuth();
             if (userResponse?.status === 200) {
               setUser(userResponse.data.user);
+              // Navigate based on role
               if (role === 'Institute') {
                 navigate('/institute/institute-landing');
               } else {
@@ -86,25 +90,26 @@ const LoginForm = () => {
               }
               return;
             }
-            await new Promise((res) => setTimeout(res, 500)); // wait 500ms
+            await new Promise((resolve) => setTimeout(resolve, 500)); // wait 500ms between retries
           }
           alert("Login session expired or not set. Please try again.");
         };
-  
+
         await waitForUser();
       }
-  
+
+      // Reset form and errors on success
       setFormData({ email: '', password: '' });
       setErrors({});
     } catch (err) {
-      console.log(err);
-      setErrors(err.response?.data?.errors || "Something went wrong");
-      alert(err.response?.data?.errors || "Something went wrong");
+      console.error(err);
+      const errorMessage = err.response?.data?.errors || "Something went wrong";
+      setErrors({ global: errorMessage }); // Set a global error message
+      alert(errorMessage); // Show alert on error
     } finally {
-      setLoading(false);
+      setLoading(false); // End loading state
     }
   };
-  
 
   return (
     <div className="bg-white rounded-xl shadow-md p-8 border border-blue-100">
@@ -116,6 +121,7 @@ const LoginForm = () => {
           </h3>
         </div>
 
+        {/* Email Input */}
         <div className="grid md:grid-cols-1 gap-6 mt-5">
           <div>
             <label className="block text-gray-700 text-sm font-medium mb-1">
@@ -136,6 +142,7 @@ const LoginForm = () => {
           </div>
         </div>
 
+        {/* Password Input */}
         <div className="grid md:grid-cols-1 gap-6 mt-5">
           <div>
             <label className="block text-gray-700 text-sm font-medium mb-1">
@@ -162,6 +169,10 @@ const LoginForm = () => {
           </div>
         </div>
 
+        {/* Global Error Message */}
+        {errors.global && <p className="text-red-500 text-sm mt-1">{errors.global}</p>}
+
+        {/* Submit Button */}
         <button
           type="submit"
           disabled={loading}
