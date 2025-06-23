@@ -4,7 +4,7 @@ import { useUser } from '../../../../../contexts/currentUserContext';
 import { useEffect } from 'react';
 
 const ManualQuestionForm = ({ setQuestions, organizationId }) => {
-  const user=useUser();
+  const {user}=useUser();
 
   const [codeData, setCodeData] = useState({
     title: '',
@@ -207,7 +207,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
 
   };
   useEffect(()=>{
-    console.log(user?.planFeatures?.coding_feature.isActive)
+    console.log("check"  ,user?.planFeatures?.coding_feature.isActive)
   },[user])
 
   return (
@@ -228,9 +228,10 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
           <option value="numerical">Numerical</option>
           <option value="match">Match the Following</option>
           <option value="comprehension">Comprehension</option>
-          {user?.planFeatures?.coding_feature.isActive && (
-            <option value="code">Code</option>
-          )}
+          {user?.planFeatures?.coding_feature?.isActive === true ||
+            user?.planFeatures?.coding_feature?.isActive === "true" ? (
+              <option value="code">Code</option>
+            ) : null}
         </select>
       </div>
 
