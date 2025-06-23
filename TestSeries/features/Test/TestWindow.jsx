@@ -10,6 +10,7 @@ import { useCachedExam } from '../../hooks/useCachedExam';
 import { calculateResult } from './utils/resultCalculator';
 import { submitResult } from '../../utils/services/resultService';
 import SubmitModal from './utils/SubmitResultComponent';
+import { VITE_SECRET_KEY_FOR_TESTWINDOW } from '../constants/env';
 
 const TestWindow = () => {
   const [eventDetails, setEventDetails] = useState();
@@ -25,7 +26,7 @@ const TestWindow = () => {
   const [showFinalPopup, setShowFinalPopup] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const { user } = useUser();
-  const secretKey = import.meta.env.VITE_SECRET_KEY_FOR_TESTWINDOW;
+  const secretKey = import.meta.env.VITE_SECRET_KEY_FOR_TESTWINDOW || VITE_SECRET_KEY_FOR_TESTWINDOW;
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const navigate = useNavigate();
