@@ -83,6 +83,7 @@ const LoginForm = () => {
             if (userResponse?.status === 200) {
               setUser(userResponse.data.user);
               // Navigate based on role
+              localStorage.setItem('hasLoggedIn', 'true'); // Set local storage flag
               if (role === 'Institute') {
                 navigate('/institute/institute-landing');
               } else {
