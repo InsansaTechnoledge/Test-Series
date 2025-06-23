@@ -53,6 +53,7 @@ import Analysis from '../../features/Analytics/Analysis';
 import PageAccessGuard from '../ProtectedRoute/PageAccessGuard';
 import FallBackPage from '../../features/auth/pages/FallBackPage';
 import FallBackPageForOrg from '../../features/afterAuth/pages/FallBackPageForOrg';
+import Loader from '../Loader/Loader';
 
 const PageLinks = () => {
   const { user, setUser} = useUser();
@@ -85,7 +86,7 @@ const PageLinks = () => {
   }, [user]);
 
   if (loading) {
-    return <div>Loading...</div>; // or a spinner
+    return <div><Loader/></div>; 
   }
 
   return (

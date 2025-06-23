@@ -16,7 +16,7 @@ import ExamAnalyticsFeatures from './pages/AnalyticsCard';
 import FeaturesPage from './pages/FeatureManagement';
 
 const BeforeAuthLanding = () => {
-  return (
+  return (       
     <>
       <Hero />
       <TestTypes />
