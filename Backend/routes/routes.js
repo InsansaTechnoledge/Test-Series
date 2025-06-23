@@ -13,7 +13,7 @@ import questionUploadRoutes from './supabaseRoutes/questionUpload.routes.js'
 import questionRoutes from './supabaseRoutes/question.routes.js';
 import videoRoutes from './supabaseRoutes/video.routes.js';
 import contestRoutes from './supabaseRoutes/contest.routes.js';
-import { checkFeatureAccess } from '../middleware/checkFeatureAccess.js';
+
 import { registerRoute } from '../utils/accessCheckerForPlan/registerRoute.js';
 const routeFeatureMap = JSON.parse(process.env.ROUTE_FEATURE_MAP || '{}');
 

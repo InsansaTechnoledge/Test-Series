@@ -1,6 +1,6 @@
 import express from 'express';
 import { registerUser, updateUser,changePassword,forgotPassword,getUser, getUsersFromBatch ,deleteUser} from '../../../controllers/FirstDB/user.controllers.js';
-import { isUserAndOrgAuthenticated } from '../../../middleware/isLoggedIn.middleware.js';
+
 const router = express.Router();
 
 router.post('/create', registerUser);
