@@ -15,7 +15,7 @@ app.set('trust proxy', 1);
 app.use(cors({
     origin: process.env.CLIENT_URL, // Ensure CLIENT_URL is correctly set
     credentials: true, // Allow cookies to be sent with cross-origin requests
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS' , 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
     exposedHeaders: ['Set-Cookie']
 }));
