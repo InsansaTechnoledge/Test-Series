@@ -4,15 +4,15 @@ import { useLocation } from 'react-router-dom';
 import PageAccessContext from '../../contexts/PageAccessContext';
 import Navbar from '../../features/afterAuth/components/Navbar/Navbar';
 import LogoutModal from '../Logout/LogoutModal';
-
+ 
 const PageAccessGuard = ({ children }) => {
   const [ShowLogoutModal, setShowLogoutModal] = useState(false);
   const { hasPlanFeature, user } = useUser();
   const location = useLocation();
-
+ 
   // Optional: wait until user is fully loaded
   if (!user) return null; // Or show a loading spinner
-
+ 
   const hasAccess =
   user.role === 'organization' ?
   Boolean(user.planPurchased) && Object.keys(user.planFeatures || {}).length > 0
@@ -25,16 +25,16 @@ const PageAccessGuard = ({ children }) => {
       keyFromPageOrAction: null,
       location: location.pathname,
     });
-
-
+ 
+ 
     return (
       <PageAccessContext.Provider value={canAccess}>
         {children}
       </PageAccessContext.Provider>
     );
   }
-
-  
+ 
+ 
   return (
     <>
     {
@@ -52,5 +52,5 @@ const PageAccessGuard = ({ children }) => {
     </>
   );
 };
-
+ 
 export default PageAccessGuard;
