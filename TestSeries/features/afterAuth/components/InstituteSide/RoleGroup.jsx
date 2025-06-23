@@ -19,10 +19,11 @@ import { useCachedOrganization } from '../../../../hooks/useCachedOrganization';
 
 
 export default function FeatureBasedRoleGroups() {
-  const { user , getFeatureKeyFromLocation } = useUser();
+  const { user, getFeatureKeyFromLocation } = useUser();
   const { featuresData, isLoading } = useCachedFeatures();
   const [showDeleteRoleGroupModal, setShowDeleteRoleGroupModal] = useState(false);
   const [roleGroupToDelete, setRoleGroupToDelete] = useState();
+  const [error, setError] = useState('');
 
   const canAccessPage = usePageAccess();
   const queryClient = useQueryClient();
@@ -40,16 +41,16 @@ export default function FeatureBasedRoleGroups() {
 
   const location = useLocation();
 
-  const canAddMoreRoles = useLimitAccess(getFeatureKeyFromLocation(location.pathname) , "totalRoleGroups");
+  const canAddMoreRoles = useLimitAccess(getFeatureKeyFromLocation(location.pathname), "totalRoleGroups");
 
   const organization =
-  user.role !== 'organization'
-    ? useCachedOrganization({ userId: user._id, orgId: user.organizationId._id })?.organization
-    : null;
+    user.role !== 'organization'
+      ? useCachedOrganization({ userId: user._id, orgId: user.organizationId._id })?.organization
+      : null;
 
-  const Total_Role = user?.role === 'organization' 
-    ? user.metaData?.totalBatches 
-    :  (  
+  const Total_Role = user?.role === 'organization'
+    ? user.metaData?.totalBatches
+    : (
       organization?.metaData?.totalBatches
     );
 
@@ -229,9 +230,22 @@ export default function FeatureBasedRoleGroups() {
                     type="text"
                     className="w-full border border-gray-300 rounded-md px-3 py-2 bg-white/70 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                     value={newGroup.name}
-                    onChange={(e) => setNewGroup({ ...newGroup, name: e.target.value })}
+                    onChange={(e) => {
+                      const input = e.target.value;
+                      setNewGroup({ ...newGroup, name: input });
+
+                      // Allow only Unicode letters, no spaces or other characters
+                      if (/^[\p{L}]*$/u.test(input)) {
+                        setError('');
+                      } else {
+                        setError('Only letters are allowed. No spaces, numbers, or special characters.');
+                      }
+                    }}
                     placeholder="Enter group name"
                   />
+
+                  {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+
                 </div>
 
                 {/* Description */}
@@ -343,8 +357,8 @@ export default function FeatureBasedRoleGroups() {
                               onClick={() => toggleFeatureInGroup(feature._id)}
                             >
                               <div className={`w-5 h-5 flex items-center justify-center rounded-md border text-white text-xs ${newGroup.features.includes(feature._id)
-                                  ? 'bg-blue-600 border-blue-600'
-                                  : 'border-gray-300 text-transparent'
+                                ? 'bg-blue-600 border-blue-600'
+                                : 'border-gray-300 text-transparent'
                                 }`}>
                                 {newGroup.features.includes(feature._id) && <Check size={14} />}
                               </div>
@@ -402,17 +416,17 @@ export default function FeatureBasedRoleGroups() {
             </p>
 
             <div className="flex items-center justify-center">
-  <p className="mt-8 text-indigo-700 bg-indigo-50 border border-indigo-100 px-5 py-4 rounded-2xl text-base flex items-center gap-3 shadow-sm backdrop-blur-sm">
-    <AlertTriangle className="w-5 h-5 text-indigo-400" />
-    <span>
-      <span className="font-semibold">Note:</span> For your current plan, you have an available limit of
-      <span className={`font-bold ${Available_limit > 0 ? "text-green-600" : "text-red-600"} mx-1`}>
-        {Available_limit}
-      </span>
-      to add more users.
-    </span>
-  </p>
-</div>
+              <p className="mt-8 text-indigo-700 bg-indigo-50 border border-indigo-100 px-5 py-4 rounded-2xl text-base flex items-center gap-3 shadow-sm backdrop-blur-sm">
+                <AlertTriangle className="w-5 h-5 text-indigo-400" />
+                <span>
+                  <span className="font-semibold">Note:</span> For your current plan, you have an available limit of
+                  <span className={`font-bold ${Available_limit > 0 ? "text-green-600" : "text-red-600"} mx-1`}>
+                    {Available_limit}
+                  </span>
+                  to add more users.
+                </span>
+              </p>
+            </div>
 
           </div>
         </div>
@@ -423,13 +437,13 @@ export default function FeatureBasedRoleGroups() {
 
 
           <NeedHelpComponent heading="creating Roles ?" about="roles help users to access systems fucntionality" question={question} answer={answer} />
-          
-        {!canAddMoreRoles && (
-           <p className="mt-4 text-center text-sm text-red-600 bg-red-100 border border-red-200 px-4 py-2 rounded-xl shadow-sm backdrop-blur-sm">
-          You've reached your batch creation limit. <br className="sm:hidden" />
-           <span className="font-medium">Upgrade your plan</span> to continue.
-         </p>
-         
+
+          {!canAddMoreRoles && (
+            <p className="mt-4 text-center text-sm text-red-600 bg-red-100 border border-red-200 px-4 py-2 rounded-xl shadow-sm backdrop-blur-sm">
+              You've reached your batch creation limit. <br className="sm:hidden" />
+              <span className="font-medium">Upgrade your plan</span> to continue.
+            </p>
+
           )}
         </div>
 
@@ -446,25 +460,25 @@ export default function FeatureBasedRoleGroups() {
             </h2>
             <div className="flex gap-3">
               <RefreshButton refreshFunction={refreshFunction} />
-              
+
               {!isAddingGroup && (
-               <button
-               disabled={canAccessPage === false || canAddMoreRoles === false}
-               onClick={() => {
-                 setIsAddingGroup(true);
-                 setEditingGroupId(null);
-                 setNewGroup({ name: '', description: '', features: [] });
-               }}
-               className={`inline-flex items-center gap-2 font-semibold px-4 py-2 rounded-xl shadow-md transition-transform duration-300
-                 ${canAccessPage && canAddMoreRoles 
-                   ? 'bg-green-500 text-white hover:scale-105' 
-                   : 'bg-red-500 text-gray-100 cursor-not-allowed'}
+                <button
+                  disabled={canAccessPage === false || canAddMoreRoles === false}
+                  onClick={() => {
+                    setIsAddingGroup(true);
+                    setEditingGroupId(null);
+                    setNewGroup({ name: '', description: '', features: [] });
+                  }}
+                  className={`inline-flex items-center gap-2 font-semibold px-4 py-2 rounded-xl shadow-md transition-transform duration-300
+                 ${canAccessPage && canAddMoreRoles
+                      ? 'bg-green-500 text-white hover:scale-105'
+                      : 'bg-red-500 text-gray-100 cursor-not-allowed'}
                `}
-             >
-               {canAccessPage && canAddMoreRoles && <Plus size={16} />}
-               <span>{!canAddMoreRoles ? "Limit Exceeded " : "Create Role Group"}</span>
-             </button>
-             
+                >
+                  {canAccessPage && canAddMoreRoles && <Plus size={16} />}
+                  <span>{!canAddMoreRoles ? "Limit Exceeded " : "Create Role Group"}</span>
+                </button>
+
               )}
             </div>
 
@@ -476,10 +490,10 @@ export default function FeatureBasedRoleGroups() {
                   Create New Role Group
                 </h3>
                 <button
-                 className={`inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold px-4 py-2 rounded-xl shadow-md hover:scale-105 transition-transform duration-300
+                  className={`inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold px-4 py-2 rounded-xl shadow-md hover:scale-105 transition-transform duration-300
                   ${canAddMoreRoles === false && "bg-gray-500"}
                 `}
-                  disabled= {canAccessPage === false || canAddMoreRoles === false}
+                  disabled={canAccessPage === false || canAddMoreRoles === false}
                   onClick={() => {
                     setIsAddingGroup(false);
                     setNewGroup({ name: '', description: '', features: [] });
@@ -500,9 +514,22 @@ export default function FeatureBasedRoleGroups() {
                         type="text"
                         className="w-full border border-gray-300 rounded-md px-3 py-2 bg-white/70 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                         value={newGroup.name}
-                        onChange={(e) => setNewGroup({ ...newGroup, name: e.target.value })}
+                        onChange={(e) => {
+                          const input = e.target.value;
+                          setNewGroup({ ...newGroup, name: input });
+
+                          // Allow only Unicode letters, no spaces or other characters
+                          if (/^[\p{L}]*$/u.test(input)) {
+                            setError('');
+                          } else {
+                            setError('Only letters are allowed. No spaces, numbers, or special characters.');
+                          }
+                        }}
                         placeholder="Enter group name"
                       />
+
+                      {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+
                     </div>
 
                     {/* Description */}
@@ -614,8 +641,8 @@ export default function FeatureBasedRoleGroups() {
                                   onClick={() => toggleFeatureInGroup(feature._id)}
                                 >
                                   <div className={`w-5 h-5 flex items-center justify-center rounded-md border text-white text-xs ${newGroup.features.includes(feature._id)
-                                      ? 'bg-blue-600 border-blue-600'
-                                      : 'border-gray-300 text-transparent'
+                                    ? 'bg-blue-600 border-blue-600'
+                                    : 'border-gray-300 text-transparent'
                                     }`}>
                                     {newGroup.features.includes(feature._id) && <Check size={14} />}
                                   </div>
@@ -634,8 +661,8 @@ export default function FeatureBasedRoleGroups() {
                 </div>
               </div>
             </div>
-          )} 
-      
+          )}
+
 
           {/* Group List */}
           <div className="w-full space-y-4">
