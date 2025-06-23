@@ -9,7 +9,7 @@ const TestTypes = () => {
       id: 1,
       type: "MCQs",
       title: "Multiple Choice Questions",
-      image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400&h=300&fit=crop&auto=format",
+      image: "https://picsum.photos/400/300?random=1",
       color: 'from-blue-500 to-indigo-600',
       description: "Single correct answer from multiple options",
       features: ["4-6 answer choices", "Auto-grading", "Randomizable options", "Partial scoring"],
@@ -22,7 +22,7 @@ const TestTypes = () => {
       id: 2,
       type: "MSQ",
       title: "Multiple Select Questions",
-      image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&h=300&fit=crop&auto=format",
+      image: "https://picsum.photos/400/300?random=2",
       color: 'from-purple-500 to-pink-600',
       description: "Multiple correct answers from options",
       features: ["Multiple selections", "Partial scoring", "Flexible grading", "Advanced analytics"],
@@ -35,7 +35,7 @@ const TestTypes = () => {
       id: 3,
       type: "Fill In The Blanks",
       title: "Fill in the Blanks",
-      image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=400&h=300&fit=crop&auto=format",
+      image: "https://picsum.photos/400/300?random=3",
       color: 'from-green-500 to-teal-600',
       description: "Complete sentences with missing words",
       features: ["Multiple blanks", "Case sensitivity", "Synonym matching", "Auto-completion"],
@@ -48,7 +48,7 @@ const TestTypes = () => {
       id: 4,
       type: "Matching Type",
       title: "Matching Questions",
-      image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=300&fit=crop&auto=format",
+      image: "https://picsum.photos/400/300?random=4",
       color: 'from-orange-500 to-red-600',
       description: "Match items from two columns",
       features: ["Drag & drop interface", "Visual matching", "Flexible pairing", "Randomized order"],
@@ -61,7 +61,7 @@ const TestTypes = () => {
       id: 5,
       type: "True/False",
       title: "True or False",
-      image: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=400&h=300&fit=crop&auto=format",
+      image: "https://picsum.photos/400/300?random=5",
       color: 'from-cyan-500 to-blue-600',
       description: "Binary choice questions",
       features: ["Quick assessment", "High completion rate", "Simple interface", "Instant feedback"],
@@ -74,7 +74,7 @@ const TestTypes = () => {
       id: 6,
       type: "Comprehension",
       title: "Reading Comprehension",
-      image: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=300&fit=crop&auto=format",
+      image: "https://picsum.photos/400/300?random=6",
       color: 'from-indigo-500 to-purple-600',
       description: "Questions based on provided text",
       features: ["Rich text support", "Multiple questions", "Context-based", "Analytical thinking"],
@@ -87,7 +87,7 @@ const TestTypes = () => {
       id: 7,
       type: "Number Type",
       title: "Numerical Answer",
-      image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&h=300&fit=crop&auto=format",
+      image: "https://picsum.photos/400/300?random=7",
       color: 'from-emerald-500 to-green-600',
       description: "Mathematical and numerical responses",
       features: ["Range validation", "Unit support", "Decimal precision", "Formula input"],
@@ -100,7 +100,7 @@ const TestTypes = () => {
       id: 8,
       type: "Code Compiler",
       title: "Programming Questions",
-      image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=300&fit=crop&auto=format",
+      image: "https://picsum.photos/400/300?random=8",
       color: 'from-gray-700 to-gray-900',
       description: "Live coding and compilation",
       features: ["Multi-language support", "Auto-testing", "Syntax highlighting", "Real-time execution"],
@@ -112,6 +112,7 @@ const TestTypes = () => {
   ];
 
   const [items, setItems] = useState(questionTypes);
+  const [imageErrors, setImageErrors] = useState({});
 
   const showSlider = (type) => {
     if (disableButtons) return;
@@ -139,8 +140,12 @@ const TestTypes = () => {
     setCarouselState('');
   };
 
+  const handleImageError = (itemId) => {
+    setImageErrors(prev => ({ ...prev, [itemId]: true }));
+  };
+
   return (
-    <div className=" font-sans">
+    <div className="font-sans">
       {/* Main Title */}
       <div className='flex item-center justify-center'>
         <div className="max-w-5xl py-4 sm:py-8 px-4">
@@ -163,16 +168,19 @@ const TestTypes = () => {
             >
               {/* Image Section */}
               <div className="relative h-48">
-                <img 
-                  src={item.image} 
-                  alt={item.title}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.parentElement.classList.add('bg-gradient-to-br', ...item.color.split(' '));
-                  }}
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-40 flex flex-col items-center justify-center text-white p-4">
+                {!imageErrors[item.id] ? (
+                  <img 
+                    src={item.image} 
+                    alt={item.title}
+                    className="w-full h-full object-cover z-30"
+                    onError={() => handleImageError(item.id)}
+                  />
+                ) : (
+                  <div className={`w-full h-full bg-gradient-to-br ${item.color} flex items-center justify-center`}>
+                    <div className="text-white text-6xl opacity-50">📋</div>
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-black -z-10 bg-opacity-40 flex flex-col items-center justify-center text-white p-4">
                   <h3 className="text-xl font-bold text-center mb-2">{item.type}</h3>
                   <p className="text-center text-sm opacity-90">{item.description}</p>
                 </div>
@@ -238,15 +246,18 @@ const TestTypes = () => {
                 } flex items-center justify-center`}>
                   <div className={`w-80 h-80 md:w-96 md:h-96 rounded-3xl overflow-hidden shadow-2xl transform hover:scale-105 transition-transform relative group`}>
                     {/* Large Image */}
-                    <img 
-                      src={item.image} 
-                      alt={item.title}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                        e.target.parentElement.classList.add('bg-gradient-to-br', ...item.color.split(' '));
-                      }}
-                    />
+                    {!imageErrors[item.id] ? (
+                      <img 
+                        src={item.image} 
+                        alt={item.title}
+                        className="w-full h-full object-cover"
+                        onError={() => handleImageError(item.id)}
+                      />
+                    ) : (
+                      <div className={`w-full h-full bg-gradient-to-br ${item.color} flex items-center justify-center`}>
+                        <div className="text-white text-8xl opacity-30">📋</div>
+                      </div>
+                    )}
                     
                     {/* Overlay with text */}
                     <div className="absolute inset-0 bg-black bg-opacity-40 flex flex-col items-center justify-center text-white p-8">

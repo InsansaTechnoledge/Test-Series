@@ -23,7 +23,7 @@ const Footer = () => {
     
 
     <div className="space-y-6">
-      <img src={logo} alt="Evalvo Logo" className="w-32" />
+      <img src={logo} alt="Evalvo Logo" className="w-32 hover:animate-bounce  " />
       <p className="text-sm text-gray-300 max-w-xs">
         Evalvo is an all-in-one platform for managing online exams, student records, and performance analytics.
         Designed for educators and institutions to simplify assessments with smart, AI-powered tools.
@@ -110,11 +110,11 @@ const Footer = () => {
 
   <div className='my-16 flex justify-center'>
 
-<img
-src={nameLogo}
-alt="Evalvo Background"
-className=""
-/>
+  <img
+  src={nameLogo}
+  alt="Evalvo Background"
+  className="animate-pulse"
+  />
 
 </div>
 
