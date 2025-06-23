@@ -55,8 +55,9 @@ import FallBackPage from '../../features/auth/pages/FallBackPage';
 import FallBackPageForOrg from '../../features/afterAuth/pages/FallBackPageForOrg';
 
 const PageLinks = () => {
-  const { user, setUser, hasPlanFeature } = useUser();
+  const { user, setUser} = useUser();
   const [loading, setLoading] = useState(true);
+  console.log('User in PageLinks:', user);
 
   const fetchUser = async () => {
     try {
@@ -89,6 +90,11 @@ const PageLinks = () => {
   return (
     <Router>
       <Routes>
+        {/*Before auth Landing Routes */}
+        <Route element={<BeforeAuthLayout />}>
+          <Route path="/" element={<LandingRoutes />} />
+        </Route>
+
         {/* Public Routes */}
         <Route element={<AuthLayout />}>
           <Route path='/institute-registration' element={<InstituteRegistrationPage />} />
@@ -153,10 +159,6 @@ const PageLinks = () => {
           </Route>
         </Route>
 
-        {/* Before Auth Landing */}
-        <Route element={<BeforeAuthLayout />}>
-          <Route path="/" element={<LandingRoutes />} />
-        </Route>
 
         {/* Top-level routes */}
         <Route path='video' element={<YoutubeConnection />} /> {/* <== Fix added! */}

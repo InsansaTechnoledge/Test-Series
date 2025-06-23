@@ -14,15 +14,18 @@ const PageAccessGuard = ({ children }) => {
   if (!user) return null; // Or show a loading spinner
 
   const hasAccess =
-    Boolean(user.planPurchased) &&
-    Array.isArray(user.planFeatures) &&
-    user.planFeatures.length > 0;
+  user.role === 'organization' ?
+  Boolean(user.planPurchased) && Object.keys(user.planFeatures || {}).length > 0
+  : Object.keys(user.planFeatures || {}).length > 0 
+
+  // console.log('User Plan Features:', hasAccess, user.planFeatures);
 
   if (hasAccess) {
     const canAccess = hasPlanFeature({
       keyFromPageOrAction: null,
       location: location.pathname,
     });
+
 
     return (
       <PageAccessContext.Provider value={canAccess}>
