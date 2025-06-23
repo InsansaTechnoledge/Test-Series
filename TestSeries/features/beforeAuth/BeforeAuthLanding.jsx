@@ -22,14 +22,16 @@ const BeforeAuthLanding = () => {
       <TestTypes />
       <WhyTakeExam />
       <ExamAnalyticsFeatures/>
-      <FeaturesPage/>
+      <div className="hidden md:block">
+        <FeaturesPage />
+      </div>
       {/* <WhyYourInstitute />   */}
       <AiBranding/>
       {/* <ProctoringWorking/> */}
       {/* <SoftwareCapabilities leftCapabilities={leftCapabilities} rightCapabilities={rightCapabilities} benefits={benefits} /> */}
       {/* <RegisterCTA/> */}
       <FAQSection studentFAQs={studentFAQs} teacherFAQs={teacherFAQs} />
-      <Testimonials />        
+      {/* <Testimonials />         */}
     </>
     
   );

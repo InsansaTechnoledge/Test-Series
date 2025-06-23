@@ -140,22 +140,84 @@ const TestTypes = () => {
   };
 
   return (
-    <div className="min-h-screen font-sans">
-     
+    <div className=" font-sans">
       {/* Main Title */}
       <div className='flex item-center justify-center'>
-        <div className=" max-w-5xl  py-8 ">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-center font-bold text-gray-800 mb-4">
-            Types of <span className='text-blue-600'> Questions  </span>we support for Creating an Exam
+        <div className="max-w-5xl py-4 sm:py-8 px-4">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-center font-bold text-gray-800 mb-4">
+            Types of <span className='text-blue-600'>Questions</span> we support for Creating an Exam
           </h1>
-          <p className="text-base text-center sm:text-lg md:text-xl text-gray-500 max-w-3xl mx-auto">
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-center text-gray-500 max-w-3xl mx-auto">
             Choose from our comprehensive collection of question formats to create engaging and effective assessments
           </p>
         </div>
       </div>
 
-      {/* Carousel */}
-      <div className={`carousel relative h-96 md:h-[500px] lg:h-[700px] overflow-hidden ${carouselState}`}>
+      {/* Mobile Row Layout (visible on sm and below) */}
+      <div className="block sm:hidden px-4 py-8">
+        <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory">
+          {items.map((item, index) => (
+            <div 
+              key={item.id}
+              className="flex-none w-80 bg-white rounded-2xl shadow-lg overflow-hidden snap-center"
+            >
+              {/* Image Section */}
+              <div className="relative h-48">
+                <img 
+                  src={item.image} 
+                  alt={item.title}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.parentElement.classList.add('bg-gradient-to-br', ...item.color.split(' '));
+                  }}
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-40 flex flex-col items-center justify-center text-white p-4">
+                  <h3 className="text-xl font-bold text-center mb-2">{item.type}</h3>
+                  <p className="text-center text-sm opacity-90">{item.description}</p>
+                </div>
+              </div>
+              
+              {/* Content Section */}
+              <div className="p-4">
+                <h4 className="text-lg font-bold text-slate-800 mb-2">{item.title}</h4>
+                <p className="text-sm text-slate-600 mb-3 line-clamp-2">{item.details}</p>
+                
+                {/* Features */}
+                <div className="flex flex-wrap gap-1 mb-3">
+                  {item.features.slice(0, 2).map((feature, idx) => (
+                    <span key={idx} className="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs">
+                      {feature}
+                    </span>
+                  ))}
+                </div>
+                
+                {/* Stats */}
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="bg-gray-50 p-2 rounded">
+                    <p className="font-semibold text-gray-600">Difficulty</p>
+                    <p className="text-gray-800">{item.difficulty}</p>
+                  </div>
+                  <div className="bg-gray-50 p-2 rounded">
+                    <p className="font-semibold text-gray-600">Setup Time</p>
+                    <p className="text-gray-800">{item.timeToCreate}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        {/* Mobile Navigation Dots */}
+        <div className="flex justify-center mt-4 gap-2">
+          {items.slice(0, 5).map((_, index) => (
+            <div key={index} className="w-2 h-2 bg-gray-300 rounded-full"></div>
+          ))}
+        </div>
+      </div>
+
+      {/* Desktop/Tablet Carousel (hidden on mobile) */}
+      <div className={`hidden sm:block carousel relative h-96 md:h-[500px] lg:h-[700px] overflow-hidden ${carouselState}`}>
         {/* Background Gradient */}
         <div className={`absolute w-96 h-64 md:w-[500px] md:h-[300px] bg-gradient-to-br ${items[1]?.color || 'from-blue-500 to-indigo-600'} rounded-[20%_30%_80%_10%] blur-[100px] md:blur-[150px] top-1/2 left-1/2 transform -translate-x-2 -translate-y-1/2 z-[-1] transition-all duration-1000 ${carouselState === 'showDetail' ? 'transform -translate-x-full -translate-y-1/2 rotate-90 blur-[130px]' : ''}`}></div>
 
@@ -181,9 +243,8 @@ const TestTypes = () => {
                       alt={item.title}
                       className="w-full h-full object-cover"
                       onError={(e) => {
-                        // Fallback to a gradient background if image fails to load
                         e.target.style.display = 'none';
-                        e.target.parentElement.classList.add('bg-gradient-to-br', item.color.split(' ')[1], item.color.split(' ')[3]);
+                        e.target.parentElement.classList.add('bg-gradient-to-br', ...item.color.split(' '));
                       }}
                     />
                     
@@ -280,14 +341,13 @@ const TestTypes = () => {
                       <p className="text-sm text-slate-800">{item.bestFor}</p>
                     </div>
                   </div>
-
                 </div>
               </div>
             );
           })}
         </div>
 
-        {/* Navigation Arrows */}
+        {/* Desktop Navigation Arrows */}
         <div className="arrows absolute bottom-8 w-full max-w-7xl flex justify-between left-1/2 transform -translate-x-1/2 px-6">
           <button
             id="prev"
@@ -322,6 +382,7 @@ const TestTypes = () => {
       </div>
 
       <style jsx>{`
+        /* Desktop Carousel Styles */
         .item:nth-child(1) {
           transform: translateX(-100%) translateY(-5%) scale(1.5);
           filter: blur(30px);
@@ -381,21 +442,30 @@ const TestTypes = () => {
         .animate-slideUp {
           animation: slideUp 0.5s ease-in-out forwards;
         }
-        
-        @media (max-width: 768px) {
-          .carousel {
-            height: 600px;
+
+        /* Mobile specific styles */
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+
+        /* Custom scrollbar for mobile horizontal scroll */
+        @media (max-width: 640px) {
+          .overflow-x-auto::-webkit-scrollbar {
+            height: 4px;
           }
-          .item {
-            width: 100%;
-            font-size: 10px;
+          .overflow-x-auto::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
           }
-          .introduce {
-            width: 50% !important;
+          .overflow-x-auto::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
           }
-          .detail {
-            backdrop-filter: blur(10px);
-            font-size: small;
+          .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
           }
         }
       `}</style>
@@ -403,7 +473,7 @@ const TestTypes = () => {
   );
 };
 
-// Helper functions
+// Helper functions (unchanged)
 const getItemClasses = (index, carouselState) => {
   let classes = '';
   

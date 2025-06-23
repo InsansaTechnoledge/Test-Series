@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import CryptoJS from "crypto-js";
+import { VITE_SECRET_KEY_FOR_COUNTDOWN_TIMER } from "../../constants/env";
 
-const ENCRYPTION_KEY = import.meta.env.VITE_SECRET_KEY_FOR_COUNTDOWN_TIMER;
+const ENCRYPTION_KEY = import.meta.env.VITE_SECRET_KEY_FOR_COUNTDOWN_TIMER || VITE_SECRET_KEY_FOR_COUNTDOWN_TIMER;
 
 function CountdownTimer({ initialTime, handleSubmitTest, submitted }) {
   const getInitialSeconds = () => {

@@ -4,12 +4,13 @@ import CryptoJS from "crypto-js";
 import useCachedContests from "../../../../../hooks/useCachedContests";
 import { useCachedOrganization } from "../../../../../hooks/useCachedOrganization";
 import { useUser } from "../../../../../contexts/currentUserContext";
+import { VITE_SECRET_KEY_FOR_CONTEST } from "../../../../constants/env";
 
 const ContestInstructionWindow = () => {
     const navigate = useNavigate();
     const { contestId } = useParams();
     const decodedId = decodeURIComponent(contestId);
-    const SECRET_KEY_CONTEST = import.meta.env.VITE_SECRET_KEY_FOR_CONTEST;
+    const SECRET_KEY_CONTEST = import.meta.env.VITE_SECRET_KEY_FOR_CONTEST || VITE_SECRET_KEY_FOR_CONTEST;
     const { user } = useUser();
 
 

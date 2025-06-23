@@ -12,6 +12,7 @@ import HeaderComponent from './components/HeaderComponent';
 import { getContestQuestions, runContestCode, runContestTestCases } from '../../../utils/services/contestQuestionService';
 import { useParams } from 'react-router-dom';
 import CryptoJS from 'crypto-js';
+import { VITE_SECRET_KEY_FOR_CONTEST } from '../../constants/env';
 
 
 const CodingPlatform = () => {
@@ -29,7 +30,7 @@ const CodingPlatform = () => {
   const [loading, setLoading] = useState(true);
 
 
-  const SECRET_KEY_CONTEST = import.meta.env.VITE_SECRET_KEY_FOR_CONTEST;
+  const SECRET_KEY_CONTEST = import.meta.env.VITE_SECRET_KEY_FOR_CONTEST || VITE_SECRET_KEY_FOR_CONTEST;
 
 
   // Decrypt the contestId only once
