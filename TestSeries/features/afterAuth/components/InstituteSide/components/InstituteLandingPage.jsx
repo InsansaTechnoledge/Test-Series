@@ -10,7 +10,6 @@ const InstituteLandingPage = () => {
   const { user } = useUser();
   
 
-
   if (!user) {
     return (
       <Loader/>
@@ -91,15 +90,16 @@ const InstituteLandingPage = () => {
 
                 <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-8">
                   <div className="flex flex-col items-center p-2 bg-white/10 backdrop-blur-sm rounded-lg">
-                    <span className="text-3xl md:text-4xl font-bold text-white">98</span>
+                    <span className="text-3xl md:text-4xl font-bold text-white">{user.metaData.totalBatches}</span>
                     <span className="text-gray-200 mt-2">Number of Batches</span>
                   </div>
                   <div className="flex flex-col items-center p-2 bg-white/10 backdrop-blur-sm rounded-lg">
-                    <span className="text-3xl md:text-4xl font-bold text-white">200+</span>
+                    <span className="text-3xl md:text-4xl font-bold text-white">{user.metaData.totalStudents
+}</span>
                     <span className="text-gray-200 mt-2">Number of Students</span>
                   </div>
                   <div className="flex flex-col items-center p-2 bg-white/10 backdrop-blur-sm rounded-lg">
-                    <span className="text-3xl md:text-4xl font-bold text-white">25</span>
+                    <span className="text-3xl md:text-4xl font-bold text-white">{user.metaData.totalExams}</span>
                     <span className="text-gray-200 mt-2">Exams Conducted</span>
                   </div>
                 </div>

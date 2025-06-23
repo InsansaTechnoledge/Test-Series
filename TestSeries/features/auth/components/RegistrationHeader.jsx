@@ -1,59 +1,64 @@
+
+
 import React from 'react';
-import { Check, ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const RegistrationHeader = () => {
   const navigate = useNavigate();
+  const handleBack = () => {
+    navigate('/')
+  };
 
   return (
-    <div className="bg-gradient-to-r from-blue-800 to-blue-600 py-12 md:py-20 px-4">
+    <div className="bg-gradient-to-br from-indigo-600 via-indigo-700 to-gray-800 py-16 md:py-24 px-4 relative">
       <div className="container mx-auto">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-center mb-6">
-          </div>
+        <div className="max-w-5xl mx-auto text-center">
           
-          <h1 className="text-4xl md:text-6xl font-bold text-white text-center mb-6">
-            Register Your Institute <span className="text-green-400">Now</span>
+          <h1 className="text-5xl md:text-7xl font-black text-white mb-8 leading-tight">
+            Register Your
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300">
+              Institute
+            </span>
           </h1>
           
-          <p className="text-xl md:text-2xl text-purple-100 text-center mb-8">
-            Join our network of educational excellence and unlock powerful assessment tools 
-            <span className="font-bold text-white"> pricing that fits your budget</span>
+          <p className="text-xl md:text-2xl text-gray-300 mb-16 max-w-3xl mx-auto leading-relaxed">
+            Join our network of educational excellence and unlock powerful assessment tools with 
+            <span className="text-white font-semibold"> flexible pricing</span>
           </p>
           
-          <div className="grid md:grid-cols-3 gap-4 mb-10">
-            <div className="bg-white bg-opacity-10 rounded-lg p-4 text-center flex flex-col items-center">
-              <div className="bg-green-500 rounded-full p-2 mb-3">
-                <Check className="text-white w-5 h-5" />
-              </div>
-              <h3 className="text-gray-700 font-semibold">Quick Setup</h3>
-              <p className="text-gray-500 text-sm">Get started in less than 5 minutes</p>
+          <div className="grid md:grid-cols-3 gap-8 mb-16">
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition-all duration-300">
+              <h3 className="text-2xl font-bold text-white mb-3">Quick Setup</h3>
+              <p className="text-gray-300 text-lg">Get started in less than 5 minutes with our streamlined process</p>
             </div>
             
-            <div className="bg-white bg-opacity-10 rounded-lg p-4 text-center flex flex-col items-center">
-              <div className="bg-green-500 rounded-full p-2 mb-3">
-                <Check className="text-white w-5 h-5" />
-              </div>
-              <h3 className="text-gray-700 font-semibold">No Credit Card</h3>
-              <p className="text-gray-500 text-sm">Free tier with no payment required</p>
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition-all duration-300">
+              <h3 className="text-2xl font-bold text-white mb-3">No Credit Card</h3>
+              <p className="text-gray-300 text-lg">Free tier available with no payment required upfront</p>
             </div>
             
-            <div className="bg-white bg-opacity-10 rounded-lg p-4 text-center flex flex-col items-center">
-              <div className="bg-green-500 rounded-full p-2 mb-3">
-                <Check className="text-white w-5 h-5" />
-              </div>
-              <h3 className="text-gray-700 font-semibold">Premium Features</h3>
-              <p className="text-gray-500 text-sm">Access core tools immediately</p>
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition-all duration-300">
+              <h3 className="text-2xl font-bold text-white mb-3">Premium Access</h3>
+              <p className="text-gray-300 text-lg">Unlock core assessment tools immediately after signup</p>
             </div>
           </div>
 
           <button 
-            className='group flex justify-center items-center text-gray-100 border-2 bg-transparent border-white px-8 rounded-4xl hover:cursor-pointer' 
-            onClick={() => navigate('/')}
-            >
-             <ArrowLeft className=' my-4 mr-3 h-5 w-6 group-hover:-translate-x-3  text-gray-100 duration-400'/>
-            Back
+            className='inline-flex items-center text-white border-2 border-white/30 bg-white/5 backdrop-blur-sm px-8 py-4 rounded-xl hover:bg-white/10 hover:border-white/50 transition-all duration-300 text-lg font-medium' 
+            onClick={handleBack}
+          >
+            <ArrowLeft className='mr-3 h-5 w-5'/>
+            Back to Home
           </button>
+
+          {/* Scroll Down Indicator */}
+          <div className="flex flex-col items-center mt-8">
+            <span className="text-white/60 text-sm mb-2 font-medium">Scroll Down</span>
+            <div className="animate-bounce">
+              <ChevronDown className="h-6 w-6 text-white/60" />
+            </div>
+          </div>
         </div>  
       </div>
     </div>
