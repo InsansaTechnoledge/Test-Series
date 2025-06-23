@@ -13,6 +13,7 @@ const LogoutModal = ({ setShowLogoutModal }) => {
       setIsUserLoggedOut(true);
       setUser(null);
       setShowLogoutModal(false);
+      localStorage.removeItem('hasLoggedIn');
 
     }
   }

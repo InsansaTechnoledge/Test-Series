@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import HeadingUtil from '../../utility/HeadingUtil'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import { generatePassword } from '../../utility/GenerateRandomPassword'
 import * as XLSX from 'xlsx'
 import { addSingleStudent, fetchStudents, updateStudentsBatch, uploadStudentExcel } from '../../../../utils/services/studentService'
@@ -8,20 +7,20 @@ import { RefreshCcw, Upload, Download, Plus, Trash2, Eye, EyeOff, Users, FileSpr
 import NeedHelpComponent from './components/NeedHelpComponent'
 import { QueryClient } from '@tanstack/react-query'
 import { useUser } from '../../../../contexts/currentUserContext'
-import { useEffect } from 'react'
-import  Banner from "../../../../assests/Institute/add student.svg"
+import Banner from "../../../../assests/Institute/add student.svg"
 import { usePageAccess } from '../../../../contexts/PageAccessContext'
 import useLimitAccess from '../../../../hooks/useLimitAccess'
 import { useLocation } from 'react-router-dom'
 import { useCachedOrganization } from '../../../../hooks/useCachedOrganization'
+
 const AddStudent = () => {
-  const { user , getFeatureKeyFromLocation } = useUser();
+  const { user, getFeatureKeyFromLocation } = useUser();
   const [batch, setBatch] = useState('')
   const [students, setStudents] = useState([getEmptyStudent()])
   const [showPassword, setShowPassword] = useState({})
   const [excelData, setExcelData] = useState([])
-  const [activeTab, setActiveTab] = useState('manual') // 'manual' or 'bulk'
-  const { batches, isLoading } = useCachedBatches();
+  const [activeTab, setActiveTab] = useState('manual')
+  const { batches } = useCachedBatches();
   const [errors, setErrors] = useState([]);
   const queryClient = new QueryClient();
   const [importBatch, setImportBatch] = useState('');
@@ -32,18 +31,47 @@ const AddStudent = () => {
     : null;
 
   const canAddMoreStudents = useLimitAccess(getFeatureKeyFromLocation(location.pathname), "totalStudents")
-  
-  const Total_students =  user?.role === 'organization' 
-    ? user.metaData?.totalBatches 
-    :  (    
-      organization?.metaData?.totalBatches
-    );
 
+  // Memoized derived values for limits
+  const Total_students = useMemo(() => (
+    user?.role === 'organization'
+      ? user.metaData?.totalBatches
+      : organization?.metaData?.totalBatches
+  ), [user, organization]);
 
-  const Creation_limit = user?.planFeatures?.student_feature?.value
-  const Available_limit = Creation_limit - Total_students;
-
+  const Creation_limit = useMemo(() => user?.planFeatures?.student_feature?.value, [user]);
+  const Available_limit = useMemo(() => Creation_limit - Total_students, [Creation_limit, Total_students]);
   const canAccessPage = usePageAccess();
+
+  // Memoized limit checks
+  const studentLimitExceeded = useMemo(() => {
+    if (activeTab === 'manual') return students.length + Total_students > Creation_limit;
+    if (activeTab === 'bulk') return excelData.length + Total_students > Creation_limit;
+    if (activeTab === 'import') return Total_students > Creation_limit;
+    return false;
+  }, [activeTab, students.length, excelData.length, Total_students, Creation_limit]);
+
+  const canSubmit = useMemo(() => (
+    canAccessPage && !studentLimitExceeded && !!batch
+  ), [canAccessPage, studentLimitExceeded, batch]);
+
+  // Button label logic
+  const submitButtonLabel = useMemo(() => {
+    if (!canAccessPage) return 'Access Denied';
+    if (studentLimitExceeded) return 'Student limit exceeded';
+    if (!batch) return 'Select a batch';
+    if (activeTab === 'manual') return 'Add Students';
+    if (activeTab === 'bulk') return 'Upload Excel Data';
+    if (activeTab === 'import') return 'Import Students';
+    return 'Submit';
+  }, [canAccessPage, studentLimitExceeded, batch, activeTab]);
+
+  // Error message logic
+  const submitError = useMemo(() => {
+    if (!canAccessPage) return 'Access denied';
+    if (Total_students >= Creation_limit) return 'Limit exceeded';
+    return '';
+  }, [canAccessPage, Total_students, Creation_limit]);
 
   // Generate empty student object
   function getEmptyStudent() {
@@ -62,8 +90,9 @@ const AddStudent = () => {
 
   useEffect(() => {
     setImportedStudents([]);
-  },[importBatch]);
+  }, [importBatch]);
 
+  // Validation logic (unchanged)
   const validateField = (name, value, index, updatedErrors) => {
     switch (name) {
       case 'fname':
@@ -79,21 +108,20 @@ const AddStudent = () => {
         const hasNumbers = /\d/.test(value);
         const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value);
         const isLongEnough = value.length >= 8;
-
         if (!isLongEnough || !hasUpperCase || !hasLowerCase || !hasNumbers || !hasSpecialChar) {
           return 'Password must be at least 8 characters with uppercase, lowercase, number, and special character';
         }
         if (students[index]?.cpassword && value !== students[index]?.cpassword) {
           return 'Passwords do not match';
         }
-        updatedErrors[index].cpassword='';
+        updatedErrors[index].cpassword = '';
         return '';
       case 'cpassword':
-        if(value===students[index]?.password){
-          updatedErrors[index].password='';
+        if (value === students[index]?.password) {
+          updatedErrors[index].password = '';
           return '';
         }
-        else{
+        else {
           return 'Passwords do not match';
         }
       case 'number':
@@ -106,7 +134,8 @@ const AddStudent = () => {
     }
   };
 
-  const handleStudentChange = (index, field, value) => {
+  // Handlers (useCallback for optimization)
+  const handleStudentChange = useCallback((index, field, value) => {
     const updatedStudents = [...students];
     updatedStudents[index] = { ...updatedStudents[index], [field]: value };
     setStudents(updatedStudents);
@@ -118,50 +147,44 @@ const AddStudent = () => {
       [field]: errorMessage
     };
     setErrors(updatedErrors);
-  };
+  }, [students, errors]);
 
-  const handleImportedStudents = async () => {
-    try{
-    const response = await fetchStudents(importBatch);
-
-    if (response.status === 200) {
-
-      setImportedStudents(response.data);
-    }
-  }catch(error){
-      if(error.response && error.response.status === 404) {
+  const handleImportedStudents = useCallback(async () => {
+    try {
+      const response = await fetchStudents(importBatch);
+      if (response.status === 200) {
+        setImportedStudents(response.data);
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
         alert('Student not found');
       }
-      else{
+      else {
         console.error('Error fetching students:', error);
         alert('Something went wrong while fetching students');
       }
-  }
-  }
+    }
+  }, [importBatch]);
 
-  // Add a new student form
-  const addStudentForm = () => {
+  const addStudentForm = useCallback(() => {
     setStudents([...students, getEmptyStudent()])
-  }
+  }, [students]);
 
-  // Remove a student form
-  const removeStudentForm = (index) => {
+  const removeStudentForm = useCallback((index) => {
     if (students.length > 1) {
       const updatedStudents = students.filter((_, i) => i !== index)
       setStudents(updatedStudents)
     }
-  }
+  }, [students]);
 
-  // Toggle password visibility
-  const togglePasswordVisibility = (index, field) => {
+  const togglePasswordVisibility = useCallback((index, field) => {
     setShowPassword(prev => ({
       ...prev,
       [`${index}-${field}`]: !prev[`${index}-${field}`]
     }))
-  }
+  }, []);
 
-  // Generate random password for a specific student
-  const generateRandomPasswordForStudent = (index) => {
+  const generateRandomPasswordForStudent = useCallback((index) => {
     const password = generatePassword()
     const updatedStudents = [...students]
     updatedStudents[index] = {
@@ -170,10 +193,9 @@ const AddStudent = () => {
       cpassword: password
     }
     setStudents(updatedStudents)
-  }
+  }, [students]);
 
-  // Handle Excel file upload
-  const handleFileUpload = (e) => {
+  const handleFileUpload = useCallback((e) => {
     const file = e.target.files[0]
     if (!file) return
 
@@ -184,8 +206,6 @@ const AddStudent = () => {
         const sheetName = workbook.SheetNames[0]
         const worksheet = workbook.Sheets[sheetName]
         const data = XLSX.utils.sheet_to_json(worksheet)
-
-        // Process the data to match student structure
         const processedData = data.map(item => ({
           fname: item.FirstName || '',
           lname: item.LastName || '',
@@ -196,19 +216,17 @@ const AddStudent = () => {
           pnumber: item.ParentPhone || '',
           pemail: item.ParentEmail || '',
           gender: item.Gender || ''
-        }))
-
-        setExcelData(processedData)
+        }));
+        setExcelData(processedData);
       } catch (error) {
         console.error('Error parsing Excel file:', error)
         alert('Error parsing Excel file. Please check the format.')
       }
     }
     reader.readAsBinaryString(file)
-  }
+  }, []);
 
-  // example Excel template
-  const downloadExcelTemplate = () => {
+  const downloadExcelTemplate = useCallback(() => {
     const template = [
       {
         FirstName: 'tanmay',
@@ -221,15 +239,14 @@ const AddStudent = () => {
         Gender: 'Male'
       }
     ]
-
     const worksheet = XLSX.utils.json_to_sheet(template)
     const workbook = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Students')
     XLSX.writeFile(workbook, 'example_student_template.xlsx')
-  }
+  }, []);
 
   // Submit form data
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     try {
       if (!batch) {
         alert('Please select a batch before submitting.');
@@ -246,28 +263,22 @@ const AddStudent = () => {
           parentEmail: s.pemail,
           parentPhone: s.pnumber
         }));
-
-        const res = await addSingleStudent(preparedStudents);
+        await addSingleStudent(preparedStudents);
         alert('Students added successfully!');
         setStudents([getEmptyStudent()]);
         setErrors('')
         queryClient.invalidateQueries(['Students', user._id])
       }
-
       if (activeTab === 'bulk') {
         if (!excelData.length) return alert('No Excel data to upload');
-
         const fileInput = document.getElementById('excel-upload');
         if (!fileInput.files[0]) return alert('No file selected');
-  
-        const res = await uploadStudentExcel(fileInput.files[0], batch);
+        await uploadStudentExcel(fileInput.files[0], batch);
         alert('Excel uploaded successfully!');
       }
-
       if (activeTab === 'import') {
-        if(!importedStudents.length) return alert('No students to import from the selected batch');
-
-        const preparedStudents = importedStudents.map(s=>s._id);
+        if (!importedStudents.length) return alert('No students to import from the selected batch');
+        const preparedStudents = importedStudents.map(s => s._id);
         const currentBatchId = batch;
         const previousBatchId = importBatch;
         const response = await updateStudentsBatch({
@@ -275,8 +286,7 @@ const AddStudent = () => {
           currentBatchId,
           previousBatchId
         })
-        
-        if(response.status === 200) {
+        if (response.status === 200) {
           alert('Students imported successfully!');
           setImportedStudents([]);
           setImportBatch('');
@@ -285,89 +295,67 @@ const AddStudent = () => {
       };
     } catch (error) {
       console.error('Submission failed:', error);
-      alert( 'Something went wrong during submission');
+      alert('Something went wrong during submission');
     }
-  };
+  }, [batch, activeTab, students, excelData, importedStudents, importBatch, user, queryClient]);
 
+  // FAQ
   const question = "How to add multiple students?"
   const answer = "You can add students one by one using the manual entry form or upload an Excel file with multiple students at once."
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-indigo-50">
-
       {/* Hero Header */}
-     
-      
       <div className="relative overflow-hidden rounded-xl h-80">
-   
-    <img 
-        src={Banner} 
-        alt="Upload Banner"
-        className="absolute  w-full h-full object-cover"
-    />
-    
-  
-    <div className="absolute "></div>
-    
-    {/* Content */}
-    <div className="relative z-10 flex items-center justify-center h-full px-6 text-center">
-        <div>
+        <img src={Banner} alt="Upload Banner" className="absolute  w-full h-full object-cover" />
+        <div className="absolute "></div>
+        <div className="relative z-10 flex items-center justify-center h-full px-6 text-center">
+          <div>
             <h1 className="text-5xl md:text-6xl font-black text-white tracking-tight mb-4 drop-shadow-lg">
-            Add Students
+              Add Students
             </h1>
             <p className="text-xl text-white/90 max-w-2xl mx-auto drop-shadow-md">
-            Create students and assign them to batches with our powerful management system
+              Create students and assign them to batches with our powerful management system
             </p>
-
-           <div>
-           <div className="flex items-center justify-center">
-  <p className="mt-8 text-indigo-700 bg-indigo-50 border border-indigo-100 px-5 py-4 rounded-2xl text-base flex items-center gap-3 shadow-sm backdrop-blur-sm">
-    <AlertTriangle className="w-5 h-5 text-indigo-400" />
-    <span>
-      <span className="font-semibold">Note:</span> For your current plan, you have an available limit of
-      <span className={`font-bold ${Available_limit > 0 ? "text-green-600" : "text-red-600"} mx-1`}>
-        {Available_limit}
-      </span>
-      Students
-    </span>
-  </p>
-</div>
-
-
-       
-</div>
-
+            <div>
+              <div className="flex items-center justify-center">
+                <p className="mt-8 text-indigo-700 bg-indigo-50 border border-indigo-100 px-5 py-4 rounded-2xl text-base flex items-center gap-3 shadow-sm backdrop-blur-sm">
+                  <AlertTriangle className="w-5 h-5 text-indigo-400" />
+                  <span>
+                    <span className="font-semibold">Note:</span> For your current plan, you have an available limit of
+                    <span className={`font-bold ${Available_limit > 0 ? "text-green-600" : "text-red-600"} mx-1`}>
+                      {Available_limit}
+                    </span>
+                    Students
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
-    </div>
-</div>
+      </div>
       <div className="max-w-7xl mx-auto px-6 -mt-8 relative z-20">
         {/* Help Component */}
         <div className="mb-8">
-          <NeedHelpComponent 
-            heading="Adding Students ?" 
-            about="create students in one/many/bulk" 
-            question={question} 
-            answer={answer} 
+          <NeedHelpComponent
+            heading="Adding Students ?"
+            about="create students in one/many/bulk"
+            question={question}
+            answer={answer}
           />
-          
-        {!canAddMoreStudents && (
-           <p className="mt-4 text-center text-sm text-red-600 bg-red-100 border border-red-200 px-4 py-2 rounded-xl shadow-sm backdrop-blur-sm">
-          You've reached your batch creation limit. <br className="sm:hidden" />
-           <span className="font-medium">Upgrade your plan</span> to continue.
-         </p>
-         
+          {!canAddMoreStudents && (
+            <p className="mt-4 text-center text-sm text-red-600 bg-red-100 border border-red-200 px-4 py-2 rounded-xl shadow-sm backdrop-blur-sm">
+              You've reached your batch creation limit. <br className="sm:hidden" />
+              <span className="font-medium">Upgrade your plan</span> to continue.
+            </p>
           )}
         </div>
-
         {/* Batch Selection Card */}
         <div className="bg-white rounded-3xl shadow-xl p-8 mb-8 border border-gray-100">
           <div className="flex items-center space-x-4 mb-6">
-            <div className="bg-indigo-100 p-3 rounded-2xl">
-              {/* <Target className="w-6 h-6 text-indigo-600" /> */}
-            </div>
+            <div className="bg-indigo-100 p-3 rounded-2xl"></div>
             <h2 className="text-2xl font-black text-gray-800">Select Target Batch</h2>
           </div>
-          
           <div className="flex flex-col md:flex-row md:items-center gap-4">
             <span className="text-gray-700 font-bold whitespace-nowrap text-lg">Batch</span>
             <select
@@ -381,45 +369,40 @@ const AddStudent = () => {
             </select>
           </div>
         </div>
-
         {/* Tab Selection */}
         <div className="bg-white rounded-3xl shadow-xl overflow-hidden mb-8 border border-gray-100">
           <div className="grid grid-cols-3 border-b-2 border-gray-100">
             <button
-              className={`flex items-center justify-center gap-3 py-6 font-bold text-lg transition-all duration-300 ${
-                activeTab === 'manual' 
-                  ? 'text-indigo-600 border-b-4 border-indigo-600 bg-indigo-50' 
-                  : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
-              }`}
+              className={`flex items-center justify-center gap-3 py-6 font-bold text-lg transition-all duration-300 ${activeTab === 'manual'
+                ? 'text-indigo-600 border-b-4 border-indigo-600 bg-indigo-50'
+                : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+                }`}
               onClick={() => setActiveTab('manual')}
             >
               <Users size={24} />
               <span>Manual Entry</span>
             </button>
             <button
-              className={`flex items-center justify-center gap-3 py-6 font-bold text-lg transition-all duration-300 ${
-                activeTab === 'bulk' 
-                  ? 'text-indigo-600 border-b-4 border-indigo-600 bg-indigo-50' 
-                  : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
-              }`}
+              className={`flex items-center justify-center gap-3 py-6 font-bold text-lg transition-all duration-300 ${activeTab === 'bulk'
+                ? 'text-indigo-600 border-b-4 border-indigo-600 bg-indigo-50'
+                : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+                }`}
               onClick={() => setActiveTab('bulk')}
             >
               <FileSpreadsheet size={24} />
               <span>Bulk Upload</span>
             </button>
             <button
-              className={`flex items-center justify-center gap-3 py-6 font-bold text-lg transition-all duration-300 ${
-                activeTab === 'import' 
-                  ? 'text-indigo-600 border-b-4 border-indigo-600 bg-indigo-50' 
-                  : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
-              }`}
+              className={`flex items-center justify-center gap-3 py-6 font-bold text-lg transition-all duration-300 ${activeTab === 'import'
+                ? 'text-indigo-600 border-b-4 border-indigo-600 bg-indigo-50'
+                : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+                }`}
               onClick={() => setActiveTab('import')}
             >
               <FileDown size={24} />
               <span>Import from Batch</span>
             </button>
           </div>
-
           {/* Manual Entry Form */}
           {activeTab === 'manual' && (
             <div className="p-8">
@@ -497,7 +480,7 @@ const AddStudent = () => {
                   <div className="mb-8">
                     <div className="flex items-center gap-3 mb-6">
                       <div className="bg-green-100 p-2 rounded-xl">
-                        {/* <Zap className="w-5 h-5 text-green-600" /> */}
+                        <Zap className="w-5 h-5 text-green-600" />
                       </div>
                       <h4 className="text-lg font-black text-gray-700 uppercase tracking-wider">Contact Information</h4>
                     </div>
@@ -548,7 +531,7 @@ const AddStudent = () => {
                               className="p-4 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 w-full pr-14 text-lg"
                               placeholder="Enter password"
                             />
-                            
+
                             <div
                               className="absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400 hover:text-gray-600"
                               onClick={() => togglePasswordVisibility(index, 'password')}
@@ -556,7 +539,7 @@ const AddStudent = () => {
                               {showPassword[`${index}-password`] ? <EyeOff size={24} /> : <Eye size={24} />}
                             </div>
                           </div>
-                          
+
                           <button
                             onClick={() => generateRandomPasswordForStudent(index)}
                             className="bg-gradient-to-r from-indigo-100 to-purple-100 hover:from-indigo-200 hover:to-purple-200 p-4 rounded-2xl flex items-center justify-center transition-all duration-300 hover:scale-105"
@@ -577,7 +560,7 @@ const AddStudent = () => {
                             className="p-4 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 w-full pr-14 text-lg"
                             placeholder="Confirm password"
                           />
-                          
+
                           <div
                             className="absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400 hover:text-gray-600"
                             onClick={() => togglePasswordVisibility(index, 'cpassword')}
@@ -626,20 +609,23 @@ const AddStudent = () => {
                   </div>
                 </div>
               ))}
-
               {/* Add Another Button */}
               <div className="flex justify-center mt-8">
                 <button
                   onClick={addStudentForm}
-                  className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-2xl py-4 px-8 flex items-center gap-3 transition-all duration-300 hover:shadow-2xl hover:scale-105 font-bold text-lg"
+                  disabled={studentLimitExceeded || !canAccessPage}
+                  className={`rounded-2xl py-4 px-8 flex items-center gap-3 font-bold text-lg transition-all duration-300
+                    ${!canAccessPage || studentLimitExceeded
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white hover:shadow-2xl hover:scale-105'}
+                  `}
                 >
                   <Plus size={22} />
-                  Add Another Student
+                  {submitButtonLabel}
                 </button>
               </div>
             </div>
           )}
-
           {/* Bulk Upload */}
           {activeTab === 'bulk' && (
             <div className="p-8">
@@ -662,8 +648,8 @@ const AddStudent = () => {
                 </div>
 
                 {/* File Upload Area */}
-               {/* File Upload Area */}
-               <div className="bg-white border-2 border-gray-200 rounded-3xl p-8 shadow-lg">
+                {/* File Upload Area */}
+                <div className="bg-white border-2 border-gray-200 rounded-3xl p-8 shadow-lg">
                   <div className="text-center mb-6">
                     <div className="flex items-center justify-center gap-3 mb-4">
                       <div className="bg-green-100 p-3 rounded-2xl">
@@ -673,7 +659,7 @@ const AddStudent = () => {
                     </div>
                     <p className="text-gray-600 text-lg">Select your Excel file to upload student data</p>
                   </div>
-                  
+
                   <div className="flex flex-col items-center gap-6">
                     <input
                       type="file"
@@ -682,7 +668,7 @@ const AddStudent = () => {
                       onChange={handleFileUpload}
                       className="w-full p-4 border-2 border-dashed border-gray-300 rounded-2xl text-lg font-medium hover:border-indigo-400 transition-all duration-300 cursor-pointer"
                     />
-                    
+
                     {excelData.length > 0 && (
                       <div className="w-full bg-green-50 border-2 border-green-200 rounded-2xl p-6">
                         <div className="flex items-center gap-3 mb-4">
@@ -699,6 +685,9 @@ const AddStudent = () => {
                                 <th className="text-left p-2 font-bold text-green-800">Email</th>
                                 <th className="text-left p-2 font-bold text-green-800">Phone</th>
                                 <th className="text-left p-2 font-bold text-green-800">Gender</th>
+                                {((excelData.length + Total_students) > Creation_limit) && (
+                                  <th className="text-left p-2 font-bold text-green-800">Actions</th>
+                                )}
                               </tr>
                             </thead>
                             <tbody>
@@ -708,6 +697,19 @@ const AddStudent = () => {
                                   <td className="p-2 text-green-700">{student.email}</td>
                                   <td className="p-2 text-green-700">{student.number}</td>
                                   <td className="p-2 text-green-700">{student.gender}</td>
+                                  {((excelData.length + Total_students) > Creation_limit) && (
+                                    <td className="p-2">
+                                      <button
+                                        onClick={() => {
+                                          const updatedExcelData = excelData.filter((_, i) => i !== idx);
+                                          setExcelData(updatedExcelData);
+                                        }}
+
+                                      >
+                                        <Trash2 className="w-5 h-5 text-red-500 hover:text-red-700 transition-all duration-300" />
+                                      </button>
+                                    </td>
+                                  )}
                                 </tr>
                               ))}
                             </tbody>
@@ -715,12 +717,23 @@ const AddStudent = () => {
                         </div>
                       </div>
                     )}
+                    {(excelData.length + Total_students > Creation_limit) && (
+                      <div className="w-full bg-red-50 border-2 border-red-200 rounded-2xl p-6">
+                        <div className="flex items-center gap-3 mb-4">
+                          <AlertTriangle className="w-6 h-6 text-red-600" />
+                          <span className="text-lg font-bold text-red-800">
+                            You've reached your limit of {Creation_limit} students. Please upgrade your plan to add more
+                          </span>
+                        </div>
+                        <p className="text-red-700">You can only add {Creation_limit - Total_students} more students.</p>
+                      </div>
+                    )}
+
                   </div>
                 </div>
               </div>
             </div>
           )}
-
           {/* Import from Batch */}
           {activeTab === 'import' && (
             <div className="p-8">
@@ -733,7 +746,7 @@ const AddStudent = () => {
                     </div>
                     <h3 className="text-2xl font-black text-gray-800">Import Students from Another Batch</h3>
                   </div>
-                  
+
                   <div className="flex flex-col md:flex-row md:items-center gap-4">
                     <span className="text-gray-700 font-bold whitespace-nowrap text-lg">Source Batch</span>
                     <select
@@ -766,7 +779,7 @@ const AddStudent = () => {
                         {importedStudents.length} Students Ready to Import
                       </h3>
                     </div>
-                    
+
                     <div className="max-h-80 overflow-y-auto">
                       <div className="grid gap-4">
                         {importedStudents.map((student, idx) => (
@@ -799,30 +812,20 @@ const AddStudent = () => {
             </div>
           )}
         </div>
-
         {/* Submit Button */}
         <div className="text-center mb-12">
           <button
             onClick={handleSubmit}
-            disabled={!batch || canAccessPage === false || canAddMoreStudents === false}
-            className={` text-white py-6 px-12 rounded-3xl text-2xl font-black transition-all duration-300 hover:shadow-2xl hover:scale-105 disabled:cursor-not-allowed disabled:transform-none
-              ${canAccessPage === false || canAddMoreStudents === false
+            disabled={!canSubmit}
+            className={`text-white py-6 px-12 rounded-3xl text-2xl font-black transition-all duration-300 hover:shadow-2xl hover:scale-105 disabled:cursor-not-allowed disabled:transform-none
+              ${!canSubmit
                 ? 'bg-gray-300 cursor-not-allowed'
                 : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 hover:scale-105 hover:shadow-2xl'}
-              `}
+            `}
           >
-          {canAddMoreStudents === false || canAccessPage && activeTab === 'manual' ?(
-            <span>Add Students</span>
-          ) : <span className='text-red-600'>{canAddMoreStudents ? "Limit exceeded" : "Access denied"}</span>}
-
-          {canAccessPage && activeTab === 'bulk' && (
-            <span>Upload Excel Data</span>
-          )}
-
-          {canAccessPage && activeTab === 'import' && (
-            <span>Import Students</span>
-          )}
-
+            <span>
+              {canSubmit ? submitButtonLabel : (<span className="text-red-600">{submitButtonLabel}</span>)}
+            </span>
           </button>
         </div>
       </div>

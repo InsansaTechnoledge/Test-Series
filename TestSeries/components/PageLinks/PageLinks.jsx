@@ -62,6 +62,7 @@ const PageLinks = () => {
 
   const fetchUser = async () => {
     try {
+      
       const response = await checkAuth();
       if (response.status === 200) {
         setUser(response.data.user);
@@ -77,7 +78,7 @@ const PageLinks = () => {
   };
 
   useEffect(() => {
-    if (!user) {
+    if (!user && (localStorage.getItem('hasLoggedIn')=== 'true')) {
       fetchUser();
     } else {
       setLoading(false);
