@@ -4,11 +4,12 @@ import QuickSteps from './components/QuickStep';
 import Analytics from './components/Analytics';
 import MostActiveBatch from './components/MostActiveBatch';
 import Features from './components/Features';
-import { mockUser } from './components/Data/Data';
+// import { mockUser } from './components/Data//';
 import useExamBatchAnalytics from '../../../../../../hooks/UseCachedExamBatchAnalytics';
+import { useUser } from '../../../../../../contexts/currentUserContext';
 
 const InstituteLandingPage = () => {
-  const user = mockUser; // Replace with actual user context or state management
+  const {user} = useUser();// Replace with actual user context or state management
   const {examBatchAnalytics}=useExamBatchAnalytics(); 
   console.log("Exam Batch Analytics Data:", examBatchAnalytics);
 

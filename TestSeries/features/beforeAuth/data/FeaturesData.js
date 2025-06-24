@@ -17,7 +17,7 @@ import {
   import  AdvExam from "../../../assests/Landing/SoftwareCapabilities/Advanced Exam Creation.svg"
   import  FmarkingSystem from "../../../assests/Landing/SoftwareCapabilities/Flexible Marking System.svg"
   import  AIpower from "../../../assests/Landing/SoftwareCapabilities/Al-Powered Proctoring.svg"
-  import  AIpower from "../../../assests/Landing/SoftwareCapabilities/Al-Powered Proctoring.svg"
+ 
   
 // Categories
 export const categories = [
