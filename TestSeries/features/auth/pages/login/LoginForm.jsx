@@ -113,10 +113,10 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-8 border border-blue-100">
+    <div className=" rounded-xl shadow-lg p-10 border border-blue-100 w-full">
       <form onSubmit={handleSubmit}>
         <div className="mt-2">
-          <h3 className="font-semibold text-blue-800 flex items-center text-lg pb-2 border-b border-blue-100">
+          <h3 className="font-semibold text-indigo-600 flex items-center text-lg pb-2 border-b border-blue-100">
             <LogIn className="mr-2" size={20} />
             Login Information
           </h3>
@@ -183,6 +183,7 @@ const LoginForm = () => {
         </button>
       </form>
     </div>
+    
   );
 };
 
