@@ -36,3 +36,8 @@ export const updateExam=async(examId, examData) => {
   const response = await api.patch(`/v1/exam/${examId}`, examData);
   return response.data;
 };
+
+export const fetchAnalyticsOnExams = async()=>{
+  const response =await api.get(`/v1/exam/analytics`);
+  return response.data;
+}
