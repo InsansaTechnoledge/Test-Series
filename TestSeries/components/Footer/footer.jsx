@@ -91,7 +91,7 @@ const Footer = () => {
       <h3 className="text-base font-semibold mb-4">Contact us</h3>
       <ul className="space-y-3 text-sm text-gray-300">
         {/* <li>Support - +91 12345 12345</li> */}
-        <li>Email - quries@insansa.com</li>
+        <li>Email - queries@insansa.com</li>
         <li className="flex gap-4 pt-2 text-white text-lg">
           <button disabled className="hover:text-indigo-400 transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-60">
             <LinkedinIcon />

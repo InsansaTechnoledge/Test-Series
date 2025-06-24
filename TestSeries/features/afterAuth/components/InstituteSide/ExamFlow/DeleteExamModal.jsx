@@ -18,7 +18,7 @@ const DeleteExamModal = ({ examId, setShowDeleteModal }) => {
       await deleteExam(examId);
       setShowDeleteModal(false);
       queryClient.invalidateQueries(['pendingExams',orgId]);
-      navigate('/institute/institute-landing'); // Go back to the previous page after deletion
+      navigate('/institute/exam-list'); // Go back to the previous page after deletion
     } catch (error) {
       console.error('Error deleting exam:', error);
     } finally {

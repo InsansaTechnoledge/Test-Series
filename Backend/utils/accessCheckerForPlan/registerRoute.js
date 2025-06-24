@@ -1,4 +1,4 @@
-import { checkFeatureAccess } from "../../middleware/checkFeatureAccess.js";
+import { checkFeatureAccess } from "../../middleware/checkFeatureAccess.middleware.js.js";
 
 export const registerRoute = (app, routePath, routeHandler, featureKey) => {
   if (featureKey) {

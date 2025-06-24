@@ -14,7 +14,10 @@ export const checkFeatureAccess = (featureKey, options = {}) => {
         }
 
         if (typeof value === 'number') {
-            req.featureLimit = value;
+            req.featureLimit = {
+                key: featureKey,
+                value: value
+            };
         }
 
         next();

@@ -6,6 +6,7 @@ import { usePendingExams } from '../../../../../hooks/useExamData';
 import { useEffect } from 'react';
 import { updateExam } from '../../../../../utils/services/examService';
 import { usePageAccess } from '../../../../../contexts/PageAccessContext';
+import { useQueryClient } from '@tanstack/react-query';
 
 
 const ExamForm = ({ canCreateMoreExams, onSubmit, initialData = {
@@ -25,6 +26,7 @@ const ExamForm = ({ canCreateMoreExams, onSubmit, initialData = {
   const canAccessPage = usePageAccess()
 
   const [form, setForm] = useState(initialData);
+  const queryClient=useQueryClient();
 
   useEffect(() => {
     setForm(initialData);
@@ -68,7 +70,9 @@ const ExamForm = ({ canCreateMoreExams, onSubmit, initialData = {
       else {
         response = await addExamAPI(payload);
       }
+
       onSubmit(response?.data);
+      queryClient.invalidateQueries(['pendingExams', payload.organization_id]);
 
     } catch (error) {
       console.error('Error creating exam:', error);
