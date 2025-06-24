@@ -8,10 +8,20 @@ import {
     LineChart, Download, Filter, Upload, Table, Search,
     Wifi, Globe, MessageSquare, Star, Bookmark
   } from 'lucide-react';
+  import MultiBatch from "../../../assests/Landing/SoftwareCapabilities/Multi-Batch Management.svg"
+  import  FManagemnet from "../../../assests/Landing/SoftwareCapabilities/Faculty Management.svg"
+  import  RBAC from "../../../assests/Landing/SoftwareCapabilities/Complete RBAC System.svg"
+  import  SMangement from "../../../assests/Landing/SoftwareCapabilities/Student Data Management.svg"
+  import  CSV from "../../../assests/Landing/SoftwareCapabilities/CSV Bulk Upload.svg"
+  import  MOrg from "../../../assests/Landing/SoftwareCapabilities/Multi-Organization Support.svg"
+  import  AdvExam from "../../../assests/Landing/SoftwareCapabilities/Advanced Exam Creation.svg"
+  import  FmarkingSystem from "../../../assests/Landing/SoftwareCapabilities/Flexible Marking System.svg"
+  import  AIpower from "../../../assests/Landing/SoftwareCapabilities/Al-Powered Proctoring.svg"
+  import  AIpower from "../../../assests/Landing/SoftwareCapabilities/Al-Powered Proctoring.svg"
   
 // Categories
 export const categories = [
-    { title: "All", color: "from-indigo-600 to-indigo-600" },
+    { title: "All", color: "bg-indigo-600" },
     { title: "Organization", color: "from-indigo-600 to-indigo-600" },
     { title: "Examination", color: "from-indigo-600 to-indigo-600" },
     { title: "Student Experience", color: "from-indigo-600 to-indigo-600" },
@@ -26,42 +36,42 @@ export const categories = [
     {
       title: 'Multi-Batch Management',
       description: 'Create and manage multiple batches with complete organizational hierarchy',
-      icon: Users,
+      icon: MultiBatch,
       category: 'Organization',
       tier: 'Pro'
     },
     {
       title: 'Faculty Management',
       description: 'Add and manage all organizational faculty members with ease',
-      icon: UserPlus,
+      icon: FManagemnet,
       category: 'Organization',
       tier: 'Basic'
     },
     {
       title: 'Complete RBAC System',
       description: 'Full Role-Based Access Control with granular permissions',
-      icon: Shield,
+      icon: RBAC,
       category: 'Organization',
       tier: 'Pro'
     },
     {
       title: 'Student Data Management',
       description: 'Comprehensive student database with batch-wise grouping',
-      icon: Database,
+      icon: SMangement,
       category: 'Organization',
       tier: 'Basic'
     },
     {
       title: 'CSV Bulk Upload',
       description: 'Upload thousands of users and data through CSV files with validation',
-      icon: Upload,
+      icon: CSV,
       category: 'Organization',
       tier: 'Pro'
     },
     {
       title: 'Multi-Organization Support',
       description: 'Manage multiple organizations from a single dashboard',
-      icon: Building,
+      icon: MOrg,
       category: 'Organization',
       tier: 'Enterprise'
     },
@@ -70,21 +80,21 @@ export const categories = [
     {
       title: 'Advanced Exam Creation',
       description: '8 different question types with flexible scheduling options',
-      icon: FileText,
+      icon: AdvExam,
       category: 'Examination',
       tier: 'Basic'
     },
     {
       title: 'Flexible Marking System',
       description: 'Positive, negative, and partial negative marking systems',
-      icon: Target,
+      icon: FmarkingSystem,
       category: 'Examination',
       tier: 'Pro'
     },
     {
       title: 'AI-Powered Proctoring',
       description: 'Advanced AI monitoring with face detection and behavior analysis',
-      icon: Eye,
+      icon: AIpower,
       category: 'Examination',
       tier: 'Enterprise'
     },

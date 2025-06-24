@@ -89,7 +89,8 @@ const FeaturesPage = () => {
         {/* Compact Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 mb-8">
           {filteredFeatures.map((feature, index) => {
-            const IconComponent = feature.icon;
+        
+          
             return (
               <div 
                 key={index}
@@ -98,7 +99,8 @@ const FeaturesPage = () => {
                 {/* Header */}
                 <div className="flex items-start justify-between mb-3">
                   <div className={`p-2.5 rounded-lg bg-gradient-to-r ${getCategoryColor(feature.category)} shadow-lg group-hover:scale-110 transition-transform`}>
-                    <IconComponent className="w-4 h-4 text-white" />
+                   
+                    <img src={feature.icon} width={20}></img>
                   </div>
                   <span className={`px-2 py-1 rounded-md text-xs font-medium border ${getTierColor(feature.tier)}`}>
                     {feature.tier}
