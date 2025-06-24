@@ -1,4 +1,4 @@
-import { createExam, deleteExam, fetchSelective, updateExam, setExamLive, fetchNonLiveExams, fetchExamsWithoutQuestionsQuery, fetchExamNameById, getExamCountForOrg } from '../../utils/SqlQueries/exam.queries.js';
+import { createExam, deleteExam, fetchSelective, updateExam, setExamLive, fetchNonLiveExams, fetchExamsWithoutQuestionsQuery, fetchExamNameById, getExamCountForOrg, getAnalyticsFromBatchExam } from '../../utils/SqlQueries/exam.queries.js';
 import { APIError } from '../../utils/ResponseAndError/ApiError.utils.js'
 import { APIResponse } from '../../utils/ResponseAndError/ApiResponse.utils.js'
 import Result from '../../models/SecondDB/result.model.js';
@@ -200,4 +200,30 @@ export const getTotalExamsForOrg = async (orgId) => {
       ["Something went wrong while fetching total exams", err.message]
     );
   }
+};
+
+export const fetchAnalyticsExamAndBatch=async (req, res) => {
+  try{
+
+  const orgId = req.user.role === 'organization' ? req.user._id : (req.user.organizationId._id || req.user.organizationId);
+  if (!orgId) {
+    return new APIError(400, ['Organization ID not found']).send(res);
+  }
+  const data=await getAnalyticsFromBatchExam(orgId);
+  if (!data || data.length === 0) {
+    return new APIResponse(200, [], "No analytics data found for the organization").send(res);
+  }
+
+  console.log("Analytics data fetched successfully:", data);
+
+  return new APIResponse(200, data, "Exam and batch analytics fetched successfully").send(res);
+
+  }catch (err) {
+  console.error("❌ Error fetching exam and batch analytics:", err);
+  return new APIError(
+    err?.status || 500,
+    ["Something went wrong while fetching exam and batch analytics", err.message]
+  ).send(res);
+}
+
 };
