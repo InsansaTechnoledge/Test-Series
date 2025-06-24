@@ -186,3 +186,13 @@ export const getExamCountForOrg=async (organization_id) => {
   return count;
 }
 
+export const getAnalyticsFromBatchExam=async(orgId)=>{
+
+  const {data,error}=await supabase
+  .rpc('get_batch_exam_analytics', { orgid: orgId });
+
+  if (error) throw error;
+  return data;
+}
+
+
