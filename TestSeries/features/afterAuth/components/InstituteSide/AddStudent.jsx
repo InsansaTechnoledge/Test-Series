@@ -35,8 +35,8 @@ const AddStudent = () => {
   // Memoized derived values for limits
   const Total_students = useMemo(() => (
     user?.role === 'organization'
-      ? user.metaData?.totalBatches
-      : organization?.metaData?.totalBatches
+      ? user.metaData?.totalStudents
+      : organization?.metaData?.totalStudents 
   ), [user, organization]);
 
   const Creation_limit = useMemo(() => user?.planFeatures?.student_feature?.value, [user]);

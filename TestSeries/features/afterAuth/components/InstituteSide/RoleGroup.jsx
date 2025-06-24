@@ -49,9 +49,9 @@ export default function FeatureBasedRoleGroups() {
       : null;
 
   const Total_Role = user?.role === 'organization'
-    ? user.metaData?.totalBatches
+    ? user.metaData?.totalRoleGroups 
     : (
-      organization?.metaData?.totalBatches
+      organization?.metaData?.totalRoleGroups
     );
 
   const Creation_limit = user?.planFeatures?.role_feature?.value
