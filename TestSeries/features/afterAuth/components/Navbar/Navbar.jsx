@@ -17,7 +17,16 @@ const Navbar = ({setShowLogoutModal}) => {
   const [searchResults, setSearchResults] = useState([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [selectedResultIndex, setSelectedResultIndex] = useState(-1);
+
+  const [theme , setTheme] = useState('light')
+
+  const handleTheme = () => {
+    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+
+  }
   
+  console.log(theme)
+
   const searchInputRef = useRef(null);
   const searchResultsRef = useRef(null);
   const { user } = useUser();
@@ -384,13 +393,25 @@ const Navbar = ({setShowLogoutModal}) => {
                       >
                         Sign out
                       </button>
+                      {
+                        user?.role === "organization" &&
+                          <button
+                            onClick={() => {
+                              navigate('/institute-subscription')
+                            }}
+                            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          >
+                            Know Your Plan
+                          </button>
+                      }
+
                       <button
-                        onClick={() => {
-                          navigate('/institute/institute-subscription')
-                        }}
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                      >
-                        Know Your Plan
+                            onClick={() => {
+                              handleTheme();
+                            }}
+                            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          >
+                            Toggle Dark
                       </button>
                     </div>
                   </div>
@@ -512,12 +533,21 @@ const Navbar = ({setShowLogoutModal}) => {
 
                   <button
                         onClick={() => {
-                          navigate('/institute/institute-subscription')
+                          navigate('/institute-subscription')
                         }}
                         className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-md"
                         >
                         Know Your Plan
                   </button>
+
+                  <button
+                            onClick={() => {
+                              handleTheme();
+                            }}
+                            className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-md"
+                            >
+                            Toggle Dark
+                      </button>
                 </div>
               </div>
             </div>

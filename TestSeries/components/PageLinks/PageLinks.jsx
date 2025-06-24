@@ -134,7 +134,7 @@ const PageLinks = () => {
                 <Route path='video' element={<YoutubeConnection />} />
                 <Route path='video-list' element={<VideoListPageInstitute />} />
                 <Route path='create-contest/:contestId?' element={<CreateContest />} />
-                <Route path='institute-subscription' element={<YourPlanPage/>}/>
+                {/* <Route path='institute-subscription' element={<YourPlanPage/>}/> */}
 
                 {/* <Route path='contest-list' element={hasPlanFeature('code_feature')?<ContestList/>:(<div>hurrreehhhhh😁</div>)} /> */}
                 <Route path='contest-list' element={<ContestList />} />
@@ -172,6 +172,9 @@ const PageLinks = () => {
         <Route path='certificate-creation' element={<CertificateCreation />} />
         <Route path='syllabus/:syllabusId' element={<SyllabusViewPage />} />
 
+        {user?.role === "organization" && (
+          <Route path='institute-subscription' element={<YourPlanPage />} />
+        )}
 
       </Routes>
     </Router>
