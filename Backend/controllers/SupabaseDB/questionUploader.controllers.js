@@ -4,6 +4,7 @@ import { mapQuestionData } from "../../utils/questionUtils/questionMapping.js";
 import parseExcel from "../../utils/questionUtils/readExcelFile.js";
 import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
 import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
+import { Organization } from "../../models/FirstDB/organization.model.js";
 
 //uploading the questions foe all types
 const uploadedQuestions = async (questionTypeData) => {
@@ -295,7 +296,7 @@ export const uploadByType = async (req, res) => {
 //       const q = questions[i];
 //       const type = q.type;
 //       const baseId = base.id;
-    
+
 //       const mapped = mapQuestionData(q, type, baseId);
 //       if (Array.isArray(mapped)) {
 //         questionTypeData[type].push(...mapped);
@@ -303,7 +304,7 @@ export const uploadByType = async (req, res) => {
 //         questionTypeData[type].push(mapped);
 //       }
 //     });
-    
+
 
 //     // Step 4: Insert into specialized tables (question_mcq, question_fill, etc.)
 //     const result = await uploadedQuestions(questionTypeData);
@@ -437,6 +438,15 @@ export const uploadFromJSON = async (req, res) => {
 
     // Step 5: Insert into all specialized tables
     const result = await uploadedQuestions(questionTypeData);
+
+    const updatedOrg = await Organization.findByIdAndUpdate(
+      organization_id,
+      { $inc: { totalExams: 1 } },
+      { new: true }
+    );
+    if (!updatedOrg) {
+      throw new Error("Organization not found or update failed");
+    }
 
     return new APIResponse(200, { insertedBases, result }, "Questions uploaded successfully").send(res);
   } catch (err) {

@@ -17,7 +17,7 @@ import CreateBatch from '../../features/afterAuth/components/InstituteSide/Creat
 import CreateStudent from '../../features/afterAuth/components/InstituteSide/AddStudent';
 import FeatureBasedRoleGroups from '../../features/afterAuth/components/InstituteSide/RoleGroup';
 import SessionExpireError from '../Error/SessionExpireError';
-import InstituteLandingPage from '../../features/afterAuth/components/InstituteSide/components/InstituteLandingPage';
+import InstituteLandingPage from '../../features/afterAuth/components/InstituteSide/components/LandingPage/InstituteLandingPage';
 import AuthRoutes from '../../routes/AuthRoutes';
 import StudentLayout from '../../layouts/StudentLayout';
 import UpcomingExam from '../../features/afterAuth/components/StudentSide/UpcomingExams/UpcomingExam';
@@ -54,6 +54,7 @@ import PageAccessGuard from '../ProtectedRoute/PageAccessGuard';
 import FallBackPage from '../../features/auth/pages/FallBackPage';
 import FallBackPageForOrg from '../../features/afterAuth/pages/FallBackPageForOrg';
 import Loader from '../Loader/Loader';
+import YourPlanPage from '../../features/afterAuth/components/InstituteSide/components/PlanPage/YourPlanPage';
 
 const PageLinks = () => {
   const { user, setUser} = useUser();
@@ -133,6 +134,7 @@ const PageLinks = () => {
                 <Route path='video' element={<YoutubeConnection />} />
                 <Route path='video-list' element={<VideoListPageInstitute />} />
                 <Route path='create-contest/:contestId?' element={<CreateContest />} />
+                <Route path='institute-subscription' element={<YourPlanPage/>}/>
 
                 {/* <Route path='contest-list' element={hasPlanFeature('code_feature')?<ContestList/>:(<div>hurrreehhhhh😁</div>)} /> */}
                 <Route path='contest-list' element={<ContestList />} />

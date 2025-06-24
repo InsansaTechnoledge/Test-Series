@@ -384,6 +384,14 @@ const Navbar = ({setShowLogoutModal}) => {
                       >
                         Sign out
                       </button>
+                      <button
+                        onClick={() => {
+                          navigate('/institute/institute-subscription')
+                        }}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      >
+                        Know Your Plan
+                      </button>
                     </div>
                   </div>
                 )}
@@ -500,6 +508,15 @@ const Navbar = ({setShowLogoutModal}) => {
                     className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-md"
                   >
                     Sign out
+                  </button>
+
+                  <button
+                        onClick={() => {
+                          navigate('/institute/institute-subscription')
+                        }}
+                        className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-md"
+                        >
+                        Know Your Plan
                   </button>
                 </div>
               </div>

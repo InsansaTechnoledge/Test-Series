@@ -10,9 +10,11 @@ import {
 } from 'lucide-react';
 import logo from "../../assests/Footer/evalvo logo white 4.svg"
 import nameLogo from "../../assests/Footer/Evalvo.svg"
+import { useNavigate } from 'react-router-dom';
 
 
 const Footer = () => {
+  const navigate = useNavigate();
   return (
     <>
    
@@ -45,7 +47,7 @@ const Footer = () => {
           </button>
         </li>
         <li>
-          <button disabled className="hover:text-white disabled:cursor-not-allowed disabled:opacity-60">
+          <button onClick={() => navigate('/institute-registration')} className="hover:text-white disabled:cursor-not-allowed disabled:opacity-60">
             Register Institute
           </button>
         </li>
@@ -88,8 +90,8 @@ const Footer = () => {
     <div>
       <h3 className="text-base font-semibold mb-4">Contact us</h3>
       <ul className="space-y-3 text-sm text-gray-300">
-        <li>Support - +91 12345 12345</li>
-        <li>Email - support@evalvo.com</li>
+        {/* <li>Support - +91 12345 12345</li> */}
+        <li>Email - queries@insansa.com</li>
         <li className="flex gap-4 pt-2 text-white text-lg">
           <button disabled className="hover:text-indigo-400 transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-60">
             <LinkedinIcon />

@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useUser } from '../../../../../contexts/currentUserContext';
 import { useEffect } from 'react';
+import CodeCreatorForm from '../../../../Test/CodeEditor/codeCreator/codeCreatorForm';
 
 const ManualQuestionForm = ({ setQuestions, organizationId }) => {
-  const user=useUser();
+  const {user}=useUser();
 
   const [codeData, setCodeData] = useState({
     title: '',
@@ -207,7 +208,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
 
   };
   useEffect(()=>{
-    console.log(user?.planFeatures?.coding_feature.isActive)
+    console.log("check"  ,user?.planFeatures?.coding_feature.isActive)
   },[user])
 
   return (
@@ -228,9 +229,10 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
           <option value="numerical">Numerical</option>
           <option value="match">Match the Following</option>
           <option value="comprehension">Comprehension</option>
-          {user?.planFeatures?.coding_feature.isActive && (
-            <option value="code">Code</option>
-          )}
+          {user?.planFeatures?.coding_feature?.isActive === true ||
+            user?.planFeatures?.coding_feature?.isActive === "true" ? (
+              <option value="code">Code</option>
+            ) : null}
         </select>
       </div>
 
@@ -376,6 +378,229 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
             Auto-generate Correct Pairs
           </button>
         </div>
+      )}
+
+          {form.type === 'code' && (
+        <div className="bg-gray-100 border rounded p-4 space-y-3">
+
+          <h4 className="font-semibold">Code Question Builder</h4>
+          <CodeCreatorForm
+            setFormData={setCodeData}
+            formData={codeData}
+
+          />
+        </div>
+
+      )}
+
+      {form.type === 'comprehension' && (
+        <>
+          {/* Comprehension Passage */}
+          <textarea
+            className="input w-full p-2 border rounded mb-2"
+            rows={4}
+            placeholder="Enter comprehension passage"
+            value={form.passage}
+            onChange={(e) => setForm(prev => ({ ...prev, passage: e.target.value }))}
+          />
+
+          <input
+            className="input w-full border rounded p-2"
+            placeholder="Positive Marks"
+            type="number"
+            value={form.sub_form.positive_marks}
+            onChange={(e) =>
+              setForm(prev => ({
+                ...prev,
+                sub_form: {
+                  ...prev.sub_form,
+                  positive_marks: parseInt(e.target.value)
+                }
+              }))
+            }
+          />
+
+          <input
+            className="input w-full border rounded p-2"
+            placeholder="Negative Marks"
+            type="number"
+            value={form.sub_form.negative_marks}
+            onChange={(e) =>
+              setForm(prev => ({
+                ...prev,
+                sub_form: {
+                  ...prev.sub_form,
+                  negative_marks: parseInt(e.target.value)
+                }
+              }))
+            }
+          />
+
+
+          {/* Sub-question builder */}
+          <div className="bg-gray-100 border rounded p-4 space-y-3">
+            <h4 className="font-semibold">Add Sub-Question</h4>
+
+            <select
+              className="input w-full border rounded p-2"
+              value={form.sub_form.type}
+              onChange={(e) =>
+                setForm(prev => ({
+                  ...prev,
+                  sub_form: { ...prev.sub_form, type: e.target.value }
+                }))
+              }
+            >
+              <option value="mcq">MCQ</option>
+              <option value="msq">MSQ</option>
+              <option value="fill">Fill in the Blank</option>
+              <option value="tf">True/False</option>
+              <option value="numerical">Numerical</option>
+            </select>
+
+            <input
+              className="input w-full border rounded p-2"
+              placeholder="Sub-question text"
+              value={form.sub_form.question_text}
+              onChange={(e) =>
+                setForm(prev => ({
+                  ...prev,
+                  sub_form: { ...prev.sub_form, question_text: e.target.value }
+                }))
+              }
+            />
+
+            {/* Options */}
+            {(form.sub_form.type === 'mcq' || form.sub_form.type === 'msq') && (
+              <>
+                {form.sub_form.options.map((opt, i) => (
+                  <input
+                    key={i}
+                    className="input w-full border rounded p-2 mb-1"
+                    placeholder={`Option ${i + 1}`}
+                    value={opt}
+                    onChange={(e) => {
+                      const updated = [...form.sub_form.options];
+                      updated[i] = e.target.value;
+                      setForm(prev => ({
+                        ...prev,
+                        sub_form: { ...prev.sub_form, options: updated }
+                      }));
+                    }}
+                  />
+                ))}
+              </>
+            )}
+
+            {/* MCQ correct index */}
+            {form.sub_form.type === 'mcq' && (
+              <input
+                type="number"
+                className="input w-full border rounded p-2"
+                placeholder="Correct option index (0-based)"
+                value={form.sub_form.correct_option}
+                onChange={(e) =>
+                  setForm(prev => ({
+                    ...prev,
+                    sub_form: {
+                      ...prev.sub_form,
+                      correct_option: parseInt(e.target.value)
+                    }
+                  }))
+                }
+              />
+            )}
+
+            {/* MSQ correct options */}
+            {form.sub_form.type === 'msq' && (
+              <input
+                className="input w-full border rounded p-2"
+                placeholder="Correct options (comma-separated)"
+                onChange={(e) =>
+                  setForm(prev => ({
+                    ...prev,
+                    sub_form: {
+                      ...prev.sub_form,
+                      correct_options: e.target.value
+                        .split(',')
+                        .map(val => parseInt(val.trim()))
+                    }
+                  }))
+                }
+              />
+            )}
+
+            {/* Fill / Numerical */}
+            {(form.sub_form.type === 'fill' || form.sub_form.type === 'numerical') && (
+              <input
+                className="input w-full border rounded p-2"
+                placeholder="Correct answer"
+                value={form.sub_form.correct_answer}
+                onChange={(e) =>
+                  setForm(prev => ({
+                    ...prev,
+                    sub_form: { ...prev.sub_form, correct_answer: e.target.value }
+                  }))
+                }
+              />
+            )}
+
+            {/* True/False */}
+            {form.sub_form.type === 'tf' && (
+              <select
+                className="input w-full border rounded p-2"
+                value={form.sub_form.is_true}
+                onChange={(e) =>
+                  setForm(prev => ({
+                    ...prev,
+                    sub_form: {
+                      ...prev.sub_form,
+                      is_true: e.target.value === 'true'
+                    }
+                  }))
+                }
+              >
+                <option value="true">True</option>
+                <option value="false">False</option>
+              </select>
+            )}
+
+            <button
+              type="button"
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+              onClick={() => {
+                setForm(prev => ({
+                  ...prev,
+                  sub_question_ids: [...prev.sub_question_ids, { ...prev.sub_form, id: uuidv4() }],
+                  sub_form: {
+                    type: 'mcq',
+                    question_text: '',
+                    options: ['', '', '', ''],
+                    correct_option: 0,
+                    correct_options: [],
+                    correct_answer: '',
+                    is_true: true,
+                    explanation: '',
+                    difficulty: 'easy',
+                    positive_marks: '',
+                    negative_marks: '0',
+                    subject: '',
+                    chapter: ''
+                  }
+                }));
+              }}
+            >
+              ➕ Add Sub-question
+            </button>
+
+            {/* Preview sub-questions */}
+            {form.sub_question_ids.length > 0 && (
+              <div className="mt-2 text-sm text-gray-700">
+                <strong>Sub-questions added:</strong> {form.sub_question_ids.length}
+              </div>
+            )}
+          </div>
+        </>
       )}
 
       {/* Subject, Chapter, Explanation */}

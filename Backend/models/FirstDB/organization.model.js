@@ -3,7 +3,6 @@ import validator from 'validator';
 import bcrypt from 'bcrypt';
 import { connOne } from '../../database/MongoDB.js';
 import { getTotalBatches } from '../../controllers/SupabaseDB/batch.controllers.js';
-import { getTotalExamsForOrg } from '../../controllers/SupabaseDB/exam.controllers.js';
 
 
 const addressSchema = new Schema({
@@ -165,7 +164,12 @@ const OrganizationSchema = new Schema({
       planPurchased:{
         type: Types.ObjectId,
         ref: 'Plan'
-      }
+      },
+      
+totalExams: {
+        type: Number,
+        default: 0,
+      },
 }, 
 {
     timestamps: true
@@ -208,18 +212,19 @@ OrganizationSchema.virtual('totalRoleGroups',{
 
 
 OrganizationSchema.methods.getFullMetadata = async function () {
-  this.populate('totalStudents totalUsers totalRoleGroups');
+  await this.populate('totalStudents totalUsers totalRoleGroups');
+
   const totalBatches = await getTotalBatches(this._id.toString());
-  const totalExams=await getTotalExamsForOrg(this._id.toString());
 
   return {
     totalStudents: this.totalStudents ?? 0,
     totalUsers: this.totalUsers ?? 0,
     totalBatches: totalBatches ?? 0,
-    totalExams: totalExams ?? 0,
+    totalExams: this.totalExams ?? 0,
     totalRoleGroups: this.totalRoleGroups ?? 0
   };
 };
+
 
 OrganizationSchema.set('toObject', { virtuals: true });
 OrganizationSchema.set('toJSON', { virtuals: true });
