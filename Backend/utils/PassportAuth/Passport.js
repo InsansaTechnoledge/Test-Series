@@ -4,7 +4,8 @@ import User from '../../models/FirstDB/user.model.js';
 import Student from '../../models/FirstDB/student.model.js';
 import { Organization } from '../../models/FirstDB/organization.model.js';
 import { getPlanFeaturesMap } from '../accessCheckerForPlan/getPlanFeature.js';
-import mongoose from 'mongoose';  // Import mongoose here
+import mongoose, { get } from 'mongoose';  // Import mongoose here
+import { getRoleFeatureMap } from '../accessCheckerForRole/getRoleFeature.js';
 
 const LocalStrategy = local.Strategy;
 
@@ -99,12 +100,23 @@ passport.use('institute-local', new LocalStrategy({
       }
 
       const planId = user.organizationId?.planPurchased || null;
-      const planFeatures = planId ? await getPlanFeaturesMap(planId) : {};
+      const roleFeatures=user.roleId ? await getRoleFeatureMap(user.roleId) : {};
+      let planFeatures = {};
+      let metaData = {};
+      if (roleFeatures && Object.keys(roleFeatures).length > 0) {
+        console.log('Role features found:', roleFeatures);
+         planFeatures = planId ? await getPlanFeaturesMap(planId) : {};
+        metaData = user.organizationId ? await user.organizationId.getFullMetadata(roleFeatures) : {};
+      }
+
+
 
       return done(null, {
         ...user.toObject(),
         role: 'user',
-        planFeatures
+        planFeatures,
+        metaData,
+        roleFeatures
       });
     }
 
@@ -151,6 +163,7 @@ passport.deserializeUser(async (object, done) => {
     let user = null;
     let planFeatures = {};
     let metaData = {};
+    let roleFeatures = {};
 
     console.log(`Attempting to deserialize ${object.role} with ID: ${object.id}`);
 
@@ -178,7 +191,7 @@ passport.deserializeUser(async (object, done) => {
 
       case 'organization': {
         console.log('Deserializing organization...');
-        user = await Organization.findById(object.id).lean();
+        user = await Organization.findById(object.id);
 
         if (!user) {
           console.error('Organization not found for ID:', object.id);
@@ -190,40 +203,32 @@ passport.deserializeUser(async (object, done) => {
         if (user.planPurchased) {
           planFeatures = await getPlanFeaturesMap(user.planPurchased);
         }
+        metaData = await user.getFullMetadata(roleFeatures);
 
-        // Fetch metadata
-        try {
-          const fullOrgDoc = await Organization.findById(object.id);
-          if (fullOrgDoc && typeof fullOrgDoc.getFullMetadata === 'function') {
-            metaData = await fullOrgDoc.getFullMetadata();
-          }
-        } catch (metaError) {
-          console.error('Error getting metadata for organization:', metaError);
-          metaData = {};
-        }
-
-        return done(null, { ...user, role: 'organization', planFeatures, metaData });
+        return done(null, { ...user.toObject(), role: 'organization', planFeatures, metaData });
       }
 
       case 'user':
       default: {
         console.log('Deserializing user...');
         user = await User.findById(object.id)
-          .populate('organizationId', 'planPurchased')
-          .lean();
+          .populate('organizationId', 'planPurchased');
 
         if (!user) {
           console.error('User not found for ID:', object.id);
           return done(null, false);
         }
 
-        console.log('User found:', { id: user._id, email: user.email });
+        roleFeatures = user.roleId ? await getRoleFeatureMap(user.roleId) : {};
 
-        if (user.organizationId && user.organizationId.planPurchased) {
+        if (user.organizationId && user.organizationId.planPurchased && Object.keys(roleFeatures).length > 0) {
           planFeatures = await getPlanFeaturesMap(user.organizationId.planPurchased);
+          metaData = await user.organizationId.getFullMetadata(roleFeatures);
         }
 
-        return done(null, { ...user, role: 'user', planFeatures });
+
+
+        return done(null, { ...user.toObject(), role: 'user', planFeatures, roleFeatures, metaData });
       }
     }
   } catch (error) {

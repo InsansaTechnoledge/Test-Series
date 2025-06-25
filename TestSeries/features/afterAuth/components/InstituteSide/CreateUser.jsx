@@ -283,7 +283,7 @@ const CreateUser = () => {
                     alt="Upload Banner"
                     className="absolute w-full h-full object-cover"
                 />
-                
+                            
                 <div className="absolute"></div>
                 
                 {/* Content */}

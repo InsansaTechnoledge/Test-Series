@@ -4,7 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { categories } from '../../data/SiddeBarData';
 import { controls } from '../../data/SiddeBarData';
 import { useUser } from '../../../../contexts/currentUserContext';
-import logo from '../../../../assests/Landing/Navbar/evalvo logo blue 2.svg'
+// import logo from '../../../../assests/Landing/Navbar/evalvo logo blue 2.svg'
+import logo from '../../../../assests/Logo/Frame 8.svg'
+import logoDark from '../../../../assests/Logo/Frame 15.svg'
+
 import ThemeToggleButton from '../../../../components/ThemeToggleButton/ThemeToggleButton';
 import { useTheme } from '../../../../hooks/useTheme.jsx';
 import { getThemeClasses } from '../../../constants/Theme/ThemeClasses.js';
@@ -249,7 +252,7 @@ const Navbar = ({setShowLogoutModal}) => {
               <div className="flex items-center space-x-3">
                 <div className="w-6 h-6 flex items-center justify-center">
                   <img 
-                    src={result.icon} 
+                    src= {result.icon} 
                     alt={result.name} 
                     className="w-5 h-5"
                   />
@@ -290,7 +293,7 @@ const Navbar = ({setShowLogoutModal}) => {
           {/* Left side - Logo */}
           <div className="flex items-center">
             <img 
-              src={logo} 
+              src={ theme === 'light' ? logo : logoDark} 
               alt="Evalvo" 
               className="h-8 w-auto"
             />
