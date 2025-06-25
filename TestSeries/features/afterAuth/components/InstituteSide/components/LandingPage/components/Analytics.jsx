@@ -1,27 +1,45 @@
 import React from 'react'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid,
+  Tooltip, ResponsiveContainer, PieChart, Pie, Cell
+} from 'recharts'
 import { batchData, examTrends } from './Data/Data'
 
-const Analytics = () => (
+const Analytics = ({ theme }) => {
+  const isDark = theme === 'dark';
+
+  const chartTextColor = isDark ? '#e2e8f0' : '#64748b';     // slate-200 or slate-500
+  const chartGridColor = isDark ? '#334155' : '#f1f5f9';     // dark slate or light slate
+  const tooltipStyle = {
+    backgroundColor: isDark ? '#1e293b' : '#ffffff',         // dark slate or white
+    border: `1px solid ${isDark ? '#475569' : '#e5e7eb'}`,   // slate-600 or gray-200
+    color: isDark ? '#f8fafc' : '#1e293b'                    // light text or dark text
+  };
+
+  return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Exam Trends */}
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Exam & Student Trends</h3>
+      <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} rounded-2xl p-6 shadow-sm border`}>
+        <h3 className={`text-lg font-semibold ${isDark ? 'text-indigo-100' : 'text-gray-800'} mb-4`}>
+          Exam & Student Trends
+        </h3>
         <ResponsiveContainer width="100%" height={200}>
           <LineChart data={examTrends}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-            <XAxis dataKey="month" stroke="#64748b" />
-            <YAxis stroke="#64748b" />
-            <Tooltip />
+            <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} />
+            <XAxis dataKey="month" stroke={chartTextColor} />
+            <YAxis stroke={chartTextColor} />
+            <Tooltip contentStyle={tooltipStyle} />
             <Line type="monotone" dataKey="exams" stroke="#4f46e5" strokeWidth={3} />
             <Line type="monotone" dataKey="students" stroke="#6366f1" strokeWidth={3} />
           </LineChart>
         </ResponsiveContainer>
       </div>
-  
+
       {/* Batch Distribution */}
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Student Distribution by Batch</h3>
+      <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'} rounded-2xl p-6 shadow-sm border`}>
+        <h3 className={`text-lg font-semibold ${isDark ? 'text-gray-100' : 'text-gray-800'} mb-4`}>
+          Student Distribution by Batch
+        </h3>
         <ResponsiveContainer width="100%" height={200}>
           <PieChart>
             <Pie
@@ -36,20 +54,22 @@ const Analytics = () => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
             </Pie>
-            <Tooltip />
+            <Tooltip contentStyle={tooltipStyle} />
           </PieChart>
         </ResponsiveContainer>
         <div className="flex flex-wrap gap-2 mt-4">
           {batchData.map((item, idx) => (
             <div key={idx} className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
-              <span className="text-sm text-gray-600">{item.name}</span>
+              <span className={`text-sm ${isDark ? 'text-gray-200' : 'text-gray-600'}`}>
+                {item.name}
+              </span>
             </div>
           ))}
         </div>
       </div>
     </div>
-  )
-  
+  );
+};
 
-export default Analytics
+export default Analytics;

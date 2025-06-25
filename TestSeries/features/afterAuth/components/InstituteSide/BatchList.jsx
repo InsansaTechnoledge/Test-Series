@@ -12,6 +12,7 @@ import { useCachedStudents } from '../../../../hooks/useCachedStudents';
 import BatchBanner from '../../../../assests/Institute/Banner 1 1.svg'
 import { useNavigate } from 'react-router-dom';
 import { usePageAccess } from '../../../../contexts/PageAccessContext';
+import { useTheme } from '../../../../hooks/useTheme';
 
 
 const BatchList = () => {
@@ -97,8 +98,10 @@ const BatchList = () => {
     return yearMatch && searchMatch;
   });
 
+  const {theme} = useTheme();
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-indigo-50">
+    <div className={`min-h-screen `}>
     
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 "></div>
@@ -125,37 +128,37 @@ const BatchList = () => {
       {/* Stats Dashboard */}
       <div className="max-w-7xl mx-auto px-6 -mt-8 relative z-20">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-3xl p-6 shadow-xl border-l-4 border-indigo-600 transform hover:scale-105 transition-all duration-300">
-            <div className="flex items-center justify-between">
+        <div className={`${theme === 'light' ? 'bg-white' : 'bg-gray-800'}  rounded-3xl p-6 shadow-xl border-l-4 border-indigo-600 transform hover:scale-105 transition-all duration-300`}>
+          <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Total Batches</p>
-                <p className="text-4xl font-black text-indigo-600">{filteredBatches?.length}</p>
+              <p className={`text-sm font-semibold   ${theme === 'light' ? 'text-gray-600' : 'text-gray-200' } uppercase tracking-wide`}>Total Batches</p>
+              <p className={`text-4xl font-black ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-200'} capitalize`}>{filteredBatches?.length}</p>
               </div>
-              <div className="bg-indigo-100 p-3 rounded-2xl">
+              <div className={` ${theme === 'light' ? 'bg-indigo-100' : 'bg-indigo-400'} p-3 rounded-2xl`}>
                 {/* <Target className="w-8 h-8 text-indigo-600" /> */}
               </div>
             </div>
           </div>
           
-          <div className="bg-white rounded-3xl p-6 shadow-xl border-l-4 border-gray-600 transform hover:scale-105 transition-all duration-300">
+          <div className={`${theme === 'light' ? 'bg-white' : 'bg-gray-800'}  rounded-3xl p-6 shadow-xl border-l-4 border-indigo-600 transform hover:scale-105 transition-all duration-300`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Active Years</p>
-                <p className="text-4xl font-black text-gray-600">{uniqueYears.length}</p>
+              <p className={`text-sm font-semibold   ${theme === 'light' ? 'text-gray-600' : 'text-gray-200' } uppercase tracking-wide`}>Active Years</p>
+              <p className={`text-4xl font-black ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-200'} capitalize`}>{uniqueYears.length}</p>
               </div>
-              <div className="bg-gray-100 p-3 rounded-2xl">
+              <div className={` ${theme === 'light' ? 'bg-indigo-100' : 'bg-indigo-400'} p-3 rounded-2xl`}>
                 {/* <Calendar className="w-8 h-8 text-gray-600" /> */}
               </div>
             </div>
           </div>
           
-          <div className="bg-white rounded-3xl p-6 shadow-xl border-l-4 border-indigo-600 transform hover:scale-105 transition-all duration-300">
+          <div className={`${theme === 'light' ? 'bg-white' : 'bg-gray-800'}  rounded-3xl p-6 shadow-xl border-l-4 border-indigo-600 transform hover:scale-105 transition-all duration-300`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Search Results</p>
-                <p className="text-4xl font-black text-indigo-600">{filteredBatches.length}</p>
+              <p className={`text-sm font-semibold   ${theme === 'light' ? 'text-gray-600' : 'text-gray-200' } uppercase tracking-wide`}>Search Results</p>
+              <p className={`text-4xl font-black ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-200'} capitalize`}>{filteredBatches.length}</p>
               </div>
-              <div className="bg-indigo-100 p-3 rounded-2xl">
+              <div className={` ${theme === 'light' ? 'bg-indigo-100' : 'bg-indigo-400'} p-3 rounded-2xl`}>
                 {/* <Search className="w-8 h-8 text-indigo-600" /> */}
               </div>
             </div>
@@ -165,13 +168,13 @@ const BatchList = () => {
         </div>
 
         {/* Control Panel */}
-        <div className="bg-white rounded-3xl shadow-xl p-6 mb-8 border border-gray-100">
+        <div className={`${theme === 'light' ? 'bg-white border border-gray-100' : 'bg-gray-800 border border-gray-700'} rounded-3xl shadow-xl p-6 mb-8 `}>
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div className="flex items-center space-x-4">
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 ${theme === 'light' ? ' text-gray-400' : ' text-gray-300'} w-5 h-5`} />
                 <input 
-                  className="bg-gray-50 border-2 border-gray-200 text-gray-900 rounded-2xl pl-12 pr-6 py-3 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 w-80"
+                  className={`${theme === 'light' ? 'bg-gray-50 border-2 border-gray-200 text-gray-900 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300' : 'bg-gray-700 border-2 border-gray-600 text-gray-100 focus:ring-4 focus:ring-indigo-400 focus:border-indigo-400 transition-all duration-300'} rounded-2xl pl-12 pr-6 py-3 w-80`}
                   placeholder="Search batches..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -179,7 +182,7 @@ const BatchList = () => {
               </div>
               
               <select
-                className="bg-gray-50 border-2 border-gray-200 text-gray-900 rounded-2xl px-6 py-3 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 font-medium"
+                className={`${theme === 'light' ? 'bg-gray-50 border-2 border-gray-200 text-gray-900 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300' : 'bg-gray-700 text-gray-100 border-2 border-gray-600 focus:ring-4 focus:ring-indigo-400 focus:border-indigo-400 transition-all duration-300'} rounded-2xl px-6 py-3 font-medium`}
                 onChange={(e) => setSelectedYear(e.target.value)}
                 value={selectedYear}
               >
@@ -205,7 +208,7 @@ const BatchList = () => {
           {filteredBatches?.map((batch, idx) => (
             <div 
               key={batch.id || idx} 
-              className="group relative bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-gray-100 overflow-hidden"
+              className={`group relative ${theme === 'light' ? 'bg-white border-gray-100' : 'bg-gray-800 border-gray-700'} rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border overflow-hidden`}
               style={{
                 animationDelay: `${idx * 100}ms`,
                 animation: 'fadeInUp 0.6s ease-out forwards'
@@ -213,38 +216,29 @@ const BatchList = () => {
             >
               {/* Gradient Header */}
              
-              <div className="h-16 bg-gradient-to-r from-indigo-500 to-indigo-400 rounded-t-2xl relative overflow-hidden shadow-md">
+              <div className={`h-16  ${theme === 'light' ? 'bg-gradient-to-r from-indigo-500 to-indigo-400' : 'bg-gradient-to-r from-indigo-600 to-indigo-700'} rounded-t-2xl relative overflow-hidden shadow-md`}>
+                <div className={`inset-0 ${theme === 'light' ? 'bg-indigo-100' : 'bg-gray-800'}  bg-opacity-5 backdrop-blur-sm`}></div>
+                <div className='flex justify-between items-center p-6 '>
+                <div className="">
+                    <h3 className="text-white font-bold text-xl leading-snug line-clamp-2">
+                    {batch.name}
+                    </h3>
+                  </div>
 
-  <div className="inset-0 bg-indigo-100 bg-opacity-5 backdrop-blur-sm"></div>
-<div className='flex justify-between items-center p-6 '>
-<div className="">
-    <h3 className="text-white font-bold text-xl leading-snug line-clamp-2">
-    {batch.name}
-    </h3>
-  </div>
-
-  <div className="">
-    <div className="bg-white text-indigo-700 text-xs font-bold px-3 py-1 rounded-full shadow backdrop-blur-md border border-white border-opacity-30 flex items-center gap-1">
-      {batch.year}
-    </div>
-  </div>
-
-  
-  
-
-
-</div>
-
-
-
-</div>
+                  <div className="">
+                    <div className="bg-white text-indigo-700 text-xs font-bold px-3 py-1 rounded-full shadow backdrop-blur-md border border-white border-opacity-30 flex items-center gap-1">
+                      {batch.year}
+                    </div>
+                  </div>
+                </div>
+              </div>
 
               {/* Card Content */}
-              <div className="p-6">
+              <div className={`p-6 ${theme === 'light' ? 'bg-white' : 'bg-gray-800'}`}>
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-2">
-                    <div className="bg-gray-100 px-3 py-1 rounded-full">
-                      <span className="text-xs font-bold text-gray-600">Batch-ID: {batch.id}</span>
+                    <div className={`${theme === 'light' ? 'bg-gray-100' : 'bg-gray-700'} px-3 py-1 rounded-full`}>
+                      <span className={`text-xs font-bold ${theme === 'light' ? 'text-gray-600' : 'text-gray-300'}`}>Batch-ID: {batch.id}</span>
                     </div>
                   </div>
                 </div>
@@ -254,17 +248,17 @@ const BatchList = () => {
                   {batch.syllabus_id ? (
                     <button 
                       onClick={() => navigate(`/syllabus/${batch.syllabus_id}`)}
-                      className="inline-flex items-center space-x-2 text-indigo-600 hover:text-indigo-800 transition-colors bg-indigo-50 px-4 py-2 rounded-xl hover:bg-indigo-100"
+                      className={`inline-flex items-center space-x-2 ${theme === 'light' ? 'text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100' : 'text-indigo-300 hover:text-indigo-100 bg-indigo-900 hover:bg-indigo-800'} transition-colors px-4 py-2 rounded-xl`}
                     >
                       <NotepadText className="w-4 h-4" />
                       <span className="text-sm font-bold">View Syllabus</span>
                     </button>
                   ) : (
-                    <div className="inline-flex items-center space-x-2 text-gray-600 bg-gray-50 px-4 py-2 rounded-xl">
+                    <div className={`inline-flex items-center space-x-2 ${theme === 'light' ? 'text-gray-600 bg-gray-50' : 'text-gray-300 bg-gray-700'} px-4 py-2 rounded-xl`}>
                       <AlertTriangle className="w-4 h-4" />
                       <div>
                         <span className="text-sm font-bold"> Syllabus Not applicable</span>
-                        <p className="text-xs text-gray-400">batch type is only subject</p>
+                        <p className={`text-xs ${theme === 'light' ? 'text-gray-400' : 'text-gray-500'}`}>batch type is only subject</p>
                       </div>
                     </div>
                   )}
@@ -273,7 +267,7 @@ const BatchList = () => {
                 {/* Action Buttons */}
                 <div className="flex justify-center space-x-3">
                   <button
-                    className="flex-1 z-10 cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 p-3 rounded-xl transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-2"
+                    className={`flex-1 z-10 cursor-pointer ${theme === 'light' ? 'bg-gray-100 hover:bg-gray-200 text-gray-700' : 'bg-gray-700 hover:bg-gray-600 text-gray-200'} p-3 rounded-xl transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-2`}
                     onClick={() => handleViewBatch(batch.id)}
                     title="View Details"
                   >
@@ -282,7 +276,7 @@ const BatchList = () => {
                   </button>
                   
                   <button
-                    className="flex-1 z-10 cursor-pointer bg-indigo-100 hover:bg-indigo-200 text-indigo-700 p-3 rounded-xl transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-2"
+                    className={`flex-1 z-10 cursor-pointer ${theme === 'light' ? 'bg-indigo-100 hover:bg-indigo-200 text-indigo-700' : 'bg-indigo-800 hover:bg-indigo-700 text-indigo-200'} p-3 rounded-xl transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-2`}
                     onClick={() => handleEditBatch(batch.id)}
                     title="Edit Batch"
                   >
@@ -291,7 +285,7 @@ const BatchList = () => {
                   </button>
                   
                   <button
-                    className="bg-red-100 z-10 cursor-pointer hover:bg-red-200 text-red-700 p-3 rounded-xl transition-all duration-300 hover:scale-105"
+                    className={`${theme === 'light' ? 'bg-red-100 hover:bg-red-200 text-red-700' : 'bg-red-800 hover:bg-red-700 text-red-200'} z-10 cursor-pointer p-3 rounded-xl transition-all duration-300 hover:scale-105`}
                     onClick={() => handleDeleteBatch(batch.id)}
                     title="Delete Batch"
                   >
@@ -309,11 +303,11 @@ const BatchList = () => {
         {/* Empty State */}
         {filteredBatches?.length === 0 && (
           <div className="text-center py-20">
-            <div className="w-32 h-32 mx-auto bg-gradient-to-r from-indigo-100 to-gray-100 rounded-full flex items-center justify-center mb-8 animate-bounce">
-              <Search className="w-12 h-12 text-indigo-400" />
+            <div className={`w-32 h-32 mx-auto ${theme === 'light' ? 'bg-gradient-to-r from-indigo-100 to-gray-100' : 'bg-gradient-to-r from-indigo-800 to-gray-700'} rounded-full flex items-center justify-center mb-8 animate-bounce`}>
+              <Search className={`w-12 h-12 ${theme === 'light' ? 'text-indigo-400' : 'text-indigo-300'}`} />
             </div>
-            <h3 className="text-3xl font-black text-gray-800 mb-4">No batches found</h3>
-            <p className="text-xl text-gray-600 mb-8 max-w-md mx-auto">
+            <h3 className={`text-3xl font-black ${theme === 'light' ? 'text-gray-800' : 'text-gray-100'} mb-4`}>No batches found</h3>
+            <p className={`text-xl ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'} mb-8 max-w-md mx-auto`}>
               {selectedYear ? `No batches found for year ${selectedYear}` : searchTerm ? `No batches match "${searchTerm}"` : 'Get started by creating your first batch'}
             </p>
             <button

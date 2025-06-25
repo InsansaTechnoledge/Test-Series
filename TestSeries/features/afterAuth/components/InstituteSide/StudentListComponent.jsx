@@ -8,6 +8,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useUser } from '../../../../contexts/currentUserContext';
 import Banner from "../../../../assests/Institute/student list.svg"
 import { usePageAccess } from '../../../../contexts/PageAccessContext';
+import { useTheme } from '../../../../hooks/useTheme';
 
 const StudentListPage = () => {
 
@@ -40,6 +41,7 @@ const StudentListPage = () => {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false)
   const [studentsToDelete, setStudentsToDelete] = useState([])
   const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' })
+  const { theme } = useTheme();
 
   useEffect(() => {
     if (students.length > 0) {
@@ -134,7 +136,7 @@ const StudentListPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-indigo-50">
+    <div className={`min-h-screen`}>
 
       {/* Hero Header */}
 
@@ -165,51 +167,51 @@ const StudentListPage = () => {
       {/* Stats Dashboard */}
       <div className="max-w-7xl mx-auto px-6 -mt-8 relative z-20">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-3xl p-6 shadow-xl border-l-4 border-indigo-600 transform hover:scale-105 transition-all duration-300">
+          <div className={`${theme === 'light' ? 'bg-white' : 'bg-gray-800'} rounded-3xl p-6 shadow-xl border-l-4 border-indigo-600 transform hover:scale-105 transition-all duration-300`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Total Students</p>
-                <p className="text-4xl font-black text-indigo-600">{filteredStudents?.length}</p>
+                <p className={`text-sm font-semibold ${theme === 'light' ? 'text-gray-600' : 'text-gray-200'} uppercase tracking-wide`}>Total Students</p>
+                <p className={`text-4xl font-black ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-200'}`}>{filteredStudents?.length}</p>
               </div>
-              <div className="bg-indigo-100 p-3 rounded-2xl">
-                <Users className="w-8 h-8 text-indigo-600" />
+              <div className={`${theme === 'light' ? 'bg-indigo-100' : 'bg-indigo-400'} p-3 rounded-2xl`}>
+                <Users className={`w-8 h-8 ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-800'}`} />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-3xl p-6 shadow-xl border-l-4 border-gray-600 transform hover:scale-105 transition-all duration-300">
+          <div className={`${theme === 'light' ? 'bg-white' : 'bg-gray-800'} rounded-3xl p-6 shadow-xl border-l-4 border-gray-600 transform hover:scale-105 transition-all duration-300`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Selected</p>
-                <p className="text-4xl font-black text-gray-600">{selectedStudents.length}</p>
+                <p className={`text-sm font-semibold ${theme === 'light' ? 'text-gray-600' : 'text-gray-200'} uppercase tracking-wide`}>Selected</p>
+                <p className={`text-4xl font-black ${theme === 'light' ? 'text-gray-600' : 'text-gray-200'}`}>{selectedStudents.length}</p>
               </div>
-              <div className="bg-gray-100 p-3 rounded-2xl">
-                <Check className="w-8 h-8 text-gray-600" />
+              <div className={`${theme === 'light' ? 'bg-gray-100' : 'bg-gray-400'} p-3 rounded-2xl`}>
+                <Check className={`w-8 h-8 ${theme === 'light' ? 'text-gray-600' : 'text-gray-800'}`} />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-3xl p-6 shadow-xl border-l-4 border-indigo-600 transform hover:scale-105 transition-all duration-300">
+          <div className={`${theme === 'light' ? 'bg-white' : 'bg-gray-800'} rounded-3xl p-6 shadow-xl border-l-4 border-indigo-600 transform hover:scale-105 transition-all duration-300`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Search Results</p>
-                <p className="text-4xl font-black text-indigo-600">{sortedStudents.length}</p>
+                <p className={`text-sm font-semibold ${theme === 'light' ? 'text-gray-600' : 'text-gray-200'} uppercase tracking-wide`}>Search Results</p>
+                <p className={`text-4xl font-black ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-200'}`}>{sortedStudents.length}</p>
               </div>
-              <div className="bg-indigo-100 p-3 rounded-2xl">
-                <Search className="w-8 h-8 text-indigo-600" />
+              <div className={`${theme === 'light' ? 'bg-indigo-100' : 'bg-indigo-400'} p-3 rounded-2xl`}>
+                <Search className={`w-8 h-8 ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-800'}`} />
               </div>
             </div>
           </div>
         </div>
 
         {/* Control Panel */}
-        <div className="bg-white rounded-3xl shadow-xl p-6 mb-8 border border-gray-100">
+        <div className={`${theme === 'light' ? 'bg-white border border-gray-100' : 'bg-gray-800 border border-gray-700'} rounded-3xl shadow-xl p-6 mb-8`}>
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div className="flex items-center space-x-4">
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 ${theme === 'light' ? 'text-gray-400' : 'text-gray-300'} w-5 h-5`} />
                 <input
-                  className="bg-gray-50 border-2 border-gray-200 text-gray-900 rounded-2xl pl-12 pr-6 py-3 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 w-80"
+                  className={`${theme === 'light' ? 'bg-gray-50 border-2 border-gray-200 text-gray-900 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400' : 'bg-gray-700 border-2 border-gray-600 text-gray-100 focus:ring-4 focus:ring-indigo-400 focus:border-indigo-400'} rounded-2xl pl-12 pr-6 py-3 transition-all duration-300 w-80`}
                   placeholder="Search by name, email or phone..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -218,7 +220,7 @@ const StudentListPage = () => {
 
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="bg-gray-50 border-2 border-gray-200 text-gray-900 rounded-2xl px-6 py-3 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 font-medium flex items-center space-x-2"
+                className={`${theme === 'light' ? 'bg-gray-50 border-2 border-gray-200 text-gray-900 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400' : 'bg-gray-700 border-2 border-gray-600 text-gray-100 focus:ring-4 focus:ring-indigo-400 focus:border-indigo-400'} rounded-2xl px-6 py-3 transition-all duration-300 font-medium flex items-center space-x-2`}
               >
                 <Filter className="w-5 h-5" />
                 <span>Filters</span>
@@ -255,11 +257,11 @@ const StudentListPage = () => {
           {showFilters && (
             <div className="mt-6 pt-6 border-t border-gray-200">
               <div className="max-w-xs">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Batch Filter</label>
+                <label className={`block text-sm font-medium ${theme === 'light' ? 'text-gray-700' : 'text-gray-200'} mb-2`}>Batch Filter</label>
                 <select
                   value={selectedBatch}
                   onChange={(e) => setSelectedBatch(e.target.value)}
-                  className="bg-gray-50 border-2 border-gray-200 text-gray-900 rounded-2xl px-4 py-3 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 w-full font-medium"
+                  className={`${theme === 'light' ? 'bg-gray-50 border-2 border-gray-200 text-gray-900 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400' : 'bg-gray-700 border-2 border-gray-600 text-gray-100 focus:ring-4 focus:ring-indigo-400 focus:border-indigo-400'} rounded-2xl px-4 py-3 transition-all duration-300 w-full font-medium`}
                 >
                   <option value="">All Batches</option>
                   {batches.map((batch) => (
@@ -272,7 +274,7 @@ const StudentListPage = () => {
         </div>
 
         {/* Sort Controls */}
-        <div className="bg-white rounded-3xl shadow-xl p-6 mb-8 border border-gray-100">
+        <div className={`${theme === 'light' ? 'bg-white border border-gray-100' : 'bg-gray-800 border border-gray-700'} rounded-3xl shadow-xl p-6 mb-8`}>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-4">
               <input
@@ -281,15 +283,15 @@ const StudentListPage = () => {
                 onChange={() => setSelectAll(!selectAll)}
                 className="w-5 h-5 rounded-lg text-indigo-600 border-2 border-gray-300 focus:ring-indigo-500"
               />
-              <span className="font-bold text-gray-700">Select All Students</span>
+              <span className={`font-bold ${theme === 'light' ? 'text-gray-700' : 'text-gray-200'}`}>Select All Students</span>
             </div>
             <div className="flex items-center gap-3">
               <button
                 onClick={() => requestSort('name')}
-                className="group flex items-center gap-2 bg-gray-50 hover:bg-indigo-50 px-4 py-2 rounded-2xl font-medium text-gray-700 hover:text-indigo-600 transition-all duration-300"
+                className={`group flex items-center gap-2 ${theme === 'light' ? 'bg-gray-50 hover:bg-indigo-50 text-gray-700 hover:text-indigo-600' : 'bg-gray-700 hover:bg-indigo-800 text-gray-200 hover:text-indigo-300'} px-4 py-2 rounded-2xl font-medium transition-all duration-300`}
               >
                 Sort by Name
-                <span className="text-gray-400 group-hover:text-indigo-600 transition-colors">
+                <span className={`${theme === 'light' ? 'text-gray-400 group-hover:text-indigo-600' : 'text-gray-400 group-hover:text-indigo-300'} transition-colors`}>
                   {sortConfig.key === 'name' && sortConfig.direction === 'asc' ? (
                     <ChevronUp size={18} />
                   ) : sortConfig.key === 'name' && sortConfig.direction === 'desc' ? (
@@ -301,10 +303,10 @@ const StudentListPage = () => {
               </button>
               <button
                 onClick={() => requestSort('batch')}
-                className="group flex items-center gap-2 bg-gray-50 hover:bg-indigo-50 px-4 py-2 rounded-2xl font-medium text-gray-700 hover:text-indigo-600 transition-all duration-300"
+                className={`group flex items-center gap-2 ${theme === 'light' ? 'bg-gray-50 hover:bg-indigo-50 text-gray-700 hover:text-indigo-600' : 'bg-gray-700 hover:bg-indigo-800 text-gray-200 hover:text-indigo-300'} px-4 py-2 rounded-2xl font-medium transition-all duration-300`}
               >
                 Sort by Batch
-                <span className="text-gray-400 group-hover:text-indigo-600 transition-colors">
+                <span className={`${theme === 'light' ? 'text-gray-400 group-hover:text-indigo-600' : 'text-gray-400 group-hover:text-indigo-300'} transition-colors`}>
                   {sortConfig.key === 'batch' && sortConfig.direction === 'asc' ? (
                     <ChevronUp size={18} />
                   ) : sortConfig.key === 'batch' && sortConfig.direction === 'desc' ? (
@@ -323,7 +325,7 @@ const StudentListPage = () => {
           {sortedStudents?.map((student, idx) => (
             <div
               key={student._id || idx}
-              className="group relative bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-gray-100 overflow-hidden"
+              className={`group relative ${theme === 'light' ? 'bg-white border-gray-100' : 'bg-gray-800 border-gray-700'} rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border overflow-hidden`}
               style={{
                 animationDelay: `${idx * 100}ms`,
                 animation: 'fadeInUp 0.6s ease-out forwards'
@@ -331,9 +333,9 @@ const StudentListPage = () => {
             >
               {/* Gradient Header */}
         
-<div className="h-16 bg-gradient-to-r from-indigo-500 to-indigo-400 rounded-t-2xl relative overflow-hidden shadow-md">
+<div className={`h-16 ${theme === 'light' ? 'bg-gradient-to-r from-indigo-500 to-indigo-400' : 'bg-gradient-to-r from-indigo-600 to-indigo-700'} rounded-t-2xl relative overflow-hidden shadow-md`}>
 
-<div className="inset-0 bg-indigo-100 bg-opacity-5 backdrop-blur-sm -z-10 absolute  bg-opacity-10"></div>
+<div className={`inset-0 ${theme === 'light' ? 'bg-indigo-100' : 'bg-gray-800'} bg-opacity-5 backdrop-blur-sm -z-10 absolute  bg-opacity-10`}></div>
 
 
 <div className='flex justify-between items-center p-6  '>
@@ -371,22 +373,22 @@ const StudentListPage = () => {
               <div className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-2">
-                    <div className="bg-gray-100 px-3 py-1 rounded-full">
-                      <span className="text-xs font-bold text-gray-600">Student-ID: {student._id?.slice(-6)}</span>
+                    <div className={`${theme === 'light' ? 'bg-gray-100' : 'bg-gray-700'} px-3 py-1 rounded-full`}>
+                      <span className={`text-xs font-bold ${theme === 'light' ? 'text-gray-600' : 'text-gray-300'}`}>Student-ID: {student._id?.slice(-6)}</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Student Details */}
                 <div className="mb-6">
-                  <div className="flex items-center space-x-2 text-gray-600 mb-2">
+                  <div className={`flex items-center space-x-2 ${theme === 'light' ? 'text-gray-600' : 'text-gray-300'} mb-2`}>
                     <span className="text-sm font-medium">Email:</span>
-                    <span className="text-sm text-gray-800 font-semibold">{student.email}</span>
+                    <span className={`text-sm ${theme === 'light' ? 'text-gray-800' : 'text-gray-100'} font-semibold`}>{student.email}</span>
                   </div>
                   {student.phone && (
-                    <div className="flex items-center space-x-2 text-gray-600">
+                    <div className={`flex items-center space-x-2 ${theme === 'light' ? 'text-gray-600' : 'text-gray-300'}`}>
                       <span className="text-sm font-medium">Phone:</span>
-                      <span className="text-sm text-gray-800 font-semibold">{student.phone}</span>
+                      <span className={`text-sm ${theme === 'light' ? 'text-gray-800' : 'text-gray-100'} font-semibold`}>{student.phone}</span>
                     </div>
                   )}
                 </div>
@@ -394,7 +396,7 @@ const StudentListPage = () => {
                 {/* Action Buttons */}
                 <div className="flex justify-center space-x-3">
                   <button
-                    className="flex-1 z-10 cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 p-3 rounded-xl transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-2"
+                    className={`flex-1 z-10 cursor-pointer ${theme === 'light' ? 'bg-gray-100 hover:bg-gray-200 text-gray-700' : 'bg-gray-700 hover:bg-gray-600 text-gray-200'} p-3 rounded-xl transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-2`}
                     onClick={() => navigate('/institute/student-detail', { state: { studentId: student._id } })}
                     title="View Details"
                   >
@@ -403,7 +405,7 @@ const StudentListPage = () => {
                   </button>
 
                   <button
-                    className="flex-1 z-10 cursor-pointer bg-indigo-100 hover:bg-indigo-200 text-indigo-700 p-3 rounded-xl transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-2"
+                    className={`flex-1 z-10 cursor-pointer ${theme === 'light' ? 'bg-indigo-100 hover:bg-indigo-200 text-indigo-700' : 'bg-indigo-800 hover:bg-indigo-700 text-indigo-200'} p-3 rounded-xl transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-2`}
                     onClick={() => navigate('/institute/student-edit', { state: { studentId: student._id } })}
                     title="Edit Student"
                   >
@@ -412,7 +414,7 @@ const StudentListPage = () => {
                   </button>
 
                   <button
-                    className="bg-red-100 z-10 cursor-pointer hover:bg-red-200 text-red-700 p-3 rounded-xl transition-all duration-300 hover:scale-105"
+                    className={`${theme === 'light' ? 'bg-red-100 hover:bg-red-200 text-red-700' : 'bg-red-800 hover:bg-red-700 text-red-200'} z-10 cursor-pointer p-3 rounded-xl transition-all duration-300 hover:scale-105`}
                     onClick={() => {
                       setStudentsToDelete([student._id]);
                       setShowConfirmDelete(true);
@@ -433,11 +435,11 @@ const StudentListPage = () => {
         {/* Empty State */}
         {sortedStudents?.length === 0 && (
           <div className="text-center py-20">
-            <div className="w-32 h-32 mx-auto bg-gradient-to-r from-indigo-100 to-gray-100 rounded-full flex items-center justify-center mb-8 animate-bounce">
-              <UserX size={48} className="text-indigo-400" />
+            <div className={`w-32 h-32 mx-auto ${theme === 'light' ? 'bg-gradient-to-r from-indigo-100 to-gray-100' : 'bg-gradient-to-r from-indigo-800 to-gray-700'} rounded-full flex items-center justify-center mb-8 animate-bounce`}>
+              <UserX size={48} className={`${theme === 'light' ? 'text-indigo-400' : 'text-indigo-300'}`} />
             </div>
-            <h3 className="text-3xl font-black text-gray-800 mb-4">No students found</h3>
-            <p className="text-xl text-gray-600 mb-8 max-w-md mx-auto">
+            <h3 className={`text-3xl font-black ${theme === 'light' ? 'text-gray-800' : 'text-gray-100'} mb-4`}>No students found</h3>
+            <p className={`text-xl ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'} mb-8 max-w-md mx-auto`}>
               {selectedBatch ? `No students found for the selected batch` : searchTerm ? `No students match "${searchTerm}"` : 'Get started by adding your first student'}
             </p>
             <button
@@ -454,21 +456,21 @@ const StudentListPage = () => {
       {/* Delete Confirmation Modal */}
       {showConfirmDelete && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full transform animate-pulse">
+          <div className={`${theme === 'light' ? 'bg-white' : 'bg-gray-800'} rounded-3xl shadow-2xl max-w-md w-full transform animate-pulse`}>
             <div className="p-8">
               <div className="flex items-center justify-center w-20 h-20 rounded-full bg-red-100 text-red-600 mx-auto mb-6">
                 <Trash2 size={32} />
               </div>
-              <h3 className="text-2xl font-black text-gray-900 text-center mb-3">
+              <h3 className={`text-2xl font-black ${theme === 'light' ? 'text-gray-900' : 'text-gray-100'} text-center mb-3`}>
                 Delete {studentsToDelete.length > 1 ? 'Students' : 'Student'}
               </h3>
-              <p className="text-gray-600 text-center mb-8 text-lg">
+              <p className={`${theme === 'light' ? 'text-gray-600' : 'text-gray-400'} text-center mb-8 text-lg`}>
                 Are you sure you want to delete {studentsToDelete.length > 1 ? `${studentsToDelete.length} students` : 'this student'}? This action cannot be undone.
               </p>
               <div className="flex gap-4">
                 <button
                   onClick={() => setShowConfirmDelete(false)}
-                  className="flex-1 inline-flex items-center justify-center gap-3 border-2 border-gray-300 bg-white hover:bg-gray-50 text-gray-700 px-6 py-4 rounded-2xl transition-all duration-300 font-bold hover:scale-105"
+                  className={`flex-1 inline-flex items-center justify-center gap-3 border-2 ${theme === 'light' ? 'border-gray-300 bg-white hover:bg-gray-50 text-gray-700' : 'border-gray-600 bg-gray-700 hover:bg-gray-600 text-gray-200'} px-6 py-4 rounded-2xl transition-all duration-300 font-bold hover:scale-105`}
                 >
                   <X size={20} />
                   Cancel

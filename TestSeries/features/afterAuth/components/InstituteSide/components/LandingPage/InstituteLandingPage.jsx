@@ -7,11 +7,12 @@ import Features from './components/Features';
 // import { mockUser } from './components/Data//';
 import useExamBatchAnalytics from '../../../../../../hooks/UseCachedExamBatchAnalytics';
 import { useUser } from '../../../../../../contexts/currentUserContext';
-
+import { useTheme } from '../../../../../../hooks/useTheme';
 const InstituteLandingPage = () => {
   const {user} = useUser();// Replace with actual user context or state management
   const {examBatchAnalytics}=useExamBatchAnalytics(); 
   console.log("Exam Batch Analytics Data:", examBatchAnalytics);
+  const {theme} = useTheme();
 
   // if (!user?.planPurchased) {
   //   return (
@@ -25,13 +26,13 @@ const InstituteLandingPage = () => {
   // }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
+    <div className="min-h-screen p-4 md:p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        <Header user={user} />
-        <QuickSteps />
-        <Analytics />
-        <MostActiveBatch />
-        <Features />
+        <Header user={user} theme={theme} />
+        <QuickSteps theme={theme} />
+        <Analytics  theme={theme}/>
+        <MostActiveBatch theme={theme} />
+        <Features theme={theme}/>
       </div>
     </div>
   );

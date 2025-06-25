@@ -12,6 +12,8 @@ import { DeleteUser } from '../../../../utils/services/userService'
 import DeleteUserModal from '../../utility/DeleteUserModal'
 import Banner  from "../../../../assests/Institute/User.svg"
 import { usePageAccess } from '../../../../contexts/PageAccessContext'
+import { useTheme } from '../../../../hooks/useTheme'
+
 const UserList = () => {
 
     const canAccessPage  = usePageAccess();
@@ -40,6 +42,7 @@ const UserList = () => {
     const [userIdToDelete, setUserIdToDelete] = useState(null);
     const [expandedUsers, setExpandedUsers] = useState({});
     const navigate = useNavigate();
+    const { theme } = useTheme();
 
     const refreshFunction = async () => {
         await queryClient.invalidateQueries(['Users', user._id]);
@@ -82,7 +85,7 @@ const UserList = () => {
     const uniqueRoles = [...new Set(users?.map(user => roleMap[user?.roleId]?.name).filter(Boolean))];
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
+        <div className={`min-h-screen`}>
             
             {/* Hero Header */}
             <div className="relative overflow-hidden">
@@ -108,51 +111,51 @@ const UserList = () => {
         {/* Stats Dashboard */}
             <div className="max-w-7xl mx-auto px-6 -mt-8 relative z-20">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div className="bg-white rounded-3xl p-6 shadow-xl border-l-4 border-blue-600 transform hover:scale-105 transition-all duration-300">
+                    <div className={`${theme === 'light' ? 'bg-white' : 'bg-gray-800'} rounded-3xl p-6 shadow-xl border-l-4 border-blue-600 transform hover:scale-105 transition-all duration-300`}>
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Total Users</p>
-                                <p className="text-4xl font-black text-blue-600">{filteredUsers?.length || 0}</p>
+                                <p className={`text-sm font-semibold ${theme === 'light' ? 'text-gray-600' : 'text-gray-200'} uppercase tracking-wide`}>Total Users</p>
+                                <p className={`text-4xl font-black ${theme === 'light' ? 'text-blue-600' : 'text-blue-200'}`}>{filteredUsers?.length || 0}</p>
                             </div>
-                            <div className="bg-blue-100 p-3 rounded-2xl">
-                                <Users className="w-8 h-8 text-blue-600" />
+                            <div className={`${theme === 'light' ? 'bg-blue-100' : 'bg-blue-400'} p-3 rounded-2xl`}>
+                                <Users className={`w-8 h-8 ${theme === 'light' ? 'text-blue-600' : 'text-blue-800'}`} />
                             </div>
                         </div>
                     </div>
                     
-                    <div className="bg-white rounded-3xl p-6 shadow-xl border-l-4 border-green-600 transform hover:scale-105 transition-all duration-300">
+                    <div className={`${theme === 'light' ? 'bg-white' : 'bg-gray-800'} rounded-3xl p-6 shadow-xl border-l-4 border-green-600 transform hover:scale-105 transition-all duration-300`}>
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Active Roles</p>
-                                <p className="text-4xl font-black text-green-600">{uniqueRoles.length}</p>
+                                <p className={`text-sm font-semibold ${theme === 'light' ? 'text-gray-600' : 'text-gray-200'} uppercase tracking-wide`}>Active Roles</p>
+                                <p className={`text-4xl font-black ${theme === 'light' ? 'text-green-600' : 'text-green-200'}`}>{uniqueRoles.length}</p>
                             </div>
-                            <div className="bg-green-100 p-3 rounded-2xl">
-                                <Shield className="w-8 h-8 text-green-600" />
+                            <div className={`${theme === 'light' ? 'bg-green-100' : 'bg-green-400'} p-3 rounded-2xl`}>
+                                <Shield className={`w-8 h-8 ${theme === 'light' ? 'text-green-600' : 'text-green-800'}`} />
                             </div>
                         </div>
                     </div>
                     
-                    <div className="bg-white rounded-3xl p-6 shadow-xl border-l-4 border-purple-600 transform hover:scale-105 transition-all duration-300">
+                    <div className={`${theme === 'light' ? 'bg-white' : 'bg-gray-800'} rounded-3xl p-6 shadow-xl border-l-4 border-purple-600 transform hover:scale-105 transition-all duration-300`}>
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Search Results</p>
-                                <p className="text-4xl font-black text-purple-600">{filteredUsers?.length || 0}</p>
+                                <p className={`text-sm font-semibold ${theme === 'light' ? 'text-gray-600' : 'text-gray-200'} uppercase tracking-wide`}>Search Results</p>
+                                <p className={`text-4xl font-black ${theme === 'light' ? 'text-purple-600' : 'text-purple-200'}`}>{filteredUsers?.length || 0}</p>
                             </div>
-                            <div className="bg-purple-100 p-3 rounded-2xl">
-                                <Search className="w-8 h-8 text-purple-600" />
+                            <div className={`${theme === 'light' ? 'bg-purple-100' : 'bg-purple-400'} p-3 rounded-2xl`}>
+                                <Search className={`w-8 h-8 ${theme === 'light' ? 'text-purple-600' : 'text-purple-800'}`} />
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Control Panel */}
-                <div className="bg-white rounded-3xl shadow-xl p-6 mb-8 border border-gray-100">
+                <div className={`${theme === 'light' ? 'bg-white border border-gray-100' : 'bg-gray-800 border border-gray-700'} rounded-3xl shadow-xl p-6 mb-8`}>
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
                         <div className="flex flex-col md:flex-row items-start md:items-center space-y-4 md:space-y-0 md:space-x-4">
                             <div className="relative">
-                                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 ${theme === 'light' ? 'text-gray-400' : 'text-gray-300'} w-5 h-5`} />
                                 <input 
-                                    className="bg-gray-50 border-2 border-gray-200 text-gray-900 rounded-2xl pl-12 pr-6 py-3 focus:ring-4 focus:ring-blue-200 focus:border-blue-400 transition-all duration-300 w-80"
+                                    className={`${theme === 'light' ? 'bg-gray-50 border-2 border-gray-200 text-gray-900 focus:ring-4 focus:ring-blue-200 focus:border-blue-400' : 'bg-gray-700 border-2 border-gray-600 text-gray-100 focus:ring-4 focus:ring-blue-400 focus:border-blue-400'} rounded-2xl pl-12 pr-6 py-3 transition-all duration-300 w-80`}
                                     placeholder="Search users..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -160,7 +163,7 @@ const UserList = () => {
                             </div>
                             
                             <select
-                                className="bg-gray-50 border-2 border-gray-200 text-gray-900 rounded-2xl px-6 py-3 focus:ring-4 focus:ring-blue-200 focus:border-blue-400 transition-all duration-300 font-medium"
+                                className={`${theme === 'light' ? 'bg-gray-50 border-2 border-gray-200 text-gray-900 focus:ring-4 focus:ring-blue-200 focus:border-blue-400' : 'bg-gray-700 border-2 border-gray-600 text-gray-100 focus:ring-4 focus:ring-blue-400 focus:border-blue-400'} rounded-2xl px-6 py-3 transition-all duration-300 font-medium`}
                                 onChange={(e) => setSelectedBatch(e.target.value)}
                                 value={selectedBatch}
                             >
@@ -189,16 +192,16 @@ const UserList = () => {
                     {filteredUsers?.map((userItem, idx) => (
                         <div 
                             key={userItem._id || idx} 
-                            className="group relative bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-gray-100 overflow-hidden"
+                            className={`group relative ${theme === 'light' ? 'bg-white border-gray-100' : 'bg-gray-800 border-gray-700'} rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border overflow-hidden`}
                             style={{
                                 animationDelay: `${idx * 100}ms`,
                                 animation: 'fadeInUp 0.6s ease-out forwards'
                             }}
                         >
                           
-                            <div className="h-16 bg-gradient-to-r from-indigo-500 to-indigo-400 rounded-t-2xl relative overflow-hidden shadow-md">
+                            <div className={`h-16 ${theme === 'light' ? 'bg-gradient-to-r from-indigo-500 to-indigo-400' : 'bg-gradient-to-r from-indigo-600 to-indigo-700'} rounded-t-2xl relative overflow-hidden shadow-md`}>
 
-  <div className="inset-0 bg-indigo-100 bg-opacity-5 backdrop-blur-sm"></div>
+  <div className={`inset-0 ${theme === 'light' ? 'bg-indigo-100' : 'bg-gray-800'} bg-opacity-5 backdrop-blur-sm`}></div>
 <div className='flex justify-between items-center p-6 '>
 <div className="">
     <h3 className="text-white font-bold text-xl leading-snug line-clamp-2">
@@ -228,15 +231,15 @@ const UserList = () => {
                             <div className="p-6">
                                 {/* Role Badge */}
                                 <div className="flex items-center justify-center mb-4">
-                                    <div className="bg-gradient-to-r from-blue-50 to-blue-100 px-4 py-2 rounded-full border border-blue-200">
+                                    <div className={`${theme === 'light' ? 'bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200' : 'bg-gradient-to-r from-blue-900 to-blue-800 border-blue-700'} px-4 py-2 rounded-full border`}>
                                         {roleMap[userItem?.roleId] ? (
-                                            <span className="text-sm font-bold text-blue-700 flex items-center">
+                                            <span className={`text-sm font-bold ${theme === 'light' ? 'text-blue-700' : 'text-blue-200'} flex items-center`}>
                                               
                                                 <Shield className="w-4 h-4 mr-2" />
                                                 {roleMap[userItem.roleId].name}
                                             </span>
                                         ) : (
-                                            <span className="text-sm font-bold text-red-500 flex items-center">
+                                            <span className={`text-sm font-bold ${theme === 'light' ? 'text-red-500' : 'text-red-400'} flex items-center`}>
                                                 <AlertTriangle className="w-4 h-4 mr-2" />
                                                 No role assigned
                                             </span>
@@ -246,20 +249,20 @@ const UserList = () => {
 
                                 {/* Batches Section */}
                                 <div className="mb-6">
-                                    <p className="text-sm font-semibold text-gray-600 mb-3">Assigned Batches:</p>
+                                    <p className={`text-sm font-semibold ${theme === 'light' ? 'text-gray-600' : 'text-gray-300'} mb-3`}>Assigned Batches:</p>
                                     <div className="flex justify-center flex-wrap gap-2">
                                         {userItem.batch?.length > 0 ? (
                                             <>
                                                 {expandedUsers[userItem._id] ? (
                                                     <>
                                                         {userItem.batch.map((batch, batchIdx) => (
-                                                            <div key={batchIdx} className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-medium border border-blue-200">
+                                                            <div key={batchIdx} className={`${theme === 'light' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-blue-900 text-blue-200 border-blue-700'} px-3 py-1 rounded-full text-xs font-medium border`}>
                                                                 {batchMap[batch]?.name} - {batchMap[batch]?.year}
                                                             </div>
                                                         ))}
                                                         {userItem.batch.length > 2 && (
                                                             <button
-                                                                className="text-xs text-blue-600 hover:text-blue-800 font-medium underline"
+                                                                className={`text-xs ${theme === 'light' ? 'text-blue-600 hover:text-blue-800' : 'text-blue-400 hover:text-blue-200'} font-medium underline`}
                                                                 onClick={() => handleExpandedUsers(userItem._id)}
                                                             >
                                                                 Show less
@@ -269,13 +272,13 @@ const UserList = () => {
                                                 ) : (
                                                     <>
                                                         {userItem.batch.slice(0, 2).map((batch, batchIdx) => (
-                                                            <div key={batchIdx} className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-medium border border-blue-200">
+                                                            <div key={batchIdx} className={`${theme === 'light' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-blue-900 text-blue-200 border-blue-700'} px-3 py-1 rounded-full text-xs font-medium border`}>
                                                                 {batchMap[batch]?.name} - {batchMap[batch]?.year}
                                                             </div>
                                                         ))}
                                                         {userItem.batch.length > 2 && (
                                                             <button
-                                                                className="text-xs text-blue-600 hover:text-blue-800 font-medium underline"
+                                                                className={`text-xs ${theme === 'light' ? 'text-blue-600 hover:text-blue-800' : 'text-blue-400 hover:text-blue-200'} font-medium underline`}
                                                                 onClick={() => handleExpandedUsers(userItem._id)}
                                                             >
                                                                 +{userItem.batch.length - 2} more
@@ -285,7 +288,7 @@ const UserList = () => {
                                                 )}
                                             </>
                                         ) : (
-                                            <div className="text-gray-500 text-sm italic">No batches assigned</div>
+                                            <div className={`${theme === 'light' ? 'text-gray-500' : 'text-gray-400'} text-sm italic`}>No batches assigned</div>
                                         )}
                                     </div>
                                 </div>
@@ -293,7 +296,7 @@ const UserList = () => {
                                 {/* Action Buttons */}
                                 <div className="flex justify-center space-x-3">
                                     <button
-                                        className="flex-1 z-10 cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 p-3 rounded-xl transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-2"
+                                        className={`flex-1 z-10 cursor-pointer ${theme === 'light' ? 'bg-gray-100 hover:bg-gray-200 text-gray-700' : 'bg-gray-700 hover:bg-gray-600 text-gray-200'} p-3 rounded-xl transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-2`}
                                         onClick={() => navigate('/institute/user-detail', { state: { userId: userItem._id } })}
                                         title="View Details"
                                     >
@@ -302,7 +305,7 @@ const UserList = () => {
                                     </button>
                                     
                                     <button
-                                        className="flex-1 z-10 cursor-pointer bg-blue-100 hover:bg-blue-200 text-blue-700 p-3 rounded-xl transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-2"
+                                        className={`flex-1 z-10 cursor-pointer ${theme === 'light' ? 'bg-blue-100 hover:bg-blue-200 text-blue-700' : 'bg-blue-800 hover:bg-blue-700 text-blue-200'} p-3 rounded-xl transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-2`}
                                         onClick={() => navigate(`/institute/user-edit/${userItem._id}`)}
                                         title="Edit User"
                                     >
@@ -311,7 +314,7 @@ const UserList = () => {
                                     </button>
                                     
                                     <button
-                                        className="bg-red-100 z-10 cursor-pointer hover:bg-red-200 text-red-700 p-3 rounded-xl transition-all duration-300 hover:scale-105"
+                                        className={`${theme === 'light' ? 'bg-red-100 hover:bg-red-200 text-red-700' : 'bg-red-800 hover:bg-red-700 text-red-200'} z-10 cursor-pointer p-3 rounded-xl transition-all duration-300 hover:scale-105`}
                                         onClick={() => {
                                             setShowDeleteModal(true);
                                             setUserIdToDelete(userItem._id);
@@ -332,11 +335,11 @@ const UserList = () => {
                 {/* Empty State */}
                 {filteredUsers?.length === 0 && (
                     <div className="text-center py-20">
-                        <div className="w-32 h-32 mx-auto bg-gradient-to-r from-blue-100 to-blue-200 rounded-full flex items-center justify-center mb-8 animate-bounce">
-                            <Users className="w-12 h-12 text-blue-400" />
+                        <div className={`w-32 h-32 mx-auto ${theme === 'light' ? 'bg-gradient-to-r from-blue-100 to-blue-200' : 'bg-gradient-to-r from-blue-800 to-blue-700'} rounded-full flex items-center justify-center mb-8 animate-bounce`}>
+                            <Users className={`w-12 h-12 ${theme === 'light' ? 'text-blue-400' : 'text-blue-300'}`} />
                         </div>
-                        <h3 className="text-3xl font-black text-gray-800 mb-4">No users found</h3>
-                        <p className="text-xl text-gray-600 mb-8 max-w-md mx-auto">
+                        <h3 className={`text-3xl font-black ${theme === 'light' ? 'text-gray-800' : 'text-gray-100'} mb-4`}>No users found</h3>
+                        <p className={`text-xl ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'} mb-8 max-w-md mx-auto`}>
                             {selectedBatch ? "No users found for selected batch" : searchTerm ? `No users match "${searchTerm}"` : 'Get started by adding your first user'}
                         </p>
                         <button
