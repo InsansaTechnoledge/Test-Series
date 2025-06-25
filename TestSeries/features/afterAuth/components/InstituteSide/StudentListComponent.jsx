@@ -148,6 +148,11 @@ const StudentListPage = () => {
           className="absolute  w-full h-full object-cover"
         />
 
+        <div className={`absolute inset-0 ${
+          theme === 'dark' 
+            ? 'bg-gray-900/60' 
+            : 'bg-black/20'
+        }`}></div>
 
         <div className="absolute "></div>
 

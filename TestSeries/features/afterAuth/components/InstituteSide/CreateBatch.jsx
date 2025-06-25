@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { X, Upload, CheckCircle, PlusCircle, FileSpreadsheet, Users, Calendar, BookOpen, Zap, Target, Sparkles } from 'lucide-react';
+import { X, Upload, CheckCircle, PlusCircle, FileSpreadsheet, Users, Calendar, BookOpen, Zap, Target, Sparkles, AlertTriangle } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import NeedHelpComponent from './components/NeedHelpComponent';
 import { useCachedUser } from '../../../../hooks/useCachedUser';
@@ -210,15 +210,34 @@ const CreateBatch = () => {
           className="relative z-10 px-6 py-24 text-center bg-cover bg-center bg-no-repeat rounded-xl"
           style={{ backgroundImage: `url(${Banner})` }}
         >
+           <div className={`absolute inset-0 ${
+          theme === 'dark' 
+            ? 'bg-gray-900/60' 
+            : 'bg-black/20'
+        }`}></div>
           <div className="inline-flex items-center space-x-3 mb-4">
-            <h1 className="text-6xl md:text-7xl font-black text-white tracking-tight">
+            <h1 className="text-6xl z-10 md:text-7xl font-black text-white tracking-tight">
               Create Batch
             </h1>
           </div>
-          <p className="text-xl text-white/80 max-w-2xl mx-auto font-medium">
+          <p className="text-xl z-10 text-white/80 max-w-2xl mx-auto font-medium">
             Create batch with subjects, faculty, syllabus.
           </p>
+          <div className="flex items-center justify-center">
+              <p className="mt-8 text-indigo-700 bg-indigo-50 border border-indigo-100 px-5 py-4 rounded-2xl text-base flex items-center gap-3 shadow-sm backdrop-blur-sm">
+                  <AlertTriangle className="w-5 h-5 text-indigo-400" />
+                  <span>
+                    <span className="font-semibold">Note:</span> For your current plan, you have an available limit of
+                    <span className={`font-bold ${Available_limit > 0 ? "text-green-600" : "text-red-600"} mx-1`}>
+                      {Available_limit}
+                    </span>
+                        Batches.
+                    </span>
+              </p>
         </div>
+        </div>
+
+       
       </div>
 
       {/* Stats Dashboard */}

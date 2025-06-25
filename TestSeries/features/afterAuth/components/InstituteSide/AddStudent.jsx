@@ -12,6 +12,7 @@ import { usePageAccess } from '../../../../contexts/PageAccessContext'
 import useLimitAccess from '../../../../hooks/useLimitAccess'
 import { useLocation } from 'react-router-dom'
 import { useCachedOrganization } from '../../../../hooks/useCachedOrganization'
+import { useTheme } from '../../../../hooks/useTheme'
 
 const AddStudent = () => {
   const { user, getFeatureKeyFromLocation } = useUser();
@@ -303,11 +304,18 @@ const AddStudent = () => {
   const question = "How to add multiple students?"
   const answer = "You can add students one by one using the manual entry form or upload an Excel file with multiple students at once."
 
+  const {theme} = useTheme();
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-indigo-50">
+    <div className="min-h-screen">
       {/* Hero Header */}
       <div className="relative overflow-hidden rounded-xl h-80">
         <img src={Banner} alt="Upload Banner" className="absolute  w-full h-full object-cover" />
+        <div className={`absolute inset-0 ${
+          theme === 'dark' 
+            ? 'bg-gray-900/60' 
+            : 'bg-black/20'
+        }`}></div>
         <div className="absolute "></div>
         <div className="relative z-10 flex items-center justify-center h-full px-6 text-center">
           <div>
@@ -344,425 +352,452 @@ const AddStudent = () => {
             answer={answer}
           />
           {!canAddMoreStudents && (
-            <p className="mt-4 text-center text-sm text-red-600 bg-red-100 border border-red-200 px-4 py-2 rounded-xl shadow-sm backdrop-blur-sm">
+           <p className={`mt-4 text-center ${theme === 'light' ? 'bg-red-100 border text-red-600 border-red-200' : 'bg-red-600 text-gray-100'} text-sm  px-4 py-2 rounded-xl shadow-sm backdrop-blur-sm`}>
               You've reached your batch creation limit. <br className="sm:hidden" />
               <span className="font-medium">Upgrade your plan</span> to continue.
             </p>
           )}
         </div>
-        {/* Batch Selection Card */}
-        <div className="bg-white rounded-3xl shadow-xl p-8 mb-8 border border-gray-100">
+        {/* Batch Selection Card */}  
+        <div className={` ${theme === 'light' ? 'border border-gray-100' : 'bg-gray-800'} rounded-3xl shadow-xl p-8 mb-8 `}>
           <div className="flex items-center space-x-4 mb-6">
-            <div className="bg-indigo-100 p-3 rounded-2xl"></div>
-            <h2 className="text-2xl font-black text-gray-800">Select Target Batch</h2>
+            <div className={`${theme === 'light' ? 'bg-indigo-100' : 'bg-indigo-500'} p-3 rounded-2xl`}></div>
+            <h2 className={` ${theme === 'light' ? ' text-gray-800' : 'text-indigo-100'} text-2xl font-black`}>Select Target Batch</h2>
           </div>
           <div className="flex flex-col md:flex-row md:items-center gap-4">
-            <span className="text-gray-700 font-bold whitespace-nowrap text-lg">Batch</span>
+            <span className={` ${theme === 'light' ? 'text-gray-700' : 'text-indigo-100'} font-bold whitespace-nowrap text-lg`}>Batch</span>
             <select
               onChange={(e) => setBatch(e.target.value)}
-              className="flex-grow bg-gray-50 border-2 border-gray-200 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 font-medium text-lg"
+              className={`flex-grow rounded-2xl px-6 py-4 font-medium text-lg duration-300
+                ${theme === 'light' 
+                  ? 'bg-gray-50 text-gray-800 border-2 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400' 
+                  : 'bg-gray-700 text-indigo-100 border border-gray-600 focus:outline-none focus:ring-4 focus:ring-indigo-400 focus:border-indigo-500'}
+              `}
             >
-              <option value="">Select a batch</option>
+              <option value="" disabled className="text-gray-400">Select a batch</option>
               {batches.map((batch, idx) => (
-                <option key={idx} value={batch.id}>{batch.name}</option>
+                <option key={idx} value={batch.id} className={theme === 'light' ? 'text-gray-800' : 'text-indigo-100'}>
+                  {batch.name}
+                </option>
               ))}
             </select>
+
           </div>
         </div>
         {/* Tab Selection */}
-        <div className="bg-white rounded-3xl shadow-xl overflow-hidden mb-8 border border-gray-100">
-          <div className="grid grid-cols-3 border-b-2 border-gray-100">
+        <div className={`${theme === 'light' ? 'border-gray-100' : 'bg-gray-800'} rounded-3xl shadow-xl overflow-hidden mb-8 border `}>
+          <div className={`grid grid-cols-3 border-b-2 ${theme === 'light' ? 'border-gray-100' : 'border-indigo-100'} `}>
+          <button
+            className={`flex items-center justify-center gap-3 py-6 font-bold text-lg transition-all duration-300
+               ${activeTab === 'manual'
+                ? (theme === 'light'
+                    ? 'text-indigo-600 border-b-4 border-indigo-600 bg-indigo-50'
+                    : 'text-gray-900 border-b-4 border-indigo-400 bg-indigo-400')
+                : (theme === 'light'
+                    ? 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+                    : 'text-gray-400 hover:bg-gray-800 hover:text-white')}
+            `}
+            onClick={() => setActiveTab('manual')}
+          >
+            <Users size={24} />
+            <span>Manual Entry</span>
+          </button>
             <button
-              className={`flex items-center justify-center gap-3 py-6 font-bold text-lg transition-all duration-300 ${activeTab === 'manual'
-                ? 'text-indigo-600 border-b-4 border-indigo-600 bg-indigo-50'
-                : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
-                }`}
-              onClick={() => setActiveTab('manual')}
-            >
-              <Users size={24} />
-              <span>Manual Entry</span>
-            </button>
-            <button
-              className={`flex items-center justify-center gap-3 py-6 font-bold text-lg transition-all duration-300 ${activeTab === 'bulk'
-                ? 'text-indigo-600 border-b-4 border-indigo-600 bg-indigo-50'
-                : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
-                }`}
+              className={`flex items-center justify-center gap-3 py-6 font-bold text-lg transition-all duration-300
+                ${activeTab === 'bulk'
+                 ? (theme === 'light'
+                     ? 'text-indigo-600 border-b-4 border-indigo-600 bg-indigo-50'
+                     : 'text-gray-900 border-b-4 border-indigo-400 bg-indigo-400')
+                 : (theme === 'light'
+                     ? 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+                     : 'text-gray-400 hover:bg-gray-800 hover:text-white')}
+             `}
               onClick={() => setActiveTab('bulk')}
             >
               <FileSpreadsheet size={24} />
               <span>Bulk Upload</span>
             </button>
             <button
-              className={`flex items-center justify-center gap-3 py-6 font-bold text-lg transition-all duration-300 ${activeTab === 'import'
-                ? 'text-indigo-600 border-b-4 border-indigo-600 bg-indigo-50'
-                : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
-                }`}
+              className={`flex items-center justify-center gap-3 py-6 font-bold text-lg transition-all duration-300
+                ${activeTab === 'import'
+                 ? (theme === 'light'
+                     ? 'text-indigo-600 border-b-4 border-indigo-600 bg-indigo-50'
+                     : 'text-gray-900 border-b-4 border-indigo-400 bg-indigo-400')
+                 : (theme === 'light'
+                     ? 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+                     : 'text-gray-400 hover:bg-gray-800 hover:text-white')}
+             `}
               onClick={() => setActiveTab('import')}
             >
               <FileDown size={24} />
               <span>Import from Batch</span>
             </button>
           </div>
+
+
           {/* Manual Entry Form */}
           {activeTab === 'manual' && (
-            <div className="p-8">
-              {students.map((student, index) => (
-                <div key={index} className="mb-12 border-2 border-gray-100 rounded-3xl p-8 bg-gradient-to-br from-gray-50 to-white shadow-lg">
-                  <div className="flex justify-between items-center mb-8">
-                    <div className="flex items-center gap-4">
-                      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full w-12 h-12 flex items-center justify-center font-black text-lg">
-                        {index + 1}
-                      </div>
-                      <h3 className="text-2xl font-black text-gray-800">Student Details</h3>
-                    </div>
-                    {students.length > 1 && (
-                      <button
-                        onClick={() => removeStudentForm(index)}
-                        className="text-red-500 hover:text-red-700 flex items-center gap-2 text-lg font-bold bg-red-50 px-4 py-2 rounded-2xl hover:bg-red-100 transition-all duration-300"
-                      >
-                        <Trash2 size={20} />
-                        <span>Remove</span>
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Personal Info */}
-                  <div className="mb-8">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="bg-blue-100 p-2 rounded-xl">
-                        {/* <Sparkles className="w-5 h-5 text-blue-600" /> */}
-                      </div>
-                      <h4 className="text-lg font-black text-gray-700 uppercase tracking-wider">Personal Information</h4>
-                    </div>
-                    <div className="grid md:grid-cols-2 gap-8">
-                      <div className="flex flex-col gap-3">
-                        <label className="text-lg font-bold text-gray-700">First Name<span className="text-red-600">*</span></label>
-                        <input
-                          type="text"
-                          value={student.fname}
-                          onChange={(e) => handleStudentChange(index, 'fname', e.target.value)}
-                          className="p-4 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 text-lg"
-                          placeholder="Enter first name"
-                        />
-                        {errors[index]?.fname && <p className="text-red-500 font-medium">{errors[index].fname}</p>}
-                      </div>
-
-                      <div className="flex flex-col gap-3">
-                        <label className="text-lg font-bold text-gray-700">Last Name<span className="text-red-600">*</span></label>
-                        <input
-                          type="text"
-                          value={student.lname}
-                          onChange={(e) => handleStudentChange(index, 'lname', e.target.value)}
-                          className="p-4 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 text-lg"
-                          placeholder="Enter last name"
-                        />
-                        {errors[index]?.lname && <p className="text-red-500 font-medium">{errors[index].lname}</p>}
-                      </div>
-
-                      <div className="flex flex-col gap-3">
-                        <label className="text-lg font-bold text-gray-700">Gender<span className="text-red-600">*</span></label>
-                        <select
-                          value={student.gender}
-                          onChange={(e) => handleStudentChange(index, 'gender', e.target.value)}
-                          className="p-4 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 text-lg"
+              <div className="p-8">
+                {students.map((student, index) => (
+                  <div
+                    key={index}
+                    className={`mb-12 rounded-3xl p-8 shadow-lg ${
+                      theme === 'light'
+                        ? 'bg-gradient-to-br from-gray-50 to-white border-2 border-gray-100'
+                        : 'bg-gray-700'
+                    }`}
+                  >
+                    <div className="flex justify-between items-center mb-8">
+                      <div className="flex items-center gap-4">
+                        <div
+                          className={`rounded-full w-12 h-12 flex items-center justify-center font-black text-lg ${
+                            theme === 'light' ? 'bg-indigo-600 text-white' : 'bg-indigo-400 text-white'
+                          }`}
                         >
-                          <option value="">Select gender</option>
-                          <option value="Male">Male</option>
-                          <option value="Female">Female</option>
-                          <option value="Other">Other</option>
-                        </select>
-                        {errors[index]?.gender && <p className="text-red-500 font-medium">{errors[index].gender}</p>}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Contact Info */}
-                  <div className="mb-8">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="bg-green-100 p-2 rounded-xl">
-                        <Zap className="w-5 h-5 text-green-600" />
-                      </div>
-                      <h4 className="text-lg font-black text-gray-700 uppercase tracking-wider">Contact Information</h4>
-                    </div>
-                    <div className="grid md:grid-cols-2 gap-8">
-                      <div className="flex flex-col gap-3">
-                        <label className="text-lg font-bold text-gray-700">Phone Number<span className="text-red-600">*</span></label>
-                        <input
-                          type="tel"
-                          value={student.number}
-                          onChange={(e) => handleStudentChange(index, 'number', e.target.value)}
-                          className="p-4 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 text-lg"
-                          placeholder="Enter phone number"
-                        />
-                        {errors[index]?.number && <p className="text-red-500 font-medium">{errors[index].number}</p>}
-                      </div>
-
-                      <div className="flex flex-col gap-3">
-                        <label className="text-lg font-bold text-gray-700">Email<span className="text-red-600">*</span></label>
-                        <input
-                          type="email"
-                          value={student.email}
-                          onChange={(e) => handleStudentChange(index, 'email', e.target.value)}
-                          className="p-4 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 text-lg"
-                          placeholder="Enter email"
-                        />
-                        {errors[index]?.email && <p className="text-red-500 font-medium">{errors[index].email}</p>}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Account Info */}
-                  <div className="mb-8">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="bg-purple-100 p-2 rounded-xl">
-                        {/* <Target className="w-5 h-5 text-purple-600" /> */}
-                      </div>
-                      <h4 className="text-lg font-black text-gray-700 uppercase tracking-wider">Account Information</h4>
-                    </div>
-                    <div className="grid md:grid-cols-2 gap-8">
-                      <div className="flex flex-col gap-3">
-                        <label className="text-lg font-bold text-gray-700">Password<span className="text-red-600">*</span></label>
-                        <div className="flex gap-3">
-                          <div className="relative flex-grow">
-                            <input
-                              type={showPassword[`${index}-password`] ? 'text' : 'password'}
-                              value={student.password}
-                              onChange={(e) => handleStudentChange(index, 'password', e.target.value)}
-                              className="p-4 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 w-full pr-14 text-lg"
-                              placeholder="Enter password"
-                            />
-
-                            <div
-                              className="absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400 hover:text-gray-600"
-                              onClick={() => togglePasswordVisibility(index, 'password')}
-                            >
-                              {showPassword[`${index}-password`] ? <EyeOff size={24} /> : <Eye size={24} />}
-                            </div>
-                          </div>
-
-                          <button
-                            onClick={() => generateRandomPasswordForStudent(index)}
-                            className="bg-gradient-to-r from-indigo-100 to-purple-100 hover:from-indigo-200 hover:to-purple-200 p-4 rounded-2xl flex items-center justify-center transition-all duration-300 hover:scale-105"
-                            title="Generate random password"
-                          >
-                            <RefreshCcw size={22} />
-                          </button>
+                          {index + 1}
                         </div>
-                        {errors[index]?.password && <p className="text-red-500 font-medium">{errors[index].password}</p>}
+                        <h3 className={`text-2xl font-black ${theme === 'light' ? 'text-gray-800' : 'text-indigo-100'}`}>
+                          Student Details
+                        </h3>
                       </div>
-                      <div className="flex flex-col gap-3">
-                        <label className="text-lg font-bold text-gray-700">Confirm Password<span className="text-red-600">*</span></label>
-                        <div className="relative w-full">
-                          <input
-                            type={showPassword[`${index}-cpassword`] ? 'text' : 'password'}
-                            value={student.cpassword}
-                            onChange={(e) => handleStudentChange(index, 'cpassword', e.target.value)}
-                            className="p-4 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 w-full pr-14 text-lg"
-                            placeholder="Confirm password"
-                          />
+                      {students.length > 1 && (
+                        <button
+                          onClick={() => removeStudentForm(index)}
+                          className={`flex items-center gap-2 text-lg font-bold px-4 py-2 rounded-2xl transition-all duration-300
+                            ${
+                              theme === 'light'
+                                ? 'text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100'
+                                : 'text-red-100 hover:text-red-200 bg-red-600 hover:bg-red-700'
+                            }`}
+                        >
+                          <Trash2 size={20} />
+                          <span>Remove</span>
+                        </button>
+                      )}
+                    </div>
 
-                          <div
-                            className="absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400 hover:text-gray-600"
-                            onClick={() => togglePasswordVisibility(index, 'cpassword')}
+                    {/* === Section Block Template === */}
+                    {[
+                      { title: 'Personal Information', fields: ['fname', 'lname', 'gender'] },
+                      { title: 'Contact Information', fields: ['number', 'email'] },
+                      { title: 'Account Information', fields: ['password', 'cpassword'] },
+                      { title: 'Parent Information', fields: ['pnumber', 'pemail'] },
+                    ].map((section, secIdx) => (
+                      <div className="mb-8" key={secIdx}>
+                        <div className="flex items-center gap-3 mb-6">
+                          <h4
+                            className={`text-lg font-black uppercase tracking-wider ${
+                              theme === 'light' ? 'text-gray-700' : 'text-indigo-100'
+                            }`}
                           >
-                            {showPassword[`${index}-cpassword`] ? <EyeOff size={24} /> : <Eye size={24} />}
-                          </div>
+                            {section.title}
+                          </h4>
                         </div>
-                        {errors[index]?.cpassword && <p className="text-red-500 font-medium">{errors[index].cpassword}</p>}
-                      </div>
-                    </div>
-                  </div>
 
-                  {/* Parent Info */}
-                  <div>
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="bg-orange-100 p-2 rounded-xl">
-                        {/* <Users className="w-5 h-5 text-orange-600" /> */}
-                      </div>
-                      <h4 className="text-lg font-black text-gray-700 uppercase tracking-wider">Parent Information</h4>
-                    </div>
-                    <div className="grid md:grid-cols-2 gap-8">
-                      <div className="flex flex-col gap-3">
-                        <label className="text-lg font-bold text-gray-700">Parent's Phone Number<span className="text-red-600">*</span></label>
-                        <input
-                          type="tel"
-                          value={student.pnumber}
-                          onChange={(e) => handleStudentChange(index, 'pnumber', e.target.value)}
-                          className="p-4 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 text-lg"
-                          placeholder="Enter parent's phone number"
-                        />
-                        {errors[index]?.pnumber && <p className="text-red-500 font-medium">{errors[index].pnumber}</p>}
-                      </div>
+                        <div className="grid md:grid-cols-2 gap-8">
+                          {section.fields.map((field) => {
+                            const label =
+                              field === 'fname'
+                                ? "First Name"
+                                : field === 'lname'
+                                ? "Last Name"
+                                : field === 'gender'
+                                ? "Gender"
+                                : field === 'number'
+                                ? "Phone Number"
+                                : field === 'email'
+                                ? "Email"
+                                : field === 'password'
+                                ? "Password"
+                                : field === 'cpassword'
+                                ? "Confirm Password"
+                                : field === 'pnumber'
+                                ? "Parent's Phone Number"
+                                : "Parent's Email";
 
-                      <div className="flex flex-col gap-3">
-                        <label className="text-lg font-bold text-gray-700">Parent's Email<span className="text-red-600">*</span></label>
-                        <input
-                          type="email"
-                          value={student.pemail}
-                          onChange={(e) => handleStudentChange(index, 'pemail', e.target.value)}
-                          className="p-4 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 text-lg"
-                          placeholder="Enter parent's email"
-                        />
-                        {errors[index]?.pemail && <p className="text-red-500 font-medium">{errors[index].pemail}</p>}
+                            const isPassword = field === 'password' || field === 'cpassword';
+
+                            const inputCommon = `p-4 rounded-2xl transition-all duration-300 text-lg w-full pr-14 ${
+                              theme === 'light'
+                                ? 'bg-white text-gray-900 border-2 border-gray-200 focus:ring-indigo-200 focus:border-indigo-400 placeholder-gray-400'
+                                : 'bg-gray-800 text-indigo-100 border-2 border-gray-600 focus:ring-indigo-500 focus:border-indigo-300 placeholder-indigo-300'
+                            }`;
+
+                            return (
+                              <div className="flex flex-col gap-3" key={field}>
+                                <label
+                                  className={`text-lg font-bold ${
+                                    theme === 'light' ? 'text-gray-700' : 'text-indigo-200'
+                                  }`}
+                                >
+                                  {label} <span className="text-red-600">*</span>
+                                </label>
+
+                                {field === 'gender' ? (
+                                  <select
+                                    value={student.gender}
+                                    onChange={(e) => handleStudentChange(index, 'gender', e.target.value)}
+                                    className={inputCommon}
+                                  >
+                                    <option value="">Select gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                  </select>
+                                ) : isPassword ? (
+                                  <div className="relative w-full flex gap-3">
+                                    <div className="relative flex-grow">
+                                      <input
+                                        type={showPassword[`${index}-${field}`] ? 'text' : 'password'}
+                                        value={student[field]}
+                                        onChange={(e) => handleStudentChange(index, field, e.target.value)}
+                                        className={inputCommon}
+                                        placeholder={`Enter ${label.toLowerCase()}`}
+                                      />
+                                      <div
+                                        className="absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400 hover:text-gray-600"
+                                        onClick={() => togglePasswordVisibility(index, field)}
+                                      >
+                                        {showPassword[`${index}-${field}`] ? <EyeOff size={24} /> : <Eye size={24} />}
+                                      </div>
+                                    </div>
+                                    {field === 'password' && (
+                                      <button
+                                        onClick={() => generateRandomPasswordForStudent(index)}
+                                        className="bg-gradient-to-r from-indigo-100 to-purple-100 hover:from-indigo-200 hover:to-purple-200 p-4 rounded-2xl flex items-center justify-center transition-all duration-300 hover:scale-105"
+                                        title="Generate random password"
+                                      >
+                                        <RefreshCcw size={22} />
+                                      </button>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <input
+                                    type={field.includes('email') ? 'email' : field.includes('number') ? 'tel' : 'text'}
+                                    value={student[field]}
+                                    onChange={(e) => handleStudentChange(index, field, e.target.value)}
+                                    className={inputCommon}
+                                    placeholder={`Enter ${label.toLowerCase()}`}
+                                  />
+                                )}
+                                {errors[index]?.[field] && (
+                                  <p className="text-red-500 font-medium">{errors[index][field]}</p>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
-                    </div>
+                    ))}
                   </div>
+                ))}
+
+                {/* Add Another Button */}
+                <div className="flex justify-center mt-8">
+                  <button
+                    onClick={addStudentForm}
+                    disabled={studentLimitExceeded || !canAccessPage}
+                    className={`rounded-2xl py-4 px-8 flex items-center gap-3 font-bold text-lg transition-all duration-300
+                      ${
+                        !canAccessPage || studentLimitExceeded
+                          ? theme === 'light'
+                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            : 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                          : theme === 'light'
+                          ? 'bg-indigo-600 text-white hover:shadow-2xl hover:scale-105'
+                          : 'bg-indigo-500 text-white hover:bg-indigo-600 hover:shadow-indigo-800'
+                      }`}
+                  >
+                    <Plus size={22} />
+                    {submitButtonLabel}
+                  </button>
                 </div>
-              ))}
-              {/* Add Another Button */}
-              <div className="flex justify-center mt-8">
-                <button
-                  onClick={addStudentForm}
-                  disabled={studentLimitExceeded || !canAccessPage}
-                  className={`rounded-2xl py-4 px-8 flex items-center gap-3 font-bold text-lg transition-all duration-300
-                    ${!canAccessPage || studentLimitExceeded
-                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                      : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white hover:shadow-2xl hover:scale-105'}
-                  `}
-                >
-                  <Plus size={22} />
-                  {submitButtonLabel}
-                </button>
               </div>
-            </div>
-          )}
+            )}
+
+
+
           {/* Bulk Upload */}
           {activeTab === 'bulk' && (
-            <div className="p-8">
-              <div className="flex flex-col gap-8">
-                {/* Template Download */}
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-100 rounded-3xl p-8">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-                    <button
-                      onClick={downloadExcelTemplate}
-                      className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-4 px-8 rounded-2xl flex items-center gap-3 whitespace-nowrap transition-all duration-300 hover:shadow-2xl hover:scale-105 font-bold text-lg"
-                    >
-                      <Download size={22} />
-                      Download Template
-                    </button>
-                    <div>
-                      <p className="text-xl font-bold text-gray-800 mb-2">Start with our template</p>
-                      <p className="text-gray-600">Download and fill out this template for bulk student uploads</p>
-                    </div>
-                  </div>
-                </div>
+              <div className="p-8">
+                <div className="flex flex-col gap-8">
 
-                {/* File Upload Area */}
-                {/* File Upload Area */}
-                <div className="bg-white border-2 border-gray-200 rounded-3xl p-8 shadow-lg">
-                  <div className="text-center mb-6">
-                    <div className="flex items-center justify-center gap-3 mb-4">
-                      <div className="bg-green-100 p-3 rounded-2xl">
-                        <Upload className="w-6 h-6 text-green-600" />
+                  {/* Template Download */}
+                  <div className={`rounded-3xl p-8 border-2 ${theme === 'light' 
+                    ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-100' 
+                    : 'bg-gray-700 border-gray-600'}`}>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+                      <button
+                        onClick={downloadExcelTemplate}
+                        className={`py-4 px-8 rounded-2xl flex items-center gap-3 whitespace-nowrap font-bold text-lg transition-all duration-300 hover:shadow-2xl hover:scale-105
+                          ${theme === 'light'
+                            ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700'
+                            : 'bg-indigo-400 text-gray-700'}
+                        `}
+                      >
+                        <Download size={22} />
+                        Download Template
+                      </button>
+                      <div>
+                        <p className={`text-xl font-bold mb-2 ${theme === 'light' ? 'text-gray-800' : 'text-white'}`}>
+                          Start with our template
+                        </p>
+                        <p className={theme === 'light' ? 'text-gray-600' : 'text-gray-300'}>
+                          Download and fill out this template for bulk student uploads
+                        </p>
                       </div>
-                      <h3 className="text-2xl font-black text-gray-800">Upload Excel File</h3>
                     </div>
-                    <p className="text-gray-600 text-lg">Select your Excel file to upload student data</p>
                   </div>
 
-                  <div className="flex flex-col items-center gap-6">
-                    <input
-                      type="file"
-                      id="excel-upload"
-                      accept=".xlsx,.xls"
-                      onChange={handleFileUpload}
-                      className="w-full p-4 border-2 border-dashed border-gray-300 rounded-2xl text-lg font-medium hover:border-indigo-400 transition-all duration-300 cursor-pointer"
-                    />
-
-                    {excelData.length > 0 && (
-                      <div className="w-full bg-green-50 border-2 border-green-200 rounded-2xl p-6">
-                        <div className="flex items-center gap-3 mb-4">
-                          <CheckCircle className="w-6 h-6 text-green-600" />
-                          <span className="text-lg font-bold text-green-800">
-                            {excelData.length} students loaded successfully!
-                          </span>
+                  {/* File Upload Area */}
+                  <div className={`rounded-3xl p-8 shadow-lg border-2 ${theme === 'light' 
+                    ? 'bg-white border-gray-200' 
+                    : 'bg-gray-800 border-gray-600'}`}>
+                    <div className="text-center mb-6">
+                      <div className="flex items-center justify-center gap-3 mb-4">
+                        <div className={`p-3 rounded-2xl ${theme === 'light' ? 'bg-green-100' : 'bg-green-900'}`}>
+                          <Upload className="w-6 h-6 text-green-600" />
                         </div>
-                        <div className="max-h-60 overflow-y-auto">
-                          <table className="w-full text-sm">
-                            <thead>
-                              <tr className="border-b border-green-200">
-                                <th className="text-left p-2 font-bold text-green-800">Name</th>
-                                <th className="text-left p-2 font-bold text-green-800">Email</th>
-                                <th className="text-left p-2 font-bold text-green-800">Phone</th>
-                                <th className="text-left p-2 font-bold text-green-800">Gender</th>
-                                {((excelData.length + Total_students) > Creation_limit) && (
-                                  <th className="text-left p-2 font-bold text-green-800">Actions</th>
-                                )}
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {excelData.map((student, idx) => (
-                                <tr key={idx} className="border-b border-green-100">
-                                  <td className="p-2 text-green-700">{student.fname} {student.lname}</td>
-                                  <td className="p-2 text-green-700">{student.email}</td>
-                                  <td className="p-2 text-green-700">{student.number}</td>
-                                  <td className="p-2 text-green-700">{student.gender}</td>
-                                  {((excelData.length + Total_students) > Creation_limit) && (
-                                    <td className="p-2">
-                                      <button
-                                        onClick={() => {
-                                          const updatedExcelData = excelData.filter((_, i) => i !== idx);
-                                          setExcelData(updatedExcelData);
-                                        }}
+                        <h3 className={`text-2xl font-black ${theme === 'light' ? 'text-gray-800' : 'text-white'}`}>
+                          Upload Excel File
+                        </h3>
+                      </div>
+                      <p className={`text-lg ${theme === 'light' ? 'text-gray-600' : 'text-gray-300'}`}>
+                        Select your Excel file to upload student data
+                      </p>
+                    </div>
 
-                                      >
-                                        <Trash2 className="w-5 h-5 text-red-500 hover:text-red-700 transition-all duration-300" />
-                                      </button>
-                                    </td>
+                    <div className="flex flex-col items-center gap-6">
+                      <input
+                        type="file"
+                        id="excel-upload"
+                        accept=".xlsx,.xls"
+                        onChange={handleFileUpload}
+                        className={`w-full p-4 text-lg font-medium rounded-2xl border-2 border-dashed transition-all duration-300 cursor-pointer
+                          ${theme === 'light'
+                            ? 'border-gray-300 hover:border-indigo-400 text-gray-800'
+                            : 'border-gray-500 hover:border-indigo-400 text-indigo-100 bg-gray-900'}`}
+                      />
+
+                      {excelData.length > 0 && (
+                        <div className={`w-full rounded-2xl p-6 border-2 ${theme === 'light'
+                          ? 'bg-green-50 border-green-200'
+                          : 'bg-green-950 border-green-700'}`}>
+                          <div className="flex items-center gap-3 mb-4">
+                            <CheckCircle className="w-6 h-6 text-green-600" />
+                            <span className={`text-lg font-bold ${theme === 'light' ? 'text-green-800' : 'text-green-300'}`}>
+                              {excelData.length} students loaded successfully!
+                            </span>
+                          </div>
+
+                          <div className="max-h-60 overflow-y-auto">
+                            <table className="w-full text-sm">
+                              <thead>
+                                <tr className={`border-b ${theme === 'light' ? 'border-green-200' : 'border-green-600'}`}>
+                                  <th className={`text-left p-2 font-bold ${theme === 'light' ? 'text-green-800' : 'text-green-300'}`}>Name</th>
+                                  <th className={`text-left p-2 font-bold ${theme === 'light' ? 'text-green-800' : 'text-green-300'}`}>Email</th>
+                                  <th className={`text-left p-2 font-bold ${theme === 'light' ? 'text-green-800' : 'text-green-300'}`}>Phone</th>
+                                  <th className={`text-left p-2 font-bold ${theme === 'light' ? 'text-green-800' : 'text-green-300'}`}>Gender</th>
+                                  {(excelData.length + Total_students > Creation_limit) && (
+                                    <th className={`text-left p-2 font-bold ${theme === 'light' ? 'text-green-800' : 'text-green-300'}`}>Actions</th>
                                   )}
                                 </tr>
-                              ))}
-                            </tbody>
-                          </table>
+                              </thead>
+                              <tbody>
+                                {excelData.map((student, idx) => (
+                                  <tr key={idx} className={`border-b ${theme === 'light' ? 'border-green-100' : 'border-green-700'}`}>
+                                    <td className={`p-2 ${theme === 'light' ? 'text-green-700' : 'text-green-200'}`}>{student.fname} {student.lname}</td>
+                                    <td className={`p-2 ${theme === 'light' ? 'text-green-700' : 'text-green-200'}`}>{student.email}</td>
+                                    <td className={`p-2 ${theme === 'light' ? 'text-green-700' : 'text-green-200'}`}>{student.number}</td>
+                                    <td className={`p-2 ${theme === 'light' ? 'text-green-700' : 'text-green-200'}`}>{student.gender}</td>
+                                    {(excelData.length + Total_students > Creation_limit) && (
+                                      <td className="p-2">
+                                        <button
+                                          onClick={() => {
+                                            const updatedExcelData = excelData.filter((_, i) => i !== idx);
+                                            setExcelData(updatedExcelData);
+                                          }}
+                                        >
+                                          <Trash2 className="w-5 h-5 text-red-500 hover:text-red-700 transition-all duration-300" />
+                                        </button>
+                                      </td>
+                                    )}
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
                         </div>
-                      </div>
-                    )}
-                    {(excelData.length + Total_students > Creation_limit) && (
-                      <div className="w-full bg-red-50 border-2 border-red-200 rounded-2xl p-6">
-                        <div className="flex items-center gap-3 mb-4">
-                          <AlertTriangle className="w-6 h-6 text-red-600" />
-                          <span className="text-lg font-bold text-red-800">
-                            You've reached your limit of {Creation_limit} students. Please upgrade your plan to add more
-                          </span>
-                        </div>
-                        <p className="text-red-700">You can only add {Creation_limit - Total_students} more students.</p>
-                      </div>
-                    )}
+                      )}
 
+                      {(excelData.length + Total_students > Creation_limit) && (
+                        <div className={`w-full rounded-2xl p-6 border-2 ${theme === 'light'
+                          ? 'bg-red-50 border-red-200'
+                          : 'bg-red-900 border-red-600'}`}>
+                          <div className="flex items-center gap-3 mb-4">
+                            <AlertTriangle className="w-6 h-6 text-red-600" />
+                            <span className={`text-lg font-bold ${theme === 'light' ? 'text-red-800' : 'text-red-300'}`}>
+                              You've reached your limit of {Creation_limit} students. Please upgrade your plan to add more
+                            </span>
+                          </div>
+                          <p className={theme === 'light' ? 'text-red-700' : 'text-red-400'}>
+                            You can only add {Creation_limit - Total_students} more students.
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+
           {/* Import from Batch */}
           {activeTab === 'import' && (
             <div className="p-8">
               <div className="flex flex-col gap-8">
+
                 {/* Batch Selection for Import */}
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-100 rounded-3xl p-8">
+                <div className={`rounded-3xl p-8 border-2 ${theme === 'light' 
+                  ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-100' 
+                  : 'bg-gray-700 border-gray-600'}`}>
                   <div className="flex items-center gap-4 mb-6">
-                    <div className="bg-blue-100 p-3 rounded-2xl">
+                    <div className={`${theme === 'light' ? 'bg-blue-100' : 'bg-blue-900'} p-3 rounded-2xl`}>
                       <FileDown className="w-6 h-6 text-blue-600" />
                     </div>
-                    <h3 className="text-2xl font-black text-gray-800">Import Students from Another Batch</h3>
+                    <h3 className={`text-2xl font-black ${theme === 'light' ? 'text-gray-800' : 'text-white'}`}>
+                      Import Students from Another Batch
+                    </h3>
                   </div>
 
                   <div className="flex flex-col md:flex-row md:items-center gap-4">
-                    <span className="text-gray-700 font-bold whitespace-nowrap text-lg">Source Batch</span>
+                    <span className={`font-bold whitespace-nowrap text-lg ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>Source Batch</span>
                     <select
                       value={importBatch}
                       onChange={(e) => setImportBatch(e.target.value)}
-                      className="flex-grow bg-white border-2 border-gray-200 rounded-2xl px-6 py-4 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-400 transition-all duration-300 font-medium text-lg"
+                      className={`flex-grow rounded-2xl px-6 py-4 border-2 transition-all duration-300 font-medium text-lg focus:outline-none focus:ring-4
+                        ${theme === 'light'
+                          ? 'bg-white border-gray-200 text-gray-800 focus:ring-blue-200 focus:border-blue-400'
+                          : 'bg-gray-800 border-gray-600 text-indigo-100 placeholder:text-gray-400 focus:ring-indigo-300 focus:border-indigo-500'}
+                      `}
                     >
                       <option value="">Select source batch</option>
                       {batches.filter(b => b.id !== batch).map((batch, idx) => (
                         <option key={idx} value={batch.id}>{batch.name}</option>
                       ))}
                     </select>
+
                     <button
                       onClick={handleImportedStudents}
                       disabled={!importBatch}
-                      className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-500 text-white py-4 px-8 rounded-2xl flex items-center gap-3 whitespace-nowrap transition-all duration-300 hover:shadow-2xl hover:scale-105 font-bold text-lg disabled:cursor-not-allowed"
+                      className={`py-4 px-8 rounded-2xl flex items-center gap-3 whitespace-nowrap font-bold text-lg transition-all duration-300 hover:shadow-2xl hover:scale-105 disabled:cursor-not-allowed
+                        ${!importBatch
+                          ? (theme === 'light'
+                              ? 'from-gray-400 to-gray-500 text-white bg-gradient-to-r'
+                              : 'from-gray-700 to-gray-600 text-gray-300 bg-gradient-to-r')
+                          : (theme === 'light'
+                              ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white'
+                              : 'bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white')}
+                      `}
                     >
                       <RefreshCcw size={22} />
                       Load Students
@@ -772,10 +807,12 @@ const AddStudent = () => {
 
                 {/* Imported Students Display */}
                 {importedStudents.length > 0 && (
-                  <div className="bg-white border-2 border-gray-200 rounded-3xl p-8 shadow-lg">
+                  <div className={`rounded-3xl p-8 shadow-lg border-2 ${theme === 'light'
+                    ? 'bg-white border-gray-200'
+                    : 'bg-gray-800 border-gray-600'}`}>
                     <div className="flex items-center gap-3 mb-6">
                       <CheckCircle className="w-6 h-6 text-green-600" />
-                      <h3 className="text-2xl font-black text-gray-800">
+                      <h3 className={`text-2xl font-black ${theme === 'light' ? 'text-gray-800' : 'text-white'}`}>
                         {importedStudents.length} Students Ready to Import
                       </h3>
                     </div>
@@ -783,23 +820,26 @@ const AddStudent = () => {
                     <div className="max-h-80 overflow-y-auto">
                       <div className="grid gap-4">
                         {importedStudents.map((student, idx) => (
-                          <div key={idx} className="bg-gradient-to-r from-gray-50 to-white border-2 border-gray-100 rounded-2xl p-6 hover:shadow-lg transition-all duration-300">
+                          <div key={idx} className={`rounded-2xl p-6 transition-all duration-300 border-2 hover:shadow-lg
+                            ${theme === 'light'
+                              ? 'bg-gradient-to-r from-gray-50 to-white border-gray-100'
+                              : 'bg-gradient-to-r from-gray-700 to-gray-800 border-gray-600'}`}>
                             <div className="grid md:grid-cols-4 gap-4">
                               <div>
-                                <span className="text-sm font-bold text-gray-500 uppercase tracking-wide">Name</span>
-                                <p className="text-lg font-bold text-gray-800">{student.name}</p>
+                                <span className={`text-sm font-bold uppercase tracking-wide ${theme === 'light' ? 'text-gray-500' : 'text-indigo-300'}`}>Name</span>
+                                <p className={`text-lg font-bold ${theme === 'light' ? 'text-gray-800' : 'text-white'}`}>{student.name}</p>
                               </div>
                               <div>
-                                <span className="text-sm font-bold text-gray-500 uppercase tracking-wide">Email</span>
-                                <p className="text-lg text-gray-700">{student.email}</p>
+                                <span className={`text-sm font-bold uppercase tracking-wide ${theme === 'light' ? 'text-gray-500' : 'text-indigo-300'}`}>Email</span>
+                                <p className={`text-lg ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>{student.email}</p>
                               </div>
                               <div>
-                                <span className="text-sm font-bold text-gray-500 uppercase tracking-wide">Phone</span>
-                                <p className="text-lg text-gray-700">{student.phone}</p>
+                                <span className={`text-sm font-bold uppercase tracking-wide ${theme === 'light' ? 'text-gray-500' : 'text-indigo-300'}`}>Phone</span>
+                                <p className={`text-lg ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>{student.phone}</p>
                               </div>
                               <div>
-                                <span className="text-sm font-bold text-gray-500 uppercase tracking-wide">Gender</span>
-                                <p className="text-lg text-gray-700">{student.gender}</p>
+                                <span className={`text-sm font-bold uppercase tracking-wide ${theme === 'light' ? 'text-gray-500' : 'text-indigo-300'}`}>Gender</span>
+                                <p className={`text-lg ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>{student.gender}</p>
                               </div>
                             </div>
                           </div>
@@ -811,23 +851,31 @@ const AddStudent = () => {
               </div>
             </div>
           )}
+
         </div>
         {/* Submit Button */}
         <div className="text-center mb-12">
           <button
             onClick={handleSubmit}
             disabled={!canSubmit}
-            className={`text-white py-6 px-12 rounded-3xl text-2xl font-black transition-all duration-300 hover:shadow-2xl hover:scale-105 disabled:cursor-not-allowed disabled:transform-none
+            className={`py-6 px-12 rounded-3xl text-2xl font-black transition-all duration-300 hover:shadow-2xl hover:scale-105 disabled:cursor-not-allowed disabled:transform-none
               ${!canSubmit
-                ? 'bg-gray-300 cursor-not-allowed'
-                : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 hover:scale-105 hover:shadow-2xl'}
+                ? (theme === 'light'
+                    ? 'bg-gray-300 text-gray-500'
+                    : 'bg-gray-700 text-gray-400')
+                : (theme === 'light'
+                    ? 'text-white bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800'
+                    : 'text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700')}
             `}
           >
-            <span>
-              {canSubmit ? submitButtonLabel : (<span className="text-red-600">{submitButtonLabel}</span>)}
-            </span>
+            {canSubmit ? (
+              <span>{submitButtonLabel}</span>
+            ) : (
+              <span className="text-red-600">{submitButtonLabel}</span>
+            )}
           </button>
         </div>
+
       </div>
     </div>
   )

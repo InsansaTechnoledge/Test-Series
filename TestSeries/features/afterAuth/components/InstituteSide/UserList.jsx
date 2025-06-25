@@ -95,9 +95,16 @@ const UserList = () => {
           className="relative z-10 px-6 py-24 text-center bg-cover bg-center bg-no-repeat rounded-xl"
           style={{ backgroundImage: `url(${Banner})` }}
         >
-               
+            <div className={`absolute inset-0 ${
+            theme === 'dark' 
+                ? 'bg-gray-900/60' 
+                : 'bg-black/20'
+            }`}>
+
+            </div>
+                
                 <div className="inline-flex items-center space-x-3 mb-4">
-            <h1 className="text-6xl md:text-7xl font-black text-white tracking-tight">
+            <h1 className="text-6xl z-10 md:text-7xl font-black text-white tracking-tight">
             All Users
             </h1>
          
