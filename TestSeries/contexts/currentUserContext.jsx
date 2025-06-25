@@ -28,7 +28,7 @@ export const UserProvider = ({ children }) => {
     }
 
     const featureKeys = matchedKey
-      ? rawMap[matchedKey] 
+      ? rawMap[matchedKey]
       : rawMap[keyFromPageOrAction];
 
     if (!featureKeys) return false;
@@ -57,10 +57,55 @@ export const UserProvider = ({ children }) => {
     return rawMap[location] || null;
   };
 
+  // const getRoleFeatureKeyFromLocation = (location) => {
+  //   const rawMap = JSON.parse(import.meta.env.VITE_ROLE_FEATURE_MAP || '{}');
+  //   return rawMap[location] || null;
+  // };
+
+   const hasRoleAccess = ({ keyFromPageOrAction, location }) => {
+
+    const rawMap = JSON.parse(import.meta.env.VITE_ROLE_FEATURE_MAP || '{}');
+    let matchedKey = null;
+
+    for (const routePattern in rawMap) {
+      const matcher = match(routePattern, { decode: decodeURIComponent });
+      const matched = matcher(location) || matcher(keyFromPageOrAction);
+      if (matched) {
+        matchedKey = routePattern;
+        break;
+      }
+    }
+
+
+    const requiredFeatureKeys = matchedKey
+      ? rawMap[matchedKey]
+      : rawMap[keyFromPageOrAction];
+
+    if (!requiredFeatureKeys) return false;
+
+    const featureList = Array.isArray(requiredFeatureKeys)
+      ? requiredFeatureKeys
+      : [requiredFeatureKeys];
+
+    for (const feature of featureList) {
+      const [category, action] = feature.split(':');
+
+      const status = user.roleFeatures?.[category]?.[action];
+      console.log(`Checking role access for feature: ${feature}, status: ${status}`);
+
+      if (status !== 'active') {
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+
 
 
   return (
-    <currentUserContext.Provider value={{ user, setUser, isUserLoggedOut, setIsUserLoggedOut, hasPlanFeature, getFeatureKeyFromLocation }}>
+    <currentUserContext.Provider value={{ user, setUser, isUserLoggedOut, setIsUserLoggedOut, hasPlanFeature, getFeatureKeyFromLocation ,hasRoleAccess}}>
       {children}
     </currentUserContext.Provider>
   );
