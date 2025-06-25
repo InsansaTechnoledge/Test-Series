@@ -87,18 +87,10 @@ export const UserProvider = ({ children }) => {
       ? requiredFeatureKeys
       : [requiredFeatureKeys];
 
-    for (const feature of featureList) {
-      const [category, action] = feature.split(':');
-
-      const status = user.roleFeatures?.[category]?.[action];
-      console.log(`Checking role access for feature: ${feature}, status: ${status}`);
-
-      if (status !== 'active') {
-        return false;
-      }
-    }
-
-    return true;
+   return featureList.some(feature => {
+    const [category, action] = feature.split(':');
+    return user?.roleFeatures?.[category]?.[action] === 'active';
+  });
   };
 
 

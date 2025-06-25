@@ -26,10 +26,12 @@ const PageAccessGuard = ({ children }) => {
       keyFromPageOrAction: null,
       location: location.pathname
     });
+    console.log("hasPlanAccess", hasPlanAccess);
 
 
     if (user.role === 'organization') {
       canAccess = hasPlanAccess;
+      console.log("canAccess", canAccess);
       return (
         <PageAccessContext.Provider value={canAccess}>
           {children}
@@ -42,29 +44,17 @@ const PageAccessGuard = ({ children }) => {
         location: location.pathname
       });
 
+      console.log("hasRoleBasedAccess", hasRoleBasedAccess);
       canAccess = hasPlanAccess && hasRoleBasedAccess;
+      console.log("canAccess", canAccess);
 
-      if (canAccess) {
+
         return (
           <PageAccessContext.Provider value={canAccess}>
             {children}
           </PageAccessContext.Provider>
         );
-      }
-      else {
-        return (
-          <>
-            {
-              ShowLogoutModal && (
-                <LogoutModal setShowLogoutModal={setShowLogoutModal} />
-              )
-            }
-            <Navbar setShowLogoutModal={setShowLogoutModal} />
-
-            <AccessDenied />
-          </>
-        );
-      }
+      
 
     }
 

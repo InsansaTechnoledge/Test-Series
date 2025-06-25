@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, Settings, ChevronDown, Menu, X, Sun, Moon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { categories } from '../../data/SiddeBarData';
-import { controls } from '../../data/SiddeBarData';
 import { useUser } from '../../../../contexts/currentUserContext';
 // import logo from '../../../../assests/Landing/Navbar/evalvo logo blue 2.svg'
 import logo from '../../../../assests/Logo/Frame 8.svg'
@@ -11,6 +9,7 @@ import logoDark from '../../../../assests/Logo/Frame 15.svg'
 import ThemeToggleButton from '../../../../components/ThemeToggleButton/ThemeToggleButton';
 import { useTheme } from '../../../../hooks/useTheme.jsx';
 import { getThemeClasses } from '../../../constants/Theme/ThemeClasses.js';
+import SideBarDataHook from '../../data/sideBarDataHook.jsx';
 
 // Epic Theme Slider Component
 const EpicThemeSlider = ({ theme, onToggle }) => {
@@ -75,6 +74,7 @@ const Navbar = ({setShowLogoutModal}) => {
   const searchResultsRef = useRef(null);
   const { user } = useUser();
   const navigate = useNavigate();
+  const { controls, categories } = SideBarDataHook();
  
 
   // Search functionality (unchanged)
