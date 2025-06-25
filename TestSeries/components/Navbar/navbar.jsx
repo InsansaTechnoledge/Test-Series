@@ -22,8 +22,8 @@ const Navbar = () => {
      
       <div className="hidden md:flex space-x-8 text-gray-700">
         <button onClick={() => navigate('/')} className="px-4 py-2 rounded-md hover:bg-indigo-100 hover:text-blue-600 transition duration-200">Home</button> 
-        <button disabled onClick={() => navigate('/about')} className="px-4 py-2 rounded-md cursor-not-allowed hover:bg-indigo-100 hover:text-blue-600 transition duration-200">About</button>        
-        <button disabled onClick={() => navigate('/contact')} className="px-4 py-2 cursor-not-allowed rounded-md hover:bg-indigo-100 hover:text-blue-600 transition duration-200">Contact</button>        
+        <button onClick={() => navigate('/about')} className="px-4 py-2 rounded-md cursor-pointer hover:bg-indigo-100 hover:text-blue-600 transition duration-200">About</button>        
+        <button  onClick={() => navigate('/contact')} className="px-4 py-2 cursor-pointer rounded-md hover:bg-indigo-100 hover:text-blue-600 transition duration-200">Contact</button>        
         
       </div>
 

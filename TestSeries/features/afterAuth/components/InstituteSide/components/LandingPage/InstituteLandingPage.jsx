@@ -15,8 +15,8 @@ const InstituteLandingPage = () => {
   const {batches,batchMap} = useCachedBatches();
 
   const {examBatchAnalytics}=useExamBatchAnalytics(); 
-  console.log(" Exam:", examBatchAnalytics);
-  console.log(" Batch map",    batches);
+  console.log(" Exam:",examBatchAnalytics);
+  console.log(" Batch map", batches);
 
   // if (!user?.planPurchased) {
   //   return (
