@@ -244,7 +244,7 @@ const CreateExam = () => {
 
                 </div>
 
-                <div className="flex-1 shadow-lg rounded-xl rounded-lg p-6 bg-white hover:shadow-md transition">
+                <div className="flex-1 shadow-lg rounded-lg p-6 bg-white hover:shadow-md transition">
                   <h3 className="text-lg font-medium mb-2">Option 2: Bulk Upload</h3>
                   <p className="text-gray-600 mb-4">Upload multiple questions at once using an Excel spreadsheet.</p>
                   <BulkUpload setQuestions={setQuestions} organizationId={examDetails.organization_id} />

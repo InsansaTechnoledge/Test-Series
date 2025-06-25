@@ -16,6 +16,7 @@ import { usePageAccess } from '../../../../contexts/PageAccessContext';
 import useLimitAccess from '../../../../hooks/useLimitAccess';
 import { useLocation } from 'react-router-dom';
 import { useCachedOrganization } from '../../../../hooks/useCachedOrganization';
+import { useCachedUser } from '../../../../hooks/useCachedUser';
 
 
 export default function FeatureBasedRoleGroups() {
@@ -24,7 +25,7 @@ export default function FeatureBasedRoleGroups() {
   const [showDeleteRoleGroupModal, setShowDeleteRoleGroupModal] = useState(false);
   const [roleGroupToDelete, setRoleGroupToDelete] = useState();
   const [error, setError] = useState('');
-
+  const {userMap}=useCachedUser();
   const canAccessPage = usePageAccess();
   const queryClient = useQueryClient();
 
@@ -723,6 +724,10 @@ export default function FeatureBasedRoleGroups() {
                   {/* Features Count */}
                   <div className="mt-3 text-sm text-indigo-600 font-semibold">
                     {Array.isArray(group.features) ? group.features.length : 0} features assigned
+                  </div>
+
+                  <div className="mt-4 text-sm text-indigo-500 ">
+                    <span>Created By : {group.createdBy.id === user._id ? user.name : userMap[group.createdBy.id].name}</span>  
                   </div>
 
                   {/* Inline Edit Form */}
