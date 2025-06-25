@@ -12,13 +12,15 @@ import { usePageAccess } from '../../../../contexts/PageAccessContext';
 import useLimitAccess from '../../../../hooks/useLimitAccess';
 import { useLocation } from 'react-router-dom';
 import { useCachedOrganization } from '../../../../hooks/useCachedOrganization';
-
+import { useTheme } from '../../../../hooks/useTheme';
 const CreateBatch = () => {
   const [formData, setFormData] = useState({ batchMode: 'only-subjects' });
   const [selectedFaculties, setSelectedFaculties] = useState([]);
   const [faculty, setFaculty] = useState([])
   // Add state for dynamic batch count tracking
   const [createdBatchesCount, setCreatedBatchesCount] = useState(0);
+
+  const {theme} = useTheme();
   
   const { users, isLoading } = useCachedUser();
   const { roleMap } = useCachedRoleGroup();
@@ -197,7 +199,7 @@ const CreateBatch = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-indigo-50">
+    <div className="min-h-screen">
 
       {/* Hero Header */}
       <div className="relative overflow-hidden">
@@ -224,10 +226,10 @@ const CreateBatch = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
 
           {/* limits section */}
-          <div className="bg-white rounded-3xl p-6 shadow-xl border-l-4 border-indigo-600 transform hover:scale-105 transition-all duration-300">
+          <div className={`${theme === 'light' ? 'bg-white' : 'bg-gray-800'}  rounded-3xl p-6 shadow-xl border-l-4 border-indigo-600 transform hover:scale-105 transition-all duration-300`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Available Limit</p>
+                <p className={`text-sm font-semibold ${theme === 'light' ? 'text-gray-600' : 'text-gray-200' }  uppercase tracking-wide`}>Available Limit</p>
                 <p className={`text-2xl font-black ${Available_limit > 0 ? "text-green-500" : "text-red-500"} capitalize`}>
                   {Available_limit}
                 </p>
@@ -238,44 +240,44 @@ const CreateBatch = () => {
                   </p>
                 )}
               </div>
-              <div className="bg-indigo-100 p-3 rounded-2xl">
+              <div className={` ${theme === 'light' ? 'bg-indigo-100' : 'bg-indigo-400'} p-3 rounded-2xl`}>
                 {/* <Target className="w-8 h-8 text-indigo-600" /> */}
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-3xl p-6 shadow-xl border-l-4 border-indigo-600 transform hover:scale-105 transition-all duration-300">
+          <div className={`${theme === 'light' ? 'bg-white' : 'bg-gray-800'}  rounded-3xl p-6 shadow-xl border-l-4 border-indigo-600 transform hover:scale-105 transition-all duration-300`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Batch Type</p>
-                <p className="text-2xl font-black text-indigo-600 capitalize">{formData.batchMode?.replace('-', ' ')}</p>
+                <p className={`text-sm font-semibold   ${theme === 'light' ? 'text-gray-600' : 'text-gray-200' } uppercase tracking-wide`}>Batch Type</p>
+                <p className={`text-2xl font-black ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-200'} capitalize`}>{formData.batchMode?.replace('-', ' ')}</p>
               </div>
-              <div className="bg-indigo-100 p-3 rounded-2xl">
+              <div className={` ${theme === 'light' ? 'bg-indigo-100' : 'bg-indigo-400'} p-3 rounded-2xl`}>
                 {/* <Target className="w-8 h-8 text-indigo-600" /> */}
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-3xl p-6 shadow-xl border-l-4 border-gray-600 transform hover:scale-105 transition-all duration-300">
+          <div className={`${theme === 'light' ? 'bg-white' : 'bg-gray-800'}  rounded-3xl p-6 shadow-xl border-l-4 border-indigo-600 transform hover:scale-105 transition-all duration-300`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Subjects Added</p>
-                <p className="text-4xl font-black text-gray-600">{formData.subjects?.length || 0}</p>
+              <p className={`text-sm font-semibold   ${theme === 'light' ? 'text-gray-600' : 'text-gray-200' } uppercase tracking-wide`}>Subjects Added</p>
+              <p className={`text-2xl font-black ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-200'} capitalize`}>{formData.subjects?.length || 0}</p>
               </div>
-              <div className="bg-gray-100 p-3 rounded-2xl">
-                {/* <BookOpen className="w-8 h-8 text-gray-600" /> */}
+              <div className={` ${theme === 'light' ? 'bg-indigo-100' : 'bg-indigo-400'} p-3 rounded-2xl`}>
+                {/* <Target className="w-8 h-8 text-indigo-600" /> */}
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-3xl p-6 shadow-xl border-l-4 border-indigo-600 transform hover:scale-105 transition-all duration-300">
+          <div className={`${theme === 'light' ? 'bg-white' : 'bg-gray-800'}  rounded-3xl p-6 shadow-xl border-l-4 border-indigo-600 transform hover:scale-105 transition-all duration-300`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Faculty Selected</p>
-                <p className="text-4xl font-black text-indigo-600">{selectedFaculties.length}</p>
+              <p className={`text-sm font-semibold   ${theme === 'light' ? 'text-gray-600' : 'text-gray-200' } uppercase tracking-wide`}>Faculty Selected</p>
+              <p className={`text-2xl font-black ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-200'} capitalize`}>{selectedFaculties.length}</p>
               </div>
-              <div className="bg-indigo-100 p-3 rounded-2xl">
-                {/* <Users className="w-8 h-8 text-indigo-600" /> */}
+              <div className={` ${theme === 'light' ? 'bg-indigo-100' : 'bg-indigo-400'} p-3 rounded-2xl`}>
+                {/* <Target className="w-8 h-8 text-indigo-600" /> */}
               </div>
             </div>
           </div>
@@ -292,14 +294,14 @@ const CreateBatch = () => {
         
         {/* Dynamic limit warning */}
         {Available_limit <= 0 && (
-           <p className="mt-4 text-center text-sm text-red-600 bg-red-100 border border-red-200 px-4 py-2 rounded-xl shadow-sm backdrop-blur-sm">
+           <p className={`mt-4 text-center ${theme === 'light' ? 'bg-red-100 border text-red-600 border-red-200' : 'bg-red-600 text-gray-100'} text-sm  px-4 py-2 rounded-xl shadow-sm backdrop-blur-sm`}>
           You've reached your batch creation limit. <br className="sm:hidden" />
            <span className="font-medium">Upgrade your plan</span> to continue.
          </p>
         )}
         
         {/* Main Form Card */}
-        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100 mt-5">
+        <div className={`${theme === 'light' ? ' border border-gray-100' : 'bg-gray-800'} rounded-3xl shadow-2xl overflow-hidden mt-5`}>
 
           {/* Batch Type Selection */}
           <div className="p-6  bg-gradient-to-r from-indigo-500 to-indigo-400 text-white relative overflow-hidden">
@@ -310,7 +312,7 @@ const CreateBatch = () => {
                 <span>Select Batch Type</span>
               </h2>
               <div className="flex gap-6">
-                <label className="group flex items-center gap-3 cursor-pointer bg-white/20 backdrop-blur-sm px-6 py-4 rounded-2xl hover:bg-white/30 transition-all duration-300 hover:scale-105">
+                <label className={`group flex items-center gap-3 cursor-pointer bg-white/20 backdrop-blur-sm px-6 py-4 rounded-2xl hover:bg-white/30 transition-all duration-300 hover:scale-105`}>
                   <input
                     type="radio"
                     name="batchMode"
@@ -323,7 +325,7 @@ const CreateBatch = () => {
                   <span className="text-lg font-bold">Only Subjects</span>
                   {/* <BookOpen className="w-5 h-5 group-hover:animate-pulse" /> */}
                 </label>
-                <label className="group flex items-center gap-3 cursor-pointer bg-white/20 backdrop-blur-sm px-6 py-4 rounded-2xl hover:bg-white/30 transition-all duration-300 hover:scale-105">
+                <label className={`group flex items-center gap-3 cursor-pointer bg-white/20 backdrop-blur-sm px-6 py-4 rounded-2xl hover:bg-white/30 transition-all duration-300 hover:scale-105`}>
                   <input
                     type="radio"
                     name="batchMode"
@@ -376,7 +378,7 @@ const CreateBatch = () => {
 
                 {/* Batch Name */}
                 <div className="group">
-                  <label htmlFor="name" className="flex items-center gap-2 text-gray-700 font-bold mb-3 text-lg">
+                  <label htmlFor="name" className={`flex items-center gap-2 ${theme === 'light' ? 'text-gray-700' : 'text-indigo-100'}  font-bold mb-3 text-lg`}>
                     {/* <Target className="w-5 h-5 text-indigo-600" /> */}
                     Batch Name <span className="text-red-500">*</span>
                   </label>
@@ -386,15 +388,15 @@ const CreateBatch = () => {
                     name="name"
                     value={formData.name?.toLowerCase() || ''}
                     onChange={(e) => onChangeHandler('name', e.target.value)}
-                    className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 text-lg font-medium bg-gray-50 group-hover:bg-white"
+                    className={`w-full p-4 ${theme === 'light' ? 'border-2 border-gray-200 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300  bg-gray-50 group-hover:bg-white' : 'border-2 border-indigo-400 transition-all duration-300  bg-indigo-100 group-hover:bg-indigo-50 text-gray-800'} rounded-2xl  text-lg font-medium`}
                     placeholder="Enter batch name"
                   />
                 </div>
 
                 {/* Year */}
                 <div className="group">
-                  <label htmlFor="year" className="flex items-center gap-2 text-gray-700 font-bold mb-3 text-lg">
-                    {/* <Calendar className="w-5 h-5 text-indigo-600" /> */}
+                <label htmlFor="name" className={`flex items-center gap-2 ${theme === 'light' ? 'text-gray-700' : 'text-indigo-100'}  font-bold mb-3 text-lg`}>
+                {/* <Calendar className="w-5 h-5 text-indigo-600" /> */}
                     Academic Year <span className="text-red-500">*</span>
                   </label>
                   <select
@@ -402,7 +404,7 @@ const CreateBatch = () => {
                     name="year"
                     value={formData.year || ''}
                     onChange={(e) => onChangeHandler('year', parseInt(e.target.value))}
-                    className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 text-lg font-medium bg-gray-50 group-hover:bg-white"
+                    className={`w-full p-4 ${theme === 'light' ? 'border-2 border-gray-200 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300  bg-gray-50 group-hover:bg-white' : 'border-2 border-indigo-400 transition-all duration-300  bg-indigo-100 group-hover:bg-indigo-50 text-gray-800'} rounded-2xl  text-lg font-medium`}
                   >
                     <option value="">Select academic year</option>
                     {getYearOptions().map((year) => (
@@ -411,11 +413,11 @@ const CreateBatch = () => {
                   </select>
                 </div>
 
-                {/* Syllabus File Upload */}
+                {/* Syllabus File Upload */}               
                 {formData.batchMode === 'subjects-chapters' && (
                   <div className="group">
-                    <label className="flex items-center gap-2 text-gray-700 font-bold mb-3 text-lg">
-                      {/* <FileSpreadsheet className="w-5 h-5 text-indigo-600" /> */}
+                    <label htmlFor="syllabus" className={`flex items-center gap-2 ${theme === 'light' ? 'text-gray-700' : 'text-gray-200'}  font-bold mb-3 text-lg`}>
+                      <FileSpreadsheet className={`w-5 h-5 ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-400'}`} />
                       Syllabus File <span className="text-red-500">*</span>
                     </label>
                     <div className="w-full">
@@ -423,7 +425,9 @@ const CreateBatch = () => {
                         htmlFor="dropzone-file"
                         className={`flex flex-col items-center justify-center w-full h-40 border-3 border-dashed rounded-3xl cursor-pointer transition-all duration-300 ${formData.syllabus?.name
                           ? 'bg-green-50 border-green-300 hover:bg-green-100'
-                          : 'bg-gray-50 border-gray-300 hover:bg-gray-100 hover:border-indigo-400'
+                          : theme === 'light' 
+                            ? 'bg-gray-50 border-gray-300 hover:bg-gray-100 hover:border-indigo-400'
+                            : 'bg-gray-700 border-gray-600 hover:bg-gray-600 hover:border-indigo-400'
                           }`}
                       >
                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
@@ -434,12 +438,12 @@ const CreateBatch = () => {
                               <p className="text-sm text-green-500 mt-2 bg-green-100 px-3 py-1 rounded-full">File uploaded successfully</p>
                             </div>
                           ) : (
-                            <div className="flex flex-col items-center text-gray-500">
-                              {/* <Upload size={40} className="mb-3 animate-bounce" /> */}
+                            <div className={`flex flex-col items-center ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>
+                              <Upload size={40} className="mb-3 animate-bounce" />
                               <p className="text-lg font-bold mb-2">
-                                <span className="text-indigo-600">Click to upload</span> or drag and drop
+                                <span className={`${theme === 'light' ? 'text-indigo-600' : 'text-indigo-400'}`}>Click to upload</span> or drag and drop
                               </p>
-                              <p className="text-sm bg-gray-100 px-3 py-1 rounded-full">Excel files only (.xlsx)</p>
+                              <p className={`text-sm ${theme === 'light' ? 'bg-gray-100' : 'bg-gray-600'} px-3 py-1 rounded-full`}>Excel files only (.xlsx)</p>
                             </div>
                           )}
                         </div>
@@ -479,8 +483,8 @@ const CreateBatch = () => {
 
                 {/* Subjects */}
                 <div className="group">
-                  <label htmlFor="subjects" className="flex items-center gap-2 text-gray-700 font-bold mb-3 text-lg">
-                    {/* <BookOpen className="w-5 h-5 text-indigo-600" /> */}
+                <label htmlFor="name" className={`flex items-center gap-2 ${theme === 'light' ? 'text-gray-700' : 'text-indigo-100'}  font-bold mb-3 text-lg`}>
+                {/* <BookOpen className="w-5 h-5 text-indigo-600" /> */}
                     Subjects <span className="text-red-500">*</span>
                   </label>
                   <div className="flex gap-3">
@@ -488,7 +492,7 @@ const CreateBatch = () => {
                       type="text"
                       id="subjects"
                       name="subjects"
-                      className="flex-1 p-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 text-lg font-medium bg-gray-50 group-hover:bg-white"
+                      className={`w-full p-4 ${theme === 'light' ? 'border-2 border-gray-200 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300  bg-gray-50 group-hover:bg-white' : 'border-2 border-indigo-400 transition-all duration-300  bg-indigo-100 group-hover:bg-indigo-50 text-gray-800'} rounded-2xl  text-lg font-medium`}
                       placeholder="Enter subject name"
                     />
                     <button
@@ -513,8 +517,8 @@ const CreateBatch = () => {
                             <span className="font-bold">{subject}</span>
                             <button
                               onClick={() => deleteSubject(idx)}
-                              className="text-indigo-700 hover:text-indigo-900 transition-all duration-300 hover:rotate-90 bg-white/50 rounded-full p-1"
-                            >
+                              className={`w-full p-4 ${theme === 'light' ? 'border-2 border-gray-200 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300  bg-gray-50 group-hover:bg-white' : 'border-2 border-indigo-400 transition-all duration-300  bg-indigo-100 group-hover:bg-indigo-50 text-gray-800'} rounded-2xl  text-lg font-medium`}
+                              >
                               <X size={16} />
                             </button>
                           </div>
@@ -526,8 +530,8 @@ const CreateBatch = () => {
 
                 {/* Faculties */}
                 <div className="group">
-                  <label htmlFor="faculties" className="flex items-center gap-2 text-gray-700 font-bold mb-3 text-lg">
-                    {/* <Users className="w-5 h-5 text-indigo-600" /> */}
+                <label htmlFor="name" className={`flex items-center gap-2 ${theme === 'light' ? 'text-gray-700' : 'text-indigo-100'}  font-bold mb-3 text-lg`}>
+                {/* <Users className="w-5 h-5 text-indigo-600" /> */}
                     Faculties <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
@@ -537,7 +541,7 @@ const CreateBatch = () => {
                     <select
                       id="faculties"
                       name="faculties"
-                      className="w-full pl-12 p-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 text-lg font-medium bg-gray-50 group-hover:bg-white"
+                      className={`w-full p-4 ${theme === 'light' ? 'border-2 border-gray-200 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300  bg-gray-50 group-hover:bg-white' : 'border-2 border-indigo-400 transition-all duration-300  bg-indigo-100 group-hover:bg-indigo-50 text-gray-800'} rounded-2xl  text-lg font-medium`}
                       onChange={handleFacultySelect}
                     >
                       <option value="">Select faculty member</option>

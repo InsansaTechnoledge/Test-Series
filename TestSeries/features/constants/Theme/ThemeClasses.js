@@ -1,6 +1,6 @@
 export const getThemeClasses = (theme) => ({
     nav: theme === 'dark'
-      ? 'bg-gray-800 shadow-sm border-b border-gray-700'
+      ? 'bg-gray-950 shadow-sm border-b border-gray-700'
       : 'bg-white shadow-sm border-b border-gray-200',
   
     button: theme === 'dark'

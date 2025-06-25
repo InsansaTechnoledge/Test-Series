@@ -55,6 +55,9 @@ import FallBackPage from '../../features/auth/pages/FallBackPage';
 import FallBackPageForOrg from '../../features/afterAuth/pages/FallBackPageForOrg';
 import Loader from '../Loader/Loader';
 import YourPlanPage from '../../features/afterAuth/components/InstituteSide/components/PlanPage/YourPlanPage';
+import AboutPage from '../../features/beforeAuth/pages/AboutPage';
+import ContactPage  from "../../features/beforeAuth/pages/ContactPage"
+
 
 const PageLinks = () => {
   const { user, setUser} = useUser();
@@ -96,6 +99,8 @@ const PageLinks = () => {
         {/*Before auth Landing Routes */}
         <Route element={<BeforeAuthLayout />}>
           <Route path="/" element={<LandingRoutes />} />
+          <Route path="/about" element={<AboutPage />} /> 
+          <Route path="/contact" element={<ContactPage/>} /> 
         </Route>
 
         {/* Public Routes */}
