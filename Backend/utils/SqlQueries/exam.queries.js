@@ -192,7 +192,7 @@ export const getAnalyticsFromBatchExam=async(orgId)=>{
   .rpc('get_batch_exam_analytics', { orgid: orgId });
 
   if (error) throw error;
-  return data;
+  return data;                                           
 }
 
 

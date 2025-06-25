@@ -1,15 +1,5 @@
+import { featureKeyToMetaDataKey } from "../utils/dataMapping.util.js";
 import { APIError } from "../utils/ResponseAndError/ApiError.utils.js";
-
-const featureKeyToMetaDataKey = {
-  exam_feature: 'totalExams',
-  student_feature: 'totalStudents',
-  batch_feature: 'totalBatches',
-  role_feature: 'totalRoleGroups',
-  video_feature: 'totalVideos',
-  user_feature: 'totalUsers',
-  contest_feature: 'totalContests'
-};
-
 
 export const checkLimitAccess= (req, res, next) => {
     console.log("Checking feature access limit...");

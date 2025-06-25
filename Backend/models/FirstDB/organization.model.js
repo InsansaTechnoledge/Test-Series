@@ -3,6 +3,7 @@ import validator from 'validator';
 import bcrypt from 'bcrypt';
 import { connOne } from '../../database/MongoDB.js';
 import { getTotalBatches } from '../../controllers/SupabaseDB/batch.controllers.js';
+import { categoryToFeatureKey, featureKeyToMetaDataKey } from '../../utils/dataMapping.util.js';
 
 
 const addressSchema = new Schema({
@@ -211,22 +212,44 @@ OrganizationSchema.virtual('totalRoleGroups',{
 })
 
 
-OrganizationSchema.methods.getFullMetadata = async function () {
+OrganizationSchema.methods.getFullMetadata = async function (roleFeatures) {
+
+  const shouldReturnAll = !roleFeatures || Object.keys(roleFeatures).length === 0;
+
   await this.populate('totalStudents totalUsers totalRoleGroups');
 
   const totalBatches = await getTotalBatches(this._id.toString());
 
-  return {
+  const fullMetadata = {
     totalStudents: this.totalStudents ?? 0,
     totalUsers: this.totalUsers ?? 0,
     totalBatches: totalBatches ?? 0,
     totalExams: this.totalExams ?? 0,
-    totalRoleGroups: this.totalRoleGroups ?? 0
+    totalRoleGroups: this.totalRoleGroups ?? 0,
+    // totalVideos: this.totalVideos ?? 0,
+    // totalContests: this.totalContests ?? 0
   };
+
+  if (shouldReturnAll) {
+    return fullMetadata;
+  }
+
+  const selectedMetadata = {};
+
+  for (const category of Object.keys(roleFeatures)) {
+    const featureKey = categoryToFeatureKey[category];
+    const metaKey = featureKeyToMetaDataKey[featureKey];
+
+    if (metaKey && fullMetadata.hasOwnProperty(metaKey)) {
+      selectedMetadata[metaKey] = fullMetadata[metaKey];
+    }
+  }
+
+  return selectedMetadata;
 };
 
 
-OrganizationSchema.set('toObject', { virtuals: true });
+OrganizationSchema.set('toObject', { virtuals: false });
 OrganizationSchema.set('toJSON', { virtuals: true });
 
 

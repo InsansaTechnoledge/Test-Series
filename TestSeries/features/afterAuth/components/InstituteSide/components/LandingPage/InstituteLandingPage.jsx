@@ -34,7 +34,17 @@ const InstituteLandingPage = () => {
   //     </div>
   //   );
   // }
-
+if(user.role !== 'organization') {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="text-center p-8 bg-white rounded-2xl shadow-lg">
+        <h1 className="text-2xl font-bold text-gray-800 mb-4">hello this is user landing page</h1>
+        <p className="text-gray-600">This page is only accessible to organizations.</p>
+      </div>
+    </div>
+  );
+}
+else
   return (
     <div className="min-h-screen p-4 md:p-6">
       <div className="max-w-7xl mx-auto space-y-6">
