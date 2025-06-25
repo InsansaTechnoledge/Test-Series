@@ -21,6 +21,8 @@ const InstituteLandingPage = () => {
   const {theme} = useTheme();
   console.log(" Exam:", examBatchAnalytics);
   console.log(" Batch map",    batches);
+  console.log(" Exam:",examBatchAnalytics);
+  console.log(" Batch map", batches);
 
   // if (!user?.planPurchased) {
   //   return (

@@ -17,6 +17,9 @@ import {
   import  AdvExam from "../../../assests/Landing/SoftwareCapabilities/Advanced Exam Creation.svg"
   import  FmarkingSystem from "../../../assests/Landing/SoftwareCapabilities/Flexible Marking System.svg"
   import  AIpower from "../../../assests/Landing/SoftwareCapabilities/Al-Powered Proctoring.svg"
+  import  TExam from "../../../assests/Landing/SoftwareCapabilities/Timed Examinations.svg"
+  import  Que from "../../../assests/Landing/SoftwareCapabilities/Question Bank Management.svg"
+  import  Automated from "../../../assests/Landing/SoftwareCapabilities/Automated Grading.svg"
  
   
 // Categories
@@ -101,21 +104,21 @@ export const categories = [
     {
       title: 'Timed Examinations',
       description: 'Comprehensive timing controls with real-time monitoring',
-      icon: Clock,
+      icon: TExam,
       category: 'Examination',
       tier: 'Basic'
     },
     {
       title: 'Question Bank Management',
       description: 'Centralized question repository with tagging and categorization',
-      icon: Database,
+      icon: Que,
       category: 'Examination',
       tier: 'Pro'
     },
     {
       title: 'Automated Grading',
       description: 'AI-powered automatic grading for objective and subjective questions',
-      icon: Bot,
+      icon: Automated,
       category: 'Examination',
       tier: 'Pro'
     },
