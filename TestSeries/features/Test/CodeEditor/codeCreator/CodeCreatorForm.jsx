@@ -1,7 +1,8 @@
 import { Code, Plus, Trash2 } from "lucide-react";
+import { useTheme } from "../../../../hooks/useTheme";
 
 const CodeCreatorForm = ({formData,setFormData}) => {
-
+const {theme} = useTheme()
  
     
       const handleInputChange = (field, value) => {
@@ -87,6 +88,14 @@ const CodeCreatorForm = ({formData,setFormData}) => {
           starter_code: { ...prev.starter_code, [language]: value }
         }));
       };
+      const inputCommon = `p-4 rounded-2xl transition-all duration-300 text-lg w-full pr-14 ${
+        theme === 'light'
+          ? 'bg-white text-gray-900 border-2 border-gray-200 focus:ring-indigo-200 focus:border-indigo-400 placeholder-gray-400'
+          : 'bg-gray-800 text-indigo-100 border-2 border-gray-600 focus:ring-indigo-500 focus:border-indigo-300 placeholder-indigo-300'
+      }`;
+    const LabelCommon =`text-lg font-bold ${
+      theme === 'light' ? 'text-gray-700' : 'text-indigo-200'
+    }`
     
 
 
@@ -102,27 +111,27 @@ const CodeCreatorForm = ({formData,setFormData}) => {
         </div>
 
         {/* Form */}
-        <form className="bg-white rounded-b-2xl shadow-xl p-8 space-y-8">
+        <form className={` rounded-b-2xl shadow-xl p-8 space-y-8 ${theme == 'light' ?"bg-white" : "bg-gray-700"}`}>
           
           {/* Basic Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-semibold text-blue-800 mb-2">Title</label>
+              <label className={LabelCommon}>Title</label>
               <input
                 type="text"
                 value={formData.title}
                 onChange={(e) => handleInputChange('title', e.target.value)}
-                className="w-full px-4 py-3 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                className={inputCommon}
                 placeholder="e.g., Two Sum"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-blue-800 mb-2">Difficulty</label>
+              <label className={LabelCommon}>Difficulty</label>
               <select
                 value={formData.difficulty}
                 onChange={(e) => handleInputChange('difficulty', e.target.value)}
-                className="w-full px-4 py-3 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                className={inputCommon}
               >
                 <option value="easy">Easy</option>
                 <option value="medium">Medium</option>
@@ -133,24 +142,24 @@ const CodeCreatorForm = ({formData,setFormData}) => {
 
           {/* Problem Description */}
           <div>
-            <label className="block text-sm font-semibold text-blue-800 mb-2">Problem Prompt</label>
+            <label className={LabelCommon}>Problem Prompt</label>
             <textarea
               value={formData.prompt}
               onChange={(e) => handleInputChange('prompt', e.target.value)}
               rows={4}
-              className="w-full px-4 py-3 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              className={inputCommon}
               placeholder="Detailed problem description..."
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-blue-800 mb-2">Description</label>
+            <label className={LabelCommon}>Description</label>
             <textarea
               value={formData.description}
               onChange={(e) => handleInputChange('description', e.target.value)}
               rows={3}
-              className="w-full px-4 py-3 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              className={inputCommon}
               placeholder="Short description for UI display..."
             />
           </div>
@@ -158,23 +167,23 @@ const CodeCreatorForm = ({formData,setFormData}) => {
           {/* Input/Output Format */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-semibold text-blue-800 mb-2">Input Format</label>
+              <label className={LabelCommon}>Input Format</label>
               <textarea
                 value={formData.input_format}
                 onChange={(e) => handleInputChange('input_format', e.target.value)}
                 rows={3}
-                className="w-full px-4 py-3 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                className={inputCommon}
                 placeholder="Describe the input format..."
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-blue-800 mb-2">Output Format</label>
+              <label className={LabelCommon}>Output Format</label>
               <textarea
                 value={formData.output_format}
                 onChange={(e) => handleInputChange('output_format', e.target.value)}
                 rows={3}
-                className="w-full px-4 py-3 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                className={inputCommon}
                 placeholder="Describe the output format..."
                 required
               />
@@ -184,23 +193,23 @@ const CodeCreatorForm = ({formData,setFormData}) => {
           {/* Sample Input/Output */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-semibold text-blue-800 mb-2">Sample Input</label>
+              <label className={LabelCommon}>Sample Input</label>
               <textarea
                 value={formData.sample_input}
                 onChange={(e) => handleInputChange('sample_input', e.target.value)}
                 rows={3}
-                className="w-full px-4 py-3 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                className={inputCommon}
                 placeholder="Sample input..."
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-blue-800 mb-2">Sample Output</label>
+              <label className={LabelCommon}>Sample Output</label>
               <textarea
                 value={formData.sample_output}
                 onChange={(e) => handleInputChange('sample_output', e.target.value)}
                 rows={3}
-                className="w-full px-4 py-3 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                className={inputCommon}
                 placeholder="Expected output..."
                 required
               />
@@ -209,8 +218,8 @@ const CodeCreatorForm = ({formData,setFormData}) => {
 
           {/* Test Cases */}
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <label className="text-sm font-semibold text-blue-800">Test Cases</label>
+            <div className="flex items-center justify-between mb-4" >
+              <label className={LabelCommon}>Test Cases</label>
               <button
                 type="button"
                 onClick={addTestCase}
@@ -222,9 +231,10 @@ const CodeCreatorForm = ({formData,setFormData}) => {
             </div>
             
             {formData.test_cases.map((testCase, index) => (
-              <div key={index} className="bg-blue-50 p-4 rounded-lg mb-4 border border-blue-200">
-                <div className="flex items-center justify-between mb-3">
-                  <h4 className="font-medium text-blue-800">Test Case {index + 1}</h4>
+              <div key={index} className={`  ${theme == 'light' ?"bg-white" : "border-red-500 z-10 p-2"}`} >
+                <div className={` p-4 rounded-lg mb-4  ${theme == 'light' ?"bg-white" : "bg-gray-700 "}`}>
+            
+                  <h4 className={`font-medium ${theme == 'light' ?"text-indigo-500" : "text-gray-300"}`}>Test Case {index + 1}</h4>
                   {formData.test_cases.length > 1 && (
                     <button
                       type="button"
@@ -237,45 +247,57 @@ const CodeCreatorForm = ({formData,setFormData}) => {
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  <div>
-                    <label className="block text-xs font-medium text-blue-700 mb-1">Input</label>
+                  <div >
+                    <label className={LabelCommon}>Input</label>
                     <textarea
                       value={testCase.input}
                       onChange={(e) => handleTestCaseChange(index, 'input', e.target.value)}
                       rows={2}
-                      className="w-full px-3 py-2 border border-blue-200 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                        theme === 'light'
+                          ? 'border-blue-200  '
+                          : 'bg-gray-800 text-indigo-100 border-2 border-gray-600 '
+                      } `}
                       placeholder="Test input..."
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-blue-700 mb-1">Expected Output</label>
+                    <label className={LabelCommon}>Expected Output</label>
                     <textarea
                       value={testCase.expected_output}
                       onChange={(e) => handleTestCaseChange(index, 'expected_output', e.target.value)}
                       rows={2}
-                      className="w-full px-3 py-2 border border-blue-200 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                        theme === 'light'
+                          ? 'border-blue-200  '
+                          : 'bg-gray-800 text-indigo-100 border-2 border-gray-600 '
+                      } `}
                       placeholder="Expected output..."
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-blue-700 mb-1">Explanation</label>
+                    <label className={LabelCommon}>Explanation</label>
                     <textarea
                       value={testCase.explanation}
                       onChange={(e) => handleTestCaseChange(index, 'explanation', e.target.value)}
                       rows={2}
-                      className="w-full px-3 py-2 border border-blue-200 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                      className={inputCommon}
                       placeholder="Explanation..."
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-blue-700 mb-1">Passed percentage</label>
+                    <label className={LabelCommon}>Passed percentage</label>
                     <input
                       type="number"
                       min="0"
                       max="100"
                       value={testCase.passed_percentage || ''}
                       onChange={(e) => handleTestCaseChange(index, 'passed_percentage', e.target.value)}
-                      className="w-full px-3 py-2 border border-blue-200 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                      className={`p-4 rounded-2xl transition-all duration-300 text-lg w-full  ${
+                        theme === 'light'
+                          ? 'bg-white text-gray-900 border-2 border-gray-200 focus:ring-indigo-200 focus:border-indigo-400 placeholder-gray-400'
+                          : 'bg-gray-800 text-indigo-100 border-2 border-gray-600 focus:ring-indigo-500 focus:border-indigo-300 placeholder-indigo-300'
+                      }`}
                       placeholder="Passed percentage (0-100) of this test case"
                     />
                   </div>
@@ -287,7 +309,7 @@ const CodeCreatorForm = ({formData,setFormData}) => {
           {/* Examples */}
           <div>
             <div className="flex items-center justify-between mb-4">
-              <label className="text-sm font-semibold text-blue-800">Examples (Legacy UI)</label>
+              <label className={LabelCommon}>Examples (Legacy UI)</label>
               <button
                 type="button"
                 onClick={addExample}
@@ -299,9 +321,9 @@ const CodeCreatorForm = ({formData,setFormData}) => {
             </div>
             
             {formData.examples.map((example, index) => (
-              <div key={index} className="bg-blue-50 p-4 rounded-lg mb-4 border border-blue-200">
+              <div key={index} className={` p-4 rounded-lg mb-4  ${theme == 'light' ?"bg-white" : "bg-gray-700 border border-gray-500"}`}>
                 <div className="flex items-center justify-between mb-3">
-                  <h4 className="font-medium text-blue-800">Example {index + 1}</h4>
+                  <h4 className={`font-medium ${theme == 'light' ?"text-indigo-500" : "text-gray-300"}`}>Example {index + 1}</h4>
                   {formData.examples.length > 1 && (
                     <button
                       type="button"
@@ -315,32 +337,32 @@ const CodeCreatorForm = ({formData,setFormData}) => {
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-xs font-medium text-blue-700 mb-1">Input</label>
+                    <label className={LabelCommon}>Input</label>
                     <input
                       type="text"
                       value={example.input}
                       onChange={(e) => handleExampleChange(index, 'input', e.target.value)}
-                      className="w-full px-3 py-2 border border-blue-200 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                      className={inputCommon}
                       placeholder="Example input..."
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-blue-700 mb-1">Output</label>
+                    <label className={LabelCommon}>Output</label>
                     <input
                       type="text"
                       value={example.output}
                       onChange={(e) => handleExampleChange(index, 'output', e.target.value)}
-                      className="w-full px-3 py-2 border border-blue-200 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                      className={inputCommon}
                       placeholder="Example output..."
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-blue-700 mb-1">Explanation</label>
+                    <label className={LabelCommon}>Explanation</label>
                     <input
                       type="text"
                       value={example.explanation}
                       onChange={(e) => handleExampleChange(index, 'explanation', e.target.value)}
-                      className="w-full px-3 py-2 border border-blue-200 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                      className={inputCommon}
                       placeholder="Explanation..."
                     />
                   </div>
@@ -352,7 +374,7 @@ const CodeCreatorForm = ({formData,setFormData}) => {
           {/* Constraints */}
           <div>
             <div className="flex items-center justify-between mb-4">
-              <label className="text-sm font-semibold text-blue-800">Constraints</label>
+              <label className={LabelCommon}>Constraints</label>
               <button
                 type="button"
                 onClick={addConstraint}
@@ -369,7 +391,7 @@ const CodeCreatorForm = ({formData,setFormData}) => {
                   type="text"
                   value={constraint}
                   onChange={(e) => handleConstraintChange(index, e.target.value)}
-                  className="flex-1 px-3 py-2 border border-blue-200 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className={inputCommon}
                   placeholder="Enter constraint..."
                 />
                 {formData.constraints.length > 1 && (
@@ -387,19 +409,19 @@ const CodeCreatorForm = ({formData,setFormData}) => {
 
           {/* Starter Code */}
           <div>
-            <label className="block text-sm font-semibold text-blue-800 mb-4">Starter Code</label>
+            <label className={LabelCommon}>Starter Code</label>
             
             <div className="space-y-4">
               {Object.entries(formData.starter_code).map(([language, code]) => (
                 <div key={language}>
-                  <label className="block text-xs font-medium text-blue-700 mb-2 capitalize">
+                  <label className={LabelCommon}>
                     {language === 'cpp' ? 'C++' : language.charAt(0).toUpperCase() + language.slice(1)}
                   </label>
                   <textarea
                     value={code}
                     onChange={(e) => handleStarterCodeChange(language, e.target.value)}
                     rows={6}
-                    className="w-full px-4 py-3 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
+                    className={inputCommon}
                     placeholder={`Enter ${language} starter code...`}
                   />
                 </div>

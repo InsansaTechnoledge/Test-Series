@@ -87,35 +87,55 @@ const ExamForm = ({ canCreateMoreExams, onSubmit, initialData = {
       <div className="max-w-4xl mx-auto">
 
 
-        <div className="mb-8 transform hover:scale-105 transition-all duration-300">
+    
+
+<div className="mb-8 transform hover:scale-105 transition-all duration-300">
           {pendingExams.length === 0 ? (
-            <div className="bg-white/50 backdrop-blur-md border border-indigo-200 rounded-xl p-6 shadow-xl">
+            <div className={`backdrop-blur-md rounded-xl p-6 shadow-xl ${
+              theme === 'light' 
+                ? 'bg-white/50 border border-indigo-200' 
+                : 'bg-gray-800/80 border border-gray-600'
+            }`}>
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
-                  <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                  theme === 'light' ? 'bg-indigo-100' : 'bg-indigo-900/50'
+                }`}>
+                  <svg className={`w-6 h-6 ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                       d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                   </svg>
                 </div>
-                <p className="text-indigo-800 font-semibold">No pending exams found for this organization.</p>
+                <p className={`font-semibold ${theme === 'light' ? 'text-indigo-800' : 'text-indigo-300'}`}>
+                  No pending exams found for this organization.
+                </p>
               </div>
             </div>
           ) : (
-            <div className="bg-white/50 backdrop-blur-md border border-indigo-200 rounded-xl p-6 shadow-xl">
+            <div className={`backdrop-blur-md rounded-xl p-6 shadow-xl ${
+              theme === 'light' 
+                ? 'bg-white/50 border border-indigo-200' 
+                : 'bg-gray-800/80 border border-gray-600'
+            }`}>
               <div className="flex items-center space-x-3 mb-4">
-                <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
-                  <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                  theme === 'light' ? 'bg-indigo-100' : 'bg-indigo-900/50'
+                }`}>
+                  <svg className={`w-6 h-6 ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                       d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
-                <h2 className="text-xl font-bold text-indigo-900">You have these exams pending (complete or delete them)</h2>
+                <h2 className={`text-xl font-bold ${theme === 'light' ? 'text-indigo-900' : 'text-indigo-300'}`}>
+                  You have these exams pending (complete or delete them)
+                </h2>
               </div>
               <ul className="space-y-2">
                 {pendingExams.map((exam, index) => (
                   <li key={exam?.id || index} className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
-                    <span className="text-indigo-800 font-medium">{exam?.name || 'Unnamed Exam'}</span>
+                    <div className={`w-2 h-2 rounded-full ${theme === 'light' ? 'bg-indigo-500' : 'bg-indigo-400'}`}></div>
+                    <span className={`font-medium ${theme === 'light' ? 'text-indigo-800' : 'text-indigo-300'}`}>
+                      {exam?.name || 'Unnamed Exam'}
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -123,7 +143,7 @@ const ExamForm = ({ canCreateMoreExams, onSubmit, initialData = {
           )}
         </div>
 
-
+        
 
 
 
@@ -134,7 +154,7 @@ const ExamForm = ({ canCreateMoreExams, onSubmit, initialData = {
 
           {/* new */}
 
-          <div className="bg-gradient-to-r from-[#4c51bf] to-[#2a4365] px-8 py-8 rounded-t-2xl  shadow-xl  ">
+          <div className="bg-gradient-to-r from-[#4c51bf] to-indigo-600 px-8 py-8 rounded-t-2xl  shadow-xl  ">
             <h1 className="text-2xl font-extrabold text-white flex items-center space-x-3">
 
               <span>Create New Exam</span>
@@ -142,18 +162,28 @@ const ExamForm = ({ canCreateMoreExams, onSubmit, initialData = {
           </div>
 
 
-          <form onSubmit={handleSubmit} className="p-8 space-y-6 backdrop-blur-md bg-white/30 rounded-b-2xl shadow-2xl border border-white/40">
+          <form onSubmit={handleSubmit} className={`p-8 space-y-8 rounded-b-3xl shadow-2xl ${
+            theme === 'light' 
+              ? 'backdrop-blur-md bg-white/30 border border-white/40' 
+              : 'bg-gray-800 border border-gray-700'
+          }`}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Exam Name */}
               <div className="md:col-span-2">
-                <label className="text-gray-800 font-semibold mb-2 flex items-center space-x-2">
-
+       
+              <label className={`font-bold mb-3 flex items-center space-x-2 text-sm ${
+                  theme === 'light' ? 'text-gray-800' : 'text-gray-100'
+                }`}>
                   <span>Choose a name for your exam</span>
                 </label>
                 <input
                   name="name"
                   placeholder="Enter exam name..."
-                  className="w-full p-4 rounded-xl bg-white/70 shadow-sm border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all hover:shadow-md"
+                  className={`p-4 rounded-2xl transition-all duration-300 text-lg w-full pr-14 ${
+                    theme === 'light'
+                      ? 'bg-white text-gray-900 border-2 border-gray-200 focus:ring-indigo-200 focus:border-indigo-400 placeholder-gray-400'
+                      : 'bg-gray-800 text-indigo-100 border-2 border-gray-600 focus:ring-indigo-500 focus:border-indigo-300 placeholder-indigo-300'
+                  }`}
                   value={form.name}
                   onChange={handleChange}
                   required
@@ -162,14 +192,20 @@ const ExamForm = ({ canCreateMoreExams, onSubmit, initialData = {
 
               {/* Date */}
               <div>
-                <label className="text-gray-800 font-semibold mb-2 flex items-center space-x-2">
+              <label className={`font-bold mb-3 flex items-center space-x-2 text-sm ${
+                  theme === 'light' ? 'text-gray-800' : 'text-gray-100'
+                }`}>
 
                   <span>Schedule your exam</span>
                 </label>
                 <input
                   type="datetime-local"
                   name="date"
-                  className="w-full p-4 rounded-xl bg-white/70 shadow-sm border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all hover:shadow-md"
+                  className={`p-4 rounded-2xl transition-all duration-300 text-lg w-full  ${
+                    theme === 'light'
+                      ? 'bg-white text-gray-900 border-2 border-gray-200 focus:ring-indigo-200 focus:border-indigo-400 placeholder-gray-400'
+                      : 'bg-gray-800 text-indigo-100 border-2 border-gray-600 focus:ring-indigo-500 focus:border-indigo-300 placeholder-indigo-300'
+                  }`}
                   value={form.date}
                   onChange={handleChange}
                   required
@@ -178,7 +214,9 @@ const ExamForm = ({ canCreateMoreExams, onSubmit, initialData = {
 
               {/* Total Marks */}
               <div>
-                <label className="text-gray-800 font-semibold mb-2 flex items-center space-x-2">
+              <label className={`font-bold mb-3 flex items-center space-x-2 text-sm ${
+                  theme === 'light' ? 'text-gray-800' : 'text-gray-100'
+                }`}>
 
                   <span>Total Marks</span>
                 </label>
@@ -186,7 +224,11 @@ const ExamForm = ({ canCreateMoreExams, onSubmit, initialData = {
                   name="total_marks"
                   type="number"
                   placeholder="Enter total marks..."
-                  className="w-full p-4 rounded-xl bg-white/70 shadow-sm border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all hover:shadow-md"
+                  className={`p-4 rounded-2xl transition-all duration-300 text-lg w-full  ${
+                    theme === 'light'
+                      ? 'bg-white text-gray-900 border-2 border-gray-200 focus:ring-indigo-200 focus:border-indigo-400 placeholder-gray-400'
+                      : 'bg-gray-800 text-indigo-100 border-2 border-gray-600 focus:ring-indigo-500 focus:border-indigo-300 placeholder-indigo-300'
+                  }`}
                   value={form.total_marks}
                   onChange={handleChange}
                 />
@@ -194,7 +236,9 @@ const ExamForm = ({ canCreateMoreExams, onSubmit, initialData = {
 
               {/* Duration */}
               <div>
-                <label className="text-gray-800 font-semibold mb-2 flex items-center space-x-2">
+              <label className={`font-bold mb-3 flex items-center space-x-2 text-sm ${
+                  theme === 'light' ? 'text-gray-800' : 'text-gray-100'
+                }`}>
 
                   <span>Duration (minutes)</span>
                 </label>
@@ -202,7 +246,11 @@ const ExamForm = ({ canCreateMoreExams, onSubmit, initialData = {
                   name="duration"
                   type="number"
                   placeholder="Enter duration in minutes..."
-                  className="w-full p-4 rounded-xl bg-white/70 shadow-sm border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all hover:shadow-md"
+                  className={`p-4 rounded-2xl transition-all duration-300 text-lg w-full pr-14 ${
+                    theme === 'light'
+                      ? 'bg-white text-gray-900 border-2 border-gray-200 focus:ring-indigo-200 focus:border-indigo-400 placeholder-gray-400'
+                      : 'bg-gray-800 text-indigo-100 border-2 border-gray-600 focus:ring-indigo-500 focus:border-indigo-300 placeholder-indigo-300'
+                  }`}
                   value={form.duration}
                   onChange={handleChange}
                 />
@@ -210,13 +258,19 @@ const ExamForm = ({ canCreateMoreExams, onSubmit, initialData = {
 
               {/* Batch Selection */}
               <div>
-                <label className="text-gray-800 font-semibold mb-2 flex items-center space-x-2">
+              <label className={`font-bold mb-3 flex items-center space-x-2 text-sm ${
+                  theme === 'light' ? 'text-gray-800' : 'text-gray-100'
+                }`}>
 
                   <span>Select Batch</span>
                 </label>
                 <select
                   name="batch_id"
-                  className="w-full p-4 rounded-xl bg-white/70 shadow-sm border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all hover:shadow-md"
+                  className={`p-4 rounded-2xl transition-all duration-300 text-lg w-full pr-14 ${
+                    theme === 'light'
+                      ? 'bg-white text-gray-900 border-2 border-gray-200 focus:ring-indigo-200 focus:border-indigo-400 placeholder-gray-400'
+                      : 'bg-gray-800 text-indigo-100 border-2 border-gray-600 focus:ring-indigo-500 focus:border-indigo-300 placeholder-indigo-300'
+                  }`}
                   value={form.batch_id}
                   onChange={handleChange}
                   required
@@ -272,10 +326,6 @@ const ExamForm = ({ canCreateMoreExams, onSubmit, initialData = {
           </form>
 
         </div>
-
-
-
-
         {/* Pending Exams Section */}
 
 
@@ -404,18 +454,6 @@ const ExamForm = ({ canCreateMoreExams, onSubmit, initialData = {
 
       </div>
     </div>
-
-
-
-
-
-
-
-
-
-
-
-
 
 
   
