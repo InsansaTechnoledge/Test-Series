@@ -22,7 +22,8 @@ export const createContestQuery = async (payload) => {
 
     const { data, error } = await supabase
         .rpc('create_contest_with_batches', rpcPayload)
-        .select();
+        .select()
+        .single();
 
     if (error) throw error;
     return data;
@@ -139,4 +140,13 @@ export const enrollStudentToContestQuery = async (contestId, userId) => {
   return data;
 }
 
+export const getContestCount=async(organizationId)=>{
+    const { data, error } = await supabase
+        .from("organization_contest")
+        .select('*', { count: 'exact' , head: true })
+        .eq("organization_id", organizationId);
+
+    if (error) throw error;
+    return data;
+}
 

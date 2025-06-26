@@ -1,6 +1,6 @@
 import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
 import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
-import { CreateOrganizationBatch, getOrganizationBacthes, updateOrganizationBatch, deleteOrganizationBatch, fetchVideoFromBatch , deleteVideoFromBatch, getBatchCount} from "../../utils/SqlQueries/batch.queries.js";
+import { CreateOrganizationBatch, getOrganizationBacthes, updateOrganizationBatch, deleteOrganizationBatch, fetchVideoFromBatch , deleteVideoFromBatch, getBatchAndVideoCount} from "../../utils/SqlQueries/batch.queries.js";
 import { createSyllabus } from "../../utils/SqlQueries/syllabus.queries.js";
 import { updateUsersFunction } from "../FirstDB/user.controllers.js";
 import { deleteStudentsFunction } from "../FirstDB/student.controllers.js";
@@ -195,8 +195,8 @@ export const handleDeleteVideo = async (req, res) => {
 export const getTotalBatches=async(orgId)=>{
   try{
 
-    const totalBatches = await getBatchCount(orgId);
-    return totalBatches;
+    const total = await getBatchAndVideoCount(orgId);
+    return total;
 
   }catch(error){
     console.error("Error in getTotalBatches:", error);

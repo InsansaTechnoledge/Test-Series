@@ -5,7 +5,7 @@ export const featureKeyToMetaDataKey = {
   role_feature: 'totalRoleGroups',
   video_feature: 'totalVideos',
   user_feature: 'totalUsers',
-  contest_feature: 'totalContests'
+  coding_feature: 'totalContests'
 };
 
 export const categoryToFeatureKey = {
@@ -14,5 +14,5 @@ export const categoryToFeatureKey = {
   batch: 'batch_feature',
   role: 'role_feature',
   video: 'video_feature',
-  contest: 'contest_feature',
+  coding: 'coding_feature',
 };

@@ -104,13 +104,23 @@ export const deleteVideoFromBatch = async (batchId, videoIdToDelete) => {
   return updatedVideos;
 };
 
-export const getBatchCount = async (organizationId) => {
-  const { count, error } = await supabase
+export const getBatchAndVideoCount = async (organizationId) => {
+  const { data, error } = await supabase
     .from('organization_batch')
-    .select('*', { count: 'exact' ,head: true })
+    .select('video_ids') // Only fetch video_ids column
     .eq('organization_id', organizationId);
 
   if (error) throw error;
 
-  return count ?? 0;
+  const batchCount = data.length;
+
+  const videoCount = data.reduce((acc, batch) => {
+    if (Array.isArray(batch.video_ids)) {
+      acc += batch.video_ids.length;
+    }
+    return acc;
+  }, 0);
+
+  return { totalBatches:batchCount, totalVideos:videoCount };
 };
+
