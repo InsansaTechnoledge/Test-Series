@@ -701,11 +701,11 @@ const CreateUser = () => {
                             <button
                                 type="button"
                                 onClick={onsubmitForm}
-                                // disabled={isLimitExceeded}
+                                disabled={isLimitExceeded}
                                 className={`py-4 px-12 rounded-2xl font-black text-lg transition-all duration-300 ${
-                                    // isLimitExceeded 
-                                        // ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
-                                        // : 
+                                    isLimitExceeded 
+                                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                                        : 
                                         'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:shadow-2xl hover:scale-105 transform'
                                 }`}
                             >

@@ -1,11 +1,21 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useUser } from '../../../../../../contexts/currentUserContext'
 import { useNavigate } from 'react-router-dom';
 import logo from '../../../../../../assests/Footer/evalvo logo white 4.svg'
-import {  ArrowLeft, Building, Building2, FilesIcon, Locate, Mail, Phone, User, Users2Icon } from 'lucide-react';
+import {  ArrowLeft, Building, Building2, FilesIcon, Locate, Mail, Phone, User, Users2Icon, Edit3, Save, X, Check } from 'lucide-react';
+import { UpdateOrganizationData } from '../../../../../../utils/services/organizationService';
+
 const YourPlanPage = () => {
   const { user } = useUser();
   const navigate = useNavigate();
+
+  const [isEditing, setIsEditing] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const [editData, setEditData] = useState({
+    name: user?.name || '',
+    email: user?.email || '',
+    phone: user?.phone || ''
+  })
 
   if (!user) return (
     <div className="min-h-screen bg-black flex items-center justify-center">
@@ -21,6 +31,46 @@ const YourPlanPage = () => {
 
   const features = user.planFeatures || {};
   const subscription = user.subscription || {};
+
+  const handleEdit = () => {
+    setIsEditing(true)
+    setEditData({
+      name: user.name || '',
+      email: user.email || '',
+      phone: user.phone || ''
+    })
+  }
+
+  const handleCancel = () => {
+    setIsEditing(false)
+    setEditData({
+      name: user.name || '',
+      email: user.email || '',
+      phone: user.phone || ''
+    })
+  }
+
+  const handleSave = async () => {
+    setIsSaving(true)
+    try {
+      const data = await UpdateOrganizationData(user._id, editData);
+      setIsEditing(false)
+      alert('Organization details updated successfully!')
+      console.log(data);
+    } catch (e) {
+      alert('Something went wrong. Please try again.')
+      console.log(e.message);
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const handleInputChange = (field, value) => {
+    setEditData(prev => ({
+      ...prev,
+      [field]: value
+    }))
+  }
   
   return (
     <div className="min-h-screen bg-black text-white">
@@ -57,7 +107,7 @@ const YourPlanPage = () => {
         </div>
       </div>
     
-        <div className=' max-w-7xl  mx-auto border-b-2 w-full border-indigo-400'></div>
+      <div className='max-w-7xl mx-auto border-b-2 w-full border-indigo-400'></div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-8 sm:space-y-12">
         {/* Usage Stats */}
@@ -143,69 +193,211 @@ const YourPlanPage = () => {
 
         {/* Organization Info */}
         <div className="bg-gray-900 rounded-lg p-6 sm:p-8 border border-gray-800">
-          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 sm:mb-8 text-center sm:text-left">Account Details</h2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
-            <div className="space-y-4 sm:space-y-6">
-              <div className="flex items-center space-x-4 sm:space-x-6 p-4 bg-gray-800 rounded-lg border border-gray-700">
-                <div className="w-12 sm:w-14 h-12 sm:h-14 bg-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Building/>
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-gray-400 text-base sm:text-lg">Organization Name</p>
-                  <p className="font-semibold text-white text-lg sm:text-xl truncate">{user.name}</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center space-x-4 sm:space-x-6 p-4 bg-gray-800 rounded-lg border border-gray-700">
-                <div className="w-12 sm:w-14 h-12 sm:h-14 bg-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Mail/>
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-gray-400 text-base sm:text-lg">Email Address</p>
-                  <p className="font-semibold text-white text-lg sm:text-xl break-all">{user.email}</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="space-y-4 sm:space-y-6">
-              <div className="flex items-center space-x-4 sm:space-x-6 p-4 bg-gray-800 rounded-lg border border-gray-700">
-                <div className="w-12 sm:w-14 h-12 sm:h-14 bg-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
-                 <Phone/>
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-gray-400 text-base sm:text-lg">Phone Number</p>
-                  <p className="font-semibold text-white text-lg sm:text-xl">{user.phone || 'Not provided'}</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center space-x-4 sm:space-x-6 p-4 bg-gray-800 rounded-lg border border-gray-700">
-                <div className="w-12 sm:w-14 h-12 sm:h-14 bg-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Locate/>
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-gray-400 text-base sm:text-lg">Location</p>
-                  <p className="font-semibold text-white text-lg sm:text-xl">
-                    {user.address?.city && user.address?.state 
-                      ? `${user.address.city}, ${user.address.state}` 
-                      : 'Not provided'}
-                  </p>
-                </div>
-              </div>
-            </div>
+          <div className="flex items-center justify-between mb-6 sm:mb-8">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white">Account Details</h2>
+            {!isEditing && (
+              <button 
+                onClick={handleEdit}
+                className="inline-flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-all duration-300 font-medium"
+              >
+                <Edit3 className="w-4 h-4" />
+                <span>Edit</span>
+              </button>
+            )}
           </div>
+
+          {isEditing ? (
+            <div className="space-y-6">
+              {/* Edit Form */}
+              <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-semibold text-white">Edit Organization Details</h3>
+                  <div className="flex items-center space-x-3">
+                    <button
+                      onClick={handleCancel}
+                      className="inline-flex items-center space-x-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-all duration-300"
+                    >
+                      <X className="w-4 h-4" />
+                      <span>Cancel</span>
+                    </button>
+                    <button
+                      onClick={handleSave}
+                      disabled={isSaving}
+                      className={`inline-flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-300 font-medium ${
+                        isSaving 
+                          ? 'bg-gray-600 cursor-not-allowed' 
+                          : 'bg-green-600 hover:bg-green-700 text-white'
+                      }`}
+                    >
+                      {isSaving ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          <span>Saving...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Save className="w-4 h-4" />
+                          <span>Save</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-300">
+                        Organization Name
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <Building className="h-5 w-5 text-gray-400" />
+                        </div>
+                        <input
+                          type="text"
+                          value={editData.name}
+                          onChange={(e) => handleInputChange('name', e.target.value)}
+                          className="w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300"
+                          placeholder="Enter organization name"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-300">
+                        Email Address
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <Mail className="h-5 w-5 text-gray-400" />
+                        </div>
+                        <input
+                          disabled
+                          type="email"
+                          value={editData.email}
+                          onChange={(e) => handleInputChange('email', e.target.value)}
+                          className="w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300"
+                          placeholder="Enter email address"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-300">
+                        Phone Number
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <Phone className="h-5 w-5 text-gray-400" />
+                        </div>
+                        <input
+                          disabled
+                          type="tel"
+                          value={editData.phone}
+                          onChange={(e) => handleInputChange('phone', e.target.value)}
+                          className="w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300"
+                          placeholder="Enter phone number"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Preview Card */}
+                  <div className="bg-gray-750 border border-gray-600 rounded-lg p-6">
+                    <h4 className="text-lg font-semibold text-white mb-4 flex items-center">
+                      <Check className="w-5 h-5 text-green-400 mr-2" />
+                      Preview Changes
+                    </h4>
+                    <div className="space-y-4">
+                      <div className="flex items-center space-x-3">
+                        <Building className="w-5 h-5 text-indigo-400" />
+                        <div>
+                          <p className="text-sm text-gray-400">Organization</p>
+                          <p className="text-white font-medium">{editData.name || 'Not provided'}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <Mail className="w-5 h-5 text-indigo-400" />
+                        <div>
+                          <p className="text-sm text-gray-400">Email</p>
+                          <p className="text-white font-medium break-all">{editData.email || 'Not provided'}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <Phone className="w-5 h-5 text-indigo-400" />
+                        <div>
+                          <p className="text-sm text-gray-400">Phone</p>
+                          <p className="text-white font-medium">{editData.phone || 'Not provided'}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+              <div className="space-y-4 sm:space-y-6">
+                <div className="flex items-center space-x-4 sm:space-x-6 p-4 bg-gray-800 rounded-lg border border-gray-700 hover:border-gray-600 transition-all duration-300">
+                  <div className="w-12 sm:w-14 h-12 sm:h-14 bg-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Building/>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-gray-400 text-base sm:text-lg">Organization Name</p>
+                    <p className="font-semibold text-white text-lg sm:text-xl truncate">{user.name}</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-4 sm:space-x-6 p-4 bg-gray-800 rounded-lg border border-gray-700 hover:border-gray-600 transition-all duration-300">
+                  <div className="w-12 sm:w-14 h-12 sm:h-14 bg-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Mail/>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-gray-400 text-base sm:text-lg">Email Address</p>
+                    <p className="font-semibold text-white text-lg sm:text-xl break-all">{user.email}</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-4 sm:space-y-6">
+                <div className="flex items-center space-x-4 sm:space-x-6 p-4 bg-gray-800 rounded-lg border border-gray-700 hover:border-gray-600 transition-all duration-300">
+                  <div className="w-12 sm:w-14 h-12 sm:h-14 bg-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Phone/>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-gray-400 text-base sm:text-lg">Phone Number</p>
+                    <p className="font-semibold text-white text-lg sm:text-xl">{user.phone || 'Not provided'}</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-4 sm:space-x-6 p-4 bg-gray-800 rounded-lg border border-gray-700 hover:border-gray-600 transition-all duration-300">
+                  <div className="w-12 sm:w-14 h-12 sm:h-14 bg-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Locate/>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-gray-400 text-base sm:text-lg">Location</p>
+                    <p className="font-semibold text-white text-lg sm:text-xl">
+                      {user.address?.city && user.address?.state 
+                        ? `${user.address.city}, ${user.address.state}` 
+                        : 'Not provided'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Call to Action */}
-       
-      </div>
-
-      <div className="bg-gradient-to-r from-indigo-900 to-indigo-700 rounded-lg p-6 sm:p-8 text-center border border-indigo-600">
+        <div className="bg-gradient-to-r from-indigo-900 to-indigo-700 rounded-lg p-6 sm:p-8 text-center border border-indigo-600">
           <h3 className="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4">Need More Features?</h3>
           <p className="text-indigo-100 mb-4 sm:mb-6 text-base sm:text-lg px-2">Upgrade your plan to unlock advanced capabilities and premium support.</p>
           <button className="bg-white text-indigo-600 px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-bold text-base sm:text-lg hover:bg-gray-100 transition-colors duration-300 w-full sm:w-auto">
             Upgrade Plan
           </button>
         </div>
+      </div>
     </div>
   )
 }

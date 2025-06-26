@@ -13,3 +13,8 @@ export const getOrganizationById=async(id)=>{
   const response=await api.get(`/v1/organization/detail/${id}`);
   return response.data;
 };
+
+export const UpdateOrganizationData = async(id , newData) => {
+  const response = await api.patch(`/v1/organization/update/${id}`, newData);
+  return response.data;
+}
