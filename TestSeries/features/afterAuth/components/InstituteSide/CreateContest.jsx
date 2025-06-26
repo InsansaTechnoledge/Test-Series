@@ -173,7 +173,6 @@ const CreateContest = () => {
 
     try {
       const response = await createContest(formData);
-      console.log(response);
       if (response.status === 200) {
         navigate('/institute/code-create/?contestId=' + response.data.id);
       }
