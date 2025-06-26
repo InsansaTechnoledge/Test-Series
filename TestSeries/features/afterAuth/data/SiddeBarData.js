@@ -47,7 +47,7 @@ import video from "../../../assests/Navigator/videos/video - nor.svg"
 import  contest from "../../../assests/Navigator/code contest/code contest - nor.svg"
 import { User } from 'lucide-react';
 
-export const controls = [
+export const controlData = [
     {
         name: "Create Batch",
         path: "create-batch",
@@ -130,7 +130,7 @@ export const controls = [
 ];
 
 
-export const categories = [
+export const categoryData = [
   {
     name: 'Users & Roles',
     icon: user,

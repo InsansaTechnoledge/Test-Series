@@ -727,7 +727,8 @@ export default function FeatureBasedRoleGroups() {
                   </div>
 
                   <div className="mt-4 text-sm text-indigo-500 ">
-                    <span>Created By : {group.createdBy.id === user._id ? user.name : userMap[group.createdBy.id].name}</span>  
+                    {console.log(userMap)}
+                    <span>Created By : {(user.role === 'organization')?(group.createdBy.id === user._id ? user?.name:userMap[group.createdBy.id].name ): (userMap[group.createdBy.id]?.name || 'Created By Your Organization')}</span>  
                   </div>
 
                   {/* Inline Edit Form */}

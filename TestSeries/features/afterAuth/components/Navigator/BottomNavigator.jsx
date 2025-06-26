@@ -1,7 +1,8 @@
 import { Info, Settings, Monitor, Smartphone, Tablet } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { controls } from '../../data/SiddeBarData';
+import SideBarDataHook from '../../data/sideBarDataHook';
+
 
 export default function BottomNavigator({ setShowLogoutModal }) {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ export default function BottomNavigator({ setShowLogoutModal }) {
   const [showLayoutOptions, setShowLayoutOptions] = useState(false);
   const [layoutPosition, setLayoutPosition] = useState('bottom');
   const [isMobile, setIsMobile] = useState(false);
+  const {controls}=SideBarDataHook();
 
   // Check if device is mobile
   useEffect(() => {
