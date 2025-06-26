@@ -20,7 +20,7 @@ const CreateBatch = () => {
   // Add state for dynamic batch count tracking
   const [createdBatchesCount, setCreatedBatchesCount] = useState(0);
 
-  const {theme} = useTheme();
+
   
   const { users, isLoading } = useCachedUser();
   const { roleMap } = useCachedRoleGroup();
@@ -49,7 +49,7 @@ const CreateBatch = () => {
   
   // Dynamic calculation that includes newly created batches in current session
   const Available_limit = Creation_Limit - (Total_Batch + createdBatchesCount);
-
+ const {theme} = useTheme()
   const onChangeHandler = (name, value) => {
     setFormData((prev) => ({
       ...prev,
@@ -102,6 +102,14 @@ const CreateBatch = () => {
     setFaculty((prev) => prev.filter((faculty) => faculty._id !== selectedId));
     e.target.value = '';
   };
+  const inputCommon = `p-4 rounded-2xl transition-all duration-300 text-lg w-full pr-14 ${
+    theme === 'light'
+      ? 'bg-white text-gray-900 border-2 border-gray-200 focus:ring-indigo-200 focus:border-indigo-400 placeholder-gray-400'
+      : 'bg-gray-800 text-indigo-100 border-2 border-gray-600 focus:ring-indigo-500 focus:border-indigo-300 placeholder-indigo-300'
+  }`;
+
+
+
 
   const handleFacultyRemove = (facultyId) => {
     const facultyToRemove = selectedFaculties.find((f) => f._id === facultyId);
@@ -407,7 +415,7 @@ const CreateBatch = () => {
                     name="name"
                     value={formData.name?.toLowerCase() || ''}
                     onChange={(e) => onChangeHandler('name', e.target.value)}
-                    className={`w-full p-4 ${theme === 'light' ? 'border-2 border-gray-200 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300  bg-gray-50 group-hover:bg-white' : 'border-2 border-indigo-400 transition-all duration-300  bg-indigo-100 group-hover:bg-indigo-50 text-gray-800'} rounded-2xl  text-lg font-medium`}
+                    className={inputCommon}
                     placeholder="Enter batch name"
                   />
                 </div>
@@ -423,7 +431,7 @@ const CreateBatch = () => {
                     name="year"
                     value={formData.year || ''}
                     onChange={(e) => onChangeHandler('year', parseInt(e.target.value))}
-                    className={`w-full p-4 ${theme === 'light' ? 'border-2 border-gray-200 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300  bg-gray-50 group-hover:bg-white' : 'border-2 border-indigo-400 transition-all duration-300  bg-indigo-100 group-hover:bg-indigo-50 text-gray-800'} rounded-2xl  text-lg font-medium`}
+                    className={inputCommon}
                   >
                     <option value="">Select academic year</option>
                     {getYearOptions().map((year) => (
@@ -511,7 +519,7 @@ const CreateBatch = () => {
                       type="text"
                       id="subjects"
                       name="subjects"
-                      className={`w-full p-4 ${theme === 'light' ? 'border-2 border-gray-200 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300  bg-gray-50 group-hover:bg-white' : 'border-2 border-indigo-400 transition-all duration-300  bg-indigo-100 group-hover:bg-indigo-50 text-gray-800'} rounded-2xl  text-lg font-medium`}
+                      className={inputCommon}
                       placeholder="Enter subject name"
                     />
                     <button
@@ -560,7 +568,7 @@ const CreateBatch = () => {
                     <select
                       id="faculties"
                       name="faculties"
-                      className={`w-full p-4 ${theme === 'light' ? 'border-2 border-gray-200 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300  bg-gray-50 group-hover:bg-white' : 'border-2 border-indigo-400 transition-all duration-300  bg-indigo-100 group-hover:bg-indigo-50 text-gray-800'} rounded-2xl  text-lg font-medium`}
+                      className={inputCommon}
                       onChange={handleFacultySelect}
                     >
                       <option value="">Select faculty member</option>

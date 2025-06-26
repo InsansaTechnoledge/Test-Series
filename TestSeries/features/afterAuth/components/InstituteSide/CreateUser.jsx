@@ -157,7 +157,11 @@ const CreateUser = () => {
             }
         });
     };
-
+    const inputCommon = `p-4 rounded-2xl transition-all duration-300 text-lg w-full pr-14 ${
+        theme === 'light'
+          ? 'bg-white text-gray-900 border-2 border-gray-200 focus:ring-indigo-200 focus:border-indigo-400 placeholder-gray-400'
+          : 'bg-gray-800 text-indigo-100 border-2 border-gray-600 focus:ring-indigo-500 focus:border-indigo-300 placeholder-indigo-300'
+      }`;
     // Separate useEffect for batch selection
     useEffect(() => {
         setFormData((prev) => ({
@@ -396,7 +400,7 @@ const CreateUser = () => {
                                         isLimitExceeded 
                                             ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed' 
                                             : 'bg-gray-50 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400'
-                                    } ${theme === 'light' ? 'border-2 border-gray-200 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300  bg-gray-50 group-hover:bg-white' : 'border-2 border-indigo-400 transition-all duration-300  bg-indigo-100 group-hover:bg-indigo-50 text-gray-800'} rounded-2xl  text-lg font-medium`}
+                                    } ${inputCommon}`}
                                     placeholder="Enter first name"
                                 />
                                 {error.firstName && (
@@ -420,7 +424,7 @@ const CreateUser = () => {
                                         isLimitExceeded 
                                             ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed' 
                                             : 'bg-gray-50 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400'
-                                    } ${theme === 'light' ? 'border-2 border-gray-200 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300  bg-gray-50 group-hover:bg-white' : 'border-2 border-indigo-400 transition-all duration-300  bg-indigo-100 group-hover:bg-indigo-50 text-gray-800'} rounded-2xl  text-lg font-medium`}
+                                    } ${inputCommon}`}
                                     placeholder="Enter last name"
                                 />
                                 {error.lastName && (
@@ -444,7 +448,7 @@ const CreateUser = () => {
                                         isLimitExceeded 
                                             ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed' 
                                             : 'bg-gray-50 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400'
-                                    } ${theme === 'light' ? 'border-2 border-gray-200 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300  bg-gray-50 group-hover:bg-white' : 'border-2 border-indigo-400 transition-all duration-300  bg-indigo-100 group-hover:bg-indigo-50 text-gray-800'} rounded-2xl  text-lg font-medium`}
+                                    } ${inputCommon}`}
                                     placeholder="Enter email address"
                                 />
                                 {error.email && (
@@ -470,7 +474,7 @@ const CreateUser = () => {
                                                 isLimitExceeded 
                                                     ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed' 
                                                     : 'bg-gray-50 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400'
-                                            }   ${theme === 'light' ? 'border-2 border-gray-200 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300  bg-gray-50 group-hover:bg-white' : 'border-2 border-indigo-400 transition-all duration-300  bg-indigo-100 group-hover:bg-indigo-50 text-gray-800'} rounded-2xl  text-lg font-medium`}
+                                            }   ${inputCommon}'} rounded-2xl  text-lg font-medium`}
                                             placeholder="Enter password or generate"
                                         />
                                         <button
@@ -522,7 +526,7 @@ const CreateUser = () => {
                                             isLimitExceeded 
                                                 ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed' 
                                                 : 'bg-gray-50 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400'
-                                        } ${theme === 'light' ? 'border-2 border-gray-200 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300  bg-gray-50 group-hover:bg-white' : 'border-2 border-indigo-400 transition-all duration-300  bg-indigo-100 group-hover:bg-indigo-50 text-gray-800'} rounded-2xl  text-lg font-medium`}
+                                        } ${inputCommon}`}
                                         placeholder="Confirm password"
                                     />
                                     <button
@@ -559,7 +563,7 @@ const CreateUser = () => {
                                         isLimitExceeded 
                                             ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed' 
                                             : 'bg-gray-50 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400'
-                                    } ${theme === 'light' ? 'border-2 border-gray-200 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300  bg-gray-50 group-hover:bg-white' : 'border-2 border-indigo-400 transition-all duration-300  bg-indigo-100 group-hover:bg-indigo-50 text-gray-800'} rounded-2xl  text-lg font-medium`}
+                                    } ${inputCommon}`}
                                     placeholder="Enter User ID provided by institute"
                                 />
                                 {error.userId && (
@@ -582,7 +586,7 @@ const CreateUser = () => {
                                         isLimitExceeded 
                                             ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed' 
                                             : 'bg-gray-50 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400'
-                                    } ${theme === 'light' ? 'border-2 border-gray-200 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300  bg-gray-50 group-hover:bg-white' : 'border-2 border-indigo-400 transition-all duration-300  bg-indigo-100 group-hover:bg-indigo-50 text-gray-800'} rounded-2xl  text-lg font-medium`}
+                                    } ${inputCommon}`}
                                 >
                                     <option value="">Select Gender</option>
                                     <option value="Male">Male</option>
@@ -609,7 +613,7 @@ const CreateUser = () => {
                                         isLimitExceeded 
                                             ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed' 
                                             : 'bg-gray-50 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400'
-                                    } ${theme === 'light' ? 'border-2 border-gray-200 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300  bg-gray-50 group-hover:bg-white' : 'border-2 border-indigo-400 transition-all duration-300  bg-indigo-100 group-hover:bg-indigo-50 text-gray-800'} rounded-2xl  text-lg font-medium`}
+                                    } ${inputCommon}`}
                                 >
                                     <option value="">Select Role</option>
                                     {roleGroups && roleGroups.map((role, idx) => (
