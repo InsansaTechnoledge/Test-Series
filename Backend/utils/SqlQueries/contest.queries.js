@@ -22,7 +22,8 @@ export const createContestQuery = async (payload) => {
 
     const { data, error } = await supabase
         .rpc('create_contest_with_batches', rpcPayload)
-        .select();
+        .select()
+        .single();
 
     if (error) throw error;
     return data;
