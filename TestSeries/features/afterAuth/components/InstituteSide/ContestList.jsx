@@ -5,13 +5,14 @@ import NeedHelpComponent from "./components/NeedHelpComponent";
 import useCachedContests from "../../../../hooks/useCachedContests";
 import { usePageAccess } from "../../../../contexts/PageAccessContext";
 import Banner from "../../../../assests/Institute/contest list.svg"
+import { useTheme } from "../../../../hooks/useTheme";
 
 const ContestList = () => {
     const { contestList, isLoading } = useCachedContests();
     const [contest, setContest] = useState([]);
 
      const canAccessPage  = usePageAccess();
-     
+     const  {theme} = useTheme()
   
            
              if (!canAccessPage) {
@@ -51,7 +52,7 @@ const ContestList = () => {
         <div className="space-y-6">
 
 
-    
+
 <div className="relative overflow-hidden rounded-xl h-80 mt-3">
         {/* // Background Image */}
         <img
@@ -59,7 +60,11 @@ const ContestList = () => {
           alt="Upload Banner"
           className="absolute  w-full h-full object-cover"
         />
-        <div className="absolute "></div>
+        
+        <div className={`absolute inset-0 ${theme === 'dark'
+            ? 'bg-gray-900/60'
+            : 'bg-black/20'
+            }`}></div>
 
         <div className="relative z-10 flex items-center justify-center h-full px-6 text-center w-full">
           <div>
