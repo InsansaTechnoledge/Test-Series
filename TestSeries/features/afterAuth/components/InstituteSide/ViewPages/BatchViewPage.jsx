@@ -9,6 +9,7 @@ import { useCachedUser } from "../../../../../hooks/useCachedUser";
 import dateFormatter from "../../../../../utils/dateFormatter";
 
 import BackButton from "../../../../constants/BackButton";
+import { useTheme } from "../../../../../hooks/useTheme";
 
 const Page = () => {
     const location = useLocation();
@@ -28,6 +29,8 @@ const Page = () => {
     const [faculty, setFaculty] = useState(() =>
         users?.filter(user => Array.isArray(user.batch) && user.batch.includes(batchId)) || []
     );
+
+    const {theme} = useTheme();
 
     useEffect(() => {
         if (students && batchId) {
@@ -88,12 +91,12 @@ const Page = () => {
                         <div className="text-center">
                             <div className="inline-flex items-center space-x-3 mb-4">
                               
-                                <h1 className="text-5xl md:text-6xl font-black text-indigo-600 tracking-tight">
+                                <h1 className={`text-5xl md:text-6xl font-black ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-200 '} tracking-tight`}>
                                     Batch Information
                                 </h1>
                                
                             </div>
-                            <p className="text-indigo-400 text-xl">
+                            <p className={` ${theme === 'light' ? 'text-indigo-500' : 'text-indigo-300'} text-xl`}>
                                 This is the detailed information of batch {batch.name}
                             </p>
                         </div>
@@ -104,11 +107,11 @@ const Page = () => {
             {/* Main Content */}
             <div className="max-w-7xl mx-auto px-6 -mt-8 relative z-20">
                 {/* Main Card */}
-                <div className="bg-white rounded-3xl shadow-xl p-8 mb-8 border border-gray-100">
+                <div className={` ${theme === 'light' ? 'bg-white border border-gray-100' : 'bg-gray-800'} rounded-3xl shadow-xl p-8 mb-8 `}>
                     {/* Header Section with Controls */}
                     <div className="flex flex-col lg:flex-row justify-between items-start gap-6 mb-8">
                         <div className="flex-1">
-                            <h1 className="text-3xl font-black text-indigo-900 mb-2">
+                            <h1 className={`text-3xl font-black ${theme === 'light' ? 'text-indigo-900' : 'text-indigo-100'}  mb-2`}>
                                 {batch.name}
                             </h1>
                         </div>
@@ -124,7 +127,7 @@ const Page = () => {
                             
                             <button
                                 onClick={() => navigate('/institute/edit-batch', { state: { batchId: batch.id } })}
-                                className="inline-flex items-center space-x-2 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-6 py-3 rounded-xl font-medium transition-all duration-300 hover:scale-105"
+                                className={` ${theme === 'light' ? 'bg-indigo-100 hover:bg-indigo-200 text-indigo-700' : 'bg-indigo-600 text-indigo-100 hover:bg-indigo-700 hover:text-indigo-200' } inline-flex items-center space-x-2  px-6 py-3 rounded-xl font-medium transition-all duration-300 hover:scale-105`}
                             >
                                 <Edit className="w-4 h-4" />
                                 <span>Edit Batch</span>
@@ -132,7 +135,7 @@ const Page = () => {
                             
                             <button
                                 onClick={() => setShowDeleteModal(true)}
-                                className="inline-flex items-center space-x-2 bg-red-100 hover:bg-red-200 text-red-700 px-6 py-3 rounded-xl font-medium transition-all duration-300 hover:scale-105"
+                                className={` ${theme === 'light' ? ' bg-red-100 hover:bg-red-200 text-red-700' : 'bg-red-600 text-red-100 hover:bg-red-700 hover:text-red-200'} inline-flex items-center space-x-2 px-6 py-3 rounded-xl font-medium transition-all duration-300 hover:scale-105`}
                             >
                                 <Trash className="w-4 h-4" />
                                 <span>Delete Batch</span>
@@ -143,12 +146,12 @@ const Page = () => {
                     {/* Overview Section */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                         <div className="space-y-4">
-                            <h2 className="text-2xl font-bold text-indigo-900 mb-6">Overview</h2>
+                            <h2 className={`text-2xl font-bold ${theme === 'light' ? 'text-indigo-900' : 'text-indigo-200'}  mb-6`}>Overview</h2>
                             
                             <div className="space-y-3">
                                 <div className="flex items-center space-x-3">
-                                    <User className="w-5 h-5 text-gray-500" />
-                                    <span className="text-gray-600">
+                                    <User className={`w-5 h-5 ${theme === 'light' ? ' text-gray-500' : 'text-indigo-600 '}`} />
+                                    <span className={` ${theme === 'light' ? 'text-gray-600' : 'text-gray-100'}`}>
                                         <span className="font-medium">Created by:</span> {
                                             userMap[batch.created_by] || 
                                             (batch.created_by === user._id ? user.name : 
@@ -158,45 +161,45 @@ const Page = () => {
                                 </div>
                                 
                                 <div className="flex items-center space-x-3">
-                                    <Calendar className="w-5 h-5 text-gray-500" />
-                                    <span className="text-gray-600">
+                                    <Calendar className={`w-5 h-5 ${theme === 'light' ? ' text-gray-500' : 'text-indigo-600 '}`} />
+                                    <span className={` ${theme === 'light' ? 'text-gray-600' : 'text-gray-100'}`}>
                                         <span className="font-medium">Year:</span> {batch.year}
                                     </span>
                                 </div>
                             </div>
 
-                            <div className="mt-6">
+                            <div className="">
                                 <div className="flex items-center space-x-3 mb-3">
-                                    <BookOpen className="w-5 h-5 text-gray-500" />
-                                    <span className="font-medium text-gray-700">Subjects:</span>
+                                    <BookOpen className={`w-5 h-5 ${theme === 'light' ? ' text-gray-500' : 'text-indigo-600 '}`} />
+                                    <span className={` ${theme === 'light' ? 'text-gray-600' : 'text-gray-100'}`}>Subjects:</span>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
                                     {batch.subjects?.length > 0 ? 
                                         batch.subjects.map((sub, idx) => (
-                                            <span key={idx} className="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-full text-sm font-medium">
+                                            <span key={idx} className={` ${theme === 'light' ? ' bg-indigo-600 text-indigo-100 ' : 'bg-indigo-100 text-indigo-700 '}px-4 py-2 rounded-full text-sm font-medium`}>
                                                 {sub}
                                             </span>
                                         )) :
-                                        <span className="text-gray-500 italic">No subjects added yet!!</span>
+                                        <span className={`font-bold ${theme === 'light' ? ' text-gray-700' : ' text-gray-100'} mb-4`}>No subjects added yet!!</span>
                                     }
                                 </div>
                             </div>
                         </div>
 
                         <div className="space-y-4">
-                            <div className="bg-gray-50 rounded-2xl p-6">
-                                <h3 className="font-bold text-gray-700 mb-4">Timeline</h3>
+                            <div className={`${theme === 'light' ? 'bg-gray-50' : 'bg-gray-600'} rounded-2xl p-6`}>
+                                <h3 className={`font-bold ${theme === 'light' ? ' text-gray-700' : ' text-gray-100'} mb-4`}>Timeline</h3>
                                 <div className="space-y-3 text-sm text-gray-600">
-                                    <div>
-                                        <span className="font-medium">Created on:</span> {dateFormatter(batch.created_at)}
+                                    <div className={`${theme !== 'light' && 'text-gray-100'}`}>
+                                        <span className={`font-bold ${theme === 'light' ? ' text-gray-700' : ' text-gray-100'} mb-4`}>Created on:</span> {dateFormatter(batch.created_at)}
                                     </div>
                                     {batch.updated_at !== batch.created_at && (
                                         <>
-                                            <div>
-                                                <span className="font-medium">Updated at:</span> {dateFormatter(batch.updated_at)}
+                                            <div className={`${theme !== 'light' && 'text-gray-100'}`}>
+                                                <span className={`font-bold ${theme === 'light' ? ' text-gray-700' : ' text-gray-100'} mb-4`}>Updated at:</span> {dateFormatter(batch.updated_at)}
                                             </div>
-                                            <div>
-                                                <span className="font-medium">Updated by:</span> {userMap[batch.updated_by]}
+                                            <div className={`${theme !== 'light' && 'text-gray-100'}`}>
+                                                <span className={`font-bold ${theme === 'light' ? ' text-gray-700' : ' text-gray-100'} mb-4`}>Updated by:</span> {userMap[batch.updated_by]}
                                             </div>
                                         </>
                                     )}
@@ -211,7 +214,7 @@ const Page = () => {
                                         <span>View Syllabus →</span>
                                     </button>
                                 ) : (
-                                    <p className="mt-6 text-red-600 font-medium">Syllabus not applicable</p>
+                                    <p className={`mt-6 ${theme === 'light' ? 'text-red-600' : 'text-red-400'}  font-medium`}>Syllabus not applicable</p>
                                 )}
                             </div>
                         </div>
@@ -220,7 +223,7 @@ const Page = () => {
                     {/* Faculty Section */}
                     <div className="mb-8">
                         <button
-                            className="inline-flex items-center space-x-3 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-2xl font-medium transition-all duration-300 hover:scale-105 mb-6"
+                            className={`inline-flex items-center space-x-3 ${theme === 'light' ? ' bg-indigo-600 hover:bg-indigo-700 text-white ' : ' bg-indigo-400 hover:bg-indigo-500 text-gray-200 '} px-6 py-3 rounded-2xl font-medium transition-all duration-300 hover:scale-105 mb-6`}
                             onClick={() => setHideFaculty(!hideFaculty)}
                         >
                            
@@ -231,38 +234,38 @@ const Page = () => {
                         </button>
 
                         {!hideFaculty && (
-                            <div className="bg-gray-50 rounded-2xl overflow-hidden">
+                            <div className={`${theme === 'light' ? 'bg-gray-50' : 'bg-indigo-600'} rounded-2xl overflow-hidden`}>
                                 <div className="overflow-x-auto">
                                     <table className="w-full">
-                                        <thead className="bg-indigo-100">
+                                        <thead className={` ${theme === 'light' ? 'bg-indigo-600' : 'bg-indigo-100'}`}>
                                             <tr>
-                                                <th className="px-6 py-4 text-left text-sm font-bold text-indigo-900 uppercase tracking-wider">
+                                                <th className={`px-6 py-4 text-left text-sm font-bold ${theme === 'light' ? ' text-indigo-100' : ' text-indigo-900'} uppercase tracking-wider`}>
                                                     Sr. No.
                                                 </th>
-                                                <th className="px-6 py-4 text-left text-sm font-bold text-indigo-900 uppercase tracking-wider">
+                                                <th className={`px-6 py-4 text-left text-sm font-bold ${theme === 'light' ? ' text-indigo-100' : ' text-indigo-900'} uppercase tracking-wider`}>
                                                     Assigned Faculty
                                                 </th>
-                                                <th className="px-6 py-4 text-left text-sm font-bold text-indigo-900 uppercase tracking-wider">
+                                                <th className={`px-6 py-4 text-left text-sm font-bold ${theme === 'light' ? ' text-indigo-100' : ' text-indigo-900'} uppercase tracking-wider`}>
                                                     Email
                                                 </th>
-                                                <th className="px-6 py-4 text-left text-sm font-bold text-indigo-900 uppercase tracking-wider">
+                                                <th className={`px-6 py-4 text-left text-sm font-bold ${theme === 'light' ? ' text-indigo-100' : ' text-indigo-900'} uppercase tracking-wider`}>
                                                     User ID
                                                 </th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-gray-200">
                                             {faculty?.map((facultyMember, idx) => (
-                                                <tr key={idx} className="hover:bg-white transition-colors">
-                                                    <td className="px-6 py-4 text-sm text-gray-900 font-medium">
+                                                <tr key={idx} className={` ${theme === 'light' ? 'hover:bg-gray-100' : 'hover:bg-indigo-700'} transition-colors`}>
+                                                    <td className={`px-6 py-4 text-sm ${theme === 'light' ? ' text-gray-900' : ' text-gray-100'} font-medium`}>
                                                         {idx + 1}
                                                     </td>
-                                                    <td className="px-6 py-4 text-sm text-gray-900 font-medium">
+                                                    <td className={`px-6 py-4 text-sm ${theme === 'light' ? ' text-gray-900' : ' text-gray-100'} font-medium`}>
                                                         {facultyMember.name}
                                                     </td>
-                                                    <td className="px-6 py-4 text-sm text-gray-600">
+                                                    <td className={`px-6 py-4 text-sm ${theme === 'light' ? ' text-gray-900' : ' text-gray-100'} font-medium`}>
                                                         {facultyMember.email}
                                                     </td>
-                                                    <td className="px-6 py-4 text-sm text-gray-600">
+                                                    <td className={`px-6 py-4 text-sm ${theme === 'light' ? ' text-gray-900' : ' text-gray-100'} font-medium`}>
                                                         {facultyMember.userId}
                                                     </td>
                                                 </tr>
@@ -277,7 +280,7 @@ const Page = () => {
                     {/* Students Section */}
                     <div>
                         <button
-                            className="inline-flex items-center space-x-3 bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-2xl font-medium transition-all duration-300 hover:scale-105 mb-6"
+                            className={`inline-flex items-center space-x-3  ${theme === 'light' ? ' bg-indigo-600 hover:bg-indigo-700 text-white ' : ' bg-indigo-400 hover:bg-indigo-500 text-gray-200 '} bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-2xl font-medium transition-all duration-300 hover:scale-105 mb-6`}
                             onClick={() => setHideStudents(!hideStudents)}
                         >
                          
@@ -288,45 +291,45 @@ const Page = () => {
                         </button>
 
                         {!hideStudents && (
-                            <div className="bg-gray-50 rounded-2xl overflow-hidden">
+                            <div className={`${theme === 'light' ? 'bg-gray-50' : 'bg-indigo-600'} rounded-2xl overflow-hidden`}>
                                 <div className="overflow-x-auto">
                                     <table className="w-full">
-                                        <thead className="bg-gray-200">
+                                        <thead c className={` ${theme === 'light' ? 'bg-indigo-600' : 'bg-indigo-100'}`}>
                                             <tr>
-                                                <th className="px-6 py-4 text-left text-sm font-bold text-gray-900 uppercase tracking-wider">
+                                                <th className={`px-6 py-4 text-left text-sm font-bold ${theme === 'light' ? ' text-indigo-100' : ' text-indigo-900'} uppercase tracking-wider`}>
                                                     Sr. No.
                                                 </th>
-                                                <th className="px-6 py-4 text-left text-sm font-bold text-gray-900 uppercase tracking-wider">
+                                                <th className={`px-6 py-4 text-left text-sm font-bold ${theme === 'light' ? ' text-indigo-100' : ' text-indigo-900'} uppercase tracking-wider`}>
                                                     Student Name
                                                 </th>
-                                                <th className="px-6 py-4 text-left text-sm font-bold text-gray-900 uppercase tracking-wider">
+                                                <th className={`px-6 py-4 text-left text-sm font-bold ${theme === 'light' ? ' text-indigo-100' : ' text-indigo-900'} uppercase tracking-wider`}>
                                                     Email
                                                 </th>
-                                                <th className="px-6 py-4 text-left text-sm font-bold text-gray-900 uppercase tracking-wider">
+                                                <th className={`px-6 py-4 text-left text-sm font-bold ${theme === 'light' ? ' text-indigo-100' : ' text-indigo-900'} uppercase tracking-wider`}>
                                                     Current Batch
                                                 </th>
-                                                <th className="px-6 py-4 text-left text-sm font-bold text-gray-900 uppercase tracking-wider">
+                                                <th className={`px-6 py-4 text-left text-sm font-bold ${theme === 'light' ? ' text-indigo-100' : ' text-indigo-900'} uppercase tracking-wider`}>
                                                     Previous Batches
                                                 </th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-gray-200">
                                             {filteredStudents?.map((student, idx) => (
-                                                <tr key={idx} className="hover:bg-white transition-colors">
-                                                    <td className="px-6 py-4 text-sm text-gray-900 font-medium">
+                                                <tr key={idx} className={` ${theme === 'light' ? 'hover:bg-gray-100' : 'hover:bg-indigo-700'} transition-colors`}>
+                                                    <td className={`px-6 py-4 text-sm ${theme === 'light' ? ' text-gray-900' : ' text-gray-100'} font-medium`}>
                                                         {idx + 1}
                                                     </td>
-                                                    <td className="px-6 py-4 text-sm text-gray-900 font-medium">
+                                                    <td className={`px-6 py-4 text-sm ${theme === 'light' ? ' text-gray-900' : ' text-gray-100'} font-medium`}>
                                                         {student?.name}
                                                     </td>
-                                                    <td className="px-6 py-4 text-sm text-gray-600">
+                                                    <td className={`px-6 py-4 text-sm ${theme === 'light' ? ' text-gray-900' : ' text-gray-100'} font-medium`}>
                                                         {student.email}
                                                     </td>
-                                                    <td className="px-6 py-4 text-sm text-gray-600">
+                                                    <td className={`px-6 py-4 text-sm ${theme === 'light' ? ' text-gray-900' : ' text-gray-100'} font-medium`}>
                                                         {batchMap[student.batch?.currentBatch]?.name}
                                                     </td>
-                                                    <td className="px-6 py-4 text-sm text-gray-600">
-                                                        {student.batch?.previousBatch?.length > 0
+                                                    <td className={`px-6 py-4 text-sm ${theme === 'light' ? ' text-gray-900' : ' text-gray-100'} font-medium`}>
+                                                        {student.batch?.previousBatch?.length > 0 
                                                             ? student.batch.previousBatch.map(prevBatchId => batchMap[prevBatchId]?.name).join(', ')
                                                             : "No previous batches"
                                                         }

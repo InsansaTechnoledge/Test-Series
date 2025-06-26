@@ -8,6 +8,7 @@ import { updateBatch } from "../../../../../utils/services/batchService";
 import BackButton from "../../../../constants/BackButton";
 import HeadingUtil from "../../../utility/HeadingUtil";
 import { X, Upload, CheckCircle, PlusCircle, FileSpreadsheet, Users, Calendar, BookOpen, Zap, Target, Sparkles } from 'lucide-react';
+import { useTheme } from "../../../../../hooks/useTheme";
 const BatchPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -140,6 +141,7 @@ const BatchPage = () => {
     };
 
 
+    const {theme} = useTheme();
     if (isLoading) return <div className="p-6 text-center text-gray-600">Loading batch information...</div>;
 
 
@@ -151,7 +153,7 @@ const BatchPage = () => {
             <div className="max-w-4xl mx-auto py-2">
 
           
-            <div className="p-8 bg-gradient-to-r from-indigo-600 to-gray-600 text-white relative overflow-hidden rounded-t-2xl">
+            <div className={`p-8 ${theme === 'light' ? 'bg-indigo-600' : 'bg-indigo-400'} mb-8 text-white relative overflow-hidden rounded-t-2xl`}>
             <div className="absolute inset-0 bg-black opacity-10"></div>
             <div className="relative z-10">
               <h2 className=" text-3xl font-black mb-1 flex items-center space-x-3">
@@ -166,7 +168,7 @@ const BatchPage = () => {
             <div className=" mx-auto">
               
          
-                <form onSubmit={handleSubmit} className="bg-white p-8 rounded-2xl shadow-2xl space-y-6">
+  <form onSubmit={handleSubmit} className={` ${theme === 'light' ? 'bg-white' : 'bg-gray-600'}  p-8 rounded-2xl shadow-2xl space-y-6`}>
 
   {/* Form Grid */}
   <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
@@ -176,8 +178,8 @@ const BatchPage = () => {
 
       {/* Batch Name */}
       <div>
-        <label htmlFor="name" className="flex items-center gap-2 text-gray-700 font-bold text-lg mb-2">
-          <Target className="w-5 h-5 text-indigo-600" />
+        <label htmlFor="name" className={`flex items-center gap-2 ${theme === 'light' ? ' text-gray-700' : ' text-indigo-100'} font-bold text-lg mb-2`}>
+          
           Batch Name
         </label>
         <input
@@ -185,14 +187,18 @@ const BatchPage = () => {
           value={formData.name}
           onChange={handleChange}
           required
-          className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 text-lg font-medium bg-gray-50"
+          className={`w-full p-4 rounded-2xl text-lg font-medium
+            ${theme === 'light'
+              ? 'bg-gray-50 border-2 border-gray-200 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400'
+              : 'bg-gray-700 text-white placeholder:text-gray-400 border border-gray-600 focus:ring-2 focus:ring-indigo-400'}
+          `}
         />
+
       </div>
 
       {/* Year */}
       <div>
-        <label className="flex items-center gap-2 text-gray-700 font-bold text-lg mb-2">
-          <Calendar className="w-5 h-5 text-indigo-600" />
+        <label className={`flex items-center gap-2 ${theme === 'light' ? ' text-gray-700' : ' text-indigo-100'} font-bold text-lg mb-2`}>
           Year
         </label>
         <input
@@ -201,7 +207,11 @@ const BatchPage = () => {
           onChange={handleChange}
           type="number"
           required
-          className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 text-lg font-medium bg-gray-50"
+          className={`w-full p-4 rounded-2xl text-lg font-medium
+            ${theme === 'light'
+              ? 'bg-gray-50 border-2 border-gray-200 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400'
+              : 'bg-gray-700 text-white placeholder:text-gray-400 border border-gray-600 focus:ring-2 focus:ring-indigo-400'}
+          `}
         />
       </div>
     </div>
@@ -211,8 +221,8 @@ const BatchPage = () => {
 
       {/* Subjects */}
       <div>
-      <label className="flex items-center gap-2 text-gray-700 font-bold text-lg ">
-          <BookOpen className="w-5 h-5 text-indigo-600" />
+      <label className={`flex items-center gap-2 ${theme === 'light' ? ' text-gray-700' : ' text-indigo-100'} font-bold text-lg mb-2`}>
+          
           Subjects
         </label>
       <input
@@ -238,8 +248,12 @@ const BatchPage = () => {
               }
             }
           }}
-          className="flex-1 p-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 text-lg font-medium bg-gray-50 group-hover:bg-white w-full my-1"
-        />
+          className={`w-full p-4 rounded-2xl text-lg font-medium
+            ${theme === 'light'
+              ? 'bg-gray-50 border-2 border-gray-200 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400'
+              : 'bg-gray-700 text-white placeholder:text-gray-400 border border-gray-600 focus:ring-2 focus:ring-indigo-400'}
+          `}        
+          />
      
 
 
@@ -248,12 +262,11 @@ const BatchPage = () => {
           {formData.subjects.map((subject, index) => (
             <span
               key={index}
-              className="group flex items-center gap-3 bg-gradient-to-r from-indigo-100 to-indigo-200 text-indigo-800 rounded-2xl px-5 py-3 transition-all duration-300 hover:from-indigo-200 hover:to-indigo-300 hover:scale-105 shadow-md"
-            >
+              className={`group flex items-center justify-between ${theme === 'light' ? 'bg-indigo-500 text-gray-100 text-lg' : 'bg-indigo-400 text-gray-100 text-lg'}  rounded-2xl p-4 transition-all duration-300 hover:scale-102 shadow-md`}>
               {subject}
               <button
                 type="button"
-                className="text-indigo-700 hover:text-indigo-900 transition-all duration-300 hover:rotate-90 bg-white/50 rounded-full p-1"
+                className=" ml-4 text-indigo-700 hover:text-indigo-900 transition-all duration-300 hover:rotate-90 bg-white/50 rounded-full p-1"
                 onClick={() =>
                   setFormData(prev => ({
                     ...prev,
@@ -273,8 +286,8 @@ const BatchPage = () => {
 
       {/* Faculties */}
       <div>
-        <label htmlFor="faculties" className="flex items-center gap-2 text-gray-700 font-bold text-lg mb-2">
-          <Users className="w-5 h-5 text-indigo-600" />
+        <label htmlFor="faculties" className={`flex items-center gap-2 ${theme === 'light' ? ' text-gray-700' : ' text-indigo-100'} font-bold text-lg mb-2`}>
+          
           Assigned Faculty
         </label>
         <select
@@ -284,8 +297,12 @@ const BatchPage = () => {
               setSelectedFaculty([...selectedFaculty, facultyId]);
             }
           }}
-          className="w-full pl-12 p-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 text-lg font-medium bg-gray-50 group-hover:bg-white"
-        >
+          className={`w-full p-4 rounded-2xl text-lg font-medium
+            ${theme === 'light'
+              ? 'bg-gray-50 border-2 border-gray-200 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400'
+              : 'bg-gray-700 text-white placeholder:text-gray-400 border border-gray-600 focus:ring-2 focus:ring-indigo-400'}
+          `}             
+          >
           <option value="">-- Select Faculty --</option>
           {users
             .filter(user => !selectedFaculty.includes(user._id))
@@ -302,7 +319,7 @@ const BatchPage = () => {
             return (
               <span
                 key={facultyId}
-                className="group flex items-center justify-between bg-gradient-to-r from-purple-100 to-purple-200 text-purple-800 rounded-2xl p-4 transition-all duration-300 hover:from-purple-200 hover:to-purple-300 hover:scale-102 shadow-md"
+                className={`group flex items-center justify-between ${theme === 'light' ? 'bg-indigo-500 text-gray-100 text-lg' : 'bg-indigo-400 text-gray-100 text-lg'}  rounded-2xl p-4 transition-all duration-300 hover:scale-102 shadow-md`}
               >
                 {faculty?.name || "Unknown"}
                 <button
@@ -327,7 +344,7 @@ const BatchPage = () => {
   </div>
 
   {/* Submit Button (outside grid) */}
-  <div className="p-8 bg-gradient-to-r from-gray-50 to-indigo-50 border-t border-gray-100 flex justify-center">
+  <div className="p-8  border-t border-gray-100 flex justify-center">
     <button
       type="submit"
       disabled={!hasChanges}
