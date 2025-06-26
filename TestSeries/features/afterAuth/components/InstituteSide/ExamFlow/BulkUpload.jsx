@@ -3,9 +3,11 @@ import * as XLSX from 'xlsx';
 import { v4 as uuidv4 } from 'uuid';
 import { generateSampleExcel } from './SampleExcel';
 import { Upload, FileSpreadsheet, Download, CheckCircle, AlertCircle, Info } from 'lucide-react';
+import { useTheme } from '../../../../../hooks/useTheme';
 const BulkUpload = ({ setQuestions, organizationId }) => {
   const [isUploading, setIsUploading] = useState(false);
     const [uploadResult, setUploadResult] = useState(null);
+    const {theme} = useTheme()
     
     // const handleFile = async (e) => {
     //   const file = e.target.files[0];
@@ -197,15 +199,19 @@ const BulkUpload = ({ setQuestions, organizationId }) => {
       
     return (
   
-      <div className="bg-white/70 backdrop-blur-md shadow-md rounded-2xl p-6 space-y-6 border border-gray-200">
+      <div
+      
+      
+      className={` shadow-md rounded-2xl p-6 space-y-6   ${theme == 'light' ?"bg-white/70 border border-gray-200" : "bg-gray-700 border border-gray-200"} `}
+      >
   {/* Header with Icon */}
   <div className="flex items-start space-x-4">
     <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
       <Upload className="w-6 h-6 text-white" />
     </div>
     <div>
-      <h3 className="text-xl font-semibold text-gray-900">Upload Excel File</h3>
-      <p className="text-sm text-gray-600">
+      <h3   className={`font-semibold text-xl  ${theme == 'light' ?"text-gray-900" : "text-gray-300"} `}>Upload Excel File</h3>
+      <p className={`font-semibold  ${theme == 'light' ?"text-gray-700" : "text-gray-300"} `}>
         Upload multiple questions at once using an Excel spreadsheet.
       </p>
     </div>
@@ -244,8 +250,24 @@ const BulkUpload = ({ setQuestions, organizationId }) => {
   )}
 
   {/* Format Guidelines */}
-  <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-4 text-sm text-gray-700 space-y-2">
-    <p className="font-semibold text-yellow-800">Excel File Format Requirements:</p>
+  <div
+  
+  
+  
+  className={` rounded-lg p-4 text-sm space-y-2   ${theme == 'light' ?"bg-yellow-50 border border-yellow-300  text-gray-700" : "bg-gray-600 border text-gray-100 "} `}
+  
+  >
+    <p className={`font-semibold  ${theme == 'light' ?"text-orange-600" : "text-orange-500"} `}
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    >Excel File Format Requirements:</p>
     <ul className="list-disc list-inside space-y-1">
       <li>Required columns: <code>type</code>, <code>question_text</code></li>
       <li>For MCQs: options as JSON array <code>["Option 1", "Option 2", ...]</code></li>
@@ -258,7 +280,7 @@ const BulkUpload = ({ setQuestions, organizationId }) => {
 
   {/* Sample Download */}
   <div className="space-y-2">
-    <p className="text-sm text-gray-700">Download the Excel file, fill in the questions, and upload it.</p>
+    <p className={`font-semibold  ${theme == 'light' ?"text-gray-700" : "text-gray-300"} `}>Download the Excel file, fill in the questions, and upload it.</p>
     <button
       onClick={generateSampleExcel}
       className="inline-flex items-center space-x-2 px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-lg shadow-md hover:from-indigo-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-200"

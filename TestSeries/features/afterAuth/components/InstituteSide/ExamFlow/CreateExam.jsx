@@ -13,6 +13,7 @@ import DeleteExamModal from './DeleteExamModal';
 import ExamForm from './ExamForm';
 import ManualQuestionForm from './ManualQuestionsForm';
 import QuestionPreview from './QuestionPreview';
+import { useTheme } from '../../../../../hooks/useTheme';
 
 const CreateExam = () => {
   const [examDetails, setExamDetails] = useState(null);
@@ -24,7 +25,7 @@ const CreateExam = () => {
   const [editingExam, setEditingExam] = useState(false);
   const { user, getFeatureKeyFromLocation } = useUser();
   const location = useLocation();
-
+  const {theme} = useTheme()
   const canCreateMoreExams = useLimitAccess(getFeatureKeyFromLocation(location.pathname), "totalExams");
 
   const organization =
@@ -206,11 +207,43 @@ const CreateExam = () => {
           }} // for edit form
         />
       ) : (
-        <div className="bg-blue-50 p-6 rounded-3xl mb-6 shadow-lg ">
-          <div className="flex justify-between items-center ">
+        // <div className="bg-blue-50 p-6 rounded-3xl mb-6 shadow-lg ">
+        //   <div className="flex justify-between items-center ">
+        //     <div className=''>
+        //       <h2 className="text-xl font-semibold">{examDetails.name}</h2>
+        //       <p className="text-gray-600">
+        //         Date: {examDetails.date} |
+        //         Duration: {examDetails.duration} mins |
+        //         Total Marks: {examDetails.total_marks}
+        //       </p>
+        //     </div>
+        //     <button
+        //       onClick={() => setEditingExam(true)}
+        //       className="text-blue-600 hover:text-blue-800"
+        //     >
+        //       Edit
+        //     </button>
+        //   </div>
+        // </div>
+        <div className={`p-6 rounded-3xl mb-6 shadow-lg ${
+          theme === 'light' 
+            ? 'bg-blue-50' 
+            : 'bg-gray-800'
+        }`}>
+          <div className="flex justify-between items-center">
             <div className=''>
-              <h2 className="text-xl font-semibold">{examDetails.name}</h2>
-              <p className="text-gray-600">
+              <h2 className={`text-xl font-semibold ${
+                theme === 'light' 
+                  ? 'text-gray-800' 
+                  : 'text-white'
+              }`}>
+                {examDetails.name}
+              </h2>
+              <p className={`${
+                theme === 'light' 
+                  ? 'text-gray-600' 
+                  : 'text-gray-300'
+              }`}>
                 Date: {examDetails.date} |
                 Duration: {examDetails.duration} mins |
                 Total Marks: {examDetails.total_marks}
@@ -218,7 +251,11 @@ const CreateExam = () => {
             </div>
             <button
               onClick={() => setEditingExam(true)}
-              className="text-blue-600 hover:text-blue-800"
+              className={`transition-colors duration-300 ${
+                theme === 'light' 
+                  ? 'text-blue-600 hover:text-blue-800' 
+                  : 'text-blue-400 hover:text-blue-300'
+              }`}
             >
               Edit
             </button>
@@ -229,14 +266,14 @@ const CreateExam = () => {
 
       {examDetails && !editingExam && (
         <>
-          <div className="mt-6 border-t pt-6">
-            <h2 className="text-xl font-semibold mb-4">Add Questions</h2>
+          <div className={`mt-6 border-t pt-6 c`}>
+            <h2 className={`text-xl font-semibold mb-4 ${theme == 'light' ?"text-black" : "text-gray-100"} `}>Add Questions</h2>
 
-            <div className="bg-gray-50 p-6 rounded-lg mb-6">
-              <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                <div className="flex-1 shadow-lg rounded-xl p-6 bg-white hover:shadow-md transition">
-                  <h3 className="text-lg font-medium mb-2">Option 1: Manual Entry</h3>
-                  <p className="text-gray-600 mb-4">Create questions one by one with full control over each question's details.</p>
+            <div className={` p-6 rounded-lg mb-6 ${theme == 'light' ?"bg-gray-50" : "bg-gray-800"}`}>
+              <div className={`flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4  ${theme == 'light' ?"bg-gray-50" : "bg-gray-800"}`}>
+                <div className={`flex-1  rounded-xl p-6 shadow-2xl transition ${theme == 'light' ?"bg-gray-50" : "bg-gray-800"}`}>
+                  <h3 className={`text-lg font-medium mb-2  ${theme == 'light' ?"text-black" : "text-gray-100"}`}>Option 1: Manual Entry</h3>
+                  <p className={`mb-4 ${theme == 'light' ?"text-gray-500" : "text-gray-500"}`} >Create questions one by one with full control over each question's details.</p>
                   <ManualQuestionForm
                     setQuestions={setQuestions}
                     organizationId={examDetails.organization_id} // ✅ pass this down!
@@ -244,9 +281,9 @@ const CreateExam = () => {
 
                 </div>
 
-                <div className="flex-1 shadow-lg  rounded-lg p-6 bg-white hover:shadow-md transition">
-                  <h3 className="text-lg font-medium mb-2">Option 2: Bulk Upload</h3>
-                  <p className="text-gray-600 mb-4">Upload multiple questions at once using an Excel spreadsheet.</p>
+                <div className={`flex-1 shadow-2xl  rounded-lg p-6 transition    ${theme == 'light' ?"bg-gray-50" : "bg-gray-800 border-gray-800 border"}`}>
+                  <h3 className={`text-lg font-medium mb-2  ${theme == 'light' ?"text-black" : "text-gray-100"}`}>Option 2: Bulk Upload</h3>
+                  <p className={`mb-4 ${theme == 'light' ?"text-gray-500" : "text-gray-500"}`}>Upload multiple questions at once using an Excel spreadsheet.</p>
                   <BulkUpload setQuestions={setQuestions} organizationId={examDetails.organization_id} />
                 </div>
               </div>
