@@ -3,9 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { callBack, register } from "../../utils/services/videoService";
 import Banner from "../../assests/Institute/upload videos.svg"
 import { usePageAccess } from "../../contexts/PageAccessContext";
+import { useTheme } from "../../hooks/useTheme";
+
 const Connection = () => {
 
     const navigate = useNavigate();
+    const { theme } = useTheme();
 
     const callbackUrl = async (code) => {
         try {
@@ -47,22 +50,23 @@ const Connection = () => {
     };
 
     return (
-     
-   
 <>
-
-<div className="min-h-screen">
+<div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : ''}`}>
 
 <div className="relative overflow-hidden rounded-xl h-80">
-    {/* // Background Image */}
+    {/* Background Image */}
     <img 
         src={Banner} 
         alt="Upload Banner"
-        className="absolute  w-full h-full object-cover"
+        className="absolute w-full h-full object-cover"
     />
     
-  
-    <div className="absolute "></div>
+    {/* Overlay */}
+    <div className={`absolute inset-0 ${
+      theme === 'dark' 
+        ? 'bg-gray-900/60' 
+        : 'bg-black/20'
+    }`}></div>
     
     {/* Content */}
     <div className="relative z-10 flex items-center justify-center h-full px-6 text-center">
@@ -77,53 +81,74 @@ const Connection = () => {
     </div>
 </div>
 
-
-{/* Connection Card  */}
+{/* Connection Card */}
 <div className="relative -mt-10 z-30 px-6 pb-12">
     <div className="max-w-4xl mx-auto">
-        <div className="backdrop-blur-xl bg-white/90 rounded-3xl shadow-2xl border border-white/20 overflow-hidden hover:shadow-3xl transition-all duration-500">
+        <div className={`rounded-3xl shadow-2xl border overflow-hidden transition-all duration-500 ${
+          theme === 'dark'
+            ? 'bg-gray-800 border-gray-700 hover:shadow-gray-900/50'
+            : 'bg-white border-gray-200 hover:shadow-xl'
+        }`}>
             {/* Header */}
-            <div className="bg-gradient-to-r from-indigo-600 via-indigo-700 to-slate-700 px-8 py-8 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-indigo-600/90 to-slate-700/90 backdrop-blur-sm"></div>
-                <div className="relative z-10">
+            <div className={`px-8 py-8 ${
+              theme === 'dark' ? 'bg-indigo-600' : 'bg-indigo-600'
+            }`}>
+                <div>
                     <h1 className="text-4xl font-bold text-white mb-3 tracking-tight">Connect to Platform</h1>
-                    <p className="text-indigo-100/90 text-lg font-medium">Seamlessly integrate your account with our modern platform</p>
+                    <p className="text-indigo-100 text-lg font-medium">Seamlessly integrate your account with our modern platform</p>
                 </div>
-             
             </div>
             
             {/* Content */}
-            <div className="px-8 py-10 space-y-8 bg-white">
+            <div className={`px-8 py-10 space-y-8 ${
+              theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+            }`}>
                 <div className="space-y-6">
-                    <p className="text-slate-700 text-xl font-medium leading-relaxed">
+                    <p className={`text-xl font-medium leading-relaxed ${
+                      theme === 'dark' ? 'text-gray-200' : 'text-gray-700'
+                    }`}>
                         To connect your account, please follow the instructions below:
                     </p>
                     
-                    <div className="backdrop-blur-sm bg-gradient-to-br from-indigo-50/80 to-slate-50/80 rounded-2xl p-8 border border-indigo-100/50 shadow-inner">
-                        <ol className="space-y-6 text-slate-700">
+                    <div className={`rounded-2xl p-8 border shadow-inner ${
+                      theme === 'dark'
+                        ? 'bg-gray-700 border-gray-600'
+                        : 'bg-gray-50 border-gray-200'
+                    }`}>
+                        <ol className={`space-y-6 ${
+                          theme === 'dark' ? 'text-gray-200' : 'text-gray-700'
+                        }`}>
                             <li className="flex items-start group hover:transform hover:translate-x-2 transition-transform duration-300">
-                                <span className="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-4 mt-0.5 shadow-lg group-hover:shadow-indigo-300/50 transition-shadow duration-300">1</span>
+                                <span className={` ${theme === 'light' ? 'bg-indigo-600' : 'bg-indigo-400'} text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-4 mt-0.5 shadow-lg group-hover:shadow-indigo-600/50 transition-shadow duration-300`}>1</span>
                                 <span className="text-lg font-medium">Go to your account settings.</span>
                             </li>
                             <li className="flex items-start group hover:transform hover:translate-x-2 transition-transform duration-300">
-                                <span className="bg-gradient-to-r from-indigo-500 to-slate-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-4 mt-0.5 shadow-lg group-hover:shadow-slate-300/50 transition-shadow duration-300">2</span>
-                                <span className="text-lg font-medium">Navigate to the "Connected Apps" section.</span>
+                            <span className={` ${theme === 'light' ? 'bg-indigo-600' : 'bg-indigo-400'} text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-4 mt-0.5 shadow-lg group-hover:shadow-indigo-600/50 transition-shadow duration-300`}>2</span>
+                            <span className="text-lg font-medium">Navigate to the "Connected Apps" section.</span>
                             </li>
                             <li className="flex items-start group hover:transform hover:translate-x-2 transition-transform duration-300">
-                                <span className="bg-gradient-to-r from-slate-500 to-indigo-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-4 mt-0.5 shadow-lg group-hover:shadow-indigo-300/50 transition-shadow duration-300">3</span>
-                                <span className="text-lg font-medium">Click on "Add New Connection" and select "Path: TestSeries".</span>
+                            <span className={` ${theme === 'light' ? 'bg-indigo-600' : 'bg-indigo-400'} text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-4 mt-0.5 shadow-lg group-hover:shadow-indigo-600/50 transition-shadow duration-300`}>3</span>
+                            <span className="text-lg font-medium">Click on "Add New Connection" and select "Path: TestSeries".</span>
                             </li>
                             <li className="flex items-start group hover:transform hover:translate-x-2 transition-transform duration-300">
-                                <span className="bg-gradient-to-r from-indigo-600 to-slate-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-4 mt-0.5 shadow-lg group-hover:shadow-slate-300/50 transition-shadow duration-300">4</span>
-                                <span className="text-lg font-medium">Follow the prompts to authorize the connection.</span>
+                            <span className={` ${theme === 'light' ? 'bg-indigo-600' : 'bg-indigo-400'} text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-4 mt-0.5 shadow-lg group-hover:shadow-indigo-600/50 transition-shadow duration-300`}>4</span>
+                            <span className="text-lg font-medium">Follow the prompts to authorize the connection.</span>
                             </li>
                         </ol>
                     </div>
                 </div>
                 
-                <div className="backdrop-blur-sm bg-gradient-to-r from-indigo-50/60 via-white/60 to-slate-50/60 p-8 rounded-2xl border border-indigo-100/30 shadow-inner">
-                    <p className="text-slate-700 leading-relaxed text-lg">
-                        <strong className="text-indigo-700 font-semibold">Once connected,</strong> you will be able to manage your videos directly from our platform with enhanced features and analytics.
+                <div className={`p-8 rounded-2xl border shadow-inner ${
+                  theme === 'dark'
+                    ? 'bg-gray-700 border-gray-600'
+                    : 'bg-indigo-50 border-indigo-200'
+                }`}>
+                    <p className={`leading-relaxed text-lg ${
+                      theme === 'dark' ? 'text-gray-200' : 'text-gray-700'
+                    }`}>
+                        <strong className={`font-semibold ${
+                          theme === 'dark' ? 'text-indigo-400' : 'text-indigo-700'
+                        }`}>Once connected,</strong> you will be able to manage your videos directly from our platform with enhanced features and analytics.
                     </p>
                 </div>
                 
@@ -132,14 +157,16 @@ const Connection = () => {
                     <button
                         disabled={canAccessPage === false}
                         onClick={handleClick}
-                        className={`group relative px-10 py-5 rounded-2xl font-bold shadow-2xl transform transition-all duration-500 backdrop-blur-sm overflow-hidden focus:outline-none 
+                        className={`group relative px-10 py-5 rounded-2xl font-bold shadow-2xl transform transition-all duration-500 overflow-hidden focus:outline-none 
                         ${canAccessPage === false
-                            ? 'bg-gray-300 cursor-not-allowed text-red-600 focus:ring-0'
-                            : 'bg-gradient-to-r from-indigo-600 via-indigo-700 to-slate-700 hover:from-indigo-700 hover:via-slate-700 hover:to-indigo-800 text-white hover:scale-105 hover:-translate-y-1 focus:ring-4 focus:ring-indigo-300/50'}
+                            ? theme === 'dark'
+                              ? 'bg-gray-700 cursor-not-allowed text-red-400'
+                              : 'bg-gray-300 cursor-not-allowed text-red-600'
+                            : 'bg-indigo-600 hover:bg-indigo-700 text-white hover:scale-105 hover:-translate-y-1 focus:ring-4 focus:ring-indigo-600/50'}
                         `}
                     >
-                        {/* Shiny animated gradient on hover */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+                        {/* Shiny animated effect on hover */}
+                        <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
 
                         {/* Button content */}
                         <div className="relative z-10 flex items-center justify-center">
@@ -157,7 +184,9 @@ const Connection = () => {
                     {/* Info below the button */}
                     <div className="mt-4 flex items-center justify-center space-x-2">
                         <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                        <p className="text-sm text-slate-500 font-medium">
+                        <p className={`text-sm font-medium ${
+                          theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                        }`}>
                         Secure OAuth 2.0 authentication
                         </p>
                     </div>
@@ -167,11 +196,8 @@ const Connection = () => {
     </div>
 </div>
 </div> 
-
 </>
     );
 };
 
-export default Connection;
-
-
+export default Connection

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { match } from 'path-to-regexp';
-import { VITE_PLAN_FEATURE_MAP } from "../features/constants/env";
+import { VITE_PLAN_FEATURE_MAP, VITE_ROLE_FEATURE_MAP } from "../features/constants/env";
 
 const currentUserContext = createContext();
 
@@ -64,7 +64,7 @@ export const UserProvider = ({ children }) => {
 
    const hasRoleAccess = ({ keyFromPageOrAction, location }) => {
 
-    const rawMap = JSON.parse(import.meta.env.VITE_ROLE_FEATURE_MAP || '{}');
+    const rawMap = JSON.parse(import.meta.env.VITE_ROLE_FEATURE_MAP || VITE_ROLE_FEATURE_MAP || '{}');
     let matchedKey = null;
 
     for (const routePattern in rawMap) {

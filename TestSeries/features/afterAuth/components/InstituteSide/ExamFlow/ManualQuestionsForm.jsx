@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { useUser } from '../../../../../contexts/currentUserContext';
 import { useEffect } from 'react';
 import CodeCreatorForm from '../../../../Test/CodeEditor/codeCreator/codeCreatorForm';
+import { useTheme } from '../../../../../hooks/useTheme';
 
 const ManualQuestionForm = ({ setQuestions, organizationId }) => {
   const {user}=useUser();
@@ -72,7 +73,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
 
   };
 
-
+  const {theme} = useTheme()
   const [form, setForm] = useState(initialFormState);
 
   const handleChange = (e) => {
@@ -210,14 +211,21 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
   useEffect(()=>{
     console.log("check"  ,user?.planFeatures?.coding_feature.isActive)
   },[user])
-
+  const inputCommon = `p-4 rounded-2xl transition-all duration-300 text-lg w-full pr-14 ${
+    theme === 'light'
+      ? 'bg-white text-gray-900 border-2 border-gray-200 focus:ring-indigo-200 focus:border-indigo-400 placeholder-gray-400'
+      : 'bg-gray-800 text-indigo-100 border-2 border-gray-600 focus:ring-indigo-500 focus:border-indigo-300 placeholder-indigo-300'
+  }`;
+const LabelCommon =`text-lg font-bold ${
+  theme === 'light' ? 'text-gray-700' : 'text-indigo-200'
+}`
   return (
-    <div className="bg-white/70 backdrop-blur-md shadow-md rounded-2xl p-6 space-y-6 border border-gray-200">
+    <div className={` backdrop-blur-md shadow-md rounded-2xl p-6 space-y-6  ${theme == 'light' ?"border border-gray-200 bg-white/70" : "bg-gray-800"}`}>
       {/* Question Type Dropdown */}
       <div>
-        <label className="text-sm font-medium text-gray-700">Question Type</label>
+        <label className={LabelCommon}>Question Type</label>
         <select
-          className="mt-1 w-full p-2.5 bg-white border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 text-sm"
+          className={inputCommon}
           name="type"
           value={form.type}
           onChange={handleChange}
@@ -235,12 +243,12 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
             ) : null}
         </select>
       </div>
-
+   
       {/* Question Text */}
       <div>
-        <label className="text-sm font-medium text-gray-700">Question Text</label>
+        <label className={LabelCommon}>Question Text</label>
         <textarea
-          className="mt-1 w-full p-3 bg-white border rounded-lg shadow-sm text-sm"
+          className={inputCommon}
           rows={3}
           name="question_text"
           value={form.question_text}
@@ -252,11 +260,11 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
       {/* MCQ / MSQ Options */}
       {(form.type === 'mcq' || form.type === 'msq') && (
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Options</label>
+          <label className={LabelCommon}>Options</label>
           {form.options.map((opt, i) => (
             <input
               key={i}
-              className="w-full p-2.5 bg-white border rounded-lg shadow-sm text-sm"
+              className={inputCommon}
               placeholder={`Option ${i + 1}`}
               value={opt}
               onChange={(e) => handleOptionsChange(i, e.target.value)}
@@ -268,7 +276,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
       {/* Correct Option(s) */}
       {form.type === 'mcq' && (
         <input
-          className="w-full p-2.5 bg-white border rounded-lg shadow-sm text-sm"
+          className={inputCommon}
           type="number"
           name="correct_option"
           value={form.correct_option}
@@ -281,7 +289,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
 
       {form.type === 'msq' && (
         <input
-          className="w-full p-2.5 bg-white border rounded-lg shadow-sm text-sm"
+          className={inputCommon}
           placeholder="Correct Option Indexes (comma-separated)"
           onChange={(e) => {
             const values = e.target.value.split(',').map(v => parseInt(v.trim())).filter(v => !isNaN(v));
@@ -293,7 +301,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
       {/* Fill / Numerical Answer */}
       {(form.type === 'fill' || form.type === 'numerical') && (
         <input
-          className="w-full p-2.5 bg-white border rounded-lg shadow-sm text-sm"
+          className={inputCommon}
           name="correct_answer"
           value={form.correct_answer}
           onChange={handleChange}
@@ -304,7 +312,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
       {/* True / False */}
       {form.type === 'tf' && (
         <select
-          className="w-full p-2.5 bg-white border rounded-lg shadow-sm text-sm"
+          className={inputCommon}
           name="is_true"
           value={form.is_true}
           onChange={handleChange}
@@ -322,11 +330,11 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
           </p>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-gray-700">Left Items</label>
+              <label className={LabelCommon}>Left Items</label>
               {form.left_items.map((item, i) => (
                 <input
                   key={i}
-                  className="w-full p-2.5 bg-white border rounded-lg shadow-sm text-sm mb-1"
+                  className={inputCommon}
                   placeholder={`Left ${i + 1}`}
                   value={item}
                   onChange={(e) => {
@@ -338,11 +346,11 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
               ))}
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">Right Items</label>
+              <label className={LabelCommon}>Right Items</label>
               {form.right_items.map((item, i) => (
                 <input
                   key={i}
-                  className="w-full p-2.5 bg-white border rounded-lg shadow-sm text-sm mb-1"
+                  className={inputCommon}
                   placeholder={`Right ${i + 1}`}
                   value={item}
                   onChange={(e) => {
@@ -355,7 +363,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
             </div>
           </div>
           <input
-            className="w-full p-2.5 bg-white border rounded-lg shadow-sm text-sm"
+            className={inputCommon}
             placeholder='Correct Pairs (e.g., {"India":"New Delhi"})'
             value={form.correct_pairs_input}
             onChange={(e) => setForm(prev => ({ ...prev, correct_pairs_input: e.target.value }))}
@@ -381,9 +389,10 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
       )}
 
           {form.type === 'code' && (
-        <div className="bg-gray-100 border rounded p-4 space-y-3">
+        <div className={` border rounded p-4 space-y-3  ${theme == 'light' ?"bg-white" : "bg-gray-700"} `}>
 
-          <h4 className="font-semibold">Code Question Builder</h4>
+     
+          <h3 className={`text-lg font-medium mb-2  ${theme == 'light' ?"text-black" : "text-gray-100"}`}>Code Question Builder</h3>
           <CodeCreatorForm
             setFormData={setCodeData}
             formData={codeData}
@@ -397,7 +406,8 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
         <>
           {/* Comprehension Passage */}
           <textarea
-            className="input w-full p-2 border rounded mb-2"
+            className={inputCommon
+            }
             rows={4}
             placeholder="Enter comprehension passage"
             value={form.passage}
@@ -405,7 +415,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
           />
 
           <input
-            className="input w-full border rounded p-2"
+            className={inputCommon}
             placeholder="Positive Marks"
             type="number"
             value={form.sub_form.positive_marks}
@@ -421,7 +431,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
           />
 
           <input
-            className="input w-full border rounded p-2"
+            className={inputCommon}
             placeholder="Negative Marks"
             type="number"
             value={form.sub_form.negative_marks}
@@ -438,11 +448,23 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
 
 
           {/* Sub-question builder */}
-          <div className="bg-gray-100 border rounded p-4 space-y-3">
-            <h4 className="font-semibold">Add Sub-Question</h4>
+          <div className={` border rounded p-4 space-y-3 ${
+            theme === 'light' 
+              ? 'bg-gray-100' 
+              : 'bg-gray-800 border border-gray-700'
+          }`}>
+      
+       
+            <h4 className={` font-semibold ${
+            theme === 'light' 
+              ? 'text-black' 
+              : 'text-gray-300'
+          }`}>Add Sub-questions</h4>
+          
+
 
             <select
-              className="input w-full border rounded p-2"
+              className={inputCommon}
               value={form.sub_form.type}
               onChange={(e) =>
                 setForm(prev => ({
@@ -459,7 +481,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
             </select>
 
             <input
-              className="input w-full border rounded p-2"
+              className={inputCommon}
               placeholder="Sub-question text"
               value={form.sub_form.question_text}
               onChange={(e) =>
@@ -476,7 +498,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
                 {form.sub_form.options.map((opt, i) => (
                   <input
                     key={i}
-                    className="input w-full border rounded p-2 mb-1"
+                    className={inputCommon}
                     placeholder={`Option ${i + 1}`}
                     value={opt}
                     onChange={(e) => {
@@ -496,7 +518,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
             {form.sub_form.type === 'mcq' && (
               <input
                 type="number"
-                className="input w-full border rounded p-2"
+                className={inputCommon}
                 placeholder="Correct option index (0-based)"
                 value={form.sub_form.correct_option}
                 onChange={(e) =>
@@ -514,7 +536,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
             {/* MSQ correct options */}
             {form.sub_form.type === 'msq' && (
               <input
-                className="input w-full border rounded p-2"
+                className={inputCommon}
                 placeholder="Correct options (comma-separated)"
                 onChange={(e) =>
                   setForm(prev => ({
@@ -533,7 +555,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
             {/* Fill / Numerical */}
             {(form.sub_form.type === 'fill' || form.sub_form.type === 'numerical') && (
               <input
-                className="input w-full border rounded p-2"
+                className={inputCommon}
                 placeholder="Correct answer"
                 value={form.sub_form.correct_answer}
                 onChange={(e) =>
@@ -548,7 +570,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
             {/* True/False */}
             {form.sub_form.type === 'tf' && (
               <select
-                className="input w-full border rounded p-2"
+                className={inputCommon}
                 value={form.sub_form.is_true}
                 onChange={(e) =>
                   setForm(prev => ({
@@ -590,7 +612,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
                 }));
               }}
             >
-              ➕ Add Sub-question
+             Add Sub-question
             </button>
 
             {/* Preview sub-questions */}
@@ -606,14 +628,14 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
       {/* Subject, Chapter, Explanation */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <input
-          className="w-full p-2.5 bg-white border rounded-lg shadow-sm text-sm"
+          className={inputCommon}
           name="subject"
           value={form.subject}
           onChange={handleChange}
           placeholder="Subject"
         />
         <input
-          className="w-full p-2.5 bg-white border rounded-lg shadow-sm text-sm"
+          className={inputCommon}
           name="chapter"
           value={form.chapter}
           onChange={handleChange}
@@ -622,7 +644,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
       </div>
 
       <textarea
-        className="w-full p-2.5 bg-white border rounded-lg shadow-sm text-sm"
+        className={inputCommon}
         name="explanation"
         value={form.explanation}
         onChange={handleChange}
@@ -633,7 +655,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
       {/* Difficulty & Marks */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <select
-          className="w-full p-2.5 bg-white border rounded-lg shadow-sm text-sm"
+          className={inputCommon}
           name="difficulty"
           value={form.difficulty}
           onChange={handleChange}
@@ -645,7 +667,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
         <div className="grid grid-cols-2 gap-4">
           <input
             type="number"
-            className="w-full p-2.5 bg-white border rounded-lg shadow-sm text-sm"
+            className={inputCommon}
             name="positive_marks"
             value={form.positive_marks}
             onChange={handleChange}
@@ -654,7 +676,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
           />
           <input
             type="number"
-            className="w-full p-2.5 bg-white border rounded-lg shadow-sm text-sm"
+            className={inputCommon}
             name="negative_marks"
             value={form.negative_marks}
             onChange={handleChange}
