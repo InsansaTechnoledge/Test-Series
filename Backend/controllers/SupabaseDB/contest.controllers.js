@@ -1,7 +1,7 @@
 import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
 import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
 // import { createContestQuery, deleteContest, fetchContest } from "../../utils/SqlQueries/contest.queries.js";
-import { createContestQuery, enrollStudentToContestQuery, fetchContest, deleteContest } from "../../utils/SqlQueries/contest.queries.js";
+import { createContestQuery, enrollStudentToContestQuery, fetchContest, deleteContest, getContestCount } from "../../utils/SqlQueries/contest.queries.js";
 
 export const createContest = async (req, res) => {
     const payload = req.body;
@@ -107,5 +107,16 @@ export const getenrolledContest = async (req, res) => {
     } catch (error) {
         console.error("Error fetching enrolled contests:", error);
         return new APIError(500, ['Failed to fetch enrolled contests', error.message]).send(res);
+    }
+}
+
+export const getTotalContest=async(organizationId)=>{
+
+   try{ const total=await getContestCount(organizationId);
+    return total;
+
+   }catch(error){
+        console.error("Error in getTotalContest:", error);
+        throw new APIError(error?.response?.status || error?.status || 500, ["Something went wrong while fetching contest count", error.message || ""]);
     }
 }

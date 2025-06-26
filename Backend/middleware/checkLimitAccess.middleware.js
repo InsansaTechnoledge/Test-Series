@@ -6,14 +6,15 @@ export const checkLimitAccess= (req, res, next) => {
     console.log(req.featureLimit);
     const metaData=req.user?.metaData;
     const featureInfo= req.featureLimit;
+    const metaKey=featureKeyToMetaDataKey[featureInfo.key]
 
-    if (!metaData ||  !metaData[featureKeyToMetaDataKey[featureInfo.key]]) {
+    if (!metaData ||  metaData?.[metaKey]=== undefined || metaData?.[metaKey] === null) {
         console.log(`You do not have access to the feature: ${featureInfo.key} in your plan.`);
         return new APIError(403, [`You do not have access to the feature: ${featureInfo.key} in your plan.`]).send(res);
     }
 
 
-    const used = metaData[featureKeyToMetaDataKey[featureInfo.key]] || 0;
+    const used = metaData[metaKey] || 0;
     const limit = featureInfo.value;
     const canUse = used < limit;
 

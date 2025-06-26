@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 import { connOne } from '../../database/MongoDB.js';
 import { getTotalBatches } from '../../controllers/SupabaseDB/batch.controllers.js';
 import { categoryToFeatureKey, featureKeyToMetaDataKey } from '../../utils/dataMapping.util.js';
+import { getTotalContest } from '../../controllers/SupabaseDB/contest.controllers.js';
 
 
 const addressSchema = new Schema({
@@ -218,7 +219,9 @@ OrganizationSchema.methods.getFullMetadata = async function (roleFeatures) {
 
   await this.populate('totalStudents totalUsers totalRoleGroups');
 
-  const totalBatches = await getTotalBatches(this._id.toString());
+  const {totalBatches,totalVideos} = await getTotalBatches(this._id.toString());
+
+  const totalContests = await getTotalContest(this._id.toString());
 
   const fullMetadata = {
     totalStudents: this.totalStudents ?? 0,
@@ -226,8 +229,8 @@ OrganizationSchema.methods.getFullMetadata = async function (roleFeatures) {
     totalBatches: totalBatches ?? 0,
     totalExams: this.totalExams ?? 0,
     totalRoleGroups: this.totalRoleGroups ?? 0,
-    // totalVideos: this.totalVideos ?? 0,
-    // totalContests: this.totalContests ?? 0
+    totalVideos: totalVideos ?? 0,
+    totalContests: totalContests ?? 0
   };
 
   if (shouldReturnAll) {

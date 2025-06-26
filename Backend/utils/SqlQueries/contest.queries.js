@@ -139,4 +139,13 @@ export const enrollStudentToContestQuery = async (contestId, userId) => {
   return data;
 }
 
+export const getContestCount=async(organizationId)=>{
+    const { data, error } = await supabase
+        .from("organization_contest")
+        .select('*', { count: 'exact' , head: true })
+        .eq("organization_id", organizationId);
+
+    if (error) throw error;
+    return data;
+}
 
