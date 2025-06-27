@@ -2,6 +2,10 @@ import { categoryToRoutes } from "../config/roleRouteMap.config.js";
 import { APIError } from "../utils/ResponseAndError/ApiError.utils.js";
 
 export const roleRouteGuard = (req,res,next)=>{
+  if(req.user.role === 'organization') {
+    console.log("🗓️ User is an organization, skipping role access check.")
+    return next();
+  }
     const path= req.route.path;
     const method = req.method;
     const category = req.roleKey;
