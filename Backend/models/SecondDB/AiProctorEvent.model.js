@@ -1,5 +1,5 @@
 import {Schema} from 'mongoose'
-import { connTwo } from '../../database/MongoDB';
+import { connTwo } from '../../database/MongoDB.js';
 
 const proctorEventSchema = new Schema({
     studentId: {

@@ -41,7 +41,8 @@ export const fetchSelective = async (conditions) => {
         name,
         year
       ),
-      reapplicable
+      reapplicable,
+      ai_proctored
     `);
 
   Object.entries(conditions).forEach(([key, value]) => {
@@ -149,7 +150,8 @@ export const fetchNonLiveExams = async (organization_id) => {
         batch_id (
           name,
           year
-        )
+        ),
+        ai_proctored
       `)
     .eq("go_live", false)
     .eq("organization_id", organization_id);
