@@ -48,8 +48,8 @@ const PageAccessGuard = ({ children }) => {
       canAccess = hasPlanAccess && hasRoleBasedAccess;
       console.log("canAccess", canAccess);
 
-
-       if(hasRoleBasedAccess){ return (
+      if(location.pathname === '/institute/institute-landing' || canAccess) {
+       return (
           <PageAccessContext.Provider value={canAccess}>
             {children}
           </PageAccessContext.Provider>
