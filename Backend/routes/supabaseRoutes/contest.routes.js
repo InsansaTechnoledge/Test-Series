@@ -3,6 +3,7 @@ import { addContestQuestion, getContestQuestions, runContestCode, testContestQue
 // import { createContest, DeleteContest, FetchContest } from '../../controllers/SupabaseDB/contest.controllers.js';
 import { createContest, enrollStudentToContest, FetchContest, getenrolledContest, DeleteContest } from '../../controllers/SupabaseDB/contest.controllers.js';
 import { checkLimitAccess } from '../../middleware/checkLimitAccess.middleware.js';
+import { roleRouteGuard } from '../../middleware/roleRouteGuard.middleware.js';
 
 const router=express.Router();
 
@@ -10,9 +11,9 @@ router.post('/questions',addContestQuestion);
 router.get('/questions', getContestQuestions);
 router.post('/test',testContestQuestion);
 router.post('/run', runContestCode);
-router.post('/create',checkLimitAccess,createContest);
+router.post('/create',roleRouteGuard,checkLimitAccess,createContest);
 router.get('/', FetchContest)
-router.delete('/:id' , DeleteContest)
+router.delete('/:id' , roleRouteGuard,DeleteContest)
 router.post('/enroll', enrollStudentToContest);
 router.get('/enroll',getenrolledContest);
 

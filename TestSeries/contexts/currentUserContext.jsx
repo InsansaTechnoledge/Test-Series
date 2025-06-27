@@ -57,10 +57,10 @@ export const UserProvider = ({ children }) => {
     return rawMap[location] || null;
   };
 
-  // const getRoleFeatureKeyFromLocation = (location) => {
-  //   const rawMap = JSON.parse(import.meta.env.VITE_ROLE_FEATURE_MAP || '{}');
-  //   return rawMap[location] || null;
-  // };
+  const getRoleFeatureKeyFromLocation = (location) => {
+    const rawMap = JSON.parse(import.meta.env.VITE_ROLE_FEATURE_MAP || '{}');
+    return rawMap[location] || null;
+  };
 
    const hasRoleAccess = ({ keyFromPageOrAction, location }) => {
 
@@ -97,7 +97,7 @@ export const UserProvider = ({ children }) => {
 
 
   return (
-    <currentUserContext.Provider value={{ user, setUser, isUserLoggedOut, setIsUserLoggedOut, hasPlanFeature, getFeatureKeyFromLocation ,hasRoleAccess}}>
+    <currentUserContext.Provider value={{ user, setUser, isUserLoggedOut, setIsUserLoggedOut, hasPlanFeature, getFeatureKeyFromLocation ,hasRoleAccess,getRoleFeatureKeyFromLocation}}>
       {children}
     </currentUserContext.Provider>
   );
