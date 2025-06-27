@@ -16,3 +16,16 @@ export const categoryToFeatureKey = {
   video: 'video_feature',
   coding: 'coding_feature',
 };
+
+export const featureKeyToCategory = {
+  exam_feature: 'exam',
+  student_feature: 'student',
+  batch_feature: 'batch',
+  role_feature: 'role',
+  video_feature: 'video',
+  coding_feature: 'coding',
+  user_feature: 'user',
+};
+
+
+

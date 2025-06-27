@@ -3,6 +3,7 @@ import React, { useMemo } from 'react';
 const WrongQuestionAnalysis = ({ examData, currentStudentId, examQuestions }) => {
   const questionStats = useMemo(() => {
     const stats = {};
+    if (!Array.isArray(examData)) return [];
 
     examData.forEach(student => {
       const wrongs = student.wrongAnswers || [];

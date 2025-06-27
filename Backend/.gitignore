@@ -20,3 +20,5 @@ build/
 # Sessions or uploads
 uploads/
 sessions/
+
+config/roleRouteMap.config.js

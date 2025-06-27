@@ -29,7 +29,10 @@ const LeaderBoard = ({ exams,exam, setExam, examData, loading, error }) => {
         }
     }
 
-    const sortedData = examData.sort((a, b) => (b.marks || 0) - (a.marks || 0))
+    // const sortedData = examData.sort((a, b) => (b.marks || 0) - (a.marks || 0))
+    const sortedData = Array.isArray(examData) ? [...examData].sort((a, b) => (b.marks || 0) - (a.marks || 0)) : []
+
+
 
     // Get current exam name for display
     const currentExamName = exams.find(e => e.id === exam)?.name || 'Loading...'

@@ -6,7 +6,7 @@ export const addExamAPI = async (data) => {
   };
 
   export const uploadExamQuestions = async ({ exam_id, organization_id, questions }) => {
-    const res = await api.post('/v1/questionUpload/upload-json', {
+    const res = await api.post('/v1/exam/upload-json', {
       exam_id,
       organization_id,
       questions

@@ -1,0 +1,9 @@
+// TEMPLATE ONLY - replace with actual values locally
+export const categoryToRoutes = {
+  batch: {
+    '/new-batch': {
+      methods: ['POST'],
+      roleFeature: 'new_batch'
+    }
+  }
+};

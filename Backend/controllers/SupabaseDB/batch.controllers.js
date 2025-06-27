@@ -12,7 +12,7 @@ export const createOrgBatch = async (req, res) => {
     const { syllabus, faculties, ...data } = req.body;
     data.updated_at = new Date();
     data.updated_by = req.user._id;
-    data.organization_id = req.user.role === 'organization' ? req.user._id : req.user.organization_id;
+    data.organization_id = req.user.role === 'organization' ? req.user._id :( req.user.organizationId || req.user.organizationId._id);
     data.created_by = req.user._id;
 
     let createdSyllabus;
