@@ -8,6 +8,7 @@ import BackButton from '../../../../constants/BackButton';
 import { useState } from 'react';
 import DeleteUserModal from '../../../utility/DeleteUserModal';
 import { useTheme } from '../../../../../hooks/useTheme';
+import { useUser } from '../../../../../contexts/currentUserContext';
 
 const UserViewPage = () => {
     const location = useLocation();
@@ -18,6 +19,10 @@ const UserViewPage = () => {
     const { batchMap } = useCachedBatches();
     const navigate = useNavigate();
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const {hasRoleAccess} = useUser();
+    const canEditUser = hasRoleAccess({keyFromPageOrAction: 'actions.editUser', location: location.pathname});
+    const canDeleteUser = hasRoleAccess({keyFromPageOrAction: 'actions.deleteUser', location: location.pathname});
+
 
     const userData = userMap[userId]
 
@@ -49,20 +54,22 @@ const UserViewPage = () => {
                             <BackButton/>
 
                             <div className="flex flex-col md:flex-row gap-4">
-                                <button 
+                              {canEditUser && (  <button 
+                                    disabled={!canEditUser}
                                     className={theme === 'light' ? 'group inline-flex items-center space-x-3 bg-emerald-500/20 hover:bg-emerald-500/30 text-blue-600 px-6 py-3 rounded-2xl font-semibold transition-all duration-300 backdrop-blur-md border border-emerald-400/30 hover:border-emerald-400/50 hover:scale-105' : 'group inline-flex items-center space-x-3 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 px-6 py-3 rounded-2xl font-semibold transition-all duration-300 backdrop-blur-md border border-emerald-400/30 hover:border-emerald-400/50 hover:scale-105'}
                                     onClick={() => navigate(`/institute/user-edit/${userId}`)}
                                 >
                                     <Edit className="w-5 h-5 group-hover:rotate-12 transition-transform" />
                                     {/* <span>Edit User</span> */}
-                                </button>
-                                <button 
+                                </button>)}
+                                {canDeleteUser && (<button 
+                                    disabled={!canDeleteUser}
                                     className="group inline-flex items-center space-x-3 bg-red-500/20 hover:bg-red-500/30 text-red-600 px-6 py-3 rounded-2xl font-semibold transition-all duration-300 backdrop-blur-md border border-red-400/30 hover:border-red-400/50 hover:scale-105"
                                     onClick={() => setShowDeleteModal(true)}
                                 >
                                     <Trash className="w-5 h-5 group-hover:scale-110 transition-transform" />
                                     {/* <span>Delete User</span> */}
-                                </button>
+                                </button>)}
                             </div>
                         </div>
 
