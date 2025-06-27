@@ -49,12 +49,12 @@ const PageAccessGuard = ({ children }) => {
       console.log("canAccess", canAccess);
 
 
-        return (
+       if(hasRoleBasedAccess){ return (
           <PageAccessContext.Provider value={canAccess}>
             {children}
           </PageAccessContext.Provider>
         );
-      
+      }
 
     }
 
