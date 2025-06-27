@@ -10,8 +10,8 @@ const router = express.Router()
 router.post('/create-batch' , isUserAndOrgAuthenticated,roleRouteGuard,checkLimitAccess,createOrgBatch)
 router.get('/get-batch',isOrgAndUserAndStudentAuthenticated ,getOrgBatches);
 router.get('/video/:batchId' , FetchYoutubeVideos)
-router.post('/delete-video', handleDeleteVideo);
+router.post('/delete-video', roleRouteGuard,handleDeleteVideo);
 router.patch('/update-batch/:id' ,roleRouteGuard ,updateOrgBatch)
-router.delete('/delete-batch/:id' , isOrganizationAuthenticated,deleteOrgBatch)
+router.delete('/delete-batch/:id' , isOrganizationAuthenticated,roleRouteGuard,deleteOrgBatch)
 
 export default router 
