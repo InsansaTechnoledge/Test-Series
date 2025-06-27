@@ -3,7 +3,7 @@ import { Search, Filter, Trash2, MoreHorizontal, Eye, Edit, UserX, Check, X, Che
 import { useCachedStudents } from '../../../../hooks/useCachedStudents';
 import { deleteStudentById } from '../../../../utils/services/studentService';
 import { useCachedBatches } from '../../../../hooks/useCachedBatches';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useUser } from '../../../../contexts/currentUserContext';
 import Banner from "../../../../assests/Institute/student list.svg"
@@ -26,7 +26,7 @@ const StudentListPage = () => {
             );
           }
 
-  const { user } = useUser();
+  const { user ,hasRoleAccess} = useUser();
   const { students, isLoading, isError } = useCachedStudents();
   const [showStudents, setShowStudents] = useState([]);
   const { batches, batchMap } = useCachedBatches();
@@ -42,6 +42,27 @@ const StudentListPage = () => {
   const [studentsToDelete, setStudentsToDelete] = useState([])
   const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' })
   const { theme } = useTheme();
+  const location = useLocation();
+
+  const canAddStudent= hasRoleAccess({
+    keyFromPageOrAction: 'actions.addStudent',
+    location: location.pathname
+  });
+  const canDeleteStudent = hasRoleAccess({
+    keyFromPageOrAction: 'actions.deleteStudent',
+    location: location.pathname
+  });
+  const canEditStudent = hasRoleAccess({
+    keyFromPageOrAction: 'actions.editStudent',
+    location: location.pathname
+  });
+
+  const canViewStudent = hasRoleAccess({
+    keyFromPageOrAction: 'actions.viewStudent',
+    location: location.pathname
+  });
+
+
 
   useEffect(() => {
     if (students.length > 0) {
@@ -130,10 +151,6 @@ const StudentListPage = () => {
     setSelectAll(false)
     setShowConfirmDelete(false)
   }
-
-  const handleViewProfile = () => {
-
-  };
 
   return (
     <div className={`min-h-screen`}>
@@ -238,8 +255,9 @@ const StudentListPage = () => {
             </div>
 
             <div className="flex items-center space-x-3">
-              {selectedStudents.length > 0 && (
+              {(selectedStudents.length > 0 && canDeleteStudent) && (
                 <button
+                  disabled={!canDeleteStudent}
                   onClick={confirmDeleteSelected}
                   className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-2xl font-bold transition-all duration-300 hover:shadow-2xl hover:scale-105 flex items-center space-x-2"
                 >
@@ -248,13 +266,14 @@ const StudentListPage = () => {
                 </button>
               )}
 
-              <button
+             {canAddStudent && ( <button
+                disabled={!canAddStudent}
                 className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-2xl font-bold transition-all duration-300 hover:shadow-2xl hover:scale-105 flex items-center space-x-3 transform"
                 onClick={() => navigate('/institute/add-student')}
               >
                 <PlusSquare className="w-5 h-5" />
                 <span>Add New Student</span>
-              </button>
+              </button>)}
             </div>
           </div>
 
@@ -400,25 +419,26 @@ const StudentListPage = () => {
 
                 {/* Action Buttons */}
                 <div className="flex justify-center space-x-3">
-                  <button
+                 {canViewStudent &&( <button
+                 disabled={!canViewStudent}
                     className={`flex-1 z-10 cursor-pointer ${theme === 'light' ? 'bg-gray-100 hover:bg-gray-200 text-gray-700' : 'bg-gray-700 hover:bg-gray-600 text-gray-200'} p-3 rounded-xl transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-2`}
                     onClick={() => navigate('/institute/student-detail', { state: { studentId: student._id } })}
                     title="View Details"
                   >
                     <Eye className="w-4 h-4" />
                     <span className="font-medium text-sm">View</span>
-                  </button>
+                  </button>)}
 
-                  <button
+                 { canEditStudent && (<button
                     className={`flex-1 z-10 cursor-pointer ${theme === 'light' ? 'bg-indigo-100 hover:bg-indigo-200 text-indigo-700' : 'bg-indigo-800 hover:bg-indigo-700 text-indigo-200'} p-3 rounded-xl transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-2`}
                     onClick={() => navigate('/institute/student-edit', { state: { studentId: student._id } })}
                     title="Edit Student"
                   >
                     <Edit className="w-4 h-4" />
                     <span className="font-medium text-sm">Edit</span>
-                  </button>
-
-                  <button
+                  </button>)
+}
+                  {canDeleteStudent && (<button
                     className={`${theme === 'light' ? 'bg-red-100 hover:bg-red-200 text-red-700' : 'bg-red-800 hover:bg-red-700 text-red-200'} z-10 cursor-pointer p-3 rounded-xl transition-all duration-300 hover:scale-105`}
                     onClick={() => {
                       setStudentsToDelete([student._id]);
@@ -427,7 +447,7 @@ const StudentListPage = () => {
                     title="Delete Student"
                   >
                     <Trash2 className="w-4 h-4" />
-                  </button>
+                  </button>)}
                 </div>
               </div>
 
@@ -447,13 +467,13 @@ const StudentListPage = () => {
             <p className={`text-xl ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'} mb-8 max-w-md mx-auto`}>
               {selectedBatch ? `No students found for the selected batch` : searchTerm ? `No students match "${searchTerm}"` : 'Get started by adding your first student'}
             </p>
-            <button
+           {canAddStudent &&( <button
               className="bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-4 rounded-2xl font-bold transition-all duration-300 hover:shadow-2xl hover:scale-105 inline-flex items-center space-x-3"
               onClick={() => navigate('/institute/add-student')}
             >
               <PlusSquare className="w-5 h-5" />
               <span>Add First Student</span>
-            </button>
+            </button>)}
           </div>
         )}
       </div>

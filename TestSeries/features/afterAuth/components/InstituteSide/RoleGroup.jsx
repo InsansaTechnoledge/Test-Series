@@ -21,7 +21,7 @@ import { useTheme } from '../../../../hooks/useTheme';
 
 
 export default function FeatureBasedRoleGroups() {
-  const { user, getFeatureKeyFromLocation } = useUser();
+  const { user, getFeatureKeyFromLocation ,hasRoleAccess} = useUser();
   const { featuresData, isLoading } = useCachedFeatures();
   const [showDeleteRoleGroupModal, setShowDeleteRoleGroupModal] = useState(false);
   const [roleGroupToDelete, setRoleGroupToDelete] = useState();
@@ -72,6 +72,20 @@ export default function FeatureBasedRoleGroups() {
     }
     featuresByCategory[feature.category].push(feature);
   });
+
+  const canCreateRoleGroup = hasRoleAccess({
+    keyFromPageOrAction: 'actions.createRole',
+    location: location.pathname
+  });
+  const canEditRoleGroup = hasRoleAccess({
+    keyFromPageOrAction: 'actions.editRole',
+    location: location.pathname
+  });
+  const canDeleteRoleGroup = hasRoleAccess({
+    keyFromPageOrAction: 'actions.deleteRole',
+    location: location.pathname
+  });
+
 
   const handleAddGroup = async () => {
     if (newGroup.name.trim() === '') return;
@@ -289,7 +303,7 @@ const renderEditForm = (group) => {
                 <button
                   className="bg-blue-600 hover:bg-blue-700 transition text-white px-4 py-2 rounded-md flex items-center gap-1 disabled:bg-gray-400"
                   onClick={handleUpdateGroup}
-                  disabled={!newGroup.name.trim()}
+                  disabled={!newGroup.name.trim() || !canEditRoleGroup}
                 >
                   <Save size={16} />
                   <span>Update Group</span>
@@ -461,9 +475,9 @@ return (
           <div className="flex gap-3">
             <RefreshButton refreshFunction={refreshFunction} />
 
-            {!isAddingGroup && (
+            {(!isAddingGroup && canCreateRoleGroup )&& (
               <button
-                disabled={canAccessPage === false || canAddMoreRoles === false}
+                disabled={canAccessPage === false || canAddMoreRoles === false ||!canCreateRoleGroup}
                 onClick={() => {
                   setIsAddingGroup(true);
                   setEditingGroupId(null);
@@ -680,13 +694,15 @@ return (
                     <p className={`text-sm ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>{group.description}</p>
                   </div>
                   <div className="flex gap-2">
-                    <button
+                    {canEditRoleGroup && (<button
+                    disabled={canAccessPage === false || !canEditRoleGroup}
                       className={`p-2 ${theme === 'light' ? 'hover:bg-blue-100 text-gray-600 hover:text-blue-700' : 'hover:bg-blue-900/50 text-gray-400 hover:text-blue-400'} rounded-full transition`}
                       onClick={() => handleEditGroup(group)}
                     >
                       <Edit size={18} />
-                    </button>
-                    <button
+                    </button>)}
+                   {canDeleteRoleGroup && ( <button
+                      disabled={canAccessPage === false || !canDeleteRoleGroup}
                       className={`p-2 ${theme === 'light' ? 'hover:bg-red-100 text-gray-600 hover:text-red-600' : 'hover:bg-red-900/50 text-gray-400 hover:text-red-400'} rounded-full transition`}
                       onClick={() => {
                         setRoleGroupToDelete(group);
@@ -694,7 +710,7 @@ return (
                       }}
                     >
                       <Trash size={18} />
-                    </button>
+                    </button>)}
                   </div>
                 </div>
 

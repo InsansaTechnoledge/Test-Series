@@ -23,7 +23,8 @@ import { mongoose,Types } from "mongoose";
 
 export const addRole = async (req, res) => {
   try {
-    const rawOrgId = req.user.id || req.user._id;
+
+    const rawOrgId = req.user.role === "organization" ? req.user._id : (req.user.organizationId._id || req.user.organizationId);
 
     const orgId = new Types.ObjectId(
       Buffer.isBuffer(rawOrgId) ? rawOrgId.toString("hex") : rawOrgId
