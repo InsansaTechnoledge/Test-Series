@@ -57,6 +57,7 @@ import Loader from '../Loader/Loader';
 import YourPlanPage from '../../features/afterAuth/components/InstituteSide/components/PlanPage/YourPlanPage';
 import AboutPage from '../../features/beforeAuth/pages/AboutPage';
 import ContactPage  from "../../features/beforeAuth/pages/ContactPage"
+import ProctorSplash from '../../features/afterAuth/components/StudentSide/Landing/ProctorSplash';
 
 
 const PageLinks = () => {
@@ -156,6 +157,7 @@ const PageLinks = () => {
                 <Route path='completed-exams' element={<ResultsPage />} />
                 <Route path='result/:examId' element={<ResultDetailPage />} />
                 <Route path='test' element={<TestWindow />} />
+                <Route path="proctor-splash" element={<ProctorSplash />} />
                 <Route path='coding-contests' element={<ContestListPage />} />
                 <Route path='classroom' element={<StudentClassroom />} />
                 <Route path='contest/:contestId' element={<ContestInstructionWindow />} />

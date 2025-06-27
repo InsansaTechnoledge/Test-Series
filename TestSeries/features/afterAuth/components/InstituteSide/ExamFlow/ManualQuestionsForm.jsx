@@ -7,6 +7,7 @@ import { useTheme } from '../../../../../hooks/useTheme';
 
 const ManualQuestionForm = ({ setQuestions, organizationId }) => {
   const {user}=useUser();
+  console.log("sdgv",user)
 
   const [codeData, setCodeData] = useState({
     title: '',
@@ -209,7 +210,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
 
   };
   useEffect(()=>{
-    console.log("check"  ,user?.planFeatures?.coding_feature.isActive)
+    console.log("check"  ,user?.planFeatures?.coding_feature?.isActive)
   },[user])
   const inputCommon = `p-4 rounded-2xl transition-all duration-300 text-lg w-full pr-14 ${
     theme === 'light'

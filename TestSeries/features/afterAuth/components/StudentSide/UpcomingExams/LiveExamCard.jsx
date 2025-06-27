@@ -2,6 +2,7 @@ import { BookOpen, CalendarDays, Clock, Goal, Radio } from 'lucide-react'
 import { useNavigate } from 'react-router-dom';
 
 const LiveExamCard = ({ data, onStartTest }) => {
+    // console.log(data)
     const navigate=useNavigate();
 
     const getButtonProps = () => {

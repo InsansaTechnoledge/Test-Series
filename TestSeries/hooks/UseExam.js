@@ -87,7 +87,7 @@ export const useGroupedExams = (exams) => {
   return useMemo(() => {
     if (!exams || !Array.isArray(exams)) return {};
     
-    const result = {};
+    const result = {}  ;
     exams.forEach((exam) => {
       const batchName = exam.batch?.name || 'Unknown Batch';
       if (!result[batchName]) result[batchName] = [];

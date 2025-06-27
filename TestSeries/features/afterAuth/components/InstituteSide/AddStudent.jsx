@@ -33,6 +33,15 @@ const AddStudent = () => {
 
   const canAddMoreStudents = useLimitAccess(getFeatureKeyFromLocation(location.pathname), "totalStudents")
 
+  console.log(batch)
+
+  useEffect(() => {
+    // Auto-select batch if there's only one option and no batch is currently selected
+    if (batches.length === 1 && !batch) {
+      setBatch(batches[0].id);
+    }
+  }, [batches, batch]);
+
   // Memoized derived values for limits
   const Total_students = useMemo(() => (
     user?.role === 'organization'
@@ -53,14 +62,15 @@ const AddStudent = () => {
   }, [activeTab, students.length, excelData.length, Total_students, Creation_limit]);
 
   const canSubmit = useMemo(() => (
-    canAccessPage && !studentLimitExceeded && !!batch
+    canAccessPage && !studentLimitExceeded && batch  
   ), [canAccessPage, studentLimitExceeded, batch]);
+  
 
   // Button label logic
   const submitButtonLabel = useMemo(() => {
     if (!canAccessPage) return 'Access Denied';
     if (studentLimitExceeded) return 'Student limit exceeded';
-    if (!batch) return 'Select a batch';
+    if (!batch) return 'Select a batch';  
     if (activeTab === 'manual') return 'Add Students';
     if (activeTab === 'bulk') return 'Upload Excel Data';
     if (activeTab === 'import') return 'Import Students';

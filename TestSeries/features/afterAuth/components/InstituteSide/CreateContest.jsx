@@ -195,8 +195,7 @@ const CreateContest = () => {
 
   return (
 
-    <div className={`min-h-screen ${theme === 'light' ? 'bg-white' : 'bg-gray-900'
-      }`}>
+    <div className={`min-h-scree}`}>
       <div className="mx-auto px-6 py-8">
         {/* Hero Header */}
         <div className="relative overflow-hidden rounded-xl h-80 mt-3">

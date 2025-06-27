@@ -11,11 +11,11 @@ const UpcomingExamCard = ({ data }) => {
                     <BookOpen className='w-12 h-12 text-indigo-950' />
                 </div>
                 <span className='my-auto text-indigo-950 text-2xl font-bold'>
-                    {data.name}
+                    {data?.name}
                 </span>
             </div>
             <div className='text-gray-700 text-sm'>
-                Description: {data.description}
+                Description: {data?.description}
             </div>
             <div>
                 <img src={dottedLine} className='w-full my-3' />
@@ -34,7 +34,7 @@ const UpcomingExamCard = ({ data }) => {
                         <Goal />
                     </div>
                     <span>
-                        {data.total_marks} Marks
+                        {data?.total_marks} Marks
                     </span>
                 </div>
                 <div className='flex gap-2'>
@@ -42,7 +42,7 @@ const UpcomingExamCard = ({ data }) => {
                         <Clock />
                     </div>
                     <span>
-                        {data.duration} Mins
+                        {data?.duration} Mins
                     </span>
                 </div>
             </div>
@@ -52,7 +52,7 @@ const UpcomingExamCard = ({ data }) => {
                         <CalendarDays />
                     </div>
                     <span>
-                        {dateFormatter(data.date)}
+                        {dateFormatter(data?.date)}
                     </span>
                 </div>
             </div>

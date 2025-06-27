@@ -16,6 +16,7 @@ const ExamForm = ({ canCreateMoreExams, onSubmit, initialData = {
   total_marks: '',
   duration: '',
   batch_id: '',
+  ai_proctored: false,
 } }) => {
 
   const {theme} = useTheme()
@@ -58,6 +59,7 @@ const ExamForm = ({ canCreateMoreExams, onSubmit, initialData = {
       return;
     }
 
+    console.log("form data" , form)
     try {
       let response = {};
 
@@ -301,6 +303,24 @@ const ExamForm = ({ canCreateMoreExams, onSubmit, initialData = {
                   checked={form.reapplicable}
                 />
                 <span className="text-gray-700 font-medium">Allow reattempt</span>
+              </div>
+            </div>
+
+            <div className="bg-white/50 p-6 rounded-xl border border-gray-200 backdrop-blur-sm transition-all hover:shadow-lg">
+            <label htmlFor="ai_proctored" className="...">
+              <span>Do you want this exam to be ai-proctored?</span>
+            </label>
+
+              <div className="flex items-center space-x-3">
+              <input
+                  id="ai_proctored"
+                  name="ai_proctored"
+                  type="checkbox"
+                  className="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 transition"
+                  onChange={handleChange}
+                  checked={form.ai_proctored}
+                />
+                <span className="text-gray-700 font-medium">yes</span>
               </div>
             </div>
 
