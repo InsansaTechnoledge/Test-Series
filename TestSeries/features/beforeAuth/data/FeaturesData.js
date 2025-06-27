@@ -1,13 +1,3 @@
-import { 
-    Users, UserPlus, Shield, Database, Calendar, FileText, 
-    Award, Eye, Clock, Mail, Video, BarChart3, Code, 
-    Settings, Target, Brain, CheckCircle, AlertTriangle,
-    Camera, Smartphone, Monitor, ArrowRight, Sparkles,
-    GraduationCap, Building, Play, Cloud, Youtube,
-    TrendingUp, PieChart, Activity, Bell, Zap, Bot,
-    LineChart, Download, Filter, Upload, Table, Search,
-    Wifi, Globe, MessageSquare, Star, Bookmark
-  } from 'lucide-react';
   import MultiBatch from "../../../assests/Landing/SoftwareCapabilities/Multi-Batch Management.svg"
   import  FManagemnet from "../../../assests/Landing/SoftwareCapabilities/Faculty Management.svg"
   import  RBAC from "../../../assests/Landing/SoftwareCapabilities/Complete RBAC System.svg"
@@ -20,6 +10,21 @@ import {
   import  TExam from "../../../assests/Landing/SoftwareCapabilities/Timed Examinations.svg"
   import  Que from "../../../assests/Landing/SoftwareCapabilities/Question Bank Management.svg"
   import  Automated from "../../../assests/Landing/SoftwareCapabilities/Automated Grading.svg"
+  import  Contest from "../../../assests/Landing/SoftwareCapabilities/Contest Management.svg"
+  import  AutoCom from "../../../assests/Landing/SoftwareCapabilities/Automated Communications.svg"
+  import  VManag from "../../../assests/Landing/SoftwareCapabilities/Video Management.svg"
+  import  DExam from "../../../assests/Landing/SoftwareCapabilities/Video Management.svg"
+  import  CG from "../../../assests/Landing/SoftwareCapabilities/Certificate Generation.svg"
+  import  MAPP from "../../../assests/Landing/SoftwareCapabilities/Mobile App Support.svg"
+  import  AADash from "../../../assests/Landing/SoftwareCapabilities/Advanced Analytics Dashboard.svg"
+  import  ARG from "../../../assests/Landing/SoftwareCapabilities/Automated Report Generation.svg"
+  import  Snoti from "../../../assests/Landing/SoftwareCapabilities/Smart Notifications.svg"
+  import  PA from "../../../assests/Landing/SoftwareCapabilities/Predictive Analytics.svg"
+  import  DA from "../../../assests/Landing/SoftwareCapabilities/Data Visualization.svg"
+  import  PD from "../../../assests/Landing/SoftwareCapabilities/Plagiarism Detection.svg"
+  import  APII from "../../../assests/Landing/SoftwareCapabilities/API Integration.svg"
+  import  CB from "../../../assests/Landing/SoftwareCapabilities/Custom Branding.svg"
+  import  LiveChat from "../../../assests/Landing/SoftwareCapabilities/Live Chat Support.svg"
  
   
 // Categories
@@ -127,42 +132,42 @@ export const categories = [
     {
       title: 'Contest Management',
       description: 'Create coding contests and tech fests with flexible participation',
-      icon: Code,
+      icon: Contest,
       category: 'Student Experience',
       tier: 'Pro'
     },
     {
       title: 'Automated Communications',
       description: 'Automatic result emails to parents and certificate generation',
-      icon: Mail,
+      icon: AutoCom,
       category: 'Student Experience',
       tier: 'Basic'
     },
     {
       title: 'Video Management',
       description: 'Upload to YouTube or use cloud-based service with complete management',
-      icon: Video,
+      icon: VManag,
       category: 'Student Experience',
       tier: 'Pro'
     },
     {
       title: 'Detailed Exam Analysis',
       description: 'Comprehensive exam analytics and performance insights',
-      icon: PieChart,
+      icon: DExam,
       category: 'Student Experience',
       tier: 'Pro'
     },
     {
       title: 'Certificate Generation',
       description: 'Automated certificate generation with custom templates',
-      icon: Award,
+      icon: CG,
       category: 'Student Experience',
       tier: 'Pro'
     },
     {
       title: 'Mobile App Support',
       description: 'Native mobile applications with offline capabilities',
-      icon: Smartphone,
+      icon: MAPP,
       category: 'Student Experience',
       tier: 'Basic'
     },
@@ -171,28 +176,28 @@ export const categories = [
     {
       title: 'Advanced Analytics Dashboard',
       description: 'Real-time insights and comprehensive performance metrics',
-      icon: TrendingUp,
+      icon: AADash,
       category: 'Analytics',
       tier: 'Pro'
     },
     {
       title: 'Automated Report Generation',
       description: 'Generate detailed reports automatically with custom templates',
-      icon: Download,
+      icon: ARG,
       category: 'Analytics',
       tier: 'Pro'
     },
     {
       title: 'Smart Notifications',
       description: 'Intelligent notification system with automated alerts',
-      icon: Bell,
+      icon: Snoti,
       category: 'Analytics',
       tier: 'Basic'
     },
     {
       title: 'Predictive Analytics',
       description: 'AI-powered insights to predict student performance',
-      icon: Brain,
+      icon: PA,
       category: 'Analytics',
       tier: 'Enterprise'
     },
@@ -200,7 +205,7 @@ export const categories = [
     {
       title: 'Data Visualization',
       description: 'Interactive charts and graphs for comprehensive analysis',
-      icon: LineChart,
+      icon: DA,
       category: 'Analytics',
       tier: 'Pro'
     },
@@ -209,28 +214,28 @@ export const categories = [
     {
       title: 'Plagiarism Detection',
       description: 'AI-powered plagiarism detection for written answers',
-      icon: Search,
+      icon: PD,
       category: 'Security',
       tier: 'Enterprise'
     },
     {
       title: 'API Integration',
       description: 'RESTful APIs and webhooks for seamless system integration',
-      icon: Code,
+      icon: APII,
       category: 'Integration',
       tier: 'Enterprise'
     },
     {
       title: 'Custom Branding',
       description: 'White-label solution with custom branding and domain',
-      icon: Star,
+      icon: CB,
       category: 'Integration',
       tier: 'Enterprise'
     },
     {
       title: 'Live Chat Support',
       description: '24/7 live chat support during exams with priority response',
-      icon: MessageSquare,
+      icon: LiveChat,
       category: 'Integration',
       tier: 'Enterprise'
     }
