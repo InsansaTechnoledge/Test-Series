@@ -29,7 +29,7 @@ const UserViewPage = () => {
     const {theme} = useTheme();
 
     const batchNames = userData.batch.map((batchId) => {
-        const batch = batchMap[batchId];
+        const batch = batchMap?.[batchId];
         return batch ? batch.name : "Unknown Batch";
     })
 
