@@ -111,7 +111,7 @@ const {theme} = useTheme()
         </div>
 
         {/* Form */}
-        <form className={` rounded-b-2xl shadow-xl p-8 space-y-8 ${theme == 'light' ?"bg-white" : "bg-gray-700"}`}>
+        <form className={` rounded-b-2xl shadow-2xl p-8 space-y-8 ${theme == 'light' ?"bg-white" : "bg-gray-700"}`}>
           
           {/* Basic Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

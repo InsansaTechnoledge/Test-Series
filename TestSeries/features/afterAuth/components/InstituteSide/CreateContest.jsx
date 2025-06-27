@@ -22,6 +22,9 @@ const CreateContest = () => {
     start: '',
     end: '',
   });
+ 
+  const [error, setError] = useState({});
+  
   const navigate = useNavigate();
 
   const canAccessPage = usePageAccess();
@@ -35,7 +38,129 @@ const CreateContest = () => {
     label: b.name,
   }));
 
+ 
+  const validateField = (name, value) => {
+    switch (name) {
+      case "name":
+        return value.trim().length >= 3 && value.trim().length <= 100
+          ? ""
+          : "Contest name must be between 3-100 characters";
+      case "description":
+        return value.trim().length >= 10 && value.trim().length <= 500
+          ? ""
+          : "Description must be between 10-500 characters";
+      case "duration":
+        const durationNum = parseInt(value);
+        return durationNum >= 1 && durationNum <= 1440
+          ? ""
+          : "Duration must be between 1-1440 minutes";
+      case "selectedBatches":
+        return value.length > 0
+          ? ""
+          : "Please select at least one batch";
+      case "validity.start":
+        return value ? "" : "Start date is required";
+      case "validity.end":
+        return value ? "" : "End date is required";
+      case "schedule":
+        return value ? "" : "Schedule date and time is required";
+      default:
+        return "";
+    }
+  };
+
+  const handleNameChange = (e) => {
+    const value = e.target.value;
+    setName(value);
+    const fieldError = validateField("name", value);
+    setError(prev => ({ ...prev, name: fieldError }));
+  };
+
+  const handleDescriptionChange = (e) => {
+    const value = e.target.value;
+    setDescription(value);
+    const fieldError = validateField("description", value);
+    setError(prev => ({ ...prev, description: fieldError }));
+  };
+
+  const handleDurationChange = (e) => {
+    const value = e.target.value;
+    setDuration(value);
+    const fieldError = validateField("duration", value);
+    setError(prev => ({ ...prev, duration: fieldError }));
+  };
+
+  const handleBatchChange = (selected) => {
+    const batchIds = selected.map(opt => opt.value);
+    setSelectedBatches(batchIds);
+    const fieldError = validateField("selectedBatches", batchIds);
+    setError(prev => ({ ...prev, selectedBatches: fieldError }));
+  };
+
+  const handleValidityChange = (field, value) => {
+    setValidity(prev => ({ ...prev, [field]: value }));
+    const fieldError = validateField(`validity.${field}`, value);
+    setError(prev => ({ ...prev, [`validity.${field}`]: fieldError }));
+   
+    if (field === 'start' && validity.end) {
+      if (new Date(value) >= new Date(validity.end)) {
+        setError(prev => ({ ...prev, 'validity.start': 'Start date must be before end date' }));
+      }
+    }
+    if (field === 'end' && validity.start) {
+      if (new Date(validity.start) >= new Date(value)) {
+        setError(prev => ({ ...prev, 'validity.end': 'End date must be after start date' }));
+      }
+    }
+  };
+
+  const handleScheduleChange = (e) => {
+    const value = e.target.value;
+    setSchedule(value);
+    const fieldError = validateField("schedule", value);
+    setError(prev => ({ ...prev, schedule: fieldError }));
+  };
+
   const handleSubmit = async () => {
+    console.log("Submitting form with data:", { ContestType, name, selectedBatches, description, duration, schedule, validity });
+    
+    const validationErrors = {};
+    
+  
+    const nameError = validateField("name", name);
+    if (nameError) validationErrors.name = nameError;
+    
+    const descriptionError = validateField("description", description);
+    if (descriptionError) validationErrors.description = descriptionError;
+    
+    const durationError = validateField("duration", duration);
+    if (durationError) validationErrors.duration = durationError;
+    
+    const batchError = validateField("selectedBatches", selectedBatches);
+    if (batchError) validationErrors.selectedBatches = batchError;
+    
+    
+    if (ContestType === 'participation_based') {
+      const startError = validateField("validity.start", validity.start);
+      if (startError) validationErrors['validity.start'] = startError;
+      
+      const endError = validateField("validity.end", validity.end);
+      if (endError) validationErrors['validity.end'] = endError;
+    
+      if (validity.start && validity.end && new Date(validity.start) >= new Date(validity.end)) {
+        validationErrors['validity.start'] = 'Start date must be before end date';
+      }
+    } else {
+      const scheduleError = validateField("schedule", schedule);
+      if (scheduleError) validationErrors.schedule = scheduleError;
+    }
+
+    // If there are validation errors, set them and return early
+    if (Object.keys(validationErrors).length > 0) {
+      setError(prev => ({ ...prev, ...validationErrors }));
+      return;
+    }
+
     const formData = {
       type: ContestType,
       name,
@@ -46,7 +171,6 @@ const CreateContest = () => {
       validity,
     }
 
-
     try {
       const response = await createContest(formData);
       if (response.status === 200) {
@@ -54,12 +178,14 @@ const CreateContest = () => {
       }
     } catch (error) {
       console.error('Error creating contest:', error);
-      alert('Failed to create contest. Please try again.');
+      const errorMessage = error?.response?.data?.errors?.[0] || 
+                          error?.response?.data?.message || 
+                          error?.message || 
+                          "An unexpected error occurred";
+      setError(prev => ({ ...prev, form: errorMessage }));
     }
-
-
-
   };
+
   const inputCommon = `p-4 rounded-2xl transition-all duration-300 text-lg w-full pr-14 ${theme === 'light'
     ? 'bg-white text-gray-900 border-2 border-gray-200 focus:ring-indigo-200 focus:border-indigo-400 placeholder-gray-400'
     : 'bg-gray-800 text-indigo-100 border-2 border-gray-600 focus:ring-indigo-500 focus:border-indigo-300 placeholder-indigo-300'
@@ -144,12 +270,16 @@ const CreateContest = () => {
                     </select>
 
                     {ContestType && (
-                      <span className={`inline-block px-4 py-2 text-sm border rounded-full ${theme === 'light'
+                    <span
+                    className={`inline-block w-1/2 p-4 border rounded-2xl text-center 
+                      ${theme === 'light'
                         ? 'text-indigo-700 bg-indigo-100 border-indigo-200'
                         : 'text-indigo-300 bg-indigo-900 border-indigo-600'
-                        }`}>
-                        {ContestType === 'participation_based' ? 'Registered Type' : 'Scheduled Type'}
-                      </span>
+                      }`}
+                  >
+                    {ContestType === 'participation_based' ? 'Registered Type' : 'Scheduled Type'}
+                  </span>
+                  
                     )}
                   </div>
                 </div>
@@ -160,40 +290,46 @@ const CreateContest = () => {
                     <div className="flex items-center gap-3">
                       <FileText className={`w-5 h-5 ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-400'
                         }`} />
-                      <label className={LabelCommon}>Contest Name</label>
+                      <label className={LabelCommon}>Contest Name <span className="text-red-500">*</span></label>
                     </div>
                     <input
                       type="text"
                       value={name}
-                      onChange={(e) => setName(e.target.value)}
+                      onChange={handleNameChange}
                       placeholder="Enter contest name"
                       className={inputCommon}
                     />
+               
+                    {error.name && (
+                      <p className="text-red-500 text-sm mt-2 font-medium">{error.name}</p>
+                    )}
                   </div>
 
                   <div className="space-y-3">
                     <div className="flex items-center gap-3">
                       <FileText className={`w-5 h-5 ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-400'
                         }`} />
-                      <label className={LabelCommon}>Description</label>
+                      <label className={LabelCommon}>Description <span className="text-red-500">*</span></label>
                     </div>
                     <textarea
                       value={description}
-                      onChange={(e) => setDescription(e.target.value)}
+                      onChange={handleDescriptionChange}
                       placeholder="Enter description"
                       rows="4"
                       className={inputCommon}
                     />
+                    
+                    {error.description && (
+                      <p className="text-red-500 text-sm mt-2 font-medium">{error.description}</p>
+                    )}
                   </div>
                 </div>
 
-
                 {/* Batch Selection */}
-
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
                     <Users className={`w-5 h-5 ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-400'}`} />
-                    <label className={LabelCommon}>Choose Batches</label>
+                    <label className={LabelCommon}>Choose Batches <span className="text-red-500">*</span></label>
                   </div>
 
                   <div className="max-w-md space-y-3">
@@ -201,7 +337,7 @@ const CreateContest = () => {
                       isMulti
                       options={batchOptions}
                       value={batchOptions.filter(opt => selectedBatches.includes(opt.value))}
-                      onChange={(selected) => setSelectedBatches(selected.map(opt => opt.value))}
+                      onChange={handleBatchChange}
                       placeholder="Select batches"
                       styles={{
                         control: (provided, state) => ({
@@ -291,6 +427,10 @@ const CreateContest = () => {
                         })
                       }}
                     />
+                    
+                    {error.selectedBatches && (
+                      <p className="text-red-500 text-sm mt-2 font-medium">{error.selectedBatches}</p>
+                    )}
 
                     {selectedBatches.length > 0 && (
                       <div className="flex flex-wrap gap-2">
@@ -313,20 +453,6 @@ const CreateContest = () => {
                   </div>
                 </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                 {/* Date Selection */}
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
@@ -338,7 +464,7 @@ const CreateContest = () => {
                         }`} />
                     )}
                     <label className={LabelCommon}>
-                      {ContestType === 'participation_based' ? 'Contest Duration' : 'Schedule Contest'}
+                      {ContestType === 'participation_based' ? 'Contest Duration' : 'Schedule Contest'} <span className="text-red-500">*</span>
                     </label>
                   </div>
 
@@ -350,12 +476,16 @@ const CreateContest = () => {
                         <input
                           type="date"
                           value={validity.start}
-                          onChange={(e) => setValidity({ ...validity, start: e.target.value })}
+                          onChange={(e) => handleValidityChange('start', e.target.value)}
                           className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:outline-none ${theme === 'light'
                             ? 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'
                             : 'bg-gray-800 border-gray-600 text-indigo-100 focus:ring-indigo-500 focus:border-indigo-300'
                             }`}
                         />
+                        {/* NEW: Error display */}
+                        {error['validity.start'] && (
+                          <p className="text-red-500 text-sm mt-1 font-medium">{error['validity.start']}</p>
+                        )}
                       </div>
                       <div className="space-y-1">
                         <label className={`block text-sm ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'
@@ -363,12 +493,16 @@ const CreateContest = () => {
                         <input
                           type="date"
                           value={validity.end}
-                          onChange={(e) => setValidity({ ...validity, end: e.target.value })}
+                          onChange={(e) => handleValidityChange('end', e.target.value)}
                           className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:outline-none ${theme === 'light'
                             ? 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'
                             : 'bg-gray-800 border-gray-600 text-indigo-100 focus:ring-indigo-500 focus:border-indigo-300'
                             }`}
                         />
+                 
+                        {error['validity.end'] && (
+                          <p className="text-red-500 text-sm mt-1 font-medium">{error['validity.end']}</p>
+                        )}
                       </div>
                     </div>
                   ) : (
@@ -378,12 +512,16 @@ const CreateContest = () => {
                       <input
                         type="datetime-local"
                         value={schedule}
-                        onChange={(e) => setSchedule(e.target.value)}
+                        onChange={handleScheduleChange}
                         className={`w-full border rounded-lg px-4 py-3 focus:ring-2 focus:outline-none ${theme === 'light'
                           ? 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'
                           : 'bg-gray-800 border-gray-600 text-indigo-100 focus:ring-indigo-500 focus:border-indigo-300'
                           }`}
                       />
+               
+                      {error.schedule && (
+                        <p className="text-red-500 text-sm mt-1 font-medium">{error.schedule}</p>
+                      )}
                     </div>
                   )}
                 </div>
@@ -393,20 +531,34 @@ const CreateContest = () => {
                   <div className="flex items-center gap-3">
                     <Clock className={`w-5 h-5 ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-400'
                       }`} />
-                    <label className={LabelCommon}>Event Duration (minutes)</label>
+                    <label className={LabelCommon}>Event Duration (minutes) <span className="text-red-500">*</span></label>
                   </div>
                   <input
                     type="number"
                     min="1"
+                    max="1440"
                     value={duration}
-                    onChange={(e) => setDuration(e.target.value)}
-                    placeholder="Enter duration"
+                    onChange={handleDurationChange}
+                    placeholder="Enter duration (1-1440 minutes)"
                     className={`w-full max-w-md border rounded-lg px-4 py-3 focus:ring-2 focus:outline-none ${theme === 'light'
                       ? 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400'
                       : 'bg-gray-800 border-gray-600 text-indigo-100 focus:ring-indigo-500 focus:border-indigo-300 placeholder-indigo-300'
                       }`}
                   />
+            
+                  {error.duration && (
+                    <p className="text-red-500 text-sm mt-2 font-medium">{error.duration}</p>
+                  )}
                 </div>
+
+          
+                {error.form && (
+                  <div className="mt-6">
+                    <p className="text-red-600 bg-red-50 border border-red-200 px-4 py-3 rounded-xl text-center font-medium">
+                      {error.form}
+                    </p>
+                  </div>
+                )}
 
                 {/* Submit */}
                 <div className="flex justify-center pt-8">

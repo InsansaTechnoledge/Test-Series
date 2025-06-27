@@ -3,6 +3,7 @@ import { Plus, Trash2, Save, Code } from 'lucide-react';
 import { saveContestQuestion } from '../../../../utils/services/contestQuestionService';
 import CodeCreatorForm from './codeCreatorForm';
 import { useSearchParams } from 'react-router-dom';
+import { useTheme } from '../../../../hooks/useTheme';
 
 export default function QuestionCreator() {
 
@@ -31,6 +32,7 @@ export default function QuestionCreator() {
       cpp: ''
     }
   });
+  const {theme} = useTheme()
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -76,7 +78,7 @@ export default function QuestionCreator() {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
+      <div className={`min-h-screen  ${theme == "light" ? "bg-white" :"bg-gray-700"}`}>
         <div className="container mx-auto px-4 py-8">
           <CodeCreatorForm
             setFormData={setFormData}
