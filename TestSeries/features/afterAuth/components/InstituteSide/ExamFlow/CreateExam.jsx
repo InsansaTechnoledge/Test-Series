@@ -23,10 +23,18 @@ const CreateExam = () => {
   const navigate = useNavigate();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [editingExam, setEditingExam] = useState(false);
-  const { user, getFeatureKeyFromLocation } = useUser();
+  const { user, getFeatureKeyFromLocation, hasRoleAccess } = useUser();
   const location = useLocation();
-  const {theme} = useTheme()
+  const { theme } = useTheme()
   const canCreateMoreExams = useLimitAccess(getFeatureKeyFromLocation(location.pathname), "totalExams");
+  const canEditExams = hasRoleAccess({
+    keyFromPageOrAction: 'actions.editExam',
+    location: location.pathname
+  });
+  const canDeleteExams = hasRoleAccess({
+    keyFromPageOrAction: 'actions.deleteExam',
+    location: location.pathname
+  });
 
   const organization =
     user.role !== 'organization'
@@ -225,40 +233,37 @@ const CreateExam = () => {
         //     </button>
         //   </div>
         // </div>
-        <div className={`p-6 rounded-3xl mb-6 shadow-lg ${
-          theme === 'light' 
-            ? 'bg-blue-50' 
+        <div className={`p-6 rounded-3xl mb-6 shadow-lg ${theme === 'light'
+            ? 'bg-blue-50'
             : 'bg-gray-800'
-        }`}>
+          }`}>
           <div className="flex justify-between items-center">
             <div className=''>
-              <h2 className={`text-xl font-semibold ${
-                theme === 'light' 
-                  ? 'text-gray-800' 
+              <h2 className={`text-xl font-semibold ${theme === 'light'
+                  ? 'text-gray-800'
                   : 'text-white'
-              }`}>
+                }`}>
                 {examDetails.name}
               </h2>
-              <p className={`${
-                theme === 'light' 
-                  ? 'text-gray-600' 
+              <p className={`${theme === 'light'
+                  ? 'text-gray-600'
                   : 'text-gray-300'
-              }`}>
+                }`}>
                 Date: {examDetails.date} |
                 Duration: {examDetails.duration} mins |
                 Total Marks: {examDetails.total_marks}
               </p>
             </div>
-            <button
+            {canEditExams && (<button
+              disabled={!canEditExams}
               onClick={() => setEditingExam(true)}
-              className={`transition-colors duration-300 ${
-                theme === 'light' 
-                  ? 'text-blue-600 hover:text-blue-800' 
+              className={`transition-colors duration-300 ${theme === 'light'
+                  ? 'text-blue-600 hover:text-blue-800'
                   : 'text-blue-400 hover:text-blue-300'
-              }`}
+                }`}
             >
               Edit
-            </button>
+            </button>)}
           </div>
         </div>
       )}
@@ -267,13 +272,13 @@ const CreateExam = () => {
       {examDetails && !editingExam && (
         <>
           <div className={`mt-6 border-t pt-6 c`}>
-            <h2 className={`text-xl font-semibold mb-4 ${theme == 'light' ?"text-black" : "text-gray-100"} `}>Add Questions</h2>
+            <h2 className={`text-xl font-semibold mb-4 ${theme == 'light' ? "text-black" : "text-gray-100"} `}>Add Questions</h2>
 
-            <div className={` p-6 rounded-lg mb-6 ${theme == 'light' ?"bg-gray-50" : "bg-gray-800"}`}>
-              <div className={`flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4  ${theme == 'light' ?"bg-gray-50" : "bg-gray-800"}`}>
-                <div className={`flex-1  rounded-xl p-6 shadow-2xl transition ${theme == 'light' ?"bg-gray-50" : "bg-gray-800"}`}>
-                  <h3 className={`text-lg font-medium mb-2  ${theme == 'light' ?"text-black" : "text-gray-100"}`}>Option 1: Manual Entry</h3>
-                  <p className={`mb-4 ${theme == 'light' ?"text-gray-500" : "text-gray-500"}`} >Create questions one by one with full control over each question's details.</p>
+            <div className={` p-6 rounded-lg mb-6 ${theme == 'light' ? "bg-gray-50" : "bg-gray-800"}`}>
+              <div className={`flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4  ${theme == 'light' ? "bg-gray-50" : "bg-gray-800"}`}>
+                <div className={`flex-1  rounded-xl p-6 shadow-2xl transition ${theme == 'light' ? "bg-gray-50" : "bg-gray-800"}`}>
+                  <h3 className={`text-lg font-medium mb-2  ${theme == 'light' ? "text-black" : "text-gray-100"}`}>Option 1: Manual Entry</h3>
+                  <p className={`mb-4 ${theme == 'light' ? "text-gray-500" : "text-gray-500"}`} >Create questions one by one with full control over each question's details.</p>
                   <ManualQuestionForm
                     setQuestions={setQuestions}
                     organizationId={examDetails.organization_id} // ✅ pass this down!
@@ -281,9 +286,9 @@ const CreateExam = () => {
 
                 </div>
 
-                <div className={`flex-1 shadow-2xl  rounded-lg p-6 transition    ${theme == 'light' ?"bg-gray-50" : "bg-gray-800 border-gray-800 border"}`}>
-                  <h3 className={`text-lg font-medium mb-2  ${theme == 'light' ?"text-black" : "text-gray-100"}`}>Option 2: Bulk Upload</h3>
-                  <p className={`mb-4 ${theme == 'light' ?"text-gray-500" : "text-gray-500"}`}>Upload multiple questions at once using an Excel spreadsheet.</p>
+                <div className={`flex-1 shadow-2xl  rounded-lg p-6 transition    ${theme == 'light' ? "bg-gray-50" : "bg-gray-800 border-gray-800 border"}`}>
+                  <h3 className={`text-lg font-medium mb-2  ${theme == 'light' ? "text-black" : "text-gray-100"}`}>Option 2: Bulk Upload</h3>
+                  <p className={`mb-4 ${theme == 'light' ? "text-gray-500" : "text-gray-500"}`}>Upload multiple questions at once using an Excel spreadsheet.</p>
                   <BulkUpload setQuestions={setQuestions} organizationId={examDetails.organization_id} />
                 </div>
               </div>
@@ -314,14 +319,15 @@ const CreateExam = () => {
               )}
             </button>
 
-            <button
+            {canDeleteExams && (<button
+              disabled={!canDeleteExams}
               onClick={() => {
                 setShowDeleteModal(true);
               }}
               className="text-red-600 border-red-600 border px-4 py-2 mt-4 rounded hover:bg-red-700 transition hover:text-white font-semibold"
             >
               Delete exam
-            </button>
+            </button>)}
           </div>
         </>
 

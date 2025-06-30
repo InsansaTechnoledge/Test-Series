@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { Edit, Eye, PlusSquare, Search, Trash, Users, UserCheck, Shield, AlertTriangle } from 'lucide-react'
-import HeadingUtil from '../../utility/HeadingUtil'
 import { useNavigate } from 'react-router-dom'
 import RefreshButton from '../../utility/RefreshButton'
 import { useCachedUser } from '../../../../hooks/useCachedUser'
@@ -8,7 +7,6 @@ import { useCachedBatches } from '../../../../hooks/useCachedBatches'
 import { useCachedRoleGroup } from '../../../../hooks/useCachedRoleGroup'
 import { useQueryClient } from '@tanstack/react-query'
 import { useUser } from '../../../../contexts/currentUserContext'
-import { DeleteUser } from '../../../../utils/services/userService'
 import DeleteUserModal from '../../utility/DeleteUserModal'
 import Banner  from "../../../../assests/Institute/User.svg"
 import { usePageAccess } from '../../../../contexts/PageAccessContext'
@@ -30,7 +28,7 @@ const UserList = () => {
               );
             }
 
-    const { user } = useUser();
+    const { user ,hasRoleAccess} = useUser();
     const { users, isLoading, isError } = useCachedUser();
     const { batches, batchMap } = useCachedBatches();
     const { roleMap, hasActiveFeatureInRole } = useCachedRoleGroup();
@@ -43,6 +41,27 @@ const UserList = () => {
     const [expandedUsers, setExpandedUsers] = useState({});
     const navigate = useNavigate();
     const { theme } = useTheme();
+
+      const canCreateUser=hasRoleAccess({
+            keyFromPageOrAction: "actions.createUser",
+            location: location.pathname
+        });
+    
+        const canEditUser=hasRoleAccess({
+            keyFromPageOrAction: "actions.editUser",
+            location: location.pathname
+        });
+    
+        const canDeleteUser=hasRoleAccess({
+            keyFromPageOrAction: "actions.deleteUser",
+            location: location.pathname
+        });
+    
+        const canViewUser=hasRoleAccess({
+            keyFromPageOrAction: "actions.viewUser",
+            location: location.pathname
+        });
+
 
     const refreshFunction = async () => {
         await queryClient.invalidateQueries(['Users', user._id]);
@@ -183,13 +202,14 @@ const UserList = () => {
 
                         <div className="flex items-center space-x-4">
                             <RefreshButton refreshFunction={refreshFunction} />
-                            <button
+                           {canCreateUser &&( <button
+                           disabled={!canCreateUser}
                                 className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-2xl font-bold transition-all duration-300 hover:shadow-2xl hover:scale-105 flex items-center space-x-3 transform"
                                 onClick={() => navigate('/institute/create-user')}
                             >
                                 <PlusSquare className="w-5 h-5" />
                                 <span>Add User</span>
-                            </button>
+                            </button>)}
                         </div>
                     </div>
                 </div>
@@ -302,25 +322,27 @@ const UserList = () => {
 
                                 {/* Action Buttons */}
                                 <div className="flex justify-center space-x-3">
-                                    <button
+                                   {canViewUser && ( <button
+                                    disabled={!canViewUser}
                                         className={`flex-1 z-10 cursor-pointer ${theme === 'light' ? 'bg-gray-100 hover:bg-gray-200 text-gray-700' : 'bg-gray-700 hover:bg-gray-600 text-gray-200'} p-3 rounded-xl transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-2`}
                                         onClick={() => navigate('/institute/user-detail', { state: { userId: userItem._id } })}
                                         title="View Details"
                                     >
                                         <Eye className="w-4 h-4" />
                                         <span className="font-medium text-sm">View</span>
-                                    </button>
+                                    </button>)}
                                     
-                                    <button
+                                   {canEditUser &&( <button
+                                        disabled={!canEditUser}
                                         className={`flex-1 z-10 cursor-pointer ${theme === 'light' ? 'bg-blue-100 hover:bg-blue-200 text-blue-700' : 'bg-blue-800 hover:bg-blue-700 text-blue-200'} p-3 rounded-xl transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-2`}
                                         onClick={() => navigate(`/institute/user-edit/${userItem._id}`)}
                                         title="Edit User"
                                     >
                                         <Edit className="w-4 h-4" />
                                         <span className="font-medium text-sm">Edit</span>
-                                    </button>
+                                    </button>)}
                                     
-                                    <button
+                                   {canDeleteUser && ( <button
                                         className={`${theme === 'light' ? 'bg-red-100 hover:bg-red-200 text-red-700' : 'bg-red-800 hover:bg-red-700 text-red-200'} z-10 cursor-pointer p-3 rounded-xl transition-all duration-300 hover:scale-105`}
                                         onClick={() => {
                                             setShowDeleteModal(true);
@@ -329,7 +351,7 @@ const UserList = () => {
                                         title="Delete User"
                                     >
                                         <Trash className="w-4 h-4" />
-                                    </button>
+                                    </button>)}
                                 </div>
                             </div>
 

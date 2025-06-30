@@ -20,11 +20,13 @@ const Page = () => {
     const queryClient = useQueryClient();
     const [hideFaculty, setHideFaculty] = useState(false);
     const [hideStudents, setHideStudents] = useState(false);
-    const { user } = useUser();
+    const { user ,hasRoleAccess} = useUser();
     const { students } = useCachedStudents();
     const [filteredStudents, setFilteredStudents] = useState([]);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const navigate = useNavigate();
+    const canEditBatch=hasRoleAccess({ keyFromPageOrAction: 'actions.editBatch', location: null });
+    const canDeleteBatch=hasRoleAccess({ keyFromPageOrAction: 'actions.deleteBatch', location: null });
 
     const [faculty, setFaculty] = useState(() =>
         users?.filter(user => Array.isArray(user.batch) && user.batch.includes(batchId)) || []
@@ -125,21 +127,23 @@ const Page = () => {
                             
                             </button>
                             
-                            <button
+                            {canEditBatch && (<button
+                            disabled={!canEditBatch}
                                 onClick={() => navigate('/institute/edit-batch', { state: { batchId: batch.id } })}
                                 className={` ${theme === 'light' ? 'bg-indigo-100 hover:bg-indigo-200 text-indigo-700' : 'bg-indigo-600 text-indigo-100 hover:bg-indigo-700 hover:text-indigo-200' } inline-flex items-center space-x-2  px-6 py-3 rounded-xl font-medium transition-all duration-300 hover:scale-105`}
                             >
                                 <Edit className="w-4 h-4" />
                                 <span>Edit Batch</span>
-                            </button>
+                            </button>)}
                             
-                            <button
+                            {canDeleteBatch && (<button
+                            disabled={!canDeleteBatch}
                                 onClick={() => setShowDeleteModal(true)}
                                 className={` ${theme === 'light' ? ' bg-red-100 hover:bg-red-200 text-red-700' : 'bg-red-600 text-red-100 hover:bg-red-700 hover:text-red-200'} inline-flex items-center space-x-2 px-6 py-3 rounded-xl font-medium transition-all duration-300 hover:scale-105`}
                             >
                                 <Trash className="w-4 h-4" />
                                 <span>Delete Batch</span>
-                            </button>
+                            </button>)}
                         </div>
                     </div>
 

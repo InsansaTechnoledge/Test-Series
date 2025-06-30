@@ -22,9 +22,9 @@ const CreateContest = () => {
     start: '',
     end: '',
   });
- 
+
   const [error, setError] = useState({});
-  
+
   const navigate = useNavigate();
 
   const canAccessPage = usePageAccess();
@@ -38,7 +38,7 @@ const CreateContest = () => {
     label: b.name,
   }));
 
- 
+
   const validateField = (name, value) => {
     switch (name) {
       case "name":
@@ -101,7 +101,7 @@ const CreateContest = () => {
     setValidity(prev => ({ ...prev, [field]: value }));
     const fieldError = validateField(`validity.${field}`, value);
     setError(prev => ({ ...prev, [`validity.${field}`]: fieldError }));
-   
+
     if (field === 'start' && validity.end) {
       if (new Date(value) >= new Date(validity.end)) {
         setError(prev => ({ ...prev, 'validity.start': 'Start date must be before end date' }));
@@ -123,30 +123,30 @@ const CreateContest = () => {
 
   const handleSubmit = async () => {
     console.log("Submitting form with data:", { ContestType, name, selectedBatches, description, duration, schedule, validity });
-    
+
     const validationErrors = {};
-    
-  
+
+
     const nameError = validateField("name", name);
     if (nameError) validationErrors.name = nameError;
-    
+
     const descriptionError = validateField("description", description);
     if (descriptionError) validationErrors.description = descriptionError;
-    
+
     const durationError = validateField("duration", duration);
     if (durationError) validationErrors.duration = durationError;
-    
+
     const batchError = validateField("selectedBatches", selectedBatches);
     if (batchError) validationErrors.selectedBatches = batchError;
-    
-    
+
+
     if (ContestType === 'participation_based') {
       const startError = validateField("validity.start", validity.start);
       if (startError) validationErrors['validity.start'] = startError;
-      
+
       const endError = validateField("validity.end", validity.end);
       if (endError) validationErrors['validity.end'] = endError;
-    
+
       if (validity.start && validity.end && new Date(validity.start) >= new Date(validity.end)) {
         validationErrors['validity.start'] = 'Start date must be before end date';
       }
@@ -178,10 +178,10 @@ const CreateContest = () => {
       }
     } catch (error) {
       console.error('Error creating contest:', error);
-      const errorMessage = error?.response?.data?.errors?.[0] || 
-                          error?.response?.data?.message || 
-                          error?.message || 
-                          "An unexpected error occurred";
+      const errorMessage = error?.response?.data?.errors?.[0] ||
+        error?.response?.data?.message ||
+        error?.message ||
+        "An unexpected error occurred";
       setError(prev => ({ ...prev, form: errorMessage }));
     }
   };
@@ -269,16 +269,16 @@ const CreateContest = () => {
                     </select>
 
                     {ContestType && (
-                    <span
-                    className={`inline-block w-1/2 p-4 border rounded-2xl text-center 
+                      <span
+                        className={`inline-block w-1/2 p-4 border rounded-2xl text-center 
                       ${theme === 'light'
-                        ? 'text-indigo-700 bg-indigo-100 border-indigo-200'
-                        : 'text-indigo-300 bg-indigo-900 border-indigo-600'
-                      }`}
-                  >
-                    {ContestType === 'participation_based' ? 'Registered Type' : 'Scheduled Type'}
-                  </span>
-                  
+                            ? 'text-indigo-700 bg-indigo-100 border-indigo-200'
+                            : 'text-indigo-300 bg-indigo-900 border-indigo-600'
+                          }`}
+                      >
+                        {ContestType === 'participation_based' ? 'Registered Type' : 'Scheduled Type'}
+                      </span>
+
                     )}
                   </div>
                 </div>
@@ -298,7 +298,7 @@ const CreateContest = () => {
                       placeholder="Enter contest name"
                       className={inputCommon}
                     />
-               
+
                     {error.name && (
                       <p className="text-red-500 text-sm mt-2 font-medium">{error.name}</p>
                     )}
@@ -317,7 +317,7 @@ const CreateContest = () => {
                       rows="4"
                       className={inputCommon}
                     />
-                    
+
                     {error.description && (
                       <p className="text-red-500 text-sm mt-2 font-medium">{error.description}</p>
                     )}
@@ -342,7 +342,9 @@ const CreateContest = () => {
                         control: (provided, state) => ({
                           ...provided,
                           backgroundColor: theme === 'light' ? 'white' : '#1f2937',
-                          borderColor: theme === 'light' ? '#e5e7eb' : '#4b5563',
+                          borderColor: state.isFocused
+                            ? theme === 'light' ? '#818cf8' : '#a5b4fc'
+                            : theme === 'light' ? '#e5e7eb' : '#4b5563',
                           borderWidth: '2px',
                           borderRadius: '1rem',
                           padding: '0.5rem',
@@ -353,13 +355,14 @@ const CreateContest = () => {
                               ? '0 0 0 3px rgba(199, 210, 254, 0.5)'
                               : '0 0 0 3px rgba(99, 102, 241, 0.5)'
                             : 'none',
-                          borderColor: state.isFocused
-                            ? theme === 'light' ? '#818cf8' : '#a5b4fc'
-                            : theme === 'light' ? '#e5e7eb' : '#4b5563',
                           '&:hover': {
-                            borderColor: theme === 'light' ? '#d1d5db' : '#6b7280'
+                            borderColor: state.isFocused
+                              ? theme === 'light' ? '#818cf8' : '#a5b4fc'
+                              : theme === 'light' ? '#d1d5db' : '#6b7280'
                           }
                         }),
+
+
                         menu: (provided) => ({
                           ...provided,
                           backgroundColor: theme === 'light' ? 'white' : '#1f2937',
@@ -426,7 +429,7 @@ const CreateContest = () => {
                         })
                       }}
                     />
-                    
+
                     {error.selectedBatches && (
                       <p className="text-red-500 text-sm mt-2 font-medium">{error.selectedBatches}</p>
                     )}
@@ -439,8 +442,8 @@ const CreateContest = () => {
                             <span
                               key={batchId}
                               className={`inline-block px-4 py-1.5 text-sm border rounded-full ${theme === 'light'
-                                  ? 'bg-gray-100 text-gray-800 border-gray-200'
-                                  : 'bg-gray-700 text-gray-300 border-gray-600'
+                                ? 'bg-gray-100 text-gray-800 border-gray-200'
+                                : 'bg-gray-700 text-gray-300 border-gray-600'
                                 }`}
                             >
                               {batch.label}
@@ -498,7 +501,7 @@ const CreateContest = () => {
                             : 'bg-gray-800 border-gray-600 text-indigo-100 focus:ring-indigo-500 focus:border-indigo-300'
                             }`}
                         />
-                 
+
                         {error['validity.end'] && (
                           <p className="text-red-500 text-sm mt-1 font-medium">{error['validity.end']}</p>
                         )}
@@ -517,7 +520,7 @@ const CreateContest = () => {
                           : 'bg-gray-800 border-gray-600 text-indigo-100 focus:ring-indigo-500 focus:border-indigo-300'
                           }`}
                       />
-               
+
                       {error.schedule && (
                         <p className="text-red-500 text-sm mt-1 font-medium">{error.schedule}</p>
                       )}
@@ -544,13 +547,13 @@ const CreateContest = () => {
                       : 'bg-gray-800 border-gray-600 text-indigo-100 focus:ring-indigo-500 focus:border-indigo-300 placeholder-indigo-300'
                       }`}
                   />
-            
+
                   {error.duration && (
                     <p className="text-red-500 text-sm mt-2 font-medium">{error.duration}</p>
                   )}
                 </div>
 
-          
+
                 {error.form && (
                   <div className="mt-6">
                     <p className="text-red-600 bg-red-50 border border-red-200 px-4 py-3 rounded-xl text-center font-medium">

@@ -18,6 +18,7 @@ import { useTheme } from '../../../../hooks/useTheme';
 const BatchList = () => {
   const canAccessPage = usePageAccess();
 
+
   if (!canAccessPage) {
     return (
       <div className="flex items-center justify-center ">
@@ -30,7 +31,7 @@ const BatchList = () => {
   }
 
   const navigate = useNavigate();
-  const { user } = useUser();
+  const { user, hasRoleAccess } = useUser();
   const { batches, isloading, isError } = useCachedBatches();
   const { users } = useCachedUser();
   const { students } = useCachedStudents();
@@ -41,6 +42,16 @@ const BatchList = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [batchId, setBatchId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const canEditBatch =hasRoleAccess({ keyFromPageOrAction: 'actions.editBatch', location: null });
+  const canDeleteBatch = hasRoleAccess({ keyFromPageOrAction: 'actions.deleteBatch', location: null });
+  const canViewBatch = hasRoleAccess({ keyFromPageOrAction: 'actions.viewBatch', location: null });
+  const canCreateBatch=hasRoleAccess({ keyFromPageOrAction: 'actions.createBatch', location: null });
+
+  console.log("canEditBatch", canEditBatch);
+  console.log("canDeleteBatch", canDeleteBatch);
+  console.log("canViewBatch", canViewBatch);
+  console.log("canCreateBatch", canCreateBatch);
+
 
   const refreshFunction = async () => {
     await queryClient.invalidateQueries(['batches', user._id]);
@@ -50,19 +61,31 @@ const BatchList = () => {
 
   // Handle View Button Click
   const handleViewBatch = (batchId) => {
-    navigate(`/institute/batch-details`, { state: { batchId: batchId } });
+    if (!canViewBatch) {
+      navigate(`/institute/institute-landing`, { state: { batchId: batchId } });
+
+    } else
+      navigate(`/institute/batch-details`, { state: { batchId: batchId } });
+
   };
 
   // Handle Edit Button Click
   const handleEditBatch = (batchId) => {
-
-    navigate(`/institute/edit-batch`, { state: { batchId: batchId } });
+    if (!canEditBatch) {
+      navigate(`/institute/edit-batch`, { state: { batchId: batchId } });
+    }
+    else
+      navigate(`/institute/edit-batch`, { state: { batchId: batchId } });
   };
 
   // Handle Delete Button Click
   const handleDeleteBatch = (batchId) => {
-    setShowDeleteModal(true);
-    setBatchId(batchId);
+    if (!canDeleteBatch) {
+      alert("You do not have permission to delete batches.");
+    } else {
+      setShowDeleteModal(true);
+      setBatchId(batchId);
+    }
   };
 
   // Handle Delete Confirmation
@@ -70,10 +93,10 @@ const BatchList = () => {
     try {
       // Add your delete API call here
       // await deleteBatch(batchId);
-      
+
       // Refresh data after deletion
       await refreshFunction();
-      
+
       // Close modal
       setShowDeleteModal(false);
       setBatchId(null);
@@ -91,39 +114,38 @@ const BatchList = () => {
       backgroundColor: 'transparent',
     }
   };
-  
+
   const filteredBatches = batches.filter(batch => {
     const yearMatch = selectedYear ? batch.year === parseInt(selectedYear) : true;
     const searchMatch = batch.name.toLowerCase().includes(searchTerm.toLowerCase());
     return yearMatch && searchMatch;
   });
 
-  const {theme} = useTheme();
+  const { theme } = useTheme();
 
   return (
     <div className={`min-h-screen `}>
-    
+
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 "></div>
         <div className="absolute inset-0  opacity-20"></div>
-        
-        
+
+
         <div
           className="relative z-10 px-6 py-24 text-center bg-cover bg-center bg-no-repeat rounded-xl"
           style={{ backgroundImage: `url(${BatchBanner})` }}
         >
-           <div className={`absolute inset-0 ${
-          theme === 'dark' 
-            ? 'bg-gray-900/60' 
+          <div className={`absolute inset-0 ${theme === 'dark'
+            ? 'bg-gray-900/60'
             : 'bg-black/20'
-        }`}></div>
+            }`}></div>
 
           <div className="inline-flex items-center space-x-3 mb-4">
             <h1 className="text-6xl z-10 md:text-7xl font-black text-white tracking-tight">
               All Batches
             </h1>
-         
-          </div>  
+
+          </div>
           <p className="text-xl z-30 text-white/80 max-w-2xl mx-auto font-medium">
             View details of all batches
           </p>
@@ -134,43 +156,43 @@ const BatchList = () => {
       {/* Stats Dashboard */}
       <div className="max-w-7xl mx-auto px-6 -mt-8 relative z-20">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className={`${theme === 'light' ? 'bg-white' : 'bg-gray-800'}  rounded-3xl p-6 shadow-xl border-l-4 border-indigo-600 transform hover:scale-105 transition-all duration-300`}>
-          <div className="flex items-center justify-between">
+          <div className={`${theme === 'light' ? 'bg-white' : 'bg-gray-800'}  rounded-3xl p-6 shadow-xl border-l-4 border-indigo-600 transform hover:scale-105 transition-all duration-300`}>
+            <div className="flex items-center justify-between">
               <div>
-              <p className={`text-sm font-semibold   ${theme === 'light' ? 'text-gray-600' : 'text-gray-200' } uppercase tracking-wide`}>Total Batches</p>
-              <p className={`text-4xl font-black ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-200'} capitalize`}>{filteredBatches?.length}</p>
+                <p className={`text-sm font-semibold   ${theme === 'light' ? 'text-gray-600' : 'text-gray-200'} uppercase tracking-wide`}>Total Batches</p>
+                <p className={`text-4xl font-black ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-200'} capitalize`}>{filteredBatches?.length}</p>
               </div>
               <div className={` ${theme === 'light' ? 'bg-indigo-100' : 'bg-indigo-400'} p-3 rounded-2xl`}>
                 {/* <Target className="w-8 h-8 text-indigo-600" /> */}
               </div>
             </div>
           </div>
-          
+
           <div className={`${theme === 'light' ? 'bg-white' : 'bg-gray-800'}  rounded-3xl p-6 shadow-xl border-l-4 border-indigo-600 transform hover:scale-105 transition-all duration-300`}>
             <div className="flex items-center justify-between">
               <div>
-              <p className={`text-sm font-semibold   ${theme === 'light' ? 'text-gray-600' : 'text-gray-200' } uppercase tracking-wide`}>Active Years</p>
-              <p className={`text-4xl font-black ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-200'} capitalize`}>{uniqueYears.length}</p>
+                <p className={`text-sm font-semibold   ${theme === 'light' ? 'text-gray-600' : 'text-gray-200'} uppercase tracking-wide`}>Active Years</p>
+                <p className={`text-4xl font-black ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-200'} capitalize`}>{uniqueYears.length}</p>
               </div>
               <div className={` ${theme === 'light' ? 'bg-indigo-100' : 'bg-indigo-400'} p-3 rounded-2xl`}>
                 {/* <Calendar className="w-8 h-8 text-gray-600" /> */}
               </div>
             </div>
           </div>
-          
+
           <div className={`${theme === 'light' ? 'bg-white' : 'bg-gray-800'}  rounded-3xl p-6 shadow-xl border-l-4 border-indigo-600 transform hover:scale-105 transition-all duration-300`}>
             <div className="flex items-center justify-between">
               <div>
-              <p className={`text-sm font-semibold   ${theme === 'light' ? 'text-gray-600' : 'text-gray-200' } uppercase tracking-wide`}>Search Results</p>
-              <p className={`text-4xl font-black ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-200'} capitalize`}>{filteredBatches.length}</p>
+                <p className={`text-sm font-semibold   ${theme === 'light' ? 'text-gray-600' : 'text-gray-200'} uppercase tracking-wide`}>Search Results</p>
+                <p className={`text-4xl font-black ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-200'} capitalize`}>{filteredBatches.length}</p>
               </div>
               <div className={` ${theme === 'light' ? 'bg-indigo-100' : 'bg-indigo-400'} p-3 rounded-2xl`}>
                 {/* <Search className="w-8 h-8 text-indigo-600" /> */}
               </div>
             </div>
           </div>
-          
-         
+
+
         </div>
 
         {/* Control Panel */}
@@ -179,14 +201,14 @@ const BatchList = () => {
             <div className="flex items-center space-x-4">
               <div className="relative">
                 <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 ${theme === 'light' ? ' text-gray-400' : ' text-gray-300'} w-5 h-5`} />
-                <input 
+                <input
                   className={`${theme === 'light' ? 'bg-gray-50 border-2 border-gray-200 text-gray-900 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300' : 'bg-gray-700 border-2 border-gray-600 text-gray-100 focus:ring-4 focus:ring-indigo-400 focus:border-indigo-400 transition-all duration-300'} rounded-2xl pl-12 pr-6 py-3 w-80`}
                   placeholder="Search batches..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              
+
               <select
                 className={`${theme === 'light' ? 'bg-gray-50 border-2 border-gray-200 text-gray-900 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300' : 'bg-gray-700 text-gray-100 border-2 border-gray-600 focus:ring-4 focus:ring-indigo-400 focus:border-indigo-400 transition-all duration-300'} rounded-2xl px-6 py-3 font-medium`}
                 onChange={(e) => setSelectedYear(e.target.value)}
@@ -198,22 +220,23 @@ const BatchList = () => {
                 ))}
               </select>
             </div>
-
-            <button
+            
+         {   canCreateBatch && (<button
+            disabled={!canCreateBatch}
               className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-2xl font-bold transition-all duration-300 hover:shadow-2xl hover:scale-105 flex items-center space-x-3 transform"
               onClick={() => navigate('/institute/create-batch')}
             >
               <PlusSquare className="w-5 h-5" />
               <span>Create Batch</span>
-            </button>
+            </button>)}
           </div>
         </div>
 
         {/* Batch Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
           {filteredBatches?.map((batch, idx) => (
-            <div 
-              key={batch.id || idx} 
+            <div
+              key={batch.id || idx}
               className={`group relative ${theme === 'light' ? 'bg-white border-gray-100' : 'bg-gray-800 border-gray-700'} rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border overflow-hidden`}
               style={{
                 animationDelay: `${idx * 100}ms`,
@@ -221,13 +244,13 @@ const BatchList = () => {
               }}
             >
               {/* Gradient Header */}
-             
+
               <div className={`h-16  ${theme === 'light' ? 'bg-gradient-to-r from-indigo-500 to-indigo-400' : 'bg-gradient-to-r from-indigo-600 to-indigo-700'} rounded-t-2xl relative overflow-hidden shadow-md`}>
                 <div className={`inset-0 ${theme === 'light' ? 'bg-indigo-100' : 'bg-gray-800'}  bg-opacity-5 backdrop-blur-sm`}></div>
                 <div className='flex justify-between items-center p-6 '>
-                <div className="">
+                  <div className="">
                     <h3 className="text-white font-bold text-xl leading-snug line-clamp-2">
-                    {batch.name}
+                      {batch.name}
                     </h3>
                   </div>
 
@@ -252,7 +275,7 @@ const BatchList = () => {
                 {/* Syllabus Status */}
                 <div className="mb-6">
                   {batch.syllabus_id ? (
-                    <button 
+                    <button
                       onClick={() => navigate(`/syllabus/${batch.syllabus_id}`)}
                       className={`inline-flex items-center space-x-2 ${theme === 'light' ? 'text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100' : 'text-indigo-300 hover:text-indigo-100 bg-indigo-900 hover:bg-indigo-800'} transition-colors px-4 py-2 rounded-xl`}
                     >
@@ -272,31 +295,34 @@ const BatchList = () => {
 
                 {/* Action Buttons */}
                 <div className="flex justify-center space-x-3">
-                  <button
+                  {canViewBatch && (<button
+                    disabled={!canViewBatch}
                     className={`flex-1 z-10 cursor-pointer ${theme === 'light' ? 'bg-gray-100 hover:bg-gray-200 text-gray-700' : 'bg-gray-700 hover:bg-gray-600 text-gray-200'} p-3 rounded-xl transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-2`}
                     onClick={() => handleViewBatch(batch.id)}
                     title="View Details"
                   >
                     <Eye className="w-4 h-4" />
                     <span className="font-medium text-sm">View</span>
-                  </button>
-                  
-                  <button
+                  </button>)}
+
+                 {canEditBatch && ( <button
+                    disabled={!canEditBatch}
                     className={`flex-1 z-10 cursor-pointer ${theme === 'light' ? 'bg-indigo-100 hover:bg-indigo-200 text-indigo-700' : 'bg-indigo-800 hover:bg-indigo-700 text-indigo-200'} p-3 rounded-xl transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-2`}
                     onClick={() => handleEditBatch(batch.id)}
                     title="Edit Batch"
                   >
                     <Edit className="w-4 h-4" />
                     <span className="font-medium text-sm">Edit</span>
-                  </button>
-                  
-                  <button
+                  </button>)}
+
+                  {canDeleteBatch && (<button
+                    disabled={!canDeleteBatch}
                     className={`${theme === 'light' ? 'bg-red-100 hover:bg-red-200 text-red-700' : 'bg-red-800 hover:bg-red-700 text-red-200'} z-10 cursor-pointer p-3 rounded-xl transition-all duration-300 hover:scale-105`}
                     onClick={() => handleDeleteBatch(batch.id)}
                     title="Delete Batch"
                   >
                     <Trash className="w-4 h-4" />
-                  </button>
+                  </button>)}
                 </div>
               </div>
 

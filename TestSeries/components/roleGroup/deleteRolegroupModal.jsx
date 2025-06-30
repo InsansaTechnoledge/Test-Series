@@ -27,6 +27,7 @@ const DeleteRoleGroupModal = ({ setShowDeleteRoleGroupModal, role }) => {
                 alert("role deleted successfully!!");
                 await queryClient.invalidateQueries(['roleGroups', user._id]);
                 await queryClient.invalidateQueries(['Users', user._id]);
+                setShowDeleteRoleGroupModal(false);
             }
         }catch(err){
             console.error(err);
