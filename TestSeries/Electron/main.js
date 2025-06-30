@@ -1,135 +1,144 @@
-const { app, BrowserWindow, ipcMain, shell } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell, Menu, nativeImage } = require('electron');
 const { spawn, exec } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 const readline = require('readline');
+const url = require('url');
+const isDev = process.env.NODE_ENV === 'development';
 
 let mainWindow;
+let protocolUrl = null;
 let proctorProcess = null;
 
-// PROTOCOL REGISTRATION - Done BEFORE app.whenReady()
-const PROTOCOL_NAME = 'examproc';
-
-// For development, force protocol registration
-if (process.env.NODE_ENV === 'development') {
-    app.removeAsDefaultProtocolClient(PROTOCOL_NAME);
-    app.setAsDefaultProtocolClient(PROTOCOL_NAME, process.execPath, [path.resolve(process.argv[1])]);
+// Function to get the correct icon path
+function getIconPath() {
+  const iconName = 'evalvo icon 2.png';
+  let iconPath;
+  
+  if (isDev) {
+    // In development, look in assets folder
+    iconPath = path.join(__dirname, 'assets', iconName);
   } else {
-    if (!app.isDefaultProtocolClient(PROTOCOL_NAME)) {
-      app.setAsDefaultProtocolClient(PROTOCOL_NAME);
+    // In production, look in resources folder
+    iconPath = path.join(process.resourcesPath, 'assets', iconName);
+  }
+  
+  // Fallback paths to try
+  const fallbackPaths = [
+    path.join(__dirname, 'assets', iconName),
+    path.join(__dirname, '..', 'assets', iconName),
+    path.join(__dirname, 'icons', iconName),
+    path.join(__dirname, iconName),
+    path.join(process.cwd(), 'assets', iconName),
+    path.join(process.cwd(), 'icons', iconName)
+  ];
+  
+  // Check if the main path exists
+  if (fs.existsSync(iconPath)) {
+    console.log('✅ Icon found at:', iconPath);
+    return iconPath;
+  }
+  
+  // Try fallback paths
+  for (const fallbackPath of fallbackPaths) {
+    if (fs.existsSync(fallbackPath)) {
+      console.log('✅ Icon found at fallback path:', fallbackPath);
+      return fallbackPath;
     }
   }
   
+  console.warn('⚠️ Icon not found. Checked paths:');
+  console.warn('  Primary:', iconPath);
+  fallbackPaths.forEach(p => console.warn('  Fallback:', p));
+  
+  return null; // Return null if no icon found
+}
 
+// Register the custom protocol
+if (process.defaultApp) {
+  if (process.argv.length >= 2) {
+    app.setAsDefaultProtocolClient('examproc', process.execPath, [path.resolve(process.argv[1])]);
+  }
+} else {
+  app.setAsDefaultProtocolClient('examproc');
+}
+
+// Safe send function for proctor communication
 function safeSend(channel, data) {
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.webContents.send(channel, data);
   }
 }
 
-function closeUnwantedApps() {
-  const platform = process.platform;
-  console.log(platform);
-
-  // For example, close unwanted apps on macOS and Windows (commented for production)
-  // if (platform === 'darwin') {
-  //   const appsToKill = ['Safari', 'Google Chrome'];
-  //   appsToKill.forEach(app => {
-  //     exec(`osascript -e 'quit app "${app}"'`, (err) => {
-  //       if (err) console.warn(`⚠️ Failed to quit ${app}:`, err.message);
-  //       else console.log(`✅ ${app} closed.`);
-  //     });
-  //   });
-  // }
-}
-
-function createWindow(route = '', userId = null, examId = null, eventId = null) {
-  const preloadPath = path.resolve(__dirname, 'preload.js');
-  
-  mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
-    fullscreen: route === 'test', // Only fullscreen for actual test
-    webPreferences: {
-      preload: preloadPath,
-      contextIsolation: true,
-      nodeIntegration: false,
-      sandbox: false,
-    },
-  });
-
-  let url;
-  const isDev = process.env.NODE_ENV === 'development';
-  
-  if (route === 'splash' && userId && examId) {
-    // Load splash page with exam parameters
-    url = isDev 
-      ? `http://localhost:5173/student/proctor-splash?userId=${userId}&examId=${examId}&eventId=${eventId || 'default'}`
-      : `file://${path.join(__dirname, '../build/index.html')}#/student/proctor-splash?userId=${userId}&examId=${examId}&eventId=${eventId || 'default'}`;
-  } else if (route === 'test' && userId && examId) {
-    // Load test page
-    url = isDev 
-      ? `http://localhost:5173/student/test?userId=${userId}&examId=${examId}&eventId=${eventId || 'default'}`
-      : `file://${path.join(__dirname, '../build/index.html')}#/student/test?userId=${userId}&examId=${examId}&eventId=${eventId || 'default'}`;
-  } else {
-    // Default to upcoming exams page
-    url = isDev 
-      ? 'http://localhost:5173/student/upcoming-exams'
-      : `file://${path.join(__dirname, '../build/index.html')}#/student/upcoming-exams`;
-  }
-
-  console.log('🔗 Loading URL:', url);
-  mainWindow.loadURL(url);
-
-  // Add development tools in dev mode
-  if (process.env.NODE_ENV === 'development') {
-    mainWindow.webContents.openDevTools();
-  }
-
-  mainWindow.on('closed', () => {
-    mainWindow = null;
-    // Clean up proctor process when window closes
-    if (proctorProcess) {
-      proctorProcess.kill('SIGTERM');
-      proctorProcess = null;
-    }
-  });
-
-  // Only close unwanted apps when starting actual test, not splash
-  if (route === 'test') {
-    closeUnwantedApps();
-  }
-}
-
+// Function to get proctor engine binary path
 function getBinaryPath() {
   const isWin = process.platform === 'win32';
-  const platformDir = isWin ? 'win' : 'mac';
-  const binaryName = isWin ? 'ai_proctor.exe' : 'ai_proctor';
-
-  let basePath = path.join(process.resourcesPath, 'bin', platformDir);
-  const fullPath = path.join(basePath, binaryName);
+  const binaryName = isWin ? 'proctor_engine.exe' : 'proctor_engine';
+  
+  let fullPath;
+  
+  if (isDev) {
+    fullPath = path.join(__dirname, binaryName);
+  } else {
+    const platformDir = isWin ? 'win' : 'mac';
+    const basePath = path.join(process.resourcesPath, 'bin', platformDir);
+    fullPath = path.join(basePath, binaryName);
+  }
 
   console.log("🛠️ Resolved binary path:", fullPath);
-
+  console.log("🛠️ Current directory (__dirname):", __dirname);
+  console.log("🛠️ isDev:", isDev);
+  
   if (!fs.existsSync(fullPath)) {
-    throw new Error(`❌ AI Proctor binary not found at: ${fullPath}`);
+    console.log("📁 Listing files in current directory:");
+    try {
+      const files = fs.readdirSync(__dirname);
+      files.forEach(file => {
+        const filePath = path.join(__dirname, file);
+        const stats = fs.statSync(filePath);
+        console.log(`  ${file} ${stats.isDirectory() ? '(dir)' : `(file, ${stats.size} bytes)`}`);
+      });
+    } catch (err) {
+      console.error("❌ Error reading directory:", err);
+    }
+    
+    throw new Error(`❌ Proctor Engine binary not found at: ${fullPath}`);
+  }
+
+  if (!isWin) {
+    try {
+      fs.accessSync(fullPath, fs.constants.F_OK | fs.constants.X_OK);
+    } catch (err) {
+      console.log("⚠️ Binary exists but may not be executable. Attempting to make it executable...");
+      try {
+        fs.chmodSync(fullPath, '755');
+        console.log("✅ Made binary executable");
+      } catch (chmodErr) {
+        console.error("❌ Failed to make binary executable:", chmodErr);
+        throw new Error(`❌ Proctor Engine binary is not executable: ${fullPath}`);
+      }
+    }
   }
 
   return fullPath;
 }
 
-function launchProctorEngine(studentId, examId, eventId = 'default') {
-  if (proctorProcess) {
-    console.log('⚠️ Proctor engine already running');
-    return;
-  }
-
+function launchProctorEngine(params) {
   try {
     const binaryPath = getBinaryPath();
-    console.log('🚀 Launching proctor with:', { studentId, examId, eventId });
+    
+    const userId = params.userId;
+    const examId = params.examId;
+    const eventId = params.eventId || params.examId;
+    
+    if (!userId || !examId) {
+      throw new Error(`❌ Missing required parameters. userId: ${userId}, examId: ${examId}`);
+    }
+    
+    console.log('🚀 Launching proctor engine with params:', { userId, examId, eventId });
     
     proctorProcess = spawn(binaryPath, [
-      '--student-id', studentId,
+      '--user-id', userId,
       '--exam-id', examId,
       '--event-id', eventId
     ], {
@@ -137,271 +146,449 @@ function launchProctorEngine(studentId, examId, eventId = 'default') {
       windowsHide: true,
     });
 
-    proctorProcess.stdout.on('data', (data) => {
-      const message = data.toString();
-      console.log('📊 Proctor stdout:', message);
-      safeSend('proctor-log', message);
+    const rl = readline.createInterface({ input: proctorProcess.stdout });
+
+    rl.on('line', (line) => {
+      console.log('📤 Raw output from proctor engine:', line);
+      
+      try {
+        const parsed = JSON.parse(line);
+        console.log('📊 Parsed proctor data:', parsed);
+        
+        if (parsed?.eventType === 'anomaly') {
+          safeSend('proctor-warning', parsed);
+        } else {
+          safeSend('proctor-event', parsed);
+        }
+      } catch (parseError) {
+        console.log('📝 Non-JSON output from proctor:', line);
+        safeSend('proctor-log', line);
+      }
     });
 
     proctorProcess.stderr.on('data', (data) => {
-      const message = data.toString();
-      console.error('❌ Proctor stderr:', message);
-      safeSend('proctor-log', `❌ ERROR: ${message}`);
+      console.error('❌ Proctor engine stderr:', data.toString());
+      safeSend('proctor-log', `❌ ERROR: ${data}`);
     });
 
     proctorProcess.on('exit', (code) => {
-      const message = `Proctor Engine exited with code ${code}`;
-      console.log('🛑', message);
-      safeSend('proctor-log', message);
+      console.log(`🛑 Proctor Engine exited with code ${code}`);
+      safeSend('proctor-log', `🛑 Proctor Engine exited with code ${code}`);
       proctorProcess = null;
     });
 
-    proctorProcess.on('error', (error) => {
-      console.error('❌ Proctor process error:', error);
-      safeSend('proctor-log', `❌ Process Error: ${error.message}`);
+    proctorProcess.on('error', (err) => {
+      console.error('❌ Proctor process error:', err);
+      safeSend('proctor-log', `❌ Failed to start engine: ${err.message}`);
       proctorProcess = null;
     });
 
+    console.log('✅ Proctor engine launched successfully');
   } catch (error) {
-    console.error('❌ Failed to launch proctor engine:', error);
-    safeSend('proctor-log', `❌ Launch Error: ${error.message}`);
+    console.error('❌ Error launching proctor engine:', error);
+    safeSend('proctor-log', `❌ Failed to launch proctor: ${error.message}`);
   }
 }
 
-// Prevent multiple instances
+function closeUnwantedApps() {
+  const platform = process.platform;
+  console.log('🔒 Platform detected:', platform);
+}
+
+function parseProtocolUrl(protocolUrl) {
+  try {
+    const parsedUrl = new URL(protocolUrl);
+    const params = {
+      userId: parsedUrl.searchParams.get('userId'),
+      examId: parsedUrl.searchParams.get('examId'),
+      eventId: parsedUrl.searchParams.get('eventId'),
+      route: parsedUrl.searchParams.get('route') || '/student/proctor-splash',
+      action: parsedUrl.pathname.replace('/', '')
+    };
+    
+    console.log('📋 Parsed protocol URL:', protocolUrl);
+    console.log('📋 Extracted parameters:', params);
+    
+    return params;
+  } catch (error) {
+    console.error('❌ Error parsing protocol URL:', error);
+    return null;
+  }
+}
+
+function handleProtocolUrl(url) {
+  console.log('🔗 Handling protocol URL:', url);
+  protocolUrl = url;
+  
+  const params = parseProtocolUrl(url);
+  
+  if (mainWindow && params) {
+    mainWindow.webContents.send('protocol-url-received', params);
+    
+    if (mainWindow.isMinimized()) mainWindow.restore();
+    mainWindow.focus();
+  }
+}
+
 const gotTheLock = app.requestSingleInstanceLock();
 
 if (!gotTheLock) {
   app.quit();
 } else {
-  app.commandLine.appendSwitch('disable-gpu-shader-disk-cache');
-  app.commandLine.appendSwitch('disk-cache-size', '0');
-  app.disableHardwareAcceleration();
-
-  let pendingOpenUrl = null;
-
-  function checkPendingProtocol() {
-    if (process.platform === 'win32') {
-      const urlArg = process.argv.find(arg => arg.startsWith(`${PROTOCOL_NAME}://`));
-      if (urlArg) {
-        console.log('🔵 Windows protocol detected:', urlArg);
-        pendingOpenUrl = urlArg;
-      }
-    }
-  }
-
-  checkPendingProtocol();
-
-  app.whenReady().then(() => {
-    console.log('🚀 App ready, checking pending protocol...');
-    
-    if (pendingOpenUrl) {
-      console.log('🔄 Processing pending URL:', pendingOpenUrl);
-      handleOpenUrl(pendingOpenUrl);
-      pendingOpenUrl = null;
-    } else {
-      createWindow();
-    }
-  });
-
-  // Handle protocol URLs
-  app.on('open-url', (event, url) => {
-    console.log('📨 Protocol URL received:', url);
-    event.preventDefault();
-    
-    if (app.isReady()) {
-      handleOpenUrl(url);
-    } else {
-      pendingOpenUrl = url;
-    }
-  });
-
-  app.on('second-instance', (event, commandLine) => {
+  app.on('second-instance', (event, commandLine, workingDirectory) => {
     console.log('🔄 Second instance detected');
     
-    // If we already have a window, focus it
     if (mainWindow) {
       if (mainWindow.isMinimized()) mainWindow.restore();
       mainWindow.focus();
     }
-
-    // Check for protocol URL in command line
-    if (process.platform === 'win32') {
-      const url = commandLine.find(arg => arg.startsWith(`${PROTOCOL_NAME}://`));
-      if (url) {
-        console.log('🔵 Protocol URL from second instance:', url);
-        handleOpenUrl(url);
-      }
+    
+    const protocolUrl = commandLine.find(arg => arg.startsWith('examproc://'));
+    if (protocolUrl) {
+      handleProtocolUrl(protocolUrl);
     }
   });
 
-  function handleOpenUrl(url) {
-    console.log('🔧 Processing protocol URL:', url);
+  app.on('open-url', (event, url) => {
+    console.log('🍎 macOS open-url event:', url);
+    event.preventDefault();
+    handleProtocolUrl(url);
+  });
 
-    try {
-      const parsedUrl = new URL(url);
-      const action = parsedUrl.hostname; // 'splash', 'start', 'test'
-      const userId = parsedUrl.searchParams.get('userId');
-      const examId = parsedUrl.searchParams.get('examId');
-      const eventId = parsedUrl.searchParams.get('eventId') || 'default';
-
-      console.log('📋 Parsed parameters:', { action, userId, examId, eventId });
-
-      // Handle test action (for backwards compatibility)
-      if (action === 'test') {
-        console.warn('⚠️ Direct test launch is deprecated, use splash instead');
-        action = 'splash';
+  app.whenReady().then(() => {
+    createWindow();
+    createMenu();
+    
+    if (process.platform === 'win32' || process.platform === 'linux') {
+      const protocolUrl = process.argv.find(arg => arg.startsWith('examproc://'));
+      if (protocolUrl) {
+        console.log('🚀 App launched with protocol URL:', protocolUrl);
+        handleProtocolUrl(protocolUrl);
       }
+    }
+  });
+}
 
-      if (action === 'splash') {
-        if (!userId || !examId) {
-          console.error('❌ Missing required parameters for splash');
-          showError('Invalid exam link: Missing required parameters');
-          return;
+function createWindow() {
+  console.log('🪟 Creating main window');
+  
+  // Get the icon path
+  const iconPath = getIconPath();
+  let appIcon = null;
+  
+  if (iconPath) {
+    try {
+      // Create native image from icon path
+      appIcon = nativeImage.createFromPath(iconPath);
+      
+      // Resize icon if needed (optional - Electron usually handles this)
+      if (!appIcon.isEmpty()) {
+        // For Windows, you might want to resize to specific sizes
+        if (process.platform === 'win32') {
+          appIcon = appIcon.resize({ width: 256, height: 256 });
         }
-
-        // Create or update window with splash page
-        if (!mainWindow || mainWindow.isDestroyed()) {
-          createWindow('splash', userId, examId, eventId);
-        } else {
-          const isDev = process.env.NODE_ENV === 'development';
-          const splashUrl = isDev 
-            ? `http://localhost:5173/student/proctor-splash?userId=${userId}&examId=${examId}&eventId=${eventId}`
-            : `file://${path.join(__dirname, '../build/index.html')}#/student/proctor-splash?userId=${userId}&examId=${examId}&eventId=${eventId}`;
-          
-          mainWindow.loadURL(splashUrl);
-          mainWindow.show();
-          mainWindow.focus();
-        }
+        console.log('✅ Icon loaded successfully');
       } else {
-        console.error('❌ Unknown protocol action:', action);
-        showError(`Unknown action: ${action}`);
+        console.warn('⚠️ Icon file exists but could not be loaded as image');
+        appIcon = null;
       }
-
     } catch (error) {
-      console.error('❌ Error parsing URL:', error);
-      showError(`Error processing exam link: ${error.message}`);
+      console.error('❌ Error loading icon:', error);
+      appIcon = null;
     }
   }
+  
+  const windowOptions = {
+    width: 1400,
+    height: 900,
+    minWidth: 800,
+    minHeight: 600,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: path.join(__dirname, 'preload.js'),
+      webSecurity: true,
+      allowRunningInsecureContent: false,
+      experimentalFeatures: false
+    },
+    show: false,
+    titleBarStyle: 'default',
+    autoHideMenuBar: false
+  };
+  
+  // Add icon only if we have one
+  if (appIcon) {
+    windowOptions.icon = appIcon;
+  }
+  
+  mainWindow = new BrowserWindow(windowOptions);
 
-  function showError(message) {
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.executeJavaScript(`
-        alert('${message}');
-      `);
-    }
+  // Set app icon for dock/taskbar (macOS/Linux)
+  if (appIcon && (process.platform === 'darwin' || process.platform === 'linux')) {
+    app.dock?.setIcon(appIcon);
   }
 
-  // IPC Handlers
-  ipcMain.handle('start-exam', async (event, examData) => {
-    try {
-      const { userId, examId, eventId = 'default' } = examData;
-      
-      console.log('🎯 Starting exam:', { userId, examId, eventId });
+  if (isDev) {
+    mainWindow.loadURL('http://localhost:5173');
+    mainWindow.webContents.openDevTools();
+  } else {
+    const startUrl = process.env.ELECTRON_START_URL || url.format({
+      pathname: path.join(__dirname, '../build/index.html'),
+      protocol: 'file:',
+      slashes: true
+    });
+    mainWindow.loadURL(startUrl);
+  }
 
-      // Switch to fullscreen test mode
-      if (mainWindow && !mainWindow.isDestroyed()) {
-        mainWindow.setFullScreen(true);
-        
-        const isDev = process.env.NODE_ENV === 'development';
-        const testPageUrl = isDev 
-          ? `http://localhost:5173/student/test?userId=${userId}&examId=${examId}&eventId=${eventId}`
-          : `file://${path.join(__dirname, '../build/index.html')}#/student/test?userId=${userId}&examId=${examId}&eventId=${eventId}`;
-        
-        await mainWindow.loadURL(testPageUrl);
-        closeUnwantedApps(); // Close unwanted apps when starting test
+  mainWindow.once('ready-to-show', () => {
+    mainWindow.show();
+    
+    if (protocolUrl) {
+      const params = parseProtocolUrl(protocolUrl);
+      if (params) {
+        mainWindow.webContents.send('protocol-url-received', params);
       }
-
-      // Launch the proctor engine for monitoring
-      launchProctorEngine(userId, examId, eventId);
-
-      return { success: true, message: 'Exam started successfully' };
-    } catch (error) {
-      console.error('❌ Failed to start exam:', error);
-      return { success: false, message: error.message };
     }
+    
+    console.log('✅ Main window ready and visible');
   });
 
-  ipcMain.handle('end-exam', async (event) => {
-    try {
-      if (proctorProcess) {
-        proctorProcess.kill('SIGINT');
-        proctorProcess = null;
-        console.log("🛑 AI Proctor Engine stopped.");
-      }
-      
-      // Exit fullscreen mode
-      if (mainWindow && !mainWindow.isDestroyed()) {
-        mainWindow.setFullScreen(false);
-      }
-      
-      return { success: true, message: 'Exam ended successfully' };
-    } catch (error) {
-      console.error('❌ Failed to end exam:', error);
-      return { success: false, message: error.message };
-    }
-  });
-
-  ipcMain.handle('get-system-info', async () => {
-    const os = require('os');
-    return {
-      platform: os.platform(),
-      arch: os.arch(),
-      memory: os.totalmem(),
-      cpus: os.cpus().length
-    };
-  });
-
-  ipcMain.on('start-proctor-engine', (_event, { userId, examId, eventId }) => {
-    launchProctorEngine(userId, examId, eventId || 'default');
-  });
-
-  ipcMain.on('stop-proctor-engine', () => {
-    if (proctorProcess) {
-      proctorProcess.kill('SIGINT');
-      proctorProcess = null;
-      console.log("🛑 AI Proctor Engine stopped manually.");
-    }
-  });
-
-  ipcMain.on('close-electron-window', () => {
-    if (proctorProcess) {
-      proctorProcess.kill('SIGINT');
-      proctorProcess = null;
-    }
-
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.close();
-    }
-  });
-
-  // App event handlers
-  app.on('window-all-closed', () => {
+  mainWindow.on('closed', () => {
     if (proctorProcess) {
       proctorProcess.kill('SIGTERM');
       proctorProcess = null;
     }
-    app.quit();
+    mainWindow = null;
   });
 
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url);
+    return { action: 'deny' };
+  });
+
+  closeUnwantedApps();
+}
+
+function createMenu() {
+  const template = [
+    {
+      label: 'File',
+      submenu: [
+        {
+          label: 'Reload',
+          accelerator: 'CmdOrCtrl+R',
+          click: () => {
+            if (mainWindow) mainWindow.reload();
+          }
+        },
+        {
+          label: 'Force Reload',
+          accelerator: 'CmdOrCtrl+Shift+R',
+          click: () => {
+            if (mainWindow) mainWindow.webContents.reloadIgnoringCache();
+          }
+        },
+        { type: 'separator' },
+        {
+          label: 'Quit',
+          accelerator: process.platform === 'darwin' ? 'Cmd+Q' : 'Ctrl+Q',
+          click: () => {
+            app.quit();
+          }
+        }
+      ]
+    },
+    {
+      label: 'View',
+      submenu: [
+        {
+          label: 'Toggle Developer Tools',
+          accelerator: process.platform === 'darwin' ? 'Alt+Cmd+I' : 'Ctrl+Shift+I',
+          click: () => {
+            if (mainWindow) mainWindow.webContents.toggleDevTools();
+          }
+        },
+        { type: 'separator' },
+        {
+          label: 'Actual Size',
+          accelerator: 'CmdOrCtrl+0',
+          click: () => {
+            if (mainWindow) mainWindow.webContents.setZoomLevel(0);
+          }
+        },
+        {
+          label: 'Zoom In',
+          accelerator: 'CmdOrCtrl+Plus',
+          click: () => {
+            if (mainWindow) {
+              const currentZoom = mainWindow.webContents.getZoomLevel();
+              mainWindow.webContents.setZoomLevel(currentZoom + 1);
+            }
+          }
+        },
+        {
+          label: 'Zoom Out',
+          accelerator: 'CmdOrCtrl+-',
+          click: () => {
+            if (mainWindow) {
+              const currentZoom = mainWindow.webContents.getZoomLevel();
+              mainWindow.webContents.setZoomLevel(currentZoom - 1);
+            }
+          }
+        }
+      ]
     }
-  });
+  ];
 
-  // Security: Prevent new window creation
-  app.on('web-contents-created', (event, contents) => {
-    contents.on('new-window', (event, navigationUrl) => {
-      event.preventDefault();
+  if (process.platform === 'darwin') {
+    template.unshift({
+      label: app.getName(),
+      submenu: [
+        { label: 'About ' + app.getName(), role: 'about' },
+        { type: 'separator' },
+        { label: 'Services', role: 'services', submenu: [] },
+        { type: 'separator' },
+        { label: 'Hide ' + app.getName(), accelerator: 'Command+H', role: 'hide' },
+        { label: 'Hide Others', accelerator: 'Command+Shift+H', role: 'hideothers' },
+        { label: 'Show All', role: 'unhide' },
+        { type: 'separator' },
+        { label: 'Quit', accelerator: 'Command+Q', click: () => app.quit() }
+      ]
     });
-  });
+  }
 
-  // Handle external links
-  app.on('web-contents-created', (event, contents) => {
-    contents.setWindowOpenHandler(({ url }) => {
-      shell.openExternal(url);
-      return { action: 'deny' };
-    });
+  const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
+}
+
+// IPC handlers
+ipcMain.handle('get-protocol-params', () => {
+  if (protocolUrl) {
+    return parseProtocolUrl(protocolUrl);
+  }
+  return null;
+});
+
+ipcMain.handle('window-minimize', () => {
+  if (mainWindow) mainWindow.minimize();
+});
+
+ipcMain.handle('window-maximize', () => {
+  if (mainWindow) {
+    if (mainWindow.isMaximized()) {
+      mainWindow.unmaximize();
+    } else {
+      mainWindow.maximize();
+    }
+  }
+});
+
+ipcMain.handle('window-close', () => {
+  if (mainWindow) mainWindow.close();
+});
+
+ipcMain.handle('dialog-open-file', async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ['openFile'],
+    filters: [
+      { name: 'All Files', extensions: ['*'] }
+    ]
   });
+  return result;
+});
+
+ipcMain.handle('dialog-save-file', async (event, data) => {
+  const result = await dialog.showSaveDialog(mainWindow, {
+    filters: [
+      { name: 'All Files', extensions: ['*'] }
+    ]
+  });
+  return result;
+});
+
+ipcMain.handle('open-dev-tools', () => {
+  if (mainWindow) mainWindow.webContents.openDevTools();
+});
+
+ipcMain.handle('start-exam', (event, examData) => {
+  console.log('🎯 Starting exam:', examData);
+  return { success: true, message: 'Exam started' };
+});
+
+ipcMain.handle('submit-exam', (event, examResults) => {
+  console.log('📊 Submitting exam results:', examResults);
+  return { success: true, message: 'Exam submitted' };
+});
+
+ipcMain.on('start-proctor-engine', (_event, params) => {
+  if (proctorProcess) {
+    safeSend('proctor-log', '⚠️ Proctor Engine already running.');
+    return;
+  }
+
+  console.log('🚀 Starting proctor engine for:', params);
+  launchProctorEngine(params);
+});
+
+ipcMain.handle('start-proctor-engine-async', async (_event, params) => {
+  if (proctorProcess) {
+    return { success: false, message: 'Proctor Engine already running.' };
+  }
+
+  try {
+    launchProctorEngine(params);
+    return { success: true, message: 'Proctor Engine started successfully.' };
+  } catch (error) {
+    return { success: false, message: `Failed to start proctor: ${error.message}` };
+  }
+});
+
+ipcMain.handle('stop-proctor-engine-async', async () => {
+  if (proctorProcess) {
+    proctorProcess.kill('SIGINT');
+    proctorProcess = null;
+    return { success: true, message: 'Proctor Engine stopped.' };
+  }
+  return { success: false, message: 'Proctor Engine was not running.' };
+});
+
+ipcMain.on('renderer-message', (event, message) => {
+  console.log('📨 Message from renderer:', message);
+});
+
+ipcMain.on('renderer-ready', () => {
+  console.log('✅ Renderer process is ready');
+});
+
+app.on('window-all-closed', () => {
+  if (proctorProcess) {
+    proctorProcess.kill('SIGTERM');
+    proctorProcess = null;
+  }
+  
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
+});
+
+app.on('activate', () => {
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
+  }
+});
+
+app.on('web-contents-created', (event, contents) => {
+  contents.on('new-window', (event, navigationUrl) => {
+    event.preventDefault();
+    shell.openExternal(navigationUrl);
+  });
+});
+
+app.commandLine.appendSwitch('disable-gpu-shader-disk-cache');
+app.commandLine.appendSwitch('disk-cache-size', '0');
+
+if (isDev) {
+  console.log('📋 Development protocol registration result:', app.isDefaultProtocolClient('examproc'));
+  console.log('🚀 Electron app ready - waiting for protocol calls...');
+  console.log('💡 Test with: examproc://splash?userId=test&examId=test&eventId=test');
 }

@@ -1,5 +1,5 @@
 import React, { Children, useEffect, useState } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import BeforeAuthLanding from '../../features/beforeAuth/BeforeAuthLanding';
 import BeforeAuthLayout from '../../layouts/BeforeAuthLayout';
 import AuthLayout from '../../layouts/authLayout';
@@ -56,18 +56,169 @@ import FallBackPageForOrg from '../../features/afterAuth/pages/FallBackPageForOr
 import Loader from '../Loader/Loader';
 import YourPlanPage from '../../features/afterAuth/components/InstituteSide/components/PlanPage/YourPlanPage';
 import AboutPage from '../../features/beforeAuth/pages/AboutPage';
-import ContactPage  from "../../features/beforeAuth/pages/ContactPage"
+import ContactPage from "../../features/beforeAuth/pages/ContactPage";
 import ProctorSplash from '../../features/afterAuth/components/StudentSide/Landing/ProctorSplash';
 
+// Error Boundary Component
+class ElectronErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('Electron Handler Error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: '20px', color: 'red' }}>
+          <h3>Electron Integration Error</h3>
+          <p>The app is running in web mode. Electron features are disabled.</p>
+          <details>
+            <summary>Error Details</summary>
+            <pre>{this.state.error?.toString()}</pre>
+          </details>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+// Component to handle Electron-specific logic
+const ElectronHandler = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { setUser } = useUser();
+  const [isElectron, setIsElectron] = useState(false);
+
+  useEffect(() => {
+    // Check if running in Electron
+    const checkElectronEnvironment = () => {
+      if (window.electronAPI) {
+        console.log('🔧 Running in Electron environment');
+        setIsElectron(true);
+        return true;
+      } else {
+        console.log('🌐 Running in web browser');
+        setIsElectron(false);
+        return false;
+      }
+    };
+
+    if (checkElectronEnvironment()) {
+      // Setup Electron-specific functionality
+      const setupElectronListeners = () => {
+        try {
+          // Listen for exam parameters from main process
+          const handleExamParameters = (event, params) => {
+            console.log('📨 Received exam parameters:', params);
+            
+            if (params.userId && params.examId) {
+              console.log('🎯 Exam Parameters:', {
+                userId: params.userId,
+                examId: params.examId,
+                eventId: params.eventId,
+                route: params.route
+              });
+
+              // Navigate to the appropriate route if specified
+              if (params.route) {
+                navigate(params.route);
+              } else {
+                // Default navigation for exam
+                navigate('/student/proctor-splash');
+              }
+            }
+          };
+
+          // Set up the listener
+          window.electronAPI.onExamParameters(handleExamParameters);
+
+          // Get URL parameters if available
+          window.electronAPI.getURLParams().then(urlParams => {
+            if (urlParams) {
+              console.log('🔗 URL Parameters:', urlParams);
+              handleExamParameters(null, urlParams);
+            }
+          }).catch(error => {
+            console.warn('Failed to get URL params:', error);
+          });
+
+          // Cleanup listener on component unmount
+          return () => {
+            if (window.electronAPI.removeAllListeners) {
+              window.electronAPI.removeAllListeners('protocol-url-received');
+            }
+          };
+        } catch (error) {
+          console.error('Error setting up Electron listeners:', error);
+          return () => {}; // Return empty cleanup function
+        }
+      };
+
+      return setupElectronListeners();
+    }
+
+    // Return empty cleanup function for non-Electron environments
+    return () => {};
+  }, [navigate, setUser]);
+
+  // Log current environment
+  useEffect(() => {
+    console.log(`🔍 Environment: ${isElectron ? 'Electron' : 'Web Browser'}`);
+    
+    // Set global flag for other components to check
+    window.isElectronApp = isElectron;
+  }, [isElectron]);
+
+  return null; // This component doesn't render anything
+};
+
+// Protocol Handler Hook
+export const useElectronProtocol = () => {
+  const [protocolData, setProtocolData] = useState(null);
+  
+  useEffect(() => {
+    if (window.electronAPI) {
+      const handleProtocolData = (event, data) => {
+        setProtocolData(data);
+      };
+      
+      window.electronAPI.onExamParameters(handleProtocolData);
+      
+      return () => {
+        if (window.electronAPI.removeAllListeners) {
+          window.electronAPI.removeAllListeners('protocol-url-received');
+        }
+      };
+    }
+  }, []);
+  
+  return protocolData;
+};
 
 const PageLinks = () => {
-  const { user, setUser} = useUser();
+  const { user, setUser } = useUser();
   const [loading, setLoading] = useState(true);
+  const [isElectronEnvironment, setIsElectronEnvironment] = useState(false);
+  
   console.log('User in PageLinks:', user);
+
+  useEffect(() => {
+    // Check if we're in Electron
+    setIsElectronEnvironment(!!window.electronAPI);
+  }, []);
 
   const fetchUser = async () => {
     try {
-      
       const response = await checkAuth();
       if (response.status === 200) {
         setUser(response.data.user);
@@ -83,42 +234,65 @@ const PageLinks = () => {
   };
 
   useEffect(() => {
-    if (!user && (localStorage.getItem('hasLoggedIn')=== 'true')) {
+    // Only check localStorage if we're not in Electron or if Electron allows it
+    const hasLoggedIn = isElectronEnvironment ? 
+      false : // In Electron, always fetch user fresh
+      localStorage.getItem('hasLoggedIn') === 'true';
+      
+    if (!user && hasLoggedIn) {
       fetchUser();
     } else {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, isElectronEnvironment]);
 
   if (loading) {
-    return <div><Loader/></div>; 
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        flexDirection: 'column'
+      }}>
+        <Loader />
+        {isElectronEnvironment && (
+          <p style={{ marginTop: '10px', color: '#666' }}>
+            Starting Electron App...
+          </p>
+        )}
+      </div>
+    );
   }
 
   return (
     <Router>
+      <ElectronErrorBoundary>
+        <ElectronHandler />
+      </ElectronErrorBoundary>
+      
       <Routes>
-        {/*Before auth Landing Routes */}
+        {/* Before auth Landing Routes */}
         <Route element={<BeforeAuthLayout />}>
           <Route path="/" element={<LandingRoutes />} />
-          <Route path="/about" element={<AboutPage />} /> 
-          <Route path="/contact" element={<ContactPage/>} /> 
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/contact" element={<ContactPage />} />
         </Route>
 
         {/* Public Routes */}
         <Route element={<AuthLayout />}>
           <Route path='/institute-registration' element={<InstituteRegistrationPage />} />
           <Route path='/login' element={<LoginMainPage />} />
-          <Route path='*' element={<FallBackPage/>} />
+          <Route path='*' element={<FallBackPage />} />
         </Route>
 
         {/* Authenticated Institute Routes */}
         <Route element={<AuthRoutes />}>
           <Route element={<AfterAuthLayout />}>
             <Route element={
-              <PageAccessGuard >
+              <PageAccessGuard>
                 <InstituteRoutes />
               </PageAccessGuard>
-
             }>
               <Route path='/institute' element={<OrganizationLayout />}>
                 <Route path='batch-list' element={<BatchList />} />
@@ -140,12 +314,9 @@ const PageLinks = () => {
                 <Route path='video' element={<YoutubeConnection />} />
                 <Route path='video-list' element={<VideoListPageInstitute />} />
                 <Route path='create-contest/:contestId?' element={<CreateContest />} />
-                {/* <Route path='institute-subscription' element={<YourPlanPage/>}/> */}
-
-                {/* <Route path='contest-list' element={hasPlanFeature('code_feature')?<ContestList/>:(<div>hurrreehhhhh😁</div>)} /> */}
                 <Route path='contest-list' element={<ContestList />} />
                 <Route path='code-create' element={<QuestionCreator />} />
-                <Route path='*' element={<FallBackPageForOrg/>} />
+                <Route path='*' element={<FallBackPageForOrg />} />
               </Route>
             </Route>
 
@@ -164,25 +335,21 @@ const PageLinks = () => {
                 <Route path='code/:contestId' element={<CodingPlatform />} />
                 <Route path='analysis' element={<Analysis />} />
                 <Route path='*' element={<div>Invalid path</div>} />
-
               </Route>
             </Route>
           </Route>
         </Route>
 
-
         {/* Top-level routes */}
-        <Route path='video' element={<YoutubeConnection />} /> {/* <== Fix added! */}
+        <Route path='video' element={<YoutubeConnection />} />
         <Route path='video/upload' element={<UploadVideo />} />
         <Route path='session-expired' element={<SessionExpireError />} />
-        {/* <Route path='code' element={<CodingPlatform/>} /> */}
         <Route path='certificate-creation' element={<CertificateCreation />} />
         <Route path='syllabus/:syllabusId' element={<SyllabusViewPage />} />
 
         {user?.role === "organization" && (
           <Route path='institute-subscription' element={<YourPlanPage />} />
         )}
-
       </Routes>
     </Router>
   );
