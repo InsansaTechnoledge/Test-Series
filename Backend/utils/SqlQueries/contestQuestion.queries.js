@@ -1,16 +1,17 @@
 import { getSupabaseClient } from "../../database/SupabaseDB.js";
 
-const supabase=getSupabaseClient();
+const supabase = getSupabaseClient();
 
-export const saveContestQuestion=async (contestId,questions) => {
-      const dataToInsert = questions.map((q) => ({
-    ...q,
-    contest_id: contestId, 
-  }));
-    const {data,error} = await supabase
-        .from("contestXcoding_questions")
+export const saveContestQuestion = async (contestId, questions) => {
+    const dataToInsert = questions.map((q) => ({
+        ...q,
+        contest_id: contestId,
+    }));
+    console.log("Data to Insert:", dataToInsert);
+    const { data, error } = await supabase
+        .from("contestxcoding_questions")
         .insert(dataToInsert)
-        .select(); 
+        .select();
 
     if (error) throw error;
     return data;
