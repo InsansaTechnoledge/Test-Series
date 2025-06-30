@@ -25,29 +25,156 @@ const TestWindow = () => {
   const [allWarnings, setAllWarnings] = useState([]);
   const [showFinalPopup, setShowFinalPopup] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
+  
+  // New proctor-specific states
+  const [proctorStatus, setProctorStatus] = useState('Not Started');
+  const [proctorEvents, setProctorEvents] = useState([]);
+  const [isElectronEnv, setIsElectronEnv] = useState(false);
+  
   const { user } = useUser();
   const secretKey = import.meta.env.VITE_SECRET_KEY_FOR_TESTWINDOW || VITE_SECRET_KEY_FOR_TESTWINDOW;
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const navigate = useNavigate();
-  // const userId = searchParams.get('userId');
   const examId = searchParams.get('examId');
-  // const eventId = searchParams.get('eventId');
-  // const [proctorStatus, setProctorStatus] = useState('Initializing...');
-  // const examId = "aa632eab-74ad-4a6b-a675-60c571257c00";
   const { questions, isError: isExamError, isLoading: isQuestionLoading } = useCachedQuestions(examId);
   const { exam, isLoading: isExamLoading } = useCachedExam(examId);
 
+  // Check if we're in Electron environment
+  useEffect(() => {
+    const checkElectronEnv = () => {
+      const isElectron = window?.electronAPI?.isElectron || false;
+      setIsElectronEnv(isElectron);
+      console.log('🔍 Electron environment detected:', isElectron);
+    };
+    
+    checkElectronEnv();
+  }, []);
+
+  // Initialize proctor engine in Electron environment
+  useEffect(() => {
+    if (isElectronEnv && user && examId && !proctorRunning) {
+      initializeProctor();
+    }
+
+    return () => {
+      if (isElectronEnv && window?.electronAPI) {
+        cleanupProctor();
+      }
+    };
+  }, [isElectronEnv, user, examId]);
+
+  const initializeProctor = async () => {
+    if (!window?.electronAPI) {
+      console.warn('⚠️ Electron API not available');
+      return;
+    }
+
+    try {
+      console.log('🚀 Initializing proctor engine...');
+      setProctorStatus('Initializing...');
+
+      // Setup event listeners
+      window.electronAPI.onProctorWarning((event, data) => {
+        console.log('⚠️ Proctor warning received:', data);
+        handleProctorWarning(data);
+      });
+
+      window.electronAPI.onProctorEvent((event, data) => {
+        console.log('📥 Proctor event received:', data);
+        handleProctorEvent(data);
+      });
+
+      window.electronAPI.onProctorLog((event, data) => {
+        console.log('📝 Proctor log:', data);
+        setProctorStatus(data);
+      });
+
+      // ✅ FIXED: Pass parameters as a single object with correct structure
+      const proctorParams = {
+        userId: user._id,    // This will be mapped to studentId in C++
+        examId: examId,
+        eventId: examId      // Using examId as eventId for now
+      };
+
+      console.log('🔧 Sending proctor params:', proctorParams);
+
+      // Start the proctor engine
+      const result = await window.electronAPI.startProctorEngineAsync(proctorParams);
+
+      if (result.success) {
+        setProctorRunning(true);
+        setProctorStatus('Running');
+        console.log('✅ Proctor engine started successfully');
+      } else {
+        setProctorStatus(`Error: ${result.message}`);
+        console.error('❌ Failed to start proctor engine:', result.message);
+      }
+    } catch (error) {
+      console.error('❌ Error initializing proctor:', error);
+      setProctorStatus(`Error: ${error.message}`);
+    }
+  };
+
+  const handleProctorWarning = (data) => {
+    const warningMessage = data.details || data.eventType || 'Unknown warning';
+    const timestamp = new Date(data.timestamp || Date.now()).toLocaleTimeString();
+    const formattedWarning = `${timestamp}: ${warningMessage}`;
+    
+    setWarning(warningMessage);
+    setWarningCount(prev => prev + 1);
+    setAllWarnings(prev => [...prev, formattedWarning]);
+    
+    // Handle specific warning types
+    if (warningMessage.includes('No face detected')) {
+      setCountdown(10); // 10 second countdown
+      const countdownTimer = setInterval(() => {
+        setCountdown(prev => {
+          if (prev <= 1) {
+            clearInterval(countdownTimer);
+            return null;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    
+    // Auto-clear warning after 5 seconds
+    setTimeout(() => {
+      setWarning(null);
+      setCountdown(null);
+    }, 5000);
+    
+    // Check if we should show final popup (5 warnings threshold)
+    if (warningCount >= 4) { // 4 because we increment after setting
+      setShowFinalPopup(true);
+    }
+  };
+
+  const handleProctorEvent = (data) => {
+    setProctorEvents(prev => [...prev.slice(-9), data]); // Keep last 10 events
+  };
+
+  const cleanupProctor = () => {
+    if (window?.electronAPI) {
+      window.electronAPI.cleanupProctorListeners();
+      if (proctorRunning) {
+        window.electronAPI.stopProctorEngine();
+        setProctorRunning(false);
+        setProctorStatus('Stopped');
+      }
+    }
+  };
+
+  // Your existing useEffect hooks remain the same...
   useEffect(() => {
     if (!isExamLoading && !isQuestionLoading && questions && questions.length > 0) {
       for (const quest of questions) {
-                      if (!quest.subject || quest.subject.trim() === "") {
-            quest.subject = "Unspecified";  // Replace empty subject with "Unspecified"
-          }
+        if (!quest.subject || quest.subject.trim() === "") {
+          quest.subject = "Unspecified";
         }
+      }
       const subjectSet = new Set(questions.map(q => q.subject));
-
-
 
       setEventDetails(prev => ({
         ...prev,
@@ -62,12 +189,8 @@ const TestWindow = () => {
     if (eventDetails) {
       const cached = localStorage.getItem('testQuestions');
 
-
       if (!cached) {
         const reduced = eventDetails.questions.reduce((acc, quest) => {
-          // Check if the subject is empty or null
-
-
           if (!acc[quest.subject]) {
             acc[quest.subject] = [{ ...quest, index: 1, status: 'unanswered', response: null }];
           } else {
@@ -83,20 +206,17 @@ const TestWindow = () => {
         setSubjectSpecificQuestions(decrypted);
       }
 
-      // Set the selected subject (use the first valid subject if possible)
       setSelectedSubject(eventDetails.subjects[0] || "Unspecified");
     }
   }, [eventDetails]);
-
 
   useEffect(() => {
     if (eventDetails) {
       const cached = localStorage.getItem('testQuestions');
       if (!cached) {
         const reduced = eventDetails.questions.reduce((acc, quest) => {
-          // Avoid including empty subjects
           if (quest.subject.trim() === "") {
-            quest.subject = "Unspecified"; // or just exclude it
+            quest.subject = "Unspecified";
           }
 
           if (!acc[quest.subject]) {
@@ -156,11 +276,15 @@ const TestWindow = () => {
     }
   }
 
-
-
-
   const handleSubmitTest = async () => {
     try {
+      // Stop proctor engine before submitting
+      if (isElectronEnv && proctorRunning) {
+        await window.electronAPI?.stopProctorEngineAsync();
+        setProctorRunning(false);
+        setProctorStatus('Stopped');
+      }
+
       localStorage.removeItem('testQuestions');
       localStorage.removeItem('encryptedTimeLeft');
 
@@ -177,7 +301,6 @@ const TestWindow = () => {
         return [...acc, ...objs];
       }, []);
 
-      
       const result = calculateResult(answers);
 
       const payload = {
@@ -187,25 +310,20 @@ const TestWindow = () => {
         wrongAnswers: result.wrongAnswers,
         unattempted: result.unattempted,
         marks: result.totalMarks,
-
       }
-
 
       const response = await submitResult(payload);
       if (response.status == 200) {
-
         navigate('/student/completed-exams');
       }
 
     } catch (err) {
-      
+      console.error('Error submitting test:', err);
     }
 
     if (window?.electronAPI?.stopProctorEngine) window.electronAPI.stopProctorEngine();
     if (window?.electronAPI?.closeWindow) window.electronAPI.closeWindow();
   };
-
-
 
   if (!eventDetails) return <div>Loading test...</div>;
 
@@ -219,14 +337,11 @@ const TestWindow = () => {
   }
 
   if (isExamLoading || isQuestionLoading) {
-    return <div>Loading...🥲
-      
-    </div>
+    return <div>Loading...🥲</div>
   }
 
   return (
-
-    <div className="flex flex-col ">
+    <div className="flex flex-col">
       {!eventDetails ? (
         <div className="flex justify-center items-center h-full text-lg font-medium text-gray-700">
           Loading test...
@@ -234,6 +349,21 @@ const TestWindow = () => {
       ) : (
         <>
           <div className="relative flex flex-col w-full px-4 py-4 sm:px-6">
+
+            {/* Electron Proctor Status - Only show in Electron environment */}
+            {isElectronEnv && (
+              <div className="fixed top-4 right-4 z-40 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg max-w-xs">
+                <div className="flex items-center gap-2">
+                  <div className={`w-2 h-2 rounded-full ${proctorRunning ? 'bg-green-400' : 'bg-red-400'}`}></div>
+                  <span className="text-sm font-medium">
+                    Proctor: {proctorRunning ? 'Active' : 'Inactive'}
+                  </span>
+                </div>
+                <div className="text-xs text-gray-300 mt-1">
+                  {proctorStatus}
+                </div>
+              </div>
+            )}
 
             {/* Warning Banner */}
             {warning && (
@@ -274,8 +404,22 @@ const TestWindow = () => {
               </div>
             )}
 
+            {/* Proctor Events Log - Only show in Electron environment and when there are events */}
+            {isElectronEnv && proctorEvents.length > 0 && (
+              <div className="fixed bottom-4 right-4 z-30 bg-gray-900 text-white p-3 rounded-lg shadow-lg max-w-sm max-h-40 overflow-y-auto">
+                <h4 className="text-sm font-semibold mb-2">Recent Events</h4>
+                <div className="space-y-1">
+                  {proctorEvents.slice(-5).map((event, idx) => (
+                    <div key={idx} className="text-xs text-gray-300">
+                      <span className="text-yellow-400">{event?.eventType}:</span> {event?.details}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Header */}
-            <div className="flex flex-col border-3  mb-12 py-3 px-2 sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6 ">
+            <div className="flex flex-col border-3 mb-12 py-3 px-2 sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
               <div>
                 <h1 className="text-xl sm:text-3xl font-bold">{eventDetails.batch?.name}</h1>
                 <h2 className="text-md sm:text-lg font-semibold text-gray-600">{eventDetails.batch.year}</h2>
@@ -297,9 +441,9 @@ const TestWindow = () => {
             </div>
 
             {/* Main Content */}
-            <div className="flex flex-col  lg:flex-row gap-4 w-full">
+            <div className="flex flex-col lg:flex-row gap-4 w-full">
               {/* Left: QuestionSection */}
-              <div className="w-full lg:w-3/5 border-3 py-3 px-2 ">
+              <div className="w-full lg:w-3/5 border-3 py-3 px-2">
                 <QuestionSection
                   setSubjectSpecificQuestions={setSubjectSpecificQuestions}
                   setSelectedQuestion={setSelectedQuestion}
@@ -352,7 +496,6 @@ const TestWindow = () => {
       )}
     </div>
   );
-
 };
 
 export default TestWindow;

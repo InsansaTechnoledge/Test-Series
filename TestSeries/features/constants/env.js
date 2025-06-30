@@ -54,58 +54,72 @@ export const VITE_PLAN_FEATURE_MAP= `{
 export const VITE_API_BASE_URL="https://test-series-1new.onrender.com/api"
 //  VITE_API_BASE_URL="http://localhost:8000/api"
 
-export const VITE_ROLE_FEATURE_MAP= `{
-    "/institute/batch-list": ["batch:view_batch", "batch:create_batch", "batch:edit_batch"],
-    "/institute/create-batch": ["batch:create_batch"],
-    "/institute/edit-batch": ["batch:edit_batch"],
-    "/institute/batch-details": ["batch:view_batch"],
-   
-  "/institute/student-list": ["student:view_student", "student:add_student", "student:edit_student"],
-    "/institute/add-student": ["student:add_student"],
-    "/institute/student-detail": ["student:view_student"],
-    "/institute/student-edit": ["student:edit_student"],
-   
-    "/institute/create-role-group": ["role:create_role"],
-   
-    "/institute/create-exam": ["exam:create_exam"],
-    "/institute/create-exam/:examId": ["exam:edit_exam"],
-    "/institute/exam-list": ["exam:view_exam", "exam:publish_exam", "exam:edit_exam", "exam:delete_exam","exam:create_exam"],
-   
-    "/institute/create-user": ["user:create_user"],
-    "/institute/user-list": ["user:view_user", "user:edit_user", "user:delete_user","user:create_user"],
-    "/institute/user-detail": ["user:view_user"],
-    "/institute/user-edit/:id": ["user:edit_user"],
-   
-    "/institute/video": ["video:view_video"],
-    "/institute/video-list": ["video:view_video", "video:upload_video"],
-   
-    "/institute/create-contest": ["contest:create_contest"],
-    "/institute/create-contest/:contestId": ["contest:edit_contest"],
-    "/institute/contest-list": ["contest:view_contest", "contest:create_contest", "contest:edit_contest", "contest:delete_contest"],
-    "/institute/code-create": ["contest:create_code"],
-   
-    "/student/upcoming-exams": ["exam:view_exam"],
-    "/student/completed-exams": ["exam:view_exam"],
-    "/student/result/:examId": ["exam:view_result"],
-    "/student/analysis": ["analysis:view_analysis"],
-   
-    "/student/contest/:contestId": ["contest:view_contest"],
-    "/student/code/:contestId": ["contest:attempt_contest"],
-    "/student/coding-contests": ["contest:view_contest"],
-   
-    "/student/classroom": ["video:view_video"],
-    "/video": ["video:view_video"],
-    "/video/upload": ["video:upload_video"],
-    "/certificate-creation": ["analysis:create_certificate"],
-   
-    "actions.createBatch": ["batch:create_batch"],
-    "actions.addStudent": ["student:add_student"],
-    "actions.createRole": ["role:create_role"],
-    "actions.createExam": ["exam:create_exam"],
-    "actions.assignExam": ["exam:publish_exam"],
-    "actions.createUser": ["user:create_user"],
-    "actions.startProctorExam": ["proctor:start_exam"],
-    "actions.createContest": ["contest:create_contest"],
-    "actions.uploadVideo": ["video:upload_video"],
-    "actions.viewReport": ["analysis:view_analysis"]
-  }`
+export const VITE_ROLE_FEATURE_MAP={
+  "/institute/batch-list": ["batch:view_batch", "batch:create_batch", "batch:edit_batch"],
+  "/institute/create-batch": ["batch:create_batch"],
+  "/institute/edit-batch": ["batch:edit_batch"],
+  "/institute/batch-details": ["batch:view_batch"],
+ 
+"/institute/student-list": ["student:view_student", "student:add_student", "student:edit_student"],
+  "/institute/add-student": ["student:add_student"],
+  "/institute/student-detail": ["student:view_student"],
+  "/institute/student-edit": ["student:edit_student"],
+ 
+  "/institute/create-role-group": ["role:create_role","role:edit_role", "role:delete_role"],
+ 
+  "/institute/create-exam": ["exam:create_exam"],
+  "/institute/create-exam/:examId": ["exam:edit_exam"],
+  "/institute/exam-list": ["exam:view_exam", "exam:publish_exam", "exam:edit_exam", "exam:delete_exam","exam:create_exam"],
+ 
+  "/institute/create-user": ["user:create_user"],
+  "/institute/user-list": ["user:view_user", "user:edit_user", "user:delete_user","user:create_user"],
+  "/institute/user-detail": ["user:view_user"],
+  "/institute/user-edit/:id": ["user:edit_user"],
+ 
+  "/institute/video": ["video:view_video"],
+  "/institute/video-list": ["video:view_video", "video:upload_video"],
+ 
+  "/institute/create-contest": ["contest:create_contest"],
+  "/institute/create-contest/:contestId": ["contest:edit_contest"],
+  "/institute/contest-list": ["contest:view_contest", "contest:create_contest", "contest:edit_contest", "contest:delete_contest"],
+  "/institute/code-create": ["contest:create_code"],
+ 
+  "/student/upcoming-exams": ["exam:view_exam"],
+  "/student/completed-exams": ["exam:view_exam"],
+  "/student/result/:examId": ["exam:view_result"],
+  "/student/analysis": ["analysis:view_analysis"],
+ 
+  "/student/contest/:contestId": ["contest:view_contest"],
+  "/student/code/:contestId": ["contest:attempt_contest"],
+  "/student/coding-contests": ["contest:view_contest"],
+ 
+  "/student/classroom": ["video:view_video"],
+  "/video": ["video:view_video"],
+  "/video/upload": ["video:upload_video"],
+  "/certificate-creation": ["analysis:create_certificate"],
+ 
+  "actions.createBatch": ["batch:create_batch"],
+  "actions.deleteBatch": ["batch:delete_batch"],
+  "actions.editBatch": ["batch:edit_batch"],
+  "actions.viewBatch": ["batch:view_batch"],
+  "actions.editExam": ["exam:edit_exam"],
+  "actions.deleteExam": ["exam:delete_exam"],
+  "actions.publishExam": ["exam:publish_exam"],
+  "actions.createExam": ["exam:create_exam"],
+  "actions.createUser": ["user:create_user"],
+  "actions.editUser": ["user:edit_user"],
+  "actions.deleteUser": ["user:delete_user"],
+  "actions.viewUser": ["user:view_user"],
+  "actions.addStudent":["student:add_student"],
+  "actions.viewStudent": ["student:view_student"],
+  "actions.editStudent": ["student:edit_student"],
+  "actions.deleteStudent": ["student:delete_student"],
+  "actions.createRole": ["role:create_role"],
+  "actions.editRole": ["role:edit_role"],
+  "actions.deleteRole": ["role:delete_role"],
+  "actions.startProctorExam": ["proctor:start_exam"],
+  "actions.createContest": ["contest:create_contest"],
+  "actions.uploadVideo": ["video:upload_video"],
+  "actions.viewReport": ["analysis:view_analysis"]
+}
+ 

@@ -242,29 +242,88 @@
 //   });
 // }
 
+
+// preload.js
 const { contextBridge, ipcRenderer } = require('electron');
 
-// Expose protected methods that allow the renderer process to use
-// the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld('electronAPI', {
-  // Exam management
-  startExam: (examData) => ipcRenderer.invoke('start-exam', examData),
-  endExam: () => ipcRenderer.invoke('end-exam'),
-  
-  // System information
-  getSystemInfo: () => ipcRenderer.invoke('get-system-info'),
-  
-  // Proctor engine controls
-  startProctorEngine: (data) => ipcRenderer.send('start-proctor-engine', data),
-  stopProctorEngine: () => ipcRenderer.send('stop-proctor-engine'),
+  // Existing methods
+  isElectron: true,
+  getProtocolParams: () => ipcRenderer.invoke('get-protocol-params'),
   
   // Window controls
-  closeWindow: () => ipcRenderer.send('close-electron-window'),
+  minimizeWindow: () => ipcRenderer.invoke('window-minimize'),
+  maximizeWindow: () => ipcRenderer.invoke('window-maximize'),
+  closeWindow: () => ipcRenderer.invoke('window-close'),
+
+  // ✅ FIXED: Proctor engine methods with proper parameter passing
+  startProctorEngineAsync: (params) => {
+    console.log('🔧 Preload: startProctorEngineAsync called with:', params);
+    return ipcRenderer.invoke('start-proctor-engine-async', params);
+  },
   
-  // Listen for proctor events
-  onProctorLog: (callback) => ipcRenderer.on('proctor-log', (_event, data) => callback(data)),
-  onProctorWarning: (callback) => ipcRenderer.on('proctor-warning', (_event, data) => callback(data)),
+  stopProctorEngineAsync: () => {
+    console.log('🛑 Preload: stopProctorEngineAsync called');
+    return ipcRenderer.invoke('stop-proctor-engine-async');
+  },
   
-  // Remove listeners
-  removeAllListeners: (channel) => ipcRenderer.removeAllListeners(channel),
+  startProctorEngine: (params) => {
+    console.log('🔧 Preload: startProctorEngine called with:', params);
+    ipcRenderer.send('start-proctor-engine', params);
+  },
+  
+  stopProctorEngine: () => {
+    console.log('🛑 Preload: stopProctorEngine called');
+    ipcRenderer.send('stop-proctor-engine');
+  },
+
+  // ✅ FIXED: Event listeners for proctor events
+  onProctorWarning: (callback) => {
+    const listener = (event, data) => {
+      console.log('📥 Preload: proctor-warning received:', data);
+      callback(event, data);
+    };
+    ipcRenderer.on('proctor-warning', listener);
+    return listener;
+  },
+
+  onProctorEvent: (callback) => {
+    const listener = (event, data) => {
+      console.log('📥 Preload: proctor-event received:', data);
+      callback(event, data);
+    };
+    ipcRenderer.on('proctor-event', listener);
+    return listener;
+  },
+
+  onProctorLog: (callback) => {
+    const listener = (event, data) => {
+      console.log('📝 Preload: proctor-log received:', data);
+      callback(event, data);
+    };
+    ipcRenderer.on('proctor-log', listener);
+    return listener;
+  },
+
+  // ✅ FIXED: Cleanup method for event listeners
+  cleanupProctorListeners: () => {
+    console.log('🧹 Preload: cleaning up proctor listeners');
+    ipcRenderer.removeAllListeners('proctor-warning');
+    ipcRenderer.removeAllListeners('proctor-event');
+    ipcRenderer.removeAllListeners('proctor-log');
+  },
+
+  // Protocol URL handling
+  onProtocolUrlReceived: (callback) => {
+    ipcRenderer.on('protocol-url-received', callback);
+  },
+
+  // Development helpers
+  openDevTools: () => ipcRenderer.invoke('open-dev-tools'),
+  
+  // Send messages to main process
+  sendMessage: (message) => ipcRenderer.send('renderer-message', message),
+  
+  // Notify main process that renderer is ready
+  rendererReady: () => ipcRenderer.send('renderer-ready')
 });
