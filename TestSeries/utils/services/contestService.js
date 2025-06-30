@@ -26,3 +26,19 @@ export const deleteContest = async (id) => {
     const resonse = await api.delete(`v1/contest/${id}`)
     return resonse.data;
 }
+
+export const fetchCodingQuestions = async (difficulty, page,limit) => {
+    const response = await api.get(`v1/contest/coding-questions/`, {
+        params: {
+            difficulty,
+            page,
+            limit
+        }
+    });
+    return response.data;
+}
+
+export const fetchCodingQuestion = async (id) => {
+    const response = await api.get(`v1/contest/coding-question/${id}`);
+    return response.data;
+}

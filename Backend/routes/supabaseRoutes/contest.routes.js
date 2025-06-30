@@ -1,5 +1,5 @@
 import express from 'express';
-import { addContestQuestion, getContestQuestions, runContestCode, testContestQuestion } from '../../controllers/SupabaseDB/contestQuestion.controllers.js';
+import { addContestQuestion, fetchCodingQuestion, fetchCodingQuestions, getContestQuestions, runContestCode, testContestQuestion } from '../../controllers/SupabaseDB/contestQuestion.controllers.js';
 // import { createContest, DeleteContest, FetchContest } from '../../controllers/SupabaseDB/contest.controllers.js';
 import { createContest, enrollStudentToContest, FetchContest, getenrolledContest, DeleteContest } from '../../controllers/SupabaseDB/contest.controllers.js';
 import { checkLimitAccess } from '../../middleware/checkLimitAccess.middleware.js';
@@ -16,5 +16,8 @@ router.get('/', FetchContest)
 router.delete('/:id' , roleRouteGuard,DeleteContest)
 router.post('/enroll', enrollStudentToContest);
 router.get('/enroll',getenrolledContest);
+// 
+router.get('/coding-questions',fetchCodingQuestions);
+router.get('/coding-question/:id', fetchCodingQuestion);
 
 export default router;

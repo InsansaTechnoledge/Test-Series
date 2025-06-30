@@ -1,5 +1,6 @@
 import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
 import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
+import { getCodingQuestions } from "../../utils/SqlQueries/codingQuestion.queries.js";
 import { fetchContestQuestions, saveContestQuestion } from "../../utils/SqlQueries/contestQuestion.queries.js";
 
 export const addContestQuestion = async (req, res) => {
@@ -119,6 +120,45 @@ export const runContestCode = async (req, res) => {
     } catch (error) {
         console.log("❌ Error running contest code:", error);
         return new APIError(500, ["Failed to run contest code", error.message]).send(res);
+    }
+};
+
+export const fetchCodingQuestions= async (req, res) => {
+    const {page=1,limit=10,difficulty='Easy'} = req.query;
+    console.log("Fetching coding questions with params:", { difficulty, page, limit });
+
+    try{
+        const questions = await getCodingQuestions(difficulty, page, limit);
+
+        if (!questions || questions.length === 0) {
+            return new APIError(404, [], "No coding questions found").send(res);
+        }
+
+        return new APIResponse(200, questions, "Coding questions fetched successfully").send(res);
+    }catch (error) {
+        console.error("❌ Error fetching coding questions:", error);
+        return new APIError(500, ["Failed to fetch coding questions", error.message]).send(res);
+    }
+};
+
+export const fetchCodingQuestion = async (req, res) => {
+    const { id } = req.params;
+
+    if (!id) {
+        return new APIError(400, ["Question ID is required"]).send(res);
+    }
+
+    try {
+        const question = await getCodingQuestions(null, null, null, id);
+
+        if (!question || question.length === 0) {
+            return new APIError(404, [], "Coding question not found").send(res);
+        }
+
+        return new APIResponse(200, question.data, "Coding question fetched successfully").send(res);
+    } catch (error) {
+        console.error("❌ Error fetching coding question:", error);
+        return new APIError(500, ["Failed to fetch coding question", error.message]).send(res);
     }
 };
 
