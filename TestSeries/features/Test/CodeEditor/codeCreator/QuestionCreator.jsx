@@ -85,19 +85,15 @@ export default function QuestionCreator() {
   const [limit] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [fullDetails, setFullDetails] = useState(null);
-  const [selectedQuestions, setSelectedQuestions] = useState({
-    Easy: [],
-    Medium: [],
-    Hard: [],
-  });
+  const [selectedQuestions, setSelectedQuestions] = useState([]);
   const [cache, setCache] = useState({});
-  const DIFFICULTIES = ["Easy", "Medium", "Hard"];
+  const [selectedId, setSelectedId] = useState(null);
 
-
-  const fetchQuestions = async () => {
+ const fetchQuestions = async () => {
     if (cache[difficulty] && cache[difficulty][page]) {
-      setQuestions(cache[difficulty][page].data || []);
-      setTotalPages(cache[difficulty][page].totalPages || 1);
+      const cachedData = cache[difficulty][page];
+      setQuestions(cachedData.data || []);
+      setTotalPages(cachedData.totalPages || 1);
       return;
     }
 
@@ -120,33 +116,17 @@ export default function QuestionCreator() {
     }));
   };
 
+  const handleNext = () => {
+    if (page < totalPages) setPage((prev) => prev + 1);
+  };
+
+  const handlePrevious = () => {
+    if (page > 1) setPage((prev) => prev - 1);
+  };
+
   const fetchFullQuestion = async (id) => {
     const res = await fetchCodingQuestion(id);
     setFullDetails(res?.data || null);
-  };
-
-  const isSelected = (id) => {
-    return selectedQuestions[difficulty].includes(id);
-  };
-
-  const handleToggleSelect = (id) => {
-    setSelectedQuestions((prev) => {
-      const currentList = prev[difficulty];
-      const updatedList = currentList.includes(id)
-        ? currentList.filter((qId) => qId !== id)
-        : [...currentList, id];
-
-      return {
-        ...prev,
-        [difficulty]: updatedList,
-      };
-    });
-  };
-
-  const handleCreateContest = () => {
-    const allSelected = [...selectedQuestions.Easy, ...selectedQuestions.Medium, ...selectedQuestions.Hard];
-    console.log("Submit to Contest:", { contestId, questionIds: allSelected });
-    // 🔥 API call here to save contest questions
   };
 
   useEffect(() => {
@@ -157,6 +137,32 @@ export default function QuestionCreator() {
   useEffect(() => {
     fetchQuestions();
   }, [page]);
+
+  const submitContest = async () => {
+    
+                // const payload = {
+                //   contest_id: contestId,
+                //   questions: selectedQuestions.map(({ id, marks }) => ({ question_id: id, marks }))
+                // };
+                const payload={
+                  contestId: contestId,
+                  questions:
+                  selectedQuestions.map(({id, marks ,difficulty}) => ({ coding_question_id:id, marks ,difficulty}))
+                }
+                console.log("✅ Submit Contest Payload:", payload);
+                const response = await saveContestQuestion(payload);
+                if (response.status === 200) {
+                  alert("Contest created successfully!");
+                  setSelectedQuestions([]);
+                  setFullDetails(null);
+                }
+                else {
+                  alert("Failed to create contest. Please try again.");
+                }
+                
+
+              
+  }
 
 
 
@@ -185,90 +191,155 @@ export default function QuestionCreator() {
 
      <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-5xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">Create Contest Questions</h1>
+        <h1 className="text-3xl font-bold text-gray-800 mb-6">Create Contest Question</h1>
 
-        <div className="mb-4 flex items-center gap-4">
-          <label className="text-gray-700 font-medium">Select Difficulty:</label>
+        <div className="mb-6 flex items-center gap-4">
+          <label className="text-gray-700 font-medium">Choose Category:</label>
           <select
+            className="border border-gray-300 px-3 py-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
             value={difficulty}
             onChange={(e) => setDifficulty(e.target.value)}
-            className="border border-gray-300 px-3 py-2 rounded-md"
           >
-            {DIFFICULTIES.map((d) => (
-              <option key={d}>{d}</option>
-            ))}
+            <option value="Easy">Easy</option>
+            <option value="Medium">Medium</option>
+            <option value="Hard">Hard</option>
           </select>
         </div>
 
-        {/* Summary bar */}
-        <div className="mb-6 p-4 rounded-xl bg-white shadow flex justify-between text-sm font-medium text-gray-700">
-          {DIFFICULTIES.map((level) => (
-            <span key={level}>
-              {level}: {selectedQuestions[level].length}
-            </span>
-          ))}
-          <button
-            onClick={handleCreateContest}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
-            Create Contest
-          </button>
-        </div>
-
-        {/* Paginated list */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {questions.map((q) => (
+          {questions?.map((q) => (
             <div
               key={q.id}
-              className={`bg-white p-4 rounded-xl border shadow hover:shadow-md cursor-pointer transition`}
-              onClick={() => fetchFullQuestion(q.id)}
+              className="bg-white p-4 rounded-xl border shadow hover:shadow-md cursor-pointer transition"
+              onClick={() => {
+                setSelectedId(q.id);
+                fetchFullQuestion(q.id);
+              }}
             >
               <h3 className="font-semibold text-lg text-gray-800">{q.title}</h3>
               <p className="text-sm text-gray-500">Slug: {q.title_slug}</p>
-              <span className="inline-block mt-2 px-2 py-1 text-xs font-medium bg-blue-100 text-blue-700 rounded">
+              <span className="mt-1 inline-block px-2 py-1 text-xs font-medium bg-blue-100 text-blue-700 rounded">
                 {q.difficulty}
               </span>
             </div>
           ))}
         </div>
 
-        {/* Pagination */}
         <div className="mt-6 flex justify-between">
           <button
-            onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-            disabled={page <= 1}
             className="px-4 py-2 bg-gray-200 rounded"
+            onClick={handlePrevious}
+            disabled={page <= 1}
           >
             Previous
           </button>
+
           <span className="text-sm font-medium">Page {page} of {totalPages}</span>
+
           <button
-            onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
-            disabled={page >= totalPages}
             className="px-4 py-2 bg-gray-200 rounded"
+            onClick={handleNext}
+            disabled={page >= totalPages}
           >
             Next
           </button>
         </div>
 
-        {/* Preview Panel */}
         {fullDetails && (
           <div className="mt-10 bg-white rounded-xl shadow p-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">{fullDetails.title}</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">
+              {fullDetails.title}
+            </h2>
             <div
-              className="prose max-w-none text-gray-700"
+              className="prose prose-sm max-w-none text-gray-700"
               dangerouslySetInnerHTML={{ __html: fullDetails.content }}
             />
             <button
-              onClick={() => handleToggleSelect(fullDetails.id)}
-              className={`mt-6 px-4 py-2 rounded text-white ${
-                isSelected(fullDetails.id) ? "bg-red-600 hover:bg-red-700" : "bg-green-600 hover:bg-green-700"
-              }`}
+              className="mt-6 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+              onClick={() => {
+                const alreadyAdded = selectedQuestions.some((q) => q.id === fullDetails.id);
+                if (!alreadyAdded) {
+                  setSelectedQuestions((prev) => [
+                    ...prev,
+                    {
+                      id: fullDetails.id,
+                      title: fullDetails.title,
+                      difficulty: fullDetails.difficulty,
+                      marks: fullDetails.test_cases?.length,
+                      test_cases: fullDetails.test_cases || [],
+                    },
+                  ]);
+                }
+              }}
             >
-              {isSelected(fullDetails.id) ? "❌ Remove from Contest" : "✅ Add to Contest"}
+              ✅ Add to Contest
             </button>
           </div>
         )}
+
+        <div className="mt-10">
+          <h2 className="text-xl font-semibold mb-3">📝 Selected Questions</h2>
+
+          {selectedQuestions.length === 0 ? (
+            <p className="text-gray-500">No questions selected yet.</p>
+          ) : (
+            <div className="space-y-4">
+              {selectedQuestions.map((q, index) => (
+                <div key={q.id} className="border p-4 rounded-md bg-white shadow-sm">
+                  <div className="flex justify-between items-center mb-2">
+                    <div>
+                      <h4 className="font-bold">{index + 1}. {q.title}</h4>
+                      <p className="text-sm text-gray-600">Difficulty: {q.difficulty}</p>
+                    </div>
+                    <button
+                      className="text-red-500 hover:text-red-700 text-sm"
+                      onClick={() => setSelectedQuestions(prev => prev.filter(que => que.id !== q.id))}
+                    >
+                      ❌ Remove
+                    </button>
+                  </div>
+
+                  <label className="text-sm text-gray-700">Marks:</label>
+                  <input
+                    type="number"
+                    className="ml-2 border px-2 py-1 rounded w-24"
+                    min={q.test_cases?.length || 1}
+                    value={q.marks}
+                    onChange={(e) => {
+                      const updatedMarks = parseInt(e.target.value) || 0;
+                      setSelectedQuestions(prev =>
+                        prev.map(item =>
+                          item.id === q.id ? { ...item, marks: updatedMarks } : item
+                        )
+                      );
+                    }}
+                  />
+
+                  {q.test_cases?.length > 0 && (
+                    <div className="mt-2 text-sm text-gray-600">
+                      <p className="mt-2 font-semibold">Test Case Distribution:</p>
+                      <ul className="list-disc pl-5">
+                        {q.test_cases.map((_, i) => {
+                          const perCaseMark = (q.marks || 0) / q.test_cases.length;
+                          return <li key={i}>Test Case {i + 1}: {perCaseMark.toFixed(2)} marks</li>;
+                        })}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {selectedQuestions.length > 0 && (
+            <button
+              className="mt-6 px-6 py-3 bg-blue-700 text-white rounded hover:bg-blue-800"
+              onClick={submitContest}
+            >
+              🎯 Create Contest with {selectedQuestions.length} Questions
+            </button>
+          )}
+        </div>
       </div>
     </div>
     </>

@@ -2,6 +2,7 @@ import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
 import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
 // import { createContestQuery, deleteContest, fetchContest } from "../../utils/SqlQueries/contest.queries.js";
 import { createContestQuery, enrollStudentToContestQuery, fetchContest, deleteContest, getContestCount } from "../../utils/SqlQueries/contest.queries.js";
+import { saveContestQuestion } from "../../utils/SqlQueries/contestQuestion.queries.js";
 
 export const createContest = async (req, res) => {
     const payload = req.body;
@@ -120,3 +121,25 @@ export const getTotalContest=async(organizationId)=>{
         throw new APIError(error?.response?.status || error?.status || 500, ["Something went wrong while fetching contest count", error.message || ""]);
     }
 }
+
+export const addContestQuestion = async (req, res) => {
+    const { contestId, questions } = req.body;
+
+    if (!contestId || !questions || !Array.isArray(questions) || questions.length === 0) {
+        return new APIError(400, 'Contest ID and questions are required').send(res);
+    }
+
+    try {
+
+        const result = await saveContestQuestion(contestId, questions);
+
+        if (result.error) {
+            throw new Error(result.error.message);
+        }
+
+        return new APIResponse(200, result, 'Questions added to contest successfully').send(res);
+    } catch (error) {
+        console.error("Error adding questions to contest:", error);
+        return new APIError(500, ['Failed to add questions to contest', error.message]).send(res);
+    }
+};
