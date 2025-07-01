@@ -9,8 +9,9 @@ export const checkRoleAccess= (featureKey) => {
             return next();
         }
 
-     if(req.method === 'GET')
+     if(req.method === 'GET' || req.user.role === 'student') 
            {
+            console.log("User is a student or GET request, skipping role access check.");
             console.log("GET request detected, skipping role access check.");
             return next();
            }

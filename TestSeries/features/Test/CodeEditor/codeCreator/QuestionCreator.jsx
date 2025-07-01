@@ -159,9 +159,6 @@ export default function QuestionCreator() {
                 else {
                   alert("Failed to create contest. Please try again.");
                 }
-                
-
-              
   }
 
 

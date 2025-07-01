@@ -1,6 +1,6 @@
 import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
 import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
-import { getCodingQuestions } from "../../utils/SqlQueries/codingQuestion.queries.js";
+import { getCodingQuestions, getContestQuetionsQuery } from "../../utils/SqlQueries/codingQuestion.queries.js";
 
 
 const getFileName = (lang) => {
@@ -129,13 +129,13 @@ export const getContestQuestions = async (req, res) => {
     }
 
     try {
-        const questions = await getCodingQuestions(null, null, null, ids);
+        const questions = await getContestQuetionsQuery(contest_id);
 
         if (!questions || questions.length === 0) {
             return new APIError(404, [], "No questions found for this contest").send(res);
         }
 
-        return new APIResponse(200, questions.data, "Contest questions fetched successfully").send(res);
+        return new APIResponse(200, questions, "Contest questions fetched successfully").send(res);
     } catch (error) {
         console.error("❌ Error fetching contest questions:", error);
         return new APIError(500, ["Failed to fetch contest questions", error.message]).send(res);
