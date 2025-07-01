@@ -30,7 +30,7 @@ export const testContestQuestion = async (req, res) => {
             });
 
             const result = await response.json();
-
+            console.log(result);
             const runOutput = result.run?.stdout?.trim() || '';
             const compileError = result.compile?.stderr || '';
             const runtimeError = result.run?.stderr || '';
@@ -72,8 +72,10 @@ export const runContestCode = async (req, res) => {
                 stdin: problem.sample_input
             })
         });
+    
 
         const result = await response.json();
+        console.log(result);
 
         return new APIResponse(200, result, "Contest code executed successfully").send(res);
     } catch (error) {

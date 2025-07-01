@@ -54,7 +54,6 @@ export const getContestQuetionsQuery = async (contest_id)=>{
   if(error){
     throw error;
   }
-  console.log("Fetched contest questions:", { contest_id, data });
   return data;
 
 };

@@ -61,11 +61,32 @@ const CodeEditor = ({ code, onChange, language }) => {
     }
   };
 
-  // Map language to Monaco's language ID
-  const mapLanguage = (lang) => {
-    const map = { cpp: 'cpp', java: 'java', python: 'python', javascript: 'javascript' };
-    return map[lang] || 'plaintext';
+// Map language to Monaco's language ID
+const mapLanguage = (lang) => {
+  const map = {
+    cpp: 'cpp',
+    java: 'java',
+    python: 'python',
+    python3: 'python',
+    javascript: 'javascript',
+    typescript: 'typescript',
+    c: 'c',
+    csharp: 'csharp',
+    php: 'php',
+    swift: 'swift',
+    kotlin: 'kotlin',
+    dart: 'dart',
+    golang: 'go',
+    ruby: 'ruby',
+    rust: 'rust',
+    scala: 'scala',
+    racket: 'racket',
+    elixir: 'elixir',
+    erlang: 'erlang'
   };
+  return map[lang] || 'plaintext';
+};
+
 
   // Update language if changed
   useEffect(() => {
