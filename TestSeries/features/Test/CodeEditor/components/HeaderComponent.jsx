@@ -124,9 +124,9 @@ const HeaderComponent = ({
         <div className="flex items-center space-x-4">
           {/* Language Selector */}
           <div className="flex items-center space-x-2">
-            <Code className={`w-4 h-4 ${
+            {/* <Code className={`w-4 h-4 ${
               theme === 'light' ? 'text-blue-600' : 'text-blue-400'
-            }`} />
+            }`} /> */}
             <select
               value={language}
               onChange={(e) => setLanguage(e.target.value)}
