@@ -58,7 +58,7 @@ export const UserProvider = ({ children }) => {
   };
 
   const getRoleFeatureKeyFromLocation = (location) => {
-    const rawMap = JSON.parse(import.meta.env.VITE_ROLE_FEATURE_MAP || '{}');
+    const rawMap = JSON.parse(import.meta.env.VITE_ROLE_FEATURE_MAP || VITE_ROLE_FEATURE_MAP|| '{}');
     return rawMap[location] || null;
   };
 

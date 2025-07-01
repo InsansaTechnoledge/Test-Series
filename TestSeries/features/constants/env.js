@@ -54,7 +54,7 @@ export const VITE_PLAN_FEATURE_MAP= `{
 export const VITE_API_BASE_URL="https://test-series-1new.onrender.com/api"
 //  VITE_API_BASE_URL="http://localhost:8000/api"
 
-export const VITE_ROLE_FEATURE_MAP={
+export const VITE_ROLE_FEATURE_MAP= `{
   "/institute/batch-list": ["batch:view_batch", "batch:create_batch", "batch:edit_batch"],
   "/institute/create-batch": ["batch:create_batch"],
   "/institute/edit-batch": ["batch:edit_batch"],
@@ -121,5 +121,5 @@ export const VITE_ROLE_FEATURE_MAP={
   "actions.createContest": ["contest:create_contest"],
   "actions.uploadVideo": ["video:upload_video"],
   "actions.viewReport": ["analysis:view_analysis"]
-}
+}`
  
