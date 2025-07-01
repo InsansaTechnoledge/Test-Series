@@ -6,6 +6,8 @@ import { useTheme } from '../../../hooks/useTheme';
 import logoDark from '../../../assests/Logo/Frame 8.svg';
 import logolight from '../../../assests/Logo/Frame 15.svg';
 import { checkAuth, orgLogin, studentLogin } from '../../../utils/services/authService';
+import lightBg from '../../../assests/appBackground/bg light.svg'
+import darkBg from '../../../assests/appBackground/bg dark 2.svg'
 
 const DownloadedLandingPage = () => {
   const { theme , handleTheme } = useTheme();
@@ -101,15 +103,45 @@ const DownloadedLandingPage = () => {
   };
 
   return (
-    <div className={`${theme === 'light' ? 'bg-white' : 'bg-gray-950'} min-h-screen flex items-center justify-center px-4`}>
-      <div className="w-full max-w-md bg-opacity-10 backdrop-blur-md border border-gray-300 dark:border-gray-700 rounded-2xl p-8 shadow-xl">
-        <div className="flex justify-center mb-8">
+    <div className={`${theme === 'light' ? 'bg-white shadow-gray-300 ' : 'bg-gray-950' } min-h-screen flex items-center justify-center px-4`} style={{
+      backgroundImage: theme === 'light'
+        ? `url(${lightBg})`
+        : `url(${darkBg})`,
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'center',
+        backgroundSize: 'cover',
+    }}>
+      <div className={` ${theme === 'light' ? 'bg-white shadow-gray-300 ' : 'bg-gray-950' }  w-full max-w-md ${theme === 'light' ? 'border-8 border-indigo-300/30 shadow-gray-800' : 'border-8 border-gray-600/30 shadow-gray-600'} shadow-2xl  rounded-4xl p-8 `}>
+        <div className="flex justify-center mb-4">
           <img src={theme === 'light' ? logoDark : logolight} alt="Evalvo Logo" className="h-16" />
         </div>
+ 
+        <p className={`${theme === 'light' ? 'text-gray-500' : 'text-indigo-100'} text-center mb-4`}>The ultimate platform for all of your exams</p>
 
-        <h2 className={`text-2xl font-bold text-center mb-6 ${theme === 'light' ? 'text-gray-800' : 'text-indigo-100'}`}>
-          {loginEntity === 'institute' ? 'Institute Login' : 'Student Login'}
-        </h2>
+      <div className={`relative grid grid-cols-2 gap-1 mb-6 ${theme === 'light' ? 'bg-indigo-200' : 'bg-gray-600'} p-1 rounded-2xl shadow-inner`}>
+          <div className={`absolute top-1 bottom-1 w-1/2 rounded-xl shadow-md transition-transform duration-300 ease-out ${loginEntity === 'student' ? 'transform translate-x-full' : ''}`}></div>
+          
+          <button 
+            onClick={loginEntity === 'student' ? EntityChangeHandler : undefined} 
+            className={`relative z-10 px-4 py-3 font-semibold rounded-xl transition-all duration-300 cursor-pointer ${
+              loginEntity === 'institute' 
+                ? `${theme === 'light' ? ' bg-indigo-600 text-indigo-100' : ' bg-indigo-600 text-indigo-100'}` 
+                : `${theme === 'light' ? 'bg-gray-100 text-indigo-600' : 'bg-gray-100 text-indigo-600'}`
+            }`}
+          >
+            Institute
+          </button>
+          <button 
+            onClick={loginEntity === 'institute' ? EntityChangeHandler : undefined} 
+            className={`relative z-10 px-4 py-3 font-semibold rounded-xl transition-all duration-300 cursor-pointer ${
+              loginEntity === 'student' 
+                ? `${theme === 'light' ? 'bg-indigo-600 text-indigo-100' : 'bg-indigo-600 text-indigo-100'}` 
+                : `${theme === 'light' ? 'bg-gray-100 text-indigo-600' : 'bg-gray-100 text-indigo-600'}`
+            }`}
+          >
+            Student
+          </button>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Email */}

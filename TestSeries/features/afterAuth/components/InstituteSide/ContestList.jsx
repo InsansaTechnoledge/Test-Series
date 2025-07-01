@@ -11,6 +11,8 @@ const ContestList = () => {
     const { contestList, isLoading } = useCachedContests();
     const [contest, setContest] = useState([]);
 
+    console.log("rsdf", contest);
+    
      const canAccessPage  = usePageAccess();
      const  {theme} = useTheme()
   
@@ -87,7 +89,7 @@ const ContestList = () => {
             />
             </div>
             <div className="w-[93%] mx-auto">
-            <ContestCard contest={contest} setContest={setContest} />
+            <ContestCard contest={contest} setContest={setContest} theme={theme} />
 
             </div>
             </div>

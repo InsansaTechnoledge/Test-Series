@@ -42,3 +42,11 @@ export const fetchCodingQuestion = async (id) => {
     const response = await api.get(`v1/contest/coding-question/${id}`);
     return response.data;
 }
+
+
+
+export const ToggleContest = async (id) => {
+    const response = await api.patch(`v1/contest/toggle-contest/${id}`);
+    return response.data;
+
+}

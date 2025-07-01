@@ -150,3 +150,34 @@ export const getContestCount=async(organizationId)=>{
     return data;
 }
 
+export const toggleContestLive = async (contestID) => {
+  // Step 1: Fetch current go_live value
+  const { data, error } = await supabase
+    .from('organization_contest')
+    .select('go_live')
+    .eq('id', contestID)
+    .single();
+
+  if (error) {
+    console.error('Error fetching contest:', error);
+    return { error };
+  }
+
+  // Step 2: Toggle the value
+  const newGoLive = !data.go_live;
+
+  // Step 3: Update the value
+  const { data: updatedData, error: updateError } = await supabase
+    .from('organization_contest')
+    .update({ go_live: newGoLive })
+    .eq('id', contestID)
+    .select()
+    .single();
+
+  if (updateError) {
+    console.error('Error updating contest:', updateError);
+    return { error: updateError };
+  }
+
+  return { data: updatedData };
+};
