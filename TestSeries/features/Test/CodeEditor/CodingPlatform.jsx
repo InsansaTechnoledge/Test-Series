@@ -293,6 +293,7 @@ import { getContestQuestions, runContestCode, runContestTestCases } from '../../
 import { useParams } from 'react-router-dom';
 import CryptoJS from 'crypto-js';
 import { VITE_SECRET_KEY_FOR_CONTEST } from '../../constants/env';
+import { generateCodeTemplate } from './Data/starterCode';
 
 const CodingPlatform = () => {
   const { contestId } = useParams();
@@ -366,10 +367,9 @@ const CodingPlatform = () => {
     setErrors([]);
     try {
       const currentLang = languages.find((l) => l.value === language);
-      problem.sample_input =  testinput?.trim().length > 0
-  ? testinput
-  : (problem.sample_test_case || '');
-      const response = await runContestCode(code, problem, currentLang);
+      const answer=await generateCodeTemplate({userCode: code, langSlug: currentLang.value, problem});
+      console.log("Generated answer:", answer);
+      const response = await runContestCode(answer, problem, currentLang);
       if (response.status !== 200) {
         setErrors(['Failed to run code: ' + response.statusText]);
         setIsRunning(false);

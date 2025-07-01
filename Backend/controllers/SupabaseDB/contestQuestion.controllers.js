@@ -69,7 +69,7 @@ export const runContestCode = async (req, res) => {
                 language: currentLang.pistonLang,
                 version: currentLang.version,
                 files: [{ name: getFileName(currentLang.pistonLang), content: code }],
-                stdin: problem.sample_input
+                stdin: ''
             })
         });
     
