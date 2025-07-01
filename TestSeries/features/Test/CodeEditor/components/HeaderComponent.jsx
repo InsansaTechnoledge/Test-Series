@@ -1,12 +1,32 @@
 import React from 'react'
-import { ChevronLeft, ChevronRight, Play, Code, Clock, Star, Users, TestTube, Send } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Play, Code, Clock, Star, Users, TestTube, Send, Palette } from 'lucide-react'
 import { useTheme } from '../../../../hooks/useTheme';
 
-const HeaderComponent = ({problems, language, setCurrentProblem, setLanguage, currentProblem, languages, runCode, isRunning, runTests}) => {
+const HeaderComponent = ({
+  problems, 
+  language, 
+  setCurrentProblem, 
+  setLanguage, 
+  currentProblem, 
+  languages, 
+  runCode, 
+  isRunning, 
+  runTests,
+  editorTheme,
+  setEditorTheme
+}) => {
   const currentProblemData = problems[currentProblem];
   
   // Get theme from hook (like in CreateBatch component)
   const { theme } = useTheme();
+  
+  
+  const editorThemes = [
+    { value: 'vs-dark', label: 'Dark' },
+    { value: 'vs-light', label: 'Light' },
+    { value: 'hc-black', label: 'High Contrast Dark' },
+    { value: 'hc-light', label: 'High Contrast Light' }
+  ];
   
   const getDifficultyColor = (difficulty) => {
     const baseColors = {
@@ -102,6 +122,7 @@ const HeaderComponent = ({problems, language, setCurrentProblem, setLanguage, cu
 
         {/* Right Section - Controls */}
         <div className="flex items-center space-x-4">
+          {/* Language Selector */}
           <div className="flex items-center space-x-2">
             <Code className={`w-4 h-4 ${
               theme === 'light' ? 'text-blue-600' : 'text-blue-400'
@@ -119,6 +140,26 @@ const HeaderComponent = ({problems, language, setCurrentProblem, setLanguage, cu
             </select>
           </div>
 
+          {/* Editor Theme Selector */}
+          <div className="flex items-center space-x-2">
+            <Palette className={`w-4 h-4 ${
+              theme === 'light' ? 'text-blue-600' : 'text-blue-400'
+            }`} />
+            <select
+              value={editorTheme}
+              onChange={(e) => setEditorTheme(e.target.value)}
+              className={selectStyles}
+              title="Editor Theme"
+            >
+              {editorThemes.map((themeOption) => (
+                <option key={themeOption.value} value={themeOption.value}>
+                  {themeOption.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Action Buttons */}
           <div className="flex items-center space-x-2">
             <button
               onClick={runCode}

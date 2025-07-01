@@ -1,10 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-const CodeEditor = ({ code, onChange, language }) => {
+const CodeEditor = ({ code, onChange, language, theme  }) => {
   const containerRef = useRef(null);
   const editorRef = useRef(null);
   const [isEditorReady, setIsEditorReady] = useState(false);
-  const [theme , setTheme] = useState('vs-dark')
 
   useEffect(() => {
     if (window.monaco) {
@@ -31,12 +30,18 @@ const CodeEditor = ({ code, onChange, language }) => {
   }, []);
 
   useEffect(() => {
-  const model = editorRef.current?.getModel();
-  if (model && language) {
-    monaco.editor.setModelLanguage(model, language);
-  }
-}, [language]);
+    const model = editorRef.current?.getModel();
+    if (model && language) {
+      monaco.editor.setModelLanguage(model, language);
+    }
+  }, [language]);
 
+  // Update theme when it changes
+  useEffect(() => {
+    if (editorRef.current && isEditorReady && theme) {
+      window.monaco.editor.setTheme(theme);
+    }
+  }, [theme, isEditorReady]);
 
   const initializeEditor = () => {
     if (containerRef.current && !editorRef.current) {
@@ -49,7 +54,52 @@ const CodeEditor = ({ code, onChange, language }) => {
         fontSize: 14,
         lineNumbers: 'on',
         wordWrap: 'on',
-        scrollBeyondLastLine: false
+        scrollBeyondLastLine: false,
+        roundedSelection: false,
+        scrollbar: {
+          vertical: 'visible',
+          horizontal: 'visible',
+          useShadows: false,
+          verticalHasArrows: true,
+          horizontalHasArrows: true,
+        },
+        overviewRulerLanes: 2,
+        cursorBlinking: 'blink',
+        cursorStyle: 'line',
+        cursorWidth: 2,
+        tabSize: 2,
+        insertSpaces: true,
+        detectIndentation: true,
+        renderLineHighlight: 'all',
+        selectionHighlight: true,
+        occurrencesHighlight: true,
+        codeLens: false,
+        folding: true,
+        foldingHighlight: true,
+        showFoldingControls: 'mouseover',
+        matchBrackets: 'always',
+        contextmenu: true,
+        mouseWheelZoom: true,
+        quickSuggestions: {
+          other: true,
+          comments: true,
+          strings: true
+        },
+        suggestOnTriggerCharacters: true,
+        acceptSuggestionOnEnter: 'on',
+        acceptSuggestionOnCommitCharacter: true,
+        snippetSuggestions: 'top',
+        emptySelectionClipboard: false,
+        copyWithSyntaxHighlighting: true,
+        wordBasedSuggestions: true,
+        suggestSelection: 'first',
+        suggestFontSize: 0,
+        suggestLineHeight: 0,
+        tabCompletion: 'off',
+        suggest: {
+          filterGraceful: true,
+          snippets: 'top'
+        }
       });
 
       editorRef.current = monacoEditor;
@@ -61,32 +111,31 @@ const CodeEditor = ({ code, onChange, language }) => {
     }
   };
 
-// Map language to Monaco's language ID
-const mapLanguage = (lang) => {
-  const map = {
-    cpp: 'cpp',
-    java: 'java',
-    python: 'python',
-    python3: 'python',
-    javascript: 'javascript',
-    typescript: 'typescript',
-    c: 'c',
-    csharp: 'csharp',
-    php: 'php',
-    swift: 'swift',
-    kotlin: 'kotlin',
-    dart: 'dart',
-    golang: 'go',
-    ruby: 'ruby',
-    rust: 'rust',
-    scala: 'scala',
-    racket: 'racket',
-    elixir: 'elixir',
-    erlang: 'erlang'
+  // Map language to Monaco's language ID
+  const mapLanguage = (lang) => {
+    const map = {
+      cpp: 'cpp',
+      java: 'java',
+      python: 'python',
+      python3: 'python',
+      javascript: 'javascript',
+      typescript: 'typescript',
+      c: 'c',
+      csharp: 'csharp',
+      php: 'php',
+      swift: 'swift',
+      kotlin: 'kotlin',
+      dart: 'dart',
+      golang: 'go',
+      ruby: 'ruby',
+      rust: 'rust',
+      scala: 'scala',
+      racket: 'racket',
+      elixir: 'elixir',
+      erlang: 'erlang'
+    };
+    return map[lang] || 'plaintext';
   };
-  return map[lang] || 'plaintext';
-};
-
 
   // Update language if changed
   useEffect(() => {
