@@ -6,12 +6,13 @@ import CodeCreatorForm from './codeCreatorForm';
 import { useTheme } from '../../../../hooks/useTheme';
 import { useEffect } from 'react';
 import { fetchCodingQuestion, fetchCodingQuestions } from '../../../../utils/services/contestService';
+import { useSearchParams } from 'react-router-dom';
 
 export default function QuestionCreator() {
   const { theme } = useTheme();
-  // const [searchParams] = useSearchParams();
-  // const contestId = searchParams.get("contestId");
-  const contestId = "demo-contest-id"; // You'll need to get this from your routing system
+  const [searchParams] = useSearchParams();
+  const contestId = searchParams.get("contestId");
+  // const contestId = "demo-contest-id"; 
   
   const [difficulty, setDifficulty] = useState("Easy");
   const [questions, setQuestions] = useState([]);

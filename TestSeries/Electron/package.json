@@ -7,7 +7,7 @@
     "electron": "electron .",
     "electron-dev": "ELECTRON_IS_DEV=true electron .",
     "start": "electron .",
-    "dev": "NODE_ENV=development electron .",
+    "dev": " electron .",
     "build": "electron-builder",
     "build:mac": "electron-builder --mac",
     "build:win": "electron-builder --win",
@@ -25,7 +25,10 @@
     "files": [
       "main.js",
       "preload.js",
-      "package.json"
+      "package.json",
+      "assets/**/*",
+      "bin/**/*",
+      "build/**/*"
     ],
     "extraFiles": [],
     "mac": {

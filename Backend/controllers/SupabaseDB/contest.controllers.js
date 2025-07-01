@@ -1,7 +1,7 @@
 import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
 import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
 // import { createContestQuery, deleteContest, fetchContest } from "../../utils/SqlQueries/contest.queries.js";
-import { createContestQuery, enrollStudentToContestQuery, fetchContest, deleteContest, getContestCount } from "../../utils/SqlQueries/contest.queries.js";
+import { createContestQuery, enrollStudentToContestQuery, fetchContest, deleteContest, getContestCount, toggleContestLive } from "../../utils/SqlQueries/contest.queries.js";
 import { saveContestQuestion } from "../../utils/SqlQueries/contestQuestion.queries.js";
 
 export const createContest = async (req, res) => {
@@ -143,3 +143,14 @@ export const addContestQuestion = async (req, res) => {
         return new APIError(500, ['Failed to add questions to contest', error.message]).send(res);
     }
 };
+
+export const toggleLiveContest = async (req, res) => {
+    const {contestId} = req.params;
+    try{
+        const data = await toggleContestLive(contestId)
+
+        return new APIResponse(200 , data , 'contest toggled successfully').send(res);
+    } catch(e) {
+        return new APIError(500 , ['Failed to toggle this contest', e.message]).send(res);
+    }
+}
