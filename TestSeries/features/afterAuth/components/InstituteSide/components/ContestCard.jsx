@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Calendar, Clock, Users, Play, Trash2, AlertCircle, CheckCircle } from 'lucide-react';
-import { ToggleContest } from '../../../../../utils/services/contestService';
+import { deleteContest, ToggleContest } from '../../../../../utils/services/contestService';
 
 const ContestCard = ({ contest, setContest , theme}) => {
   // const [theme, setTheme] = useState('light');
@@ -56,8 +56,8 @@ const ContestCard = ({ contest, setContest , theme}) => {
     setLoadingDelete(prev => ({ ...prev, [id]: true }));
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      await deleteContest(id)
       
       setContest((prevContests) => prevContests.filter((item) => item.id !== id));
       alert('Contest deleted successfully');
