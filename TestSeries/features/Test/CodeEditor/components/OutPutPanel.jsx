@@ -1,6 +1,6 @@
 import React from 'react';
 import { Check, X } from 'lucide-react';
-
+import { useTheme } from '../../../../hooks/useTheme'; 
 
 const OutputPanel = ({
   activeTab,
@@ -13,25 +13,97 @@ const OutputPanel = ({
   testinput,
   setTestInput
 }) => {
+  const { theme } = useTheme();
   const passedTests = testResults.filter((r) => r.passed).length;
   const failedTests = testResults.length - passedTests;
 
+  // Theme-aware classes
+  const containerClass = theme === 'light' 
+    ? 'bg-gray-50 border-t' 
+    : 'bg-gray-900 border-t border-gray-700';
+
+  const tabContainerClass = theme === 'light' 
+    ? 'flex border-b border-gray-200 flex-shrink-0' 
+    : 'flex border-b border-gray-700 flex-shrink-0';
+
+  const activeTabClass = theme === 'light'
+    ? 'border-blue-500 text-blue-600 bg-white'
+    : 'border-blue-400 text-blue-400 bg-gray-800';
+
+  const inactiveTabClass = theme === 'light'
+    ? 'border-transparent text-gray-600 hover:text-gray-800'
+    : 'border-transparent text-gray-400 hover:text-gray-200';
+
+  const contentClass = theme === 'light'
+    ? 'flex-1 p-4 overflow-y-auto bg-white'
+    : 'flex-1 p-4 overflow-y-auto bg-gray-900';
+
+  const headingClass = theme === 'light'
+    ? 'font-semibold mb-3 text-gray-900'
+    : 'font-semibold mb-3 text-gray-100';
+
+  const labelClass = theme === 'light'
+    ? 'text-gray-500 text-sm'
+    : 'text-gray-400 text-sm';
+
+  const inputClass = theme === 'light'
+    ? 'border border-gray-300 rounded p-2 w-full bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+    : 'border border-gray-600 rounded p-2 w-full bg-gray-800 text-gray-100 focus:ring-2 focus:ring-blue-400 focus:border-blue-400';
+
+  const runningTextClass = theme === 'light'
+    ? 'text-blue-600'
+    : 'text-blue-400';
+
+  const noResultsClass = theme === 'light'
+    ? 'text-gray-500'
+    : 'text-gray-400';
+
+  const passedTestClass = theme === 'light'
+    ? 'bg-green-100 text-green-700'
+    : 'bg-green-900/50 text-green-400 border border-green-800';
+
+  const failedTestClass = theme === 'light'
+    ? 'bg-red-100 text-red-700'
+    : 'bg-red-900/50 text-red-400 border border-red-800';
+
+  const errorContainerClass = theme === 'light'
+    ? 'bg-red-50 border border-red-200 rounded p-2'
+    : 'bg-red-900/20 border border-red-800 rounded p-2';
+
+  const errorTextClass = theme === 'light'
+    ? 'text-sm text-red-700 whitespace-pre-wrap break-words'
+    : 'text-sm text-red-400 whitespace-pre-wrap break-words';
+
+  const outputContainerClass = theme === 'light'
+    ? 'bg-gray-100 border border-gray-300 rounded p-2 min-h-20'
+    : 'bg-gray-800 border border-gray-600 rounded p-2 min-h-20';
+
+  const outputTextClass = theme === 'light'
+    ? 'text-sm whitespace-pre-wrap break-words text-gray-900'
+    : 'text-sm whitespace-pre-wrap break-words text-gray-100';
+
+  const placeholderTextClass = theme === 'light'
+    ? 'text-gray-500'
+    : 'text-gray-400';
+
   return (
-    <div className="bg-gray-50 border-t flex flex-col" style={{ height: `${height}px` }}>
+    <div className={`${containerClass} flex flex-col`} style={{ height: `${height}px` }}>
       {/* Tabs */}
-      <div className="flex border-b flex-shrink-0">
+      <div className={tabContainerClass}>
         <button
           onClick={() => setActiveTab('testcase')}
-          className={`relative px-4 py-2 border-b-2 ${activeTab === 'testcase' ? 'border-blue-500 text-blue-600 bg-white' : 'border-transparent'
-            }`}
+          className={`relative px-4 py-2 border-b-2 transition-colors duration-200 ${
+            activeTab === 'testcase' ? activeTabClass : inactiveTabClass
+          }`}
         >
           Test Results
         </button>
 
         <button
           onClick={() => setActiveTab('output')}
-          className={`relative px-4 py-2 border-b-2 ${activeTab === 'output' ? 'border-blue-500 text-blue-600 bg-white' : 'border-transparent'
-            }`}
+          className={`relative px-4 py-2 border-b-2 transition-colors duration-200 ${
+            activeTab === 'output' ? activeTabClass : inactiveTabClass
+          }`}
         >
           Output
           {errors.length > 0 && (
@@ -43,61 +115,62 @@ const OutputPanel = ({
       </div>
 
       {/* Content - Fixed: Made this scrollable */}
-      <div className="flex-1 p-4 overflow-y-auto">
+      <div className={contentClass}>
         {activeTab === 'testcase' && (
           <div>
-            <h3 className="font-semibold mb-3">Test Results</h3>
+            <h3 className={headingClass}>Test Results</h3>
             <div className="mb-4 grid-cols-1 gap-4">
               <div className="flex items-center mb-3">
-                <span className="text-gray-500 text-sm">
+                <span className={labelClass}>
                   Input:
                 </span>
-                <span className="text-gray-700 text-sm">
-
+                <span className={`${theme === 'light' ? 'text-gray-700' : 'text-gray-300'} text-sm`}>
                   <input
                     type="text"
-                    className="border rounded p-2 w-full"
+                    className={inputClass}
                     placeholder={testinput !== '' ? "Enter input here" : "No input provided"}
-
                     onChange={(e) => {
                       setTestInput(e.target.value);
                     }}
                   />
-
-
-
                 </span>
-
               </div>
+              
               <div className="mb-3">
-                <span className="text-gray-500 text-sm">
+                <span className={labelClass}>
                   Output:
                 </span>
                 {testResults.length > 0 && (
                   <div className="flex space-x-4 mb-3 text-xs font-medium">
-                    <div className="text-green-600">Passed: {passedTests}</div>
-                    <div className="text-red-600">Failed: {failedTests}</div>
-                    <div className="text-gray-600">Total: {testResults.length}</div>
+                    <div className={theme === 'light' ? 'text-green-600' : 'text-green-400'}>
+                      Passed: {passedTests}
+                    </div>
+                    <div className={theme === 'light' ? 'text-red-600' : 'text-red-400'}>
+                      Failed: {failedTests}
+                    </div>
+                    <div className={theme === 'light' ? 'text-gray-600' : 'text-gray-400'}>
+                      Total: {testResults.length}
+                    </div>
                   </div>
                 )}
 
                 {isRunning ? (
-                  <div className="text-blue-600">
+                  <div className={runningTextClass}>
                     {(!testinput?.trim()) && (
-                     <div> Using sample test case as default input.</div>
+                      <div>Using sample test case as default input.</div>
                     )}
                     Running tests...
-
                   </div>
                 ) : testResults.length === 0 ? (
-                  <div className="text-gray-500">No test results yet</div>
+                  <div className={noResultsClass}>No test results yet</div>
                 ) : (
                   <div className="space-y-2">
                     {testResults.map((result, i) => (
                       <div
                         key={i}
-                        className={`flex items-start p-2 rounded ${result.passed ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                          }`}
+                        className={`flex items-start p-2 rounded transition-colors duration-200 ${
+                          result.passed ? passedTestClass : failedTestClass
+                        }`}
                       >
                         {result.passed ? (
                           <Check className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" />
@@ -115,7 +188,11 @@ const OutputPanel = ({
                             </div>
                           )}
                           {result.explanation && (
-                            <div className="text-xs mt-1 text-gray-600 break-words">{result.explanation}</div>
+                            <div className={`text-xs mt-1 break-words ${
+                              theme === 'light' ? 'text-gray-600' : 'text-gray-400'
+                            }`}>
+                              {result.explanation}
+                            </div>
                           )}
                         </div>
                       </div>
@@ -129,20 +206,26 @@ const OutputPanel = ({
 
         {activeTab === 'output' && (
           <div>
-            <h3 className="font-semibold mb-3">Console Output</h3>
+            <h3 className={headingClass}>Console Output</h3>
             {errors.length > 0 && (
               <div className="mb-4">
-                <h4 className="text-red-600 font-medium mb-2">Errors:</h4>
-                <div className="bg-red-50 border border-red-200 rounded p-2">
-                  <pre className="text-sm text-red-700 whitespace-pre-wrap break-words">
+                <h4 className={`font-medium mb-2 ${theme === 'light' ? 'text-red-600' : 'text-red-400'}`}>
+                  Errors:
+                </h4>
+                <div className={errorContainerClass}>
+                  <pre className={errorTextClass}>
                     {errors.join('\n')}
                   </pre>
                 </div>
               </div>
             )}
-            <div className="bg-gray-100 border rounded p-2 min-h-20">
-              <pre className="text-sm whitespace-pre-wrap break-words">
-                {output || 'No output yet. Run your code to see results.'}
+            <div className={outputContainerClass}>
+              <pre className={outputTextClass}>
+                {output || (
+                  <span className={placeholderTextClass}>
+                    No output yet. Run your code to see results.
+                  </span>
+                )}
               </pre>
             </div>
           </div>
