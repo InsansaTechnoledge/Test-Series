@@ -71,7 +71,7 @@ const ContestCard = ({ contest , handleParticipate ,notParticipated}) => {
             navigate(`/student/contest/${safeId}`);
           }}
           className="mt-4 bg-green-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-green-700">
-            Go Live
+            Start Contest
           </button>
         )}
     </div>

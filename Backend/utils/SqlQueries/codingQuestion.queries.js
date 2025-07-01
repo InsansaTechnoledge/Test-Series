@@ -44,3 +44,17 @@ export const getCodingQuestions = async (difficulty, page = 1, limit = 10, id) =
     totalPages: id ? 1 : Math.ceil(count / limit),
   };
 };
+
+export const getContestQuetionsQuery = async (contest_id)=>{
+  const {data,error}=await supabase
+  .rpc('get_contest_coding_question',{
+    p_contest_id: contest_id
+  });
+
+  if(error){
+    throw error;
+  }
+  console.log("Fetched contest questions:", { contest_id, data });
+  return data;
+
+};
