@@ -250,6 +250,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Existing methods
   isElectron: true,
   getProtocolParams: () => ipcRenderer.invoke('get-protocol-params'),
+  getURLParams: () => ipcRenderer.invoke('get-url-params'),
+  onExamParameters: (callback) => {
+    ipcRenderer.on('exam-parameters', (_event, data) => {
+      console.log('📥 Preload: exam-parameters received:', data);
+      callback(data);
+    });
+  },
   
   // Window controls
   minimizeWindow: () => ipcRenderer.invoke('window-minimize'),
