@@ -293,6 +293,7 @@ import { getContestQuestions, runContestCode, runContestTestCases } from '../../
 import { useParams } from 'react-router-dom';
 import CryptoJS from 'crypto-js';
 import { VITE_SECRET_KEY_FOR_CONTEST } from '../../constants/env';
+import { useTheme } from '../../../hooks/useTheme';
 
 const CodingPlatform = () => {
   const { contestId } = useParams();
@@ -359,7 +360,7 @@ const CodingPlatform = () => {
       setErrors([]);
     }
   }, [currentProblem, language, problem]);
-
+const {theme} = useTheme()
   const runCode = async () => {
     setIsRunning(true);
     setOutput('');
@@ -433,7 +434,10 @@ const CodingPlatform = () => {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-white">
+
+    <div className={`h-screen flex flex-col  ${
+          theme === 'light' ? 'bg-gray-200' : 'bg-gray-700'
+        }`}>
       <HeaderComponent
         problems={problems}
         language={language}
@@ -448,13 +452,27 @@ const CodingPlatform = () => {
       <div className="flex-1 flex overflow-hidden">
         <div
           ref={leftPanel.containerRef}
-          className="bg-white border-r flex flex-col"
+          className={`border-r flex flex-col ${
+            theme === 'light' 
+              ? 'bg-white border-gray-200' 
+              : 'bg-gray-800 border-gray-700'
+          }`}
           style={{ width: `${leftPanel.width}%` }}
         >
-          <div className="flex border-b flex-shrink-0">
+          <div className={`flex border-b flex-shrink-0 ${
+          theme === 'light' ? 'border-gray-200' : 'border-gray-700'
+        }`}>
             <button
               onClick={() => setActiveTab('description')}
-              className={`px-4 py-2 border-b-2 ${activeTab === 'description' ? 'border-blue-500 text-blue-600 bg-gray-50' : 'border-transparent'}`}
+              className={`px-4 py-2 border-b-2 transition-all duration-300 ${
+                activeTab === 'description' 
+                  ? theme === 'light'
+                    ? 'border-blue-500 text-blue-600 bg-gray-50'
+                    : 'border-blue-400 text-blue-300 bg-gray-700'
+                  : theme === 'light'
+                    ? 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                    : 'border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-700'
+              }`}
             >
               Description
             </button>
@@ -505,4 +523,3 @@ const CodingPlatform = () => {
 };
 
 export default CodingPlatform;
-
