@@ -1,6 +1,6 @@
 import React from 'react';
 import { Check, X } from 'lucide-react';
-import { useTheme } from '../../../../hooks/useTheme'; 
+import { useTheme } from '../../../../hooks/useTheme';
 
 const OutputPanel = ({
   activeTab,
@@ -10,20 +10,19 @@ const OutputPanel = ({
   output,
   errors = [],
   height,
-  testinput,
-  setTestInput
+  testInput,
 }) => {
   const { theme } = useTheme();
-  const passedTests = testResults.filter((r) => r.passed).length;
-  const failedTests = testResults.length - passedTests;
+  const passedTests = testResults.passedCount
+  const failedTests = testResults.total - passedTests;
 
   // Theme-aware classes
-  const containerClass = theme === 'light' 
-    ? 'bg-gray-50 border-t' 
+  const containerClass = theme === 'light'
+    ? 'bg-gray-50 border-t'
     : 'bg-gray-900 border-t border-gray-700';
 
-  const tabContainerClass = theme === 'light' 
-    ? 'flex border-b border-gray-200 flex-shrink-0' 
+  const tabContainerClass = theme === 'light'
+    ? 'flex border-b border-gray-200 flex-shrink-0'
     : 'flex border-b border-gray-700 flex-shrink-0';
 
   const activeTabClass = theme === 'light'
@@ -92,18 +91,16 @@ const OutputPanel = ({
       <div className={tabContainerClass}>
         <button
           onClick={() => setActiveTab('testcase')}
-          className={`relative px-4 py-2 border-b-2 transition-colors duration-200 ${
-            activeTab === 'testcase' ? activeTabClass : inactiveTabClass
-          }`}
+          className={`relative px-4 py-2 border-b-2 transition-colors duration-200 ${activeTab === 'testcase' ? activeTabClass : inactiveTabClass
+            }`}
         >
           Test Results
         </button>
 
         <button
           onClick={() => setActiveTab('output')}
-          className={`relative px-4 py-2 border-b-2 transition-colors duration-200 ${
-            activeTab === 'output' ? activeTabClass : inactiveTabClass
-          }`}
+          className={`relative px-4 py-2 border-b-2 transition-colors duration-200 ${activeTab === 'output' ? activeTabClass : inactiveTabClass
+            }`}
         >
           Output
           {errors.length > 0 && (
@@ -119,93 +116,80 @@ const OutputPanel = ({
         {activeTab === 'testcase' && (
           <div>
             <h3 className={headingClass}>Test Results</h3>
-            <div className="mb-4 grid-cols-1 gap-4">
-              <div className="flex items-center mb-3">
-                <span className={labelClass}>
-                  Input:
-                </span>
-                <span className={`${theme === 'light' ? 'text-gray-700' : 'text-gray-300'} text-sm`}>
-                  <input
-                    type="text"
-                    className={inputClass}
-                    placeholder={testinput !== '' ? "Enter input here" : "No input provided"}
-                    onChange={(e) => {
-                      setTestInput(e.target.value);
-                    }}
-                  />
-                </span>
-              </div>
-              
-              <div className="mb-3">
-                <span className={labelClass}>
-                  Output:
-                </span>
-                {testResults.length > 0 && (
-                  <div className="flex space-x-4 mb-3 text-xs font-medium">
-                    <div className={theme === 'light' ? 'text-green-600' : 'text-green-400'}>
-                      Passed: {passedTests}
-                    </div>
-                    <div className={theme === 'light' ? 'text-red-600' : 'text-red-400'}>
-                      Failed: {failedTests}
-                    </div>
-                    <div className={theme === 'light' ? 'text-gray-600' : 'text-gray-400'}>
-                      Total: {testResults.length}
-                    </div>
-                  </div>
-                )}
 
-                {isRunning ? (
-                  <div className={runningTextClass}>
-                    {(!testinput?.trim()) && (
-                      <div>Using sample test case as default input.</div>
-                    )}
-                    Running tests...
+
+
+            <div className="mb-3">
+              <span className={labelClass}>
+                Output:
+              </span>
+              {testResults.length > 0 ? (
+                <div className="flex space-x-4 mb-3 text-xs font-medium">
+                  <div className={theme === 'light' ? 'text-green-600' : 'text-green-400'}>
+                    Passed: {passedTests}
                   </div>
-                ) : testResults.length === 0 ? (
-                  <div className={noResultsClass}>No test results yet</div>
-                ) : (
-                  <div className="space-y-2">
-                    {testResults.map((result, i) => (
-                      <div
-                        key={i}
-                        className={`flex items-start p-2 rounded transition-colors duration-200 ${
-                          result.passed ? passedTestClass : failedTestClass
+                  <div className={theme === 'light' ? 'text-red-600' : 'text-red-400'}>
+                    Failed: {failedTests}
+                  </div>
+                  <div className={theme === 'light' ? 'text-gray-600' : 'text-gray-400'}>
+                    Total: {testResults.total}
+                  </div>
+                </div>
+              )
+            :(
+              <span className={placeholderTextClass}>
+                No test results available.
+              </span>
+            )}
+
+              {isRunning ? (
+                <div className={runningTextClass}>
+                  <div>Using sample test case as default input.</div>
+                  Running tests...
+                </div>
+              ) : testResults.length === 0 ? (
+                <div className={noResultsClass}>No test results yet</div>
+              ) : (
+                <div className="space-y-2">
+                  {testResults.results?.map((result, i) => (
+                    <div
+                      key={i}
+                      className={`flex items-start p-2 rounded transition-colors duration-200 ${result?.passed ? passedTestClass : failedTestClass
                         }`}
-                      >
-                        {result.passed ? (
-                          <Check className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" />
-                        ) : (
-                          <X className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" />
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <div>
-                            Test Case {i + 1}: {result.passed ? 'Passed' : 'Failed'}
-                          </div>
-                          {!result.passed && (
-                            <div className="text-xs mt-1">
-                              <div className="break-words">Expected: {result.expected}</div>
-                              <div className="break-words">Got: {result.actual}</div>
-                            </div>
-                          )}
-                          {result.explanation && (
-                            <div className={`text-xs mt-1 break-words ${
-                              theme === 'light' ? 'text-gray-600' : 'text-gray-400'
-                            }`}>
-                              {result.explanation}
-                            </div>
-                          )}
+                    >
+                      {result.passed ? (
+                        <Check className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" />
+                      ) : (
+                        <X className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <div>
+                          Test Case {i + 1}: {result.passed ? 'Passed' : 'Failed'}
                         </div>
+                        {!result.passed && (
+                          <div className="text-xs mt-1">
+                            <div className="break-words">Expected: {result.expected}</div>
+                            <div className="break-words">Got: {result.actual}</div>
+                          </div>
+                        )}
+                        {result.explanation && (
+                          <div className={`text-xs mt-1 break-words ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'
+                            }`}>
+                            {result.explanation}
+                          </div>
+                        )}
                       </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}
 
         {activeTab === 'output' && (
           <div>
+            {console.log("🎀🎀🎀🎀11,",testInput)}
             <h3 className={headingClass}>Console Output</h3>
             {errors.length > 0 && (
               <div className="mb-4">
@@ -221,11 +205,52 @@ const OutputPanel = ({
             )}
             <div className={outputContainerClass}>
               <pre className={outputTextClass}>
-                {output || (
-                  <span className={placeholderTextClass}>
-                    No output yet. Run your code to see results.
-                  </span>
-                )}
+                {output ? (
+<>
+
+  {testInput.length === output.length
+    ? testInput?.map((input, index) => (
+        <div key={index} className="mb-4">
+          <div className="mb-2">
+            <span className={labelClass}>Input:</span>
+            <div className={inputClass}>
+              {JSON.stringify(input)}
+            </div>
+          </div>
+          <div className="mb-2">
+            <span className={labelClass}>Output:</span> 
+            <div className={outputTextClass}>
+              {typeof output === 'string'?output: JSON.stringify(output[index]) }
+           
+            </div>
+          </div>
+        </div>
+      ))
+    : testInput?.map((input, index) => (
+        <div key={index} className="mb-4">
+          <div className="mb-2">
+            <span className={labelClass}>Input:</span>
+            <div className={inputClass}>
+              {JSON.stringify(input)}
+            </div>
+          </div>
+          <div className="mb-2">
+            <span className={labelClass}>Output:</span>
+            <div className={outputTextClass}>
+            {typeof output === 'string'?output: JSON.stringify(output[index]) }
+            </div>
+          </div>
+        </div>
+      ))
+  }
+</>
+
+) : (
+  <span className={placeholderTextClass}>
+    No output yet. Run your code to see results.
+  </span>
+)}
+
               </pre>
             </div>
           </div>
