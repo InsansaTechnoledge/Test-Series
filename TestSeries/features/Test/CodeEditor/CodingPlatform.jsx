@@ -174,8 +174,8 @@ const CodingPlatform = () => {
   }
 
   return (
-    <div className={`h-screen flex flex-col ${
-      theme === 'light' ? 'bg-gray-200' : 'bg-gray-700'
+    <div className={` flex flex-col m-6 ${
+      theme === 'light' ? '' : 'bg-gray-700'
     }`}>
       <HeaderComponent
         problems={problems}

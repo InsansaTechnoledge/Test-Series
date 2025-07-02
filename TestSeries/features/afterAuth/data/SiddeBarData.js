@@ -181,3 +181,58 @@ export const categoryData = [
     ]
   }
 ];
+
+
+export const studentControlData = [
+  {
+    name: "Student Landing",
+    path: "student-landing",
+    icon: '', activeIcon: ''
+  },
+  {
+    name: "Upcoming Exams",
+    path: "upcoming-exams",
+    icon: '', activeIcon: ''
+  },
+  {
+    name: "Completed Exams",
+    path: "completed-exams",
+    icon: '', activeIcon: ''
+  },
+  {
+    name: "Classroom",
+    path: "classroom",
+    icon: '', activeIcon: ''
+  },
+  {
+    name: "Coding Contests",
+    path: "coding-contests",
+    icon: '', activeIcon: ''
+  },
+  {
+    name: "Analysis",
+    path: "analysis",
+    icon: '', activeIcon: ''
+  }
+];
+
+export const studentCategoryData = [
+  {
+    name: "Exams",
+    icon: exam,
+    features: [
+      "Upcoming Exams",
+      "Completed Exams"
+    ]
+  },
+  {
+    name: "Contests",
+    icon: contest,
+    features: ["Coding Contests"]
+  },
+  {
+    name: "Academics",
+    icon: video,
+    features: ["Classroom", "Analysis"]
+  }
+];

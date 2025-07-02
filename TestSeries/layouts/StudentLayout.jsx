@@ -17,8 +17,8 @@ const StudentLayout = () => {
         <div>
         <Navbar setShowLogoutModal={setShowLogoutModal}/>
         </div>
-        <div className={`h-screen flex flex-col  ${
-          theme === 'light' ? 'bg-gray-200' : 'bg-gray-700'
+        <div className={` flex flex-col  gap-2  ${
+          theme === 'light' ? 'bg-gray-100' : 'bg-gray-900'
         }`}>         <Outlet />
         </div>
       </div>
