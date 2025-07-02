@@ -9,6 +9,7 @@ import { useTheme } from '../../../../hooks/useTheme.jsx';
 import { getThemeClasses } from '../../../constants/Theme/ThemeClasses.js';
 import SideBarDataHook from '../../data/SideBarDataHook.jsx';
 import EpicThemeSlider from './ThemeSlide.jsx';
+import SearchResults from './SearchResults.jsx';
 
 const Navbar = ({setShowLogoutModal}) => {
   const [activeCategory, setActiveCategory] = useState('');
@@ -188,66 +189,6 @@ const Navbar = ({setShowLogoutModal}) => {
     setShowMobileMenu(false); 
   };
   
-
-  // Search Results Component with theming
-  const SearchResults = ({ isMobile = false }) => {
-    if (!showSearchResults || searchResults.length === 0) return null;
-
-    return (
-      <div 
-        ref={searchResultsRef}
-        className={`absolute rounded-lg shadow-xl z-[9999] ${themeClasses.searchResults} ${
-          isMobile 
-            ? 'top-full left-0 right-0 mt-2' 
-            : 'top-full left-0 right-0 mt-1 max-w-2xl mx-auto'
-        }`}
-      >
-        <div className="py-2 max-h-80 overflow-y-auto">
-          {searchResults.map((result, index) => (
-            <button
-              key={`${result.type}-${result.name}-${index}`}
-              onClick={() => handleResultClick(result)}
-              className={`w-full px-4 py-3 text-left transition-colors ${themeClasses.searchResultItem} ${
-                selectedResultIndex === index ? 'bg-indigo-50 border-l-2 border-indigo-500' : ''
-              }`}
-            >
-              <div className="flex items-center space-x-3">
-                <div className="w-6 h-6 flex items-center justify-center">
-                  <img 
-                    src= {result.icon} 
-                    alt={result.name} 
-                    className="w-5 h-5"
-                  />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center space-x-2">
-                    <span className={`font-medium truncate ${themeClasses.textPrimary}`}>
-                      {result.name}
-                    </span>
-                    {result.type === 'feature' && (
-                      <span className={`px-2 py-1 text-xs rounded-full ${
-                        theme === 'dark' 
-                          ? 'bg-gray-700 text-gray-300' 
-                          : 'bg-gray-100 text-gray-600'
-                      }`}>
-                        {result.category}
-                      </span>
-                    )}
-                  </div>
-                  {result.type === 'category' && (
-                    <p className={`text-sm mt-1 ${themeClasses.textSecondary}`}>
-                      {result.features.length} features available
-                    </p>
-                  )}
-                </div>
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
   return (
     <nav className={`z-50 ${themeClasses.nav}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -339,8 +280,17 @@ const Navbar = ({setShowLogoutModal}) => {
                       <X className="h-4 w-4" />
                     </button>
                   </div>
-                  <SearchResults />
-                </div>
+                  <SearchResults 
+                    setShowSearchResults={setShowSearchResults} 
+                    searchResults={searchResults} 
+                    theme={theme} 
+                    themeClasses={themeClasses} 
+                    showSearchResults={showSearchResults} 
+                    searchResultsRef={searchResultsRef} 
+                    selectedResultIndex={selectedResultIndex}
+                    handleResultClick={handleResultClick} 
+                  />                
+                  </div>
               ) : (
                 <button
                   onClick={toggleDesktopSearch}
@@ -383,6 +333,20 @@ const Navbar = ({setShowLogoutModal}) => {
                         Know Your Plan
                       </button>
                     )}
+                    {
+                      (user?.role === 'user' || user?.role === 'student') && (
+                        <button
+                          onClick={() => {
+                            if (user?._id) {
+                              navigate(`/edit-profile/${user._id}`);
+                            }
+                          }}
+                        className={`block w-full text-left px-4 py-2 text-sm ${themeClasses.dropdownItem}`}
+                      >
+                        Edit Profile
+                      </button>
+                      )
+                    }
                     <button
                       onClick={() => {
                         setShowLogoutModal(true);
@@ -430,7 +394,17 @@ const Navbar = ({setShowLogoutModal}) => {
                   onFocus={() => searchQuery && setShowSearchResults(true)}
                   className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 ${themeClasses.input}`}
                 />
-                <SearchResults isMobile={true} />
+               <SearchResults 
+                  isMobile={true} 
+                  setShowSearchResults={setShowSearchResults} 
+                  searchResults={searchResults} 
+                  theme={theme} 
+                  themeClasses={themeClasses} 
+                  showSearchResults={showSearchResults} 
+                  searchResultsRef={searchResultsRef} 
+                  selectedResultIndex={selectedResultIndex}
+                  handleResultClick={handleResultClick} 
+                />
               </div>
 
               {/* Mobile Categories */}
@@ -512,12 +486,32 @@ const Navbar = ({setShowLogoutModal}) => {
                   </div>
                 </div>
 
-                <button
+              {
+                user?.role === 'organization' && (
+                  <button
                   onClick={() => navigate('/institute-subscription')}
                   className={`block w-full text-left px-3 py-2 text-base font-medium rounded-md ${themeClasses.dropdownItem}`}
                 >
                   Know Your Plan
                 </button>
+                )
+              }
+               
+                {
+                  (user?.role === 'user' || user?.role === 'student') && (
+                    <button
+                      onClick={() => {
+                        if (user?._id) {
+                          navigate(`/edit-profile/${user._id}`);
+                        }
+                      }}
+                    
+                      className={`block w-full text-left px-3 py-2 text-base font-medium rounded-md ${themeClasses.dropdownItem}`}
+                      >
+                      Edit Profile
+                    </button>
+                  )
+                }
                 
                 <button
                   onClick={() => {
