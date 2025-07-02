@@ -58,6 +58,7 @@ import YourPlanPage from '../../features/afterAuth/components/InstituteSide/comp
 import AboutPage from '../../features/beforeAuth/pages/AboutPage';
 import ContactPage from "../../features/beforeAuth/pages/ContactPage";
 import ProctorSplash from '../../features/afterAuth/components/StudentSide/Landing/ProctorSplash';
+import ProfilePage from '../../features/UserProfile/ProfilePage';
 
 // Error Boundary Component
 class ElectronErrorBoundary extends React.Component {
@@ -350,6 +351,11 @@ const PageLinks = () => {
         {user?.role === "organization" && (
           <Route path='institute-subscription' element={<YourPlanPage />} />
         )}
+        {
+          user?.role === 'user' || user?.role === 'student' && (
+            <Route path='edit-profile/:id' element={<ProfilePage/>}/>
+          )
+        }
       </Routes>
     </Router>
   );

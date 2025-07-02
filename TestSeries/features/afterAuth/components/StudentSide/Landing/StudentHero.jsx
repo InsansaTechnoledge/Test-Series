@@ -3,37 +3,82 @@ import { Building, Mail, Phone, User } from 'lucide-react';
 import { useCachedBatches } from '../../../../../hooks/useCachedBatches';
 import { useUser } from '../../../../../contexts/currentUserContext';
 import { useCachedOrganization } from '../../../../../hooks/useCachedOrganization';
+import { useTheme } from '../../../../../hooks/useTheme';
 
 const StudentHero = () => {
-    const {user} = useUser();
-    const {batches,isloading,isError,batchMap} = useCachedBatches();
-    const {organization} = useCachedOrganization({userId:user._id,orgId:(user.organizationId._id || user.organizationId)});
-
+    const { user } = useUser();
+    const { batches, isloading, isError, batchMap } = useCachedBatches();
+    const { organization } = useCachedOrganization({ userId: user._id, orgId: (user.organizationId._id || user.organizationId) });
+    const { theme } = useTheme()
 
     return (
-        <div className='relative bg-black/60 shadow-gray-600'>
-            <img src={heroBanner}
-                alt='heroBanner'
-                className='-z-10 absolute w-full h-full'
-            />
-            {/* banner */}
-            <div className='md:px-20 py-10'>
-                <h1 className='text-center text-white text-4xl font-bold'>
-                    {batchMap[user?.batchId]?.name}
-                <Building className='mx-auto mt-6 w-20 h-20'/>    
-                </h1>
-                <div className='hidden md:block text-white max-w-2/5 text-wrap my-5 mx-auto text-center'>
-                    {organization?.address?.line1}, {organization?.address?.line2}, {organization?.address?.city}, {organization?.address?.state}, {organization?.address?.country} - {organization?.address?.pincode}
-                </div>
-                <div className='mt-16 mx-auto w-fit flex flex-col justify-center'>
-                    <div className='text-white text-xl'>Connect with us on:</div>
-                    <div className='w-fit flex justify-center space-x-8 mx-auto mt-5'>
-                        <Mail className='text-white' />
-                        <Phone className='text-white' />
+
+
+
+        <div className={` max-w-6xl rounded-3xl overflow-hidden shadow-2xl backdrop-blur-lg transition-all duration-500 hover:shadow-3xl hover:-translate-y-2 ${theme === 'light'
+                ? 'bg-white/95 border border-gray-200/50'
+                : 'bg-gray-800/95 border border-gray-700/50'
+            }`}>
+            {/* Organization Info Section */}
+            <div className='relative overflow-hidden'>
+                <img
+                    src={heroBanner}
+                    alt='heroBanner'
+                    className='absolute inset-0 w-full h-full object-cover -z-10'
+                />
+                <div className='relative bg-black/60 backdrop-blur-sm'>
+                    {/* Banner Content */}
+                    <div className='px-6 md:px-8 py-8 md:py-10'>
+                        <h1 className={`text-center text-2xl md:text-3xl font-bold mb-6 ${theme === 'light' ? 'text-white' : 'text-white'
+                            }`}>
+                            {batchMap[user?.batchId]?.name}
+                        </h1>
+
+                        {/* Building Icon */}
+                        <div className='flex justify-center mb-6'>
+                            <div className={`p-4 rounded-2xl backdrop-blur-md transition-all duration-300 ${theme === 'light'
+                                    ? 'bg-white/20 border border-white/30'
+                                    : 'bg-gray-800/30 border border-gray-600/30'
+                                }`}>
+                                <Building className='w-12 h-12 md:w-16 md:h-16 text-white' />
+                            </div>
+                        </div>
+
+                        {/* Address */}
+                        <div className={`hidden md:block text-center text-sm leading-relaxed mb-8 px-4 ${theme === 'light' ? 'text-white/90' : 'text-white/90'
+                            }`}>
+                            <div className={`inline-block px-4 py-2 rounded-xl backdrop-blur-md ${theme === 'light'
+                                    ? 'bg-white/10 border border-white/20'
+                                    : 'bg-gray-800/20 border border-gray-600/20'
+                                }`}>
+                                {organization?.address?.line1}, {organization?.address?.line2}, {organization?.address?.city}, {organization?.address?.state}, {organization?.address?.country} - {organization?.address?.pincode}
+                            </div>
+                        </div>
+
+                        {/* Connect Section */}
+                        <div className='text-center'>
+                            <div className={`text-lg font-medium mb-4 ${theme === 'light' ? 'text-white' : 'text-white'
+                                }`}>
+                                Connect with us on:
+                            </div>
+                            <div className='flex justify-center space-x-6'>
+                                <div className={`p-3 rounded-xl backdrop-blur-md transition-all duration-300 hover:scale-110 cursor-pointer ${theme === 'light'
+                                        ? 'bg-white/20 border border-white/30 hover:bg-white/30'
+                                        : 'bg-gray-800/30 border border-gray-600/30 hover:bg-gray-700/40'
+                                    }`}>
+                                    <Mail className='w-6 h-6 text-white' />
+                                </div>
+                                <div className={`p-3 rounded-xl backdrop-blur-md transition-all duration-300 hover:scale-110 cursor-pointer ${theme === 'light'
+                                        ? 'bg-white/20 border border-white/30 hover:bg-white/30'
+                                        : 'bg-gray-800/30 border border-gray-600/30 hover:bg-gray-700/40'
+                                    }`}>
+                                    <Phone className='w-6 h-6 text-white' />
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            
         </div>
     )
 }
