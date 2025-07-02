@@ -6,6 +6,11 @@ export const roleRouteGuard = (req, res, next) => {
     console.log("🗓️ User is an organization, skipping role access check.")
     return next();
   }
+  if(req.method === 'GET' || req.user.role === 'student') {
+    console.log("🗓️ User is a student or GET request, skipping role access  check.");
+    return next();
+  }
+  
   const path = req.route.path;
   const method = req.method;
   const category = req.roleKey;

@@ -29,9 +29,9 @@ const CodingPlatform = () => {
   const [output, setOutput] = useState('');
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [testinput, setTestInput] = useState('');
-  
-  
+  const [testinput, setTestInput] = useState([]);
+
+
   const [editorTheme, setEditorTheme] = useState('vs-dark');
 
   const SECRET_KEY_CONTEST = import.meta.env.VITE_SECRET_KEY_FOR_CONTEST || VITE_SECRET_KEY_FOR_CONTEST;
@@ -97,20 +97,25 @@ const CodingPlatform = () => {
   }, [theme]);
 
   const runCode = async () => {
+    //  setTestInput([]);
     setIsRunning(true);
     setOutput('');
     setErrors([]);
     try {
       const currentLang = languages.find((l) => l.value === language);
-      const answer=await getFinalCodeForTestRun(currentLang.langSlug, code, problem);
-      const response = await runContestCode(answer, currentLang);
+      const answer = await getFinalCodeForTestRun(currentLang.langSlug, code, problem);
+      console.log("Final Code for Run:", answer.finalCode);
+      console.log("Test Input for Run:", answer.testInput);
+      setTestInput(answer.testInput);
+      const response = await runContestCode(answer.finalCode, currentLang);
+
+
       if (response.status !== 200) {
         setErrors(['Failed to run code: ' + response.statusText]);
         setIsRunning(false);
         return;
       }
       const result = response.data;
-      setTestInput('');
       if (!result) {
         setErrors(['No response from server']);
         setIsRunning(false);
@@ -119,16 +124,24 @@ const CodingPlatform = () => {
       if (result.compile?.stderr) {
         setErrors((prev) => [...prev, result.compile.stderr]);
       }
-      if (result.run?.stdout) setOutput(result.run.stdout);
+      if (result.run?.stdout) {
+        setOutput(
+          typeof result.run.stdout === "string"
+            ? (() => { try { return JSON.parse(result.run.stdout); } catch { return result.run.stdout; } })()
+            : result.run.stdout
+        );
+      }
       if (result.run?.stderr) setErrors((prev) => [...prev, result.run.stderr]);
     } catch (error) {
       setErrors(['Network error: ' + error.message]);
     } finally {
       setIsRunning(false);
+
     }
   };
 
   const runTests = async () => {
+    setTestInput([])
     setIsRunning(true);
     let results = [];
     setErrors([]);
@@ -144,10 +157,14 @@ const CodingPlatform = () => {
         setIsRunning(false);
         return;
       }
-      const answer =await getFinalCodeForSubmission(currentLang.langSlug, code, problem);
+      const answer = await getFinalCodeForSubmission(currentLang.langSlug, code, problem);
+      setTestInput(answer.testInput);
       const response = await runContestTestCases(answer.finalCode, answer.output, currentLang);
+
       if (response.status === 200) {
         results = response.data.results;
+        console.log("Test Results:", results);
+            setOutput(results.fullOutput || '');
         setErrors(response.data.errors || []);
       }
     } catch (error) {
@@ -155,18 +172,18 @@ const CodingPlatform = () => {
       setErrors(['Test execution failed: ' + error.message]);
     }
     setTestResults(results);
+
     setIsRunning(false);
     setOutputTab('testcase');
+
   };
 
   if (loading) {
     return (
-      <div className={`flex items-center justify-center h-screen ${
-        theme === 'light' ? 'bg-gray-100' : 'bg-gray-900'
-      }`}>
-        <div className={`text-lg ${
-          theme === 'light' ? 'text-gray-700' : 'text-gray-300'
+      <div className={`flex items-center justify-center h-screen ${theme === 'light' ? 'bg-gray-100' : 'bg-gray-900'
         }`}>
+        <div className={`text-lg ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'
+          }`}>
           Loading...
         </div>
       </div>
@@ -174,9 +191,8 @@ const CodingPlatform = () => {
   }
 
   return (
-    <div className={` flex flex-col m-6 ${
-      theme === 'light' ? '' : 'bg-gray-700'
-    }`}>
+    <div className={` flex flex-col m-6 ${theme === 'light' ? '' : 'bg-gray-700'
+      }`}>
       <HeaderComponent
         problems={problems}
         language={language}
@@ -193,35 +209,32 @@ const CodingPlatform = () => {
       <div className="flex-1 flex overflow-hidden">
         <div
           ref={leftPanel.containerRef}
-          className={`border-r flex flex-col ${
-            theme === 'light' 
-              ? 'bg-white border-gray-200' 
+          className={`border-r flex flex-col ${theme === 'light'
+              ? 'bg-white border-gray-200'
               : 'bg-gray-800 border-gray-700'
-          }`}
+            }`}
           style={{ width: `${leftPanel.width}%` }}
         >
-          <div className={`flex border-b flex-shrink-0 ${
-            theme === 'light' ? 'border-gray-200' : 'border-gray-700'
-          }`}>
+          <div className={`flex border-b flex-shrink-0 ${theme === 'light' ? 'border-gray-200' : 'border-gray-700'
+            }`}>
             <button
               onClick={() => setActiveTab('description')}
-              className={`px-4 py-2 border-b-2 transition-all duration-300 ${
-                activeTab === 'description' 
+              className={`px-4 py-2 border-b-2 transition-all duration-300 ${activeTab === 'description'
                   ? theme === 'light'
                     ? 'border-blue-500 text-blue-600 bg-gray-50'
                     : 'border-blue-400 text-blue-300 bg-gray-700'
                   : theme === 'light'
                     ? 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                     : 'border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-700'
-              }`}
+                }`}
             >
               Description
             </button>
-           
+
           </div>
           <div className="flex-1 overflow-hidden flex flex-col">
             {activeTab === 'description' && <ProblemDescription problem={problem} />}
-           
+
           </div>
         </div>
         <VerticalDragHandle
@@ -233,9 +246,9 @@ const CodingPlatform = () => {
             style={{ height: `calc(100% - ${outputPanel.height}px)` }}
             className="overflow-hidden"
           >
-            <CodeEditor 
-              code={code} 
-              onChange={setCode} 
+            <CodeEditor
+              code={code}
+              onChange={setCode}
               language={language}
               theme={editorTheme}
             />
@@ -253,8 +266,7 @@ const CodingPlatform = () => {
               output={output}
               errors={errors}
               height={outputPanel.height}
-              testinput={testinput}
-              setTestInput={setTestInput}
+              testInput={testinput}
             />
           </div>
         </div>

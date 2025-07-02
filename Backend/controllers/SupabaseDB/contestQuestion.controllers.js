@@ -16,9 +16,7 @@ export const testContestQuestion = async (req, res) => {
         const errors = [];
         if (!code || !output || !currentLang) {
             return new APIError(400, ["Code, test cases, and language are required"]).send(res);
-        }
-
-        
+        }        
             const response = await fetch('https://emkc.org/api/v2/piston/execute', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -32,7 +30,9 @@ export const testContestQuestion = async (req, res) => {
 
             const result = await response.json();
             console.log(result);
-            const runOutput = result.run?.stdout?.trim() || '';
+            const runOutput = typeof result.run.stdout === "string"
+            ? (() => { try { return JSON.parse(result.run.stdout); } catch { return result.run.stdout; } })()
+            : result.run.stdout
             const compileError = result.compile?.stderr || '';
             const runtimeError = result.run?.stderr || '';
 
@@ -43,15 +43,46 @@ export const testContestQuestion = async (req, res) => {
                 errors.push(runtimeError);
             }
 
-            const passed = runOutput === output;
-            results.push({
-                passed,
-                expected: output,
-                actual: runOutput
-            });
-        
 
-        return new APIResponse(200, { results, errors }, "Contest question tested successfully").send(res);
+
+// 2. Get only the actual test case outputs (excluding examples)
+const actualTestOutputs = runOutput.slice(-output.length);
+
+// 3. Compare each actual output with expected output
+const detailedResults = [];
+let passedCount = 0;
+
+for (let i = 0; i < output.length; i++) {
+  const expected = output[i];
+  const actual = actualTestOutputs[i];
+
+  const passed = JSON.stringify(actual) === JSON.stringify(expected);
+
+  if (passed) passedCount++;
+
+  detailedResults.push({
+    index: i + 1,
+    passed,
+    expected,
+    actual,
+  });
+}
+
+// 4. Push overall result
+console.log(`✅ Passed ${passedCount} out of ${output.length} test cases.`);
+console.log("🧪 Detailed Results:", results);
+
+
+// 5. (Optional) Keep full runOutput for UI
+const fullResult = {
+  results: detailedResults,
+  passedCount,
+  total: output.length,
+  fullOutput: runOutput,
+};
+
+
+        return new APIResponse(200, { results:fullResult, errors }, "Contest question tested successfully").send(res);
     } catch (error) {
         console.log("❌ Error testing contest question:", error);
         return new APIError(500, ["Failed to test contest question", error.message]).send(res);
