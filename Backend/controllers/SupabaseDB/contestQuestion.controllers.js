@@ -4,20 +4,21 @@ import { getCodingQuestions, getContestQuetionsQuery } from "../../utils/SqlQuer
 
 
 const getFileName = (lang) => {
-    const files = { javascript: 'main.js', python: 'main.py', java: 'main.java', cpp: 'main.cpp' };
+    const files = { javascript: 'main.js', python: 'main.py', java: 'main.java', cpp: 'main.cpp' ,c : 'main.c'};
     return files[lang] || 'main.txt';
 };
 
 export const testContestQuestion = async (req, res) => {
     try {
-        const { code, testCases, currentLang } = req.body;
+        const { code, output, currentLang } = req.body;
+        console.log("Testing contest question with code:", code, "output:", output, "language:", currentLang);
         const results = [];
         const errors = [];
-        if (!code || !testCases || !currentLang) {
+        if (!code || !output || !currentLang) {
             return new APIError(400, ["Code, test cases, and language are required"]).send(res);
         }
 
-        for (const testCase of testCases) {
+        
             const response = await fetch('https://emkc.org/api/v2/piston/execute', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -25,7 +26,7 @@ export const testContestQuestion = async (req, res) => {
                     language: currentLang.pistonLang,
                     version: currentLang.version,
                     files: [{ name: getFileName(currentLang.pistonLang), content: code }],
-                    stdin: testCase.input
+                    stdin: ''
                 })
             });
 
@@ -42,14 +43,13 @@ export const testContestQuestion = async (req, res) => {
                 errors.push(runtimeError);
             }
 
-            const passed = runOutput === testCase.expected_output;
+            const passed = runOutput === output;
             results.push({
                 passed,
-                expected: testCase.expected_output,
-                actual: runOutput,
-                explanation: testCase.explanation
+                expected: output,
+                actual: runOutput
             });
-        }
+        
 
         return new APIResponse(200, { results, errors }, "Contest question tested successfully").send(res);
     } catch (error) {
@@ -60,7 +60,7 @@ export const testContestQuestion = async (req, res) => {
 
 export const runContestCode = async (req, res) => {
     try {
-        const { code, problem, currentLang } = req.body;
+        const { code, currentLang } = req.body;
 
         const response = await fetch('https://emkc.org/api/v2/piston/execute', {
             method: 'POST',

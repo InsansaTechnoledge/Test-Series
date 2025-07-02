@@ -13,7 +13,7 @@ import { getContestQuestions, runContestCode, runContestTestCases } from '../../
 import { useParams } from 'react-router-dom';
 import CryptoJS from 'crypto-js';
 import { VITE_SECRET_KEY_FOR_CONTEST } from '../../constants/env';
-import { generateCodeTemplate } from './Data/starterCode';
+import { generateCodeTemplate, getFinalCodeForSubmission, getFinalCodeForTestRun } from './Data/starterCode';
 import { useTheme } from '../../../hooks/useTheme';
 
 const CodingPlatform = () => {
@@ -102,9 +102,8 @@ const CodingPlatform = () => {
     setErrors([]);
     try {
       const currentLang = languages.find((l) => l.value === language);
-      const answer=await generateCodeTemplate({userCode: code, langSlug: currentLang.value, problem});
-      console.log("Generated answer:", answer);
-      const response = await runContestCode(answer, problem, currentLang);
+      const answer=await getFinalCodeForTestRun(currentLang.langSlug, code, problem);
+      const response = await runContestCode(answer, currentLang);
       if (response.status !== 200) {
         setErrors(['Failed to run code: ' + response.statusText]);
         setIsRunning(false);
@@ -145,7 +144,8 @@ const CodingPlatform = () => {
         setIsRunning(false);
         return;
       }
-      const response = await runContestTestCases(code, problem.test_cases, currentLang);
+      const answer =await getFinalCodeForSubmission(currentLang.langSlug, code, problem);
+      const response = await runContestTestCases(answer.finalCode, answer.output, currentLang);
       if (response.status === 200) {
         results = response.data.results;
         setErrors(response.data.errors || []);
