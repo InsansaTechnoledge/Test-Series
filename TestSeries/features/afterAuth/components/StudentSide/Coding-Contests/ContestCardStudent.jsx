@@ -4,6 +4,8 @@ import CryptoJS from 'crypto-js';
 import { useTheme } from '../../../../../hooks/useTheme';
 
 const ContestCard = ({ contest , handleParticipate ,notParticipated}) => {
+
+  console.log("dsvas", contest)
   const navigate=useNavigate();
   const {theme} = useTheme()
   const SECRET_KEY='THIS IS SECRET KEY FOR ENCRYPTION';
@@ -88,10 +90,11 @@ const ContestCard = ({ contest , handleParticipate ,notParticipated}) => {
 
       {/* Action Buttons */}
       <div className="space-y-3 mt-2">
-        {contest.type && contest.type === 'participation_based' && notParticipated && (
+        {contest.type && contest.type === 'participation_based' && notParticipated &&  (
           <div className="flex justify-center">
             <button
               onClick={() => handleParticipate(contest.id)}
+              disabled={contest.go_live === true}
               className={`px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 transform hover:scale-105 flex items-center gap-2 ${
                 theme === 'light'
                   ? 'bg-indigo-600 hover:bg-indigo-700 text-white hover:shadow-lg'
@@ -99,12 +102,12 @@ const ContestCard = ({ contest , handleParticipate ,notParticipated}) => {
               }`}
             >
               <ListChecks className="w-4 h-4" />
-              Enroll Now in the Contest
+              {!contest.go_live ? 'Enroll Now in the Contest' : 'Contest has Already Started'}
             </button>
           </div>
         )}
 
-        {contest.type && contest.type === 'participation_based' && !notParticipated && (
+        {contest.type && contest.type === 'participation_based' && !notParticipated && !contest.go_live && (
           <div className={`text-center py-3 px-4 rounded-xl border ${
             theme === 'light'
               ? 'text-green-700 bg-green-50 border-green-200'
@@ -117,7 +120,7 @@ const ContestCard = ({ contest , handleParticipate ,notParticipated}) => {
           </div>
         )}
 
-        {contest.go_live && (
+        {contest.go_live && contest.isEnrolled && (
           <div className="flex justify-center">
             <button
               onClick={() => {
