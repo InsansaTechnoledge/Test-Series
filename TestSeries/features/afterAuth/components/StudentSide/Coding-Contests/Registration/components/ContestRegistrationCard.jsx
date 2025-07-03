@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 const ContestRegistrationPage = ({contest}) => {
   
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen ">
      
       {contest.length === 0 ? (
         <p className="text-center text-gray-500 text-lg">No participation-based contests found.</p>
