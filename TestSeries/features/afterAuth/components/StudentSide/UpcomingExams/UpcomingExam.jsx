@@ -408,8 +408,8 @@ const UpcomingExam = () => {
           transition-all duration-300 shadow-lg backdrop-blur-sm
           ${isProctored 
             ? theme === 'light'
-              ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-red-200/50 border border-red-300/30' 
-              : 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-red-900/50 border border-red-500/30'
+              ? 'bg-gradient-to-r from-indigo-800 to-indigo-600 text-white shadow-indigo-200/50 border border-inidgo-300/30' 
+              : 'bg-gradient-to-r from-indigo-800 to-indigo-700 text-white shadow-indigo-900/50 border border-indigo-500/30'
             : theme === 'light'
               ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-emerald-200/50 border border-emerald-300/30'
               : 'bg-gradient-to-r from-emerald-600 to-emerald-700 text-white shadow-emerald-900/50 border border-emerald-500/30'
@@ -418,7 +418,7 @@ const UpcomingExam = () => {
           <div className={`
             w-2 h-2 rounded-full animate-pulse
             ${isProctored 
-              ? 'bg-red-200' 
+              ? 'bg-indigo-200' 
               : 'bg-emerald-200'
             }
           `}></div>
