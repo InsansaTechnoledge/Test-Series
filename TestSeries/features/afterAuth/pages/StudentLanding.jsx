@@ -12,7 +12,8 @@ import ExamComponent from '../components/StudentSide/Landing/ExamComponent';
 import { useTheme } from '../../../hooks/useTheme';
 import RegisteredComponent from '../components/StudentSide/Coding-Contests/RegisteredAndScheduled/components/RegisteredComponent';
 import LiveContestComponent from '../components/StudentSide/Coding-Contests/LiveContest/components/LiveContestComponent';
-
+import OverviewAnalysisCard from "../components/StudentSide/Landing/OverviewAnalysisCard"
+import Certificates from "../components/StudentSide/Landing/Certificates"
 const StudentLanding = () => {
   const { theme } = useTheme();
   
@@ -40,7 +41,7 @@ const StudentLanding = () => {
         </section>
 
         {/* Academic Information Section */}
-        <section className={`${theme === 'light' ? 'bg-white' : 'bg-gray-950'} rounded-3xl shadow-lg border ${theme === 'light' ? 'border-gray-200' : 'border-gray-800'} overflow-hidden`}>
+        <section className={`${theme === 'light' ? 'bg-white' : 'bg-gray-950'} rounded-3xl shadow-lg border ${theme === 'light' ? 'border-gray-200' : 'border-gray-800'} overflow-hidden`}>6
           <div className="p-6 lg:p-8">
             <div className="flex items-center mb-6">
               <div className={`w-1 h-8 ${theme === 'light' ? 'bg-indigo-600' : 'bg-indigo-400'} rounded-full mr-4`}></div>
@@ -57,6 +58,48 @@ const StudentLanding = () => {
             </div>
           </div>
         </section>
+        <section className={`${theme === 'light' ? 'bg-white' : 'bg-gray-950'} rounded-3xl shadow-lg border ${theme === 'light' ? 'border-gray-200' : 'border-gray-800'} overflow-hidden`}>
+{/* Certificates and Overview Analysis Section */}
+<div className="m-4 md:m-10 rounded-3xl overflow-hidden">
+  <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+    
+    {/* Certificates Section */}
+    <div className={`w-full lg:w-[45%] ${theme === 'light' ? 'bg-white' : 'bg-gray-950'} rounded-2xl border ${theme === 'light' ? 'border-gray-200' : 'border-gray-800'} shadow-lg overflow-hidden`}>
+      <div className="p-6 lg:p-8">
+        <div className="flex items-center mb-6">
+          <div className={`w-1 h-8 ${theme === 'light' ? 'bg-indigo-600' : 'bg-indigo-400'} rounded-full mr-4`}></div>
+          <h3 className={`text-2xl font-bold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>Certificates</h3>
+        </div>
+        
+        <div className="h-full">
+          <Certificates />
+        </div>
+      </div>
+    </div>
+
+    {/* Overview Analysis Section */}
+    <div className={`w-full lg:w-[50%] ${theme === 'light' ? 'bg-white' : 'bg-gray-950'} rounded-2xl border ${theme === 'light' ? 'border-gray-200' : 'border-gray-800'} shadow-lg overflow-hidden`}>
+      <div className="p-6 lg:p-8">
+        <div className="flex items-center mb-6">
+          <div className={`w-1 h-8 ${theme === 'light' ? 'bg-indigo-600' : 'bg-indigo-400'} rounded-full mr-4`}></div>
+          <h3 className={`text-2xl font-bold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>Performance Analysis</h3>
+        </div>
+        
+        <div className="h-full">
+          <OverviewAnalysisCard />
+        </div>
+      </div>
+    </div>
+    
+  </div>
+</div>
+
+
+          </section>
+
+
+
+
 
         {/* Registration & Contests Section */}
         <section className={`${theme === 'light' ? 'bg-white' : 'bg-gray-950'} rounded-3xl shadow-lg border ${theme === 'light' ? 'border-gray-200' : 'border-gray-800'} overflow-hidden`}>
@@ -81,7 +124,9 @@ const StudentLanding = () => {
               </div>
             </div>
           </div>
+      
         </section>
+        
 
       </div>
     </div>

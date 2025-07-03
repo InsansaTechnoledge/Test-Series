@@ -69,9 +69,7 @@ const {theme} = useTheme()
 
   return (
     
-    <div className={`min-h-screen transition-all duration-500 ${
-        theme === 'light' ? 'bg-gray-50' : 'bg-gray-900'
-      }`}>
+    <div>
         <div className="container mx-auto px-6 py-8">
           {/* Live Exams Section */}
           <div className="mb-12">
