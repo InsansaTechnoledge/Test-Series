@@ -1,7 +1,6 @@
 import StudentHero from '../components/StudentSide/Landing/StudentHero';
 import StudentDetails from '../components/StudentSide/Landing/StudentDetails';
 import FacultySection from '../components/StudentSide/Landing/FacultySection';
-// import SubjectCards from '../components/StudentSide/Landing/SubjectCards';
 import ExamLinksComponent from '../components/StudentSide/Landing/ExamLinksComponent';
 import { cards } from '../data/DisplayComponentData';
 import ExamStatsDashboard from '../components/StudentSide/Landing/ExamStatsDashboard';
@@ -9,79 +8,83 @@ import HeadingUtil from '../utility/HeadingUtil';
 import BatchInfoCard from '../components/StudentSide/Landing/BatchInfoCard';
 import ContestRegistrationPage from '../components/StudentSide/Coding-Contests/Registration/ContestRegistrationPage';
 import RegistrationComponent from '../components/StudentSide/Coding-Contests/Registration/components/RegistrationComponent';
-// import ExamComponent from '../components/StudentSide/Landing/ExamComponent';
-
-// import Certificates from '../components/StudentSide/Landing/Certificates'
-// import LeaderBoardCard from '../components/StudentSide/Landing/LeaderBoardCard'
-
-
-// import React, { useEffect, useState } from 'react'
-// // import ExamAnalysis from '../components/StudentSide/'
-
-// import useStudentExamResults from '../../../features/afterAuth/components/StudentSide/CompletedExams/useExamResults';
-// import { useUser } from '../../../contexts/currentUserContext';
-// // import WrongQuestionAnalysis from './Components/WrongQuestion/WrongQuestionAnalysis';
-// // import LeaderBoard from '../';
-// import { useExamManagement } from '../../../hooks/UseExam';
-// import { getAllStudentData } from '../../../utils/services/resultPage';
-
-
+import ExamComponent from '../components/StudentSide/Landing/ExamComponent';
+import { useTheme } from '../../../hooks/useTheme';
+import RegisteredComponent from '../components/StudentSide/Coding-Contests/RegisteredAndScheduled/components/RegisteredComponent';
+import LiveContestComponent from '../components/StudentSide/Coding-Contests/LiveContest/components/LiveContestComponent';
 
 const StudentLanding = () => {
-    return (
-        <>
+  const { theme } = useTheme();
+  
+  return (
+    <div className={`min-h-screen ${theme === 'light' ? 'bg-white' : 'bg-gray-950'}`}>
+      {/* Main Container */}
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+        
+        {/* Hero Section - Student Profile & Dashboard */}
+        <section className={`${theme === 'light' ? 'bg-white' : 'bg-gray-950'} rounded-3xl shadow-lg border ${theme === 'light' ? 'border-gray-200' : 'border-gray-800'} overflow-hidden`}>
+          <div className="flex flex-col lg:flex-row">
+            <div className={`w-full lg:w-1/3 ${theme === 'light' ? 'bg-indigo-600 text-white' : 'bg-indigo-400 text-gray-950'}`}>
+              <div className="p-6 lg:p-8">
+                <StudentDetails />
+              </div>
+            </div>
+            
+            {/* Hero Content */}
+            <div className={`w-full lg:w-2/3 ${theme === 'light' ? 'bg-white' : 'bg-gray-950'}`}>
+              <div className="p-6 lg:p-8">
+                <StudentHero />
+              </div>
+            </div>
+          </div>
+        </section>
 
+        {/* Academic Information Section */}
+        <section className={`${theme === 'light' ? 'bg-white' : 'bg-gray-950'} rounded-3xl shadow-lg border ${theme === 'light' ? 'border-gray-200' : 'border-gray-800'} overflow-hidden`}>
+          <div className="p-6 lg:p-8">
+            <div className="flex items-center mb-6">
+              <div className={`w-1 h-8 ${theme === 'light' ? 'bg-indigo-600' : 'bg-indigo-400'} rounded-full mr-4`}></div>
+              <h2 className={`text-2xl font-bold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>Academic Overview</h2>
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className={`${theme === 'light' ? 'bg-white' : 'bg-gray-950'} rounded-2xl p-6 border ${theme === 'light' ? 'border-gray-200' : 'border-gray-800'}`}>
+                <BatchInfoCard />
+              </div>
+              <div className={`${theme === 'light' ? 'bg-white' : 'bg-gray-950'} rounded-2xl p-6 border ${theme === 'light' ? 'border-gray-200' : 'border-gray-800'}`}>
+                <ExamComponent />
+              </div>
+            </div>
+          </div>
+        </section>
 
+        {/* Registration & Contests Section */}
+        <section className={`${theme === 'light' ? 'bg-white' : 'bg-gray-950'} rounded-3xl shadow-lg border ${theme === 'light' ? 'border-gray-200' : 'border-gray-800'} overflow-hidden`}>
+          <div className="p-6 lg:p-8">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center">
+                <div className={`w-1 h-8 ${theme === 'light' ? 'bg-indigo-600' : 'bg-indigo-400'} rounded-full mr-4`}></div>
+                <h2 className={`text-2xl font-bold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>Contest Registrations</h2>
+              </div>
 
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className={`${theme === 'light' ? 'bg-white' : 'bg-gray-950'} rounded-2xl p-6 border ${theme === 'light' ? 'border-gray-200' : 'border-gray-800'}`}>
+                <RegistrationComponent />
+              </div>
+              <div className={`${theme === 'light' ? 'bg-white' : 'bg-gray-950'} rounded-2xl p-6 border ${theme === 'light' ? 'border-gray-200' : 'border-gray-800'}`}>
+                <RegisteredComponent />
+              </div>
+              <div className={`${theme === 'light' ? 'bg-white' : 'bg-gray-950'} rounded-2xl p-6 border ${theme === 'light' ? 'border-gray-200' : 'border-gray-800'}`}>
+                <LiveContestComponent />
+              </div>
+            </div>
+          </div>
+        </section>
 
-
-
-            <div>
-                {/* /student and profiles */}
-                <div className='m-4 md:m-10 rounded-4xl overflow-hidden shadow-md flex flex-col lg:flex-row'>
-
-                    <div className='w-full lg:w-1/3 flex-shrink-0'>
-                        <StudentDetails />
-                    </div>
-
-
-                    <div className='w-full lg:w-2/3 flex-grow'>
-                        <StudentHero />
-                    </div>
-                </div>
-                <div className='m-4 md:m-10 rounded-4xl overflow-hidden shadow-md flex flex-col lg:flex-row'>
-
-<BatchInfoCard/>
-<ExamComponent/>
-                </div>
-
-      <div className="m-4 md:m-10 rounded-4xl overflow-hidden shadow-md flex flex-col lg:flex-row">
-        <BatchInfoCard />
-        {/* <ExamComponent /> */}
       </div>
-
-      <div className="m-4 md:m-10 rounded-4xl overflow-hidden shadow-md flex flex-col lg:flex-row">
-        <RegistrationComponent/>
-        <RegistrationComponent/>
-        <RegistrationComponent/>
-
-      </div>
-
-
-      {/* <div className="my-12">
-        <HeadingUtil
-          heading="Quick Link's to Exams"
-          description="View and access all your examination resources"
-        />
-        <ExamLinksComponent Data={cards} />
-      </div>
-
-      
-
-      <FacultySection />
-     
-      <ExamStatsDashboard /> */}
-    </>
+    </div>
   );
 };
 

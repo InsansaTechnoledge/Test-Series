@@ -1,10 +1,13 @@
 import React, { useState } from 'react'
 import { Calendar, Trophy, Users, ArrowRight, Clock } from 'lucide-react'
 import { useTheme } from '../../../../../../../hooks/useTheme'
+import { useNavigate } from 'react-router-dom'
 
 const RegistrationComponent = () => {
   const [isHovered, setIsHovered] = useState(false)
   const {theme} = useTheme();
+
+  const navigate = useNavigate();
 
   return (
     <div className="max-w-4xl p-6">
@@ -57,12 +60,16 @@ const RegistrationComponent = () => {
 
           {/* Registration button */}
           <div className="flex items-center justify-center">
-            <button className={`
+
+            <button 
+            onClick={() => navigate('/student/register-contest')}
+            className={`
               group relative px-8 py-4 ${theme === 'light' ? 'bg-indigo-600 text-indigo-100' : 'bg-indigo-400'} text-gray-900 font-bold rounded-xl
               transform transition-all duration-300 hover:scale-105 
               shadow-lg hover:shadow-xl flex items-center space-x-2
               ${isHovered ? 'animate-pulse' : ''}
             `}>
+                
               <span>Register Now</span>
               <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
             </button>
