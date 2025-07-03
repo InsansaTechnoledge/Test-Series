@@ -1,4 +1,4 @@
-import heroBanner from '../../../../../assests/StudentLanding/heroBanner.jpg';
+import heroBanner from '../../../../../assests/StudentLanding/heroBanner.svg';
 import { Building, Mail, Phone, User } from 'lucide-react';
 import { useCachedBatches } from '../../../../../hooks/useCachedBatches';
 import { useUser } from '../../../../../contexts/currentUserContext';
@@ -24,9 +24,9 @@ const StudentHero = () => {
                 <img
                     src={heroBanner}
                     alt='heroBanner'
-                    className='absolute inset-0 w-full h-full object-cover -z-10'
+                    className='absolute  w-full h-full object-cover -z-10'
                 />
-                <div className='relative bg-black/60 backdrop-blur-sm'>
+                <div className='relative backdrop-blur-sm'>
                     {/* Banner Content */}
                     <div className='px-6 md:px-8 py-8 md:py-10'>
                         <h1 className={`text-center text-2xl md:text-3xl font-bold mb-6 ${theme === 'light' ? 'text-white' : 'text-white'
