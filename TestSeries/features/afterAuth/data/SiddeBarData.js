@@ -205,8 +205,18 @@ export const studentControlData = [
     icon: '', activeIcon: ''
   },
   {
-    name: "Coding Contests",
-    path: "coding-contests",
+    name: "New Contests",
+    path: "register-contest",
+    icon: '', activeIcon: ''
+  },
+  {
+    name: "Registered Contests",
+    path: "registered-contest",
+    icon: '', activeIcon: ''
+  },
+  {
+    name: "Live Contests",
+    path: "live-contest",
     icon: '', activeIcon: ''
   },
   {
@@ -228,7 +238,7 @@ export const studentCategoryData = [
   {
     name: "Contests",
     icon: contest,
-    features: ["Coding Contests"]
+    features: ["New Contests", "Registered Contests", "Live Contests"]
   },
   {
     name: "Academics",

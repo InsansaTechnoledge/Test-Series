@@ -16,14 +16,14 @@ const ContestInstructionWindow = () => {
 
 
     // Decrypt the contestId only once
-    const contest_id = useMemo(() => {
-        try {
-            return CryptoJS.AES.decrypt(decodedId, SECRET_KEY_CONTEST).toString(CryptoJS.enc.Utf8);
-        } catch (error) {
-            console.error("Error decrypting contestId:", error);
-            return null;
-        }
-    }, [decodedId, SECRET_KEY_CONTEST]);
+    // const contest_id = useMemo(() => {
+    //     try {
+    //         return CryptoJS.AES.decrypt(decodedId, SECRET_KEY_CONTEST).toString(CryptoJS.enc.Utf8);
+    //     } catch (error) {
+    //         console.error("Error decrypting contestId:", error);
+    //         return null;
+    //     }
+    // }, [decodedId, SECRET_KEY_CONTEST]);
 
     const { contestMap, isLoading: contestsLoading } = useCachedContests();
 
@@ -32,19 +32,19 @@ const ContestInstructionWindow = () => {
     const [guidelinesAccepted, setGuidelinesAccepted] = useState(false);
 
     useEffect(() => {
-        if (!contest_id || contestsLoading) {
+        if (!contestId || contestsLoading) {
             setLoading(true);
             return;
         }
 
-        const contestData = contestMap?.[contest_id];
+        const contestData = contestMap?.[contestId];
 
         if (contestData) {
             setContest(contestData);
         }
 
         setLoading(false);
-    }, [contest_id, contestMap, contestsLoading]);
+    }, [contestId, contestMap, contestsLoading]);
 
     const { organization } = useCachedOrganization({ userId: user._id, orgId: contest.organization_id });
 
@@ -54,7 +54,7 @@ const ContestInstructionWindow = () => {
             return;
 
         }
-        const encryptedId = CryptoJS.AES.encrypt(contest_id, SECRET_KEY_CONTEST).toString();
+        const encryptedId = CryptoJS.AES.encrypt(contestId, SECRET_KEY_CONTEST).toString();
         const safeId = encodeURIComponent(encryptedId);
         navigate(`/student/code/${safeId}`);
     }
@@ -77,7 +77,7 @@ const {theme} = useTheme()
       <div className="absolute inset-0 bg-gradient-to-r from-green-600/20 to-green-700/20"></div>
       <div className="relative z-10">
         <h1 className="text-3xl md:text-4xl font-black text-center mb-3 tracking-tight">
-          {contest?.name || `Contest: ${contest_id}`}
+          {contest?.name || `Contest: ${contestId}`}
         </h1>
         <p className="text-center text-green-100 text-lg font-medium">
           Organized by {organization?.name || "The Contest Team"}

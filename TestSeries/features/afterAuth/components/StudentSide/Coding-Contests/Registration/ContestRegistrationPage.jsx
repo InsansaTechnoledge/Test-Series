@@ -2,11 +2,10 @@ import React, { useEffect, useState } from 'react';
 import useCachedContests from '../../../../../../hooks/useCachedContests';
 import ContestRegistrationCard from './components/ContestRegistrationCard';
 import { enrollContest } from '../../../../../../utils/services/contestService';
+import { useTheme } from '../../../../../../hooks/useTheme';
 
 const ContestRegistrationPage = () => {
   const { contestList } = useCachedContests();
-  const [contests, setContests] = useState([]);
-  const [enrolledContests, setEnrolledContests] = useState()
   
   const [registerTypeContest, setRegisterTypeContest] = useState([]);
 
@@ -17,6 +16,8 @@ const ContestRegistrationPage = () => {
     }
   }, [contestList]); 
 
+  const {theme} = useTheme();
+
    const handleParticipate = async (contestId) => {
           try {
               const response=await enrollContest(contestId);
@@ -24,9 +25,7 @@ const ContestRegistrationPage = () => {
             
                   console.error("Failed to enroll in contest:", response.data);
               }
-  
-              setEnrolledContests(prev => [...prev, contests.find(contest => contest.id === contestId)]);
-              setContests(prev => prev.filter(contest => contest.id !== contestId));
+              setRegisterTypeContest(prev => prev.filter(contest => contest.id !== contestId));
   
           } catch (error) {
               console.error("Error participating in contest:", error);
@@ -37,11 +36,31 @@ const ContestRegistrationPage = () => {
 
   return (
     <div className="min-h-screen mt-12">
-       <h1 className="text-3xl font-bold text-indigo-700 mb-8 text-center">
-        Register for Participation-Based Contests
-      </h1>
+       <div className="relative overflow-hidden">
+            <div className={`absolute inset-0 ${
+              theme === 'dark' 
+                ? 'bg-indigo-400' 
+                : 'bg-indigo-600'
+            }`}></div>
+            <div className="relative px-4 py-12 sm:px-6 lg:px-8">
+              <div className="text-center">
+              
+                <h1 className={`text-4xl font-bold mb-4 ${
+                  theme === 'dark' ? 'text-white' : 'text-gray-100'
+                }`}>
+                  Contest Registration
+                </h1>
+                <p className={`text-xl max-w-3xl mx-auto ${
+                  theme === 'dark' ? 'text-gray-100' : 'text-gray-100'
+                }`}>
+                  Join exciting coding competitions and showcase your skills to your peers
+                </p>
+              </div>
+            </div>
+          </div>
+    
       
-      <ContestRegistrationCard contest={registerTypeContest} handleParticipate={handleParticipate} notParticipated={false} />
+      <ContestRegistrationCard contest={registerTypeContest} handleParticipate={handleParticipate} theme={theme}/>
     </div>
   );
 };
