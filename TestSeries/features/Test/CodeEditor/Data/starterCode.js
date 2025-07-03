@@ -58,7 +58,10 @@ export const getFinalCodeForTestRun = async (langSlug, userCode, problem) => {
   const finalCode = await generateCodeTemplate(langSlug, userCode, inputArray, template);
 
 
-  return finalCode;
+  return {
+    finalCode: finalCode,
+    testInput: inputArray
+  };
 
 }
 
@@ -102,7 +105,8 @@ export const getFinalCodeForSubmission = async (langSlug, userCode, problem) => 
 
   return {
     finalCode: finalCode,
-    output: outputArray
+    output: outputArray,
+    testInput: inputArray
   }
 };
 

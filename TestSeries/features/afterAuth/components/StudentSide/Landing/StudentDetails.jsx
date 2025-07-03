@@ -25,10 +25,7 @@ export default function StudentDetails() {
 
   return (
 
-    <div className={` transition-colors duration-300 ${theme === 'light'
-        ? 'bg-gray-50'
-        : 'bg-gray-900'
-      }`}>
+    <div className={` transition-colors duration-300`}>
       <div className="p-6">
         <div className={`max-w-sm rounded-3xl overflow-hidden shadow-2xl backdrop-blur-lg transition-all duration-500 hover:shadow-3xl hover:-translate-y-2 ${theme === 'light'
             ? 'bg-white/95 border border-gray-200/50'

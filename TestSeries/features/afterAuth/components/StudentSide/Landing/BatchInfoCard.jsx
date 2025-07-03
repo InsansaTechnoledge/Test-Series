@@ -34,10 +34,7 @@ const BatchInfoCard = () => {
   return (
 
 
-    <div className={`p-6 transition-all duration-500 ${theme === 'light'
-        ? 'bg-gray-50'
-        : 'bg-gray-900'
-      }`}>
+    <div className={`p-6 transition-all duration-500 `}>
 
 
 

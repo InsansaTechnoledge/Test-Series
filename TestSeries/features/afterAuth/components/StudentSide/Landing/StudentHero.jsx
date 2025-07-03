@@ -15,10 +15,7 @@ const StudentHero = () => {
 
 
 
-        <div className={` max-w-6xl rounded-3xl overflow-hidden shadow-2xl backdrop-blur-lg transition-all duration-500 hover:shadow-3xl hover:-translate-y-2 ${theme === 'light'
-                ? 'bg-white/95 border border-gray-200/50'
-                : 'bg-gray-800/95 border border-gray-700/50'
-            }`}>
+        <div className={` max-w-6xl rounded-3xl overflow-hidden mt-6 shadow-2xl backdrop-blur-lg transition-all duration-500 hover:shadow-3xl hover:-translate-y-2 `}>
             {/* Organization Info Section */}
             <div className='relative overflow-hidden'>
                 <img
