@@ -360,7 +360,6 @@ const UpcomingExam = () => {
     navigate(`/student/test?userId=${userId}&examId=${examId}&eventId=${eventId}`);
   };
 
-  // const ExamBadge = ({ exam }) => {
   //   const isProctored = isAiProctored(exam);
     
   //   return (
@@ -399,8 +398,6 @@ const UpcomingExam = () => {
   //     </div>
   //   );
   // };
-
-
   const ExamBadge = ({ exam, theme }) => {
     const isProctored = isAiProctored(exam);
          
@@ -454,148 +451,6 @@ const UpcomingExam = () => {
   }, []);
 
   return (
-    // <div style={{ opacity: proctorStatus === 'starting' ? 0.6 : 1, transition: 'opacity 0.3s ease' }}>
-    //     {/* <NeedHelpComponent question={question} answer={answer} /> */}
-    //   <div>
-    //     <HeadingUtil 
-    //       heading="Live Exam:" 
-    //       subHeading=""
-    //     />
-    //     <div style={{ pointerEvents: proctorStatus === 'starting' ? 'none' : 'auto' }}>
-    //       {
-    //         liveExams && liveExams.length > 0
-    //           ?
-    //           liveExams.map((exam, idx) => (
-    //             <div key={idx} style={{ 
-    //               opacity: (proctorStatus === 'starting' && currentExamId !== exam.id) ? 0.4 : 1,
-    //               transition: 'opacity 0.3s ease',
-    //               marginBottom: '20px',
-    //               padding: '15px',
-    //               border: '1px solid #e0e0e0',
-    //               borderRadius: '8px',
-    //               backgroundColor: '#f9f9f9'
-    //             }}>
-    //               <ExamBadge exam={exam} />
-    //               <LiveExamCard 
-    //                 data={exam} 
-    //                 onStartTest={() => handleStartTest(exam.id, exam.ai_proctored)}
-    //               />
-    //               <StartButton 
-    //                 exam={exam} 
-    //                 onStartTest={handleStartTest}
-    //                 getStartButtonConfig={getStartButtonConfig}
-    //                 proctorStatus={proctorStatus}
-    //                 isElectronEnv={isElectronEnv}
-    //                 currentExamId={exam.id}
-    //               />
-    //             </div>
-    //           ))
-    //           :
-    //           <div>
-    //             No live exams yet :)
-    //           </div>
-    //       }
-    //     </div>
-        
-    //     <HeadingUtil 
-    //       heading="Upcoming Exams:" 
-    //       subHeading=""
-    //     />
-    //     <div style={{ pointerEvents: proctorStatus === 'starting' ? 'none' : 'auto' }}>
-    //       {
-    //         upcomingExams && upcomingExams.length > 0
-    //           ?
-    //           upcomingExams.map((exam, idx) => (
-    //             <div key={idx} style={{ 
-    //               opacity: (proctorStatus === 'starting' && currentExamId !== exam.id) ? 0.4 : 1,
-    //               transition: 'opacity 0.3s ease',
-    //               marginBottom: '20px',
-    //               padding: '15px',
-    //               border: '1px solid #e0e0e0',
-    //               borderRadius: '8px',
-    //               backgroundColor: '#f9f9f9'
-    //             }}>
-    //               <ExamBadge exam={exam} />
-    //               <UpcomingExamCard 
-    //                 data={exam} 
-    //                 onStartTest={() => handleStartTest(exam.id, exam.ai_proctored)}
-    //               />
-    //               <StartButton 
-    //                 exam={exam} 
-    //                 onStartTest={handleStartTest}
-    //                 getStartButtonConfig={getStartButtonConfig}
-    //                 proctorStatus={proctorStatus}
-    //                 isElectronEnv={isElectronEnv}
-    //                 currentExamId={exam.id}
-    //               />
-    //             </div>
-    //           ))
-    //           :
-    //           <div>
-    //             No upcoming exams yet :)
-    //           </div>
-    //       }
-    //     </div>
-        
-    //     <AppRequiredMessage isElectronEnv={isElectronEnv}/>
-        
-    //     {/* Debug Info */}
-    //     {/* {process.env.NODE_ENV === 'development' && (
-    //       <div style={{ 
-    //         position: 'fixed', 
-    //         bottom: '10px', 
-    //         right: '10px', 
-    //         background: '#f0f0f0', 
-    //         padding: '10px', 
-    //         borderRadius: '5px',
-    //         fontSize: '12px',
-    //         zIndex: 1000
-    //       }}>
-    //         <div>Electron Environment: {isElectronEnv ? '✅' : '❌'}</div>
-    //         <div>Proctor Status: {proctorStatus}</div>
-    //         <div>Current Exam ID: {currentExamId || 'None'}</div>
-    //         <div>User ID: {user?._id || 'Not loaded'}</div>
-    //         <div>Platform: {navigator.platform}</div>
-    //         {isElectronEnv && (
-    //           <div style={{ marginTop: '5px' }}>
-    //             <button 
-    //               onClick={() => startProctorEngine('test123')}
-    //               disabled={proctorStatus !== 'idle'}
-    //               style={{
-    //                 padding: '5px 10px',
-    //                 background: proctorStatus === 'idle' ? '#007bff' : '#6c757d',
-    //                 color: 'white',
-    //                 border: 'none',
-    //                 borderRadius: '3px',
-    //                 cursor: proctorStatus === 'idle' ? 'pointer' : 'not-allowed',
-    //                 fontSize: '11px',
-    //                 marginRight: '5px'
-    //               }}
-    //             >
-    //               Test Start Proctor
-    //             </button>
-    //             <button 
-    //               onClick={stopProctorEngine}
-    //               disabled={proctorStatus !== 'running'}
-    //               style={{
-    //                 padding: '5px 10px',
-    //                 background: proctorStatus === 'running' ? '#dc3545' : '#6c757d',
-    //                 color: 'white',
-    //                 border: 'none',
-    //                 borderRadius: '3px',
-    //                 cursor: proctorStatus === 'running' ? 'pointer' : 'not-allowed',
-    //                 fontSize: '11px'
-    //               }}
-    //             >
-    //               Test Stop Proctor
-    //             </button>
-    //           </div>
-    //         )}
-    //       </div>
-    //     )} */}
-    //   </div>
-    
-    // </div>
 
 <div>
 <div className={`transition-opacity duration-300 ${proctorStatus === 'starting' ? 'opacity-60' : 'opacity-100'}`}>
