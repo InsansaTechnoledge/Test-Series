@@ -1,4 +1,6 @@
-import heroBanner from '../../../../../assests/StudentLanding/heroBanner.svg';
+import heroBanner from '../../../../../assests/StudentLanding/heroBannerWhite.svg';
+import  herobannerdark from '../../../../../assests/StudentLanding/heroBanner.svg';
+
 import { Building, Mail, Phone, User } from 'lucide-react';
 import { useCachedBatches } from '../../../../../hooks/useCachedBatches';
 import { useUser } from '../../../../../contexts/currentUserContext';
@@ -15,11 +17,11 @@ const StudentHero = () => {
 
 
 
-        <div className={` max-w-6xl rounded-3xl overflow-hidden mt-6 shadow-2xl backdrop-blur-lg transition-all duration-500 hover:shadow-3xl hover:-translate-y-2 `}>
+        <div className={` max-w-6xl rounded-3xl overflow-hidden mt-6 shadow-xl backdrop-blur-md transition-all duration-500 hover:shadow-3xl hover:-translate-y-2 `}>
             {/* Organization Info Section */}
             <div className='relative overflow-hidden'>
                 <img
-                    src={heroBanner}
+                    src={`${theme == 'light' ? heroBanner : herobannerdark}`}
                     alt='heroBanner'
                     className='absolute  w-full h-full object-cover -z-10'
                 />
@@ -34,18 +36,18 @@ const StudentHero = () => {
                         {/* Building Icon */}
                         <div className='flex justify-center mb-6'>
                             <div className={`p-4 rounded-2xl backdrop-blur-md transition-all duration-300 ${theme === 'light'
-                                    ? 'bg-white/20 border border-white/30'
+                                    ? 'bg-white/20 border border-gray-700'
                                     : 'bg-gray-800/30 border border-gray-600/30'
                                 }`}>
-                                <Building className='w-12 h-12 md:w-16 md:h-16 text-white' />
+                                <Building className='w-12 h-12 md:w-16 md:h-16 text-gray-600' />
                             </div>
                         </div>
 
                         {/* Address */}
-                        <div className={`hidden md:block text-center text-sm leading-relaxed mb-8 px-4 ${theme === 'light' ? 'text-white/90' : 'text-white/90'
+                        <div className={`hidden md:block text-center text-sm leading-relaxed mb-8 px-4 ${theme === 'light' ? 'text-gray-700' : 'text-white/90'
                             }`}>
                             <div className={`inline-block px-4 py-2 rounded-xl backdrop-blur-md ${theme === 'light'
-                                    ? 'bg-white/10 border border-white/20'
+                                    ? 'bg-white/10 border border-gray-700'
                                     : 'bg-gray-800/20 border border-gray-600/20'
                                 }`}>
                                 {organization?.address?.line1}, {organization?.address?.line2}, {organization?.address?.city}, {organization?.address?.state}, {organization?.address?.country} - {organization?.address?.pincode}
@@ -54,22 +56,22 @@ const StudentHero = () => {
 
                         {/* Connect Section */}
                         <div className='text-center'>
-                            <div className={`text-lg font-medium mb-4 ${theme === 'light' ? 'text-white' : 'text-white'
+                            <div className={`text-lg font-medium mb-4 ${theme === 'light' ? 'text-gray-600' : 'text-white'
                                 }`}>
                                 Connect with us on:
                             </div>
                             <div className='flex justify-center space-x-6'>
                                 <div className={`p-3 rounded-xl backdrop-blur-md transition-all duration-300 hover:scale-110 cursor-pointer ${theme === 'light'
-                                        ? 'bg-white/20 border border-white/30 hover:bg-white/30'
+                                        ? 'bg-white/20 border  border-gray-700 hover:bg-white/30'
                                         : 'bg-gray-800/30 border border-gray-600/30 hover:bg-gray-700/40'
                                     }`}>
-                                    <Mail className='w-6 h-6 text-white' />
+                                    <Mail className='w-6 h-6 text-gray-600' />
                                 </div>
                                 <div className={`p-3 rounded-xl backdrop-blur-md transition-all duration-300 hover:scale-110 cursor-pointer ${theme === 'light'
-                                        ? 'bg-white/20 border border-white/30 hover:bg-white/30'
+                                        ? 'bg-white/20 border border-gray-700 hover:bg-white/30'
                                         : 'bg-gray-800/30 border border-gray-600/30 hover:bg-gray-700/40'
                                     }`}>
-                                    <Phone className='w-6 h-6 text-white' />
+                                    <Phone className='w-6 h-6 text-gray-600' />
                                 </div>
                             </div>
                         </div>
