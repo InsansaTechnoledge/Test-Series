@@ -162,7 +162,7 @@ const CreateExam = () => {
 
         {!canCreateMoreExams && (
           <p className="mt-4 text-center text-sm text-red-600 bg-red-100 border border-red-200 px-4 py-2 rounded-xl shadow-sm backdrop-blur-sm">
-            You've reached your batch creation limit. <br className="sm:hidden" />
+            You've reached your Exam creation limit. <br className="sm:hidden" />
             <span className="font-medium">Upgrade your plan</span> to continue.
           </p>
 
