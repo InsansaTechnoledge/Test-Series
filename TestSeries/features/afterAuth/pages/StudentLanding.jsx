@@ -41,7 +41,7 @@ const StudentLanding = () => {
         </section>
 
         {/* Academic Information Section */}
-        <section className={`${theme === 'light' ? 'bg-white' : 'bg-gray-950'} rounded-3xl shadow-lg border ${theme === 'light' ? 'border-gray-200' : 'border-gray-800'} overflow-hidden`}>6
+        <section className={`${theme === 'light' ? 'bg-white' : 'bg-gray-950'} rounded-3xl shadow-lg border ${theme === 'light' ? 'border-gray-200' : 'border-gray-800'} overflow-hidden`}>
           <div className="p-6 lg:p-8">
             <div className="flex items-center mb-6">
               <div className={`w-1 h-8 ${theme === 'light' ? 'bg-indigo-600' : 'bg-indigo-400'} rounded-full mr-4`}></div>
