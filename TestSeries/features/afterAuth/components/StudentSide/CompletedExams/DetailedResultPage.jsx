@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { getResultDetail } from '../../../../../utils/services/resultPage';
 import { useSearchParams } from 'react-router-dom';
-
+import { useTheme } from '../../../../../hooks/useTheme';
 const ResultPage = () => {
+    const { theme } = useTheme();
     const { examId } = useParams();
     const [resultData, setResultData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -12,8 +13,8 @@ const ResultPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterType, setFilterType] = useState('all');
     const [filterResult, setFilterResult] = useState('all');
+    const [viewMode, setViewMode] = useState('detailed'); // 'detailed' or 'compact'
     
-
     const [searchParams] = useSearchParams();
     const examName = searchParams.get('name');
 
@@ -21,7 +22,7 @@ const ResultPage = () => {
         const fetchResultData = async () => {
             try {
                 setLoading(true);
-                const data = await getResultDetail(examId,false);
+                const data = await getResultDetail(examId, false);
                 setResultData(data);
             } catch (err) {
                 setError(err.message || 'Failed to fetch result data');
@@ -59,7 +60,6 @@ const ResultPage = () => {
                 passage: q.passage,
                 sub_question_ids: q.sub_question_ids
             };
-
 
             if (q.question_type === 'comprehension' && Array.isArray(q.sub_questions)) {
                 transformed.sub_questions = q.sub_questions.map(sub => ({
@@ -105,11 +105,9 @@ const ResultPage = () => {
         // Set correct answers for questions that were answered correctly
         questions.forEach(q => {
             if (q.question_type === 'comprehension' && Array.isArray(q.sub_questions)) {
-                // Handle comprehension sub-questions
                 q.sub_questions.forEach(sub => {
                     if (!wrongAnswers.find(w => w.questionId === sub.id) &&
                         (!resultData.unattempted || !resultData.unattempted.includes(sub.id))) {
-                        // This sub-question was answered correctly
                         if (sub.question_type === 'mcq') {
                             userAnswers[sub.id] = sub.correct_option;
                         } else if (sub.question_type === 'msq') {
@@ -118,17 +116,14 @@ const ResultPage = () => {
                             userAnswers[sub.id] = sub.is_true;
                         } else if (sub.question_type === 'fill' || sub.question_type === 'numerical') {
                             userAnswers[sub.id] = sub.correct_answer;
-                        }
-                        else if (sub.question_type === 'match') {
+                        } else if (sub.question_type === 'match') {
                             userAnswers[sub.id] = sub.correct_pairs;
                         }
                     }
                 });
             } else {
-                // Handle regular questions
                 if (!wrongAnswers.find(w => w.questionId === q.id) &&
                     (!resultData.unattempted || !resultData.unattempted.includes(q.id))) {
-                    // This question was answered correctly, set the correct answer
                     if (q.question_type === 'mcq') {
                         userAnswers[q.id] = q.correct_option;
                     } else if (q.question_type === 'msq') {
@@ -137,8 +132,7 @@ const ResultPage = () => {
                         userAnswers[q.id] = q.is_true;
                     } else if (q.question_type === 'fill' || q.question_type === 'numerical') {
                         userAnswers[q.id] = q.correct_answer;
-                    }
-                    else if (q.question_type === 'match') {
+                    } else if (q.question_type === 'match') {
                         userAnswers[q.id] = q.correct_pairs;
                     }
                 }
@@ -151,7 +145,6 @@ const ResultPage = () => {
     // Get result status for a question (including comprehension logic)
     const getQuestionResult = (question, userAnswers) => {
         if (question.type === 'comprehension' && Array.isArray(question.sub_questions)) {
-            // For comprehension questions, check all sub-questions
             let allAnswered = true;
             let allCorrect = true;
             let hasCorrect = false;
@@ -168,21 +161,45 @@ const ResultPage = () => {
             });
 
             if (!allAnswered) {
-                return { status: 'unanswered', class: 'bg-gray-100 text-gray-800', label: 'Partially Answered' };
+                return { 
+                    status: 'unanswered', 
+                    class: theme === 'dark' ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-700', 
+                    label: 'Partially Answered',
+                    icon: '◐'
+                };
             } else if (allCorrect) {
-                return { status: 'correct', class: 'bg-green-100 text-green-800', label: 'All Correct' };
+                return { 
+                    status: 'correct', 
+                    class: theme === 'dark' ? 'bg-green-900 text-green-300' : 'bg-green-100 text-green-800', 
+                    label: 'All Correct',
+                    icon: '✓'
+                };
             } else if (hasCorrect) {
-                return { status: 'partial', class: 'bg-yellow-100 text-yellow-800', label: 'Partially Correct' };
+                return { 
+                    status: 'partial', 
+                    class: theme === 'dark' ? 'bg-yellow-900 text-yellow-300' : 'bg-yellow-100 text-yellow-800', 
+                    label: 'Partially Correct',
+                    icon: '◑'
+                };
             } else {
-                return { status: 'incorrect', class: 'bg-red-100 text-red-800', label: 'All Incorrect' };
+                return { 
+                    status: 'incorrect', 
+                    class: theme === 'dark' ? 'bg-red-900 text-red-300' : 'bg-red-100 text-red-800', 
+                    label: 'All Incorrect',
+                    icon: '✗'
+                };
             }
         }
 
-        // Regular question logic
         const userAnswer = userAnswers[question.id];
 
         if (userAnswer === undefined || userAnswer === null || userAnswer === '') {
-            return { status: 'unanswered', class: 'bg-gray-100 text-gray-800', label: 'Not Answered' };
+            return { 
+                status: 'unanswered', 
+                class: theme === 'dark' ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-700', 
+                label: 'Not Answered',
+                icon: '○'
+            };
         }
 
         let isCorrect = false;
@@ -195,8 +212,7 @@ const ResultPage = () => {
             isCorrect = userAnswer === question.is_true;
         } else if (question.type === 'fill' || question.type === 'numerical') {
             isCorrect = userAnswer?.toString().toLowerCase().trim() === question.correct_answer?.toString().toLowerCase().trim();
-        }
-        else if (question.type === 'match') {
+        } else if (question.type === 'match') {
             const sortObject = (obj) => {
                 return Object.keys(obj || {})
                     .sort()
@@ -212,9 +228,19 @@ const ResultPage = () => {
         }
 
         if (isCorrect) {
-            return { status: 'correct', class: 'bg-green-100 text-green-800', label: 'Correct' };
+            return { 
+                status: 'correct', 
+                class: theme === 'dark' ? 'bg-green-900 text-green-300' : 'bg-green-100 text-green-800', 
+                label: 'Correct',
+                icon: '✓'
+            };
         } else {
-            return { status: 'incorrect', class: 'bg-red-100 text-red-800', label: 'Incorrect' };
+            return { 
+                status: 'incorrect', 
+                class: theme === 'dark' ? 'bg-red-900 text-red-300' : 'bg-red-100 text-red-800', 
+                label: 'Incorrect',
+                icon: '✗'
+            };
         }
     };
 
@@ -229,7 +255,6 @@ const ResultPage = () => {
                 subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 chapter.toLowerCase().includes(searchTerm.toLowerCase());
 
-            // Also search in sub-questions for comprehension
             if (q.type === 'comprehension' && Array.isArray(q.sub_questions)) {
                 matchesSearch = matchesSearch || q.sub_questions.some(sub =>
                     (sub.question_text || '').toLowerCase().includes(searchTerm.toLowerCase())
@@ -237,8 +262,6 @@ const ResultPage = () => {
             }
 
             const matchesType = filterType === 'all' || q.type === filterType;
-
-            // Check result status
             const result = getQuestionResult(q, userAnswers);
             const matchesResult = filterResult === 'all' ||
                 (filterResult === 'correct' && result.status === 'correct') ||
@@ -249,7 +272,6 @@ const ResultPage = () => {
         });
     };
 
-    // Get the question type as a readable string
     const getQuestionTypeLabel = (type) => {
         const types = {
             'mcq': 'Multiple Choice',
@@ -264,45 +286,66 @@ const ResultPage = () => {
         return types[type] || type.toUpperCase();
     };
 
-    // Get the difficulty badge class
     const getDifficultyBadgeClass = (difficulty) => {
-        switch (difficulty) {
-            case 'easy': return 'bg-green-100 text-green-800';
-            case 'medium': return 'bg-yellow-100 text-yellow-800';
-            case 'hard': return 'bg-red-100 text-red-800';
-            default: return 'bg-gray-100 text-gray-800';
+        if (theme === 'dark') {
+            switch (difficulty) {
+                case 'easy': return 'bg-green-900 text-green-300 border-green-700';
+                case 'medium': return 'bg-yellow-900 text-yellow-300 border-yellow-700';
+                case 'hard': return 'bg-red-900 text-red-300 border-red-700';
+                default: return 'bg-gray-800 text-gray-300 border-gray-600';
+            }
+        } else {
+            switch (difficulty) {
+                case 'easy': return 'bg-green-100 text-green-800 border-green-200';
+                case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+                case 'hard': return 'bg-red-100 text-red-800 border-red-200';
+                default: return 'bg-gray-100 text-gray-800 border-gray-200';
+            }
         }
     };
 
-    // Toggle expanded state for a question
     const toggleExpand = (id) => {
-        if (expandedQuestion === id) {
-            setExpandedQuestion(null);
-        } else {
-            setExpandedQuestion(id);
-        }
+        setExpandedQuestion(expandedQuestion === id ? null : id);
     };
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center min-h-screen">
-                <div className="text-lg">Loading result...</div>
+            <div className={`min-h-screen flex items-center justify-center ${theme === 'dark' ? 'bg-gray-950' : 'bg-gray-50'}`}>
+                <div className="text-center">
+                    <div className={`animate-spin rounded-full h-16 w-16 border-4 ${theme === 'dark' ? 'border-indigo-400 border-t-transparent' : 'border-indigo-600 border-t-transparent'} mx-auto mb-4`}></div>
+                    <p className={`text-lg font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Loading your results...</p>
+                </div>
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="flex justify-center items-center min-h-screen">
-                <div className="text-red-600 text-lg">Error: {error}</div>
+            <div className={`min-h-screen flex items-center justify-center ${theme === 'dark' ? 'bg-gray-950' : 'bg-gray-50'}`}>
+                <div className={`max-w-md w-full mx-4 p-6 rounded-2xl shadow-xl ${theme === 'dark' ? 'bg-gray-900 border border-gray-800' : 'bg-white border border-gray-200'}`}>
+                    <div className="text-center">
+                        <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                            <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.96-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                            </svg>
+                        </div>
+                        <h3 className={`text-lg font-medium ${theme === 'dark' ? 'text-white' : 'text-gray-900'} mb-2`}>Error Loading Results</h3>
+                        <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{error}</p>
+                    </div>
+                </div>
             </div>
         );
     }
 
     if (!resultData || !resultData.questions) {
         return (
-            <div className="flex justify-center items-center min-h-screen">
-                <div className="text-gray-600 text-lg">No result data found</div>
+            <div className={`min-h-screen flex items-center justify-center ${theme === 'dark' ? 'bg-gray-950' : 'bg-gray-50'}`}>
+                <div className={`text-center ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <svg className="mx-auto h-24 w-24 mb-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <p className="text-xl font-medium">No result data found</p>
+                </div>
             </div>
         );
     }
@@ -311,7 +354,6 @@ const ResultPage = () => {
     const userAnswers = transformUserAnswers(resultData.wrongAnswers || [], resultData.questions);
     const filteredQuestions = getFilteredQuestions(questions, userAnswers);
 
-    // Calculate total marks including sub-questions
     const calculateTotalMarks = (questions) => {
         return questions.reduce((sum, q) => {
             if (q.type === 'comprehension' && Array.isArray(q.sub_questions)) {
@@ -326,429 +368,387 @@ const ResultPage = () => {
     const scoredMarks = resultData.marks || 0;
     const percentage = totalMarks > 0 ? ((scoredMarks / totalMarks) * 100).toFixed(2) : 'N/A';
 
+    // Calculate statistics
+    const correctCount = questions.filter(q => getQuestionResult(q, userAnswers).status === 'correct').length;
+    const incorrectCount = questions.filter(q => getQuestionResult(q, userAnswers).status === 'incorrect').length;
+    const unansweredCount = questions.filter(q => getQuestionResult(q, userAnswers).status === 'unanswered').length;
+
     return (
-        <div className="container mx-auto px-4 py-6">
+        <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-950' : 'bg-gray-50'} transition-colors duration-200`}>
             {/* Header */}
-            <div className="mb-6">
-                <h1 className="text-2xl font-bold text-gray-800 mb-2">Exam Result for {examName}</h1>
-                <div className="text-sm text-gray-600">
-                    <span>Exam ID: {examId}</span>
-                    <span className="mx-2">•</span>
-                    <span>Status: {resultData.status}</span>
-                    <span className="mx-2">•</span>
-                    <span>Date: {new Date(resultData.resultDate).toLocaleDateString()}</span>
+            <div className={`${theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'} border-b sticky top-0 z-10 backdrop-blur-sm bg-opacity-95`}>
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                        <div className="flex-1 min-w-0">
+                            <div className="flex items-center">
+                                <div className={`flex-shrink-0 w-12 h-12 rounded-xl ${theme === 'dark' ? 'bg-indigo-900' : 'bg-indigo-100'} flex items-center justify-center mr-4`}>
+                                    <svg className={`w-6 h-6 ${theme === 'dark' ? 'text-indigo-400' : 'text-indigo-600'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h1 className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                        {examName || 'Exam Results'}
+                                    </h1>
+                                    <div className={`flex items-center text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
+                                        <span>ID: {examId}</span>
+                                        <span className="mx-2">•</span>
+                                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${theme === 'dark' ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-700'}`}>
+                                            {resultData.status}
+                                        </span>
+                                        <span className="mx-2">•</span>
+                                        <span>{new Date(resultData.resultDate).toLocaleDateString()}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div className="mt-6 border-t pt-6">
-                <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-semibold">Exam Results ({filteredQuestions.length} of {totalQuestions} questions)</h2>
-                    <div className="text-sm text-gray-700 space-x-4">
-                        <span>Scored: <strong className={`${scoredMarks >= 0 ? "text-green-600" : "text-red-600"}`}>{scoredMarks}</strong></span>
-                        <span>Out of: <strong>{totalMarks}</strong></span>
-                        <span>Percentage: <strong className={`${percentage >= 33 ? "text-green-600" : "text-red-600"}`}>{percentage}%</strong></span>
-                        <span>Rank: <strong>{resultData.rank}</strong></span>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {/* Stats Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div className={`${theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'} rounded-2xl border p-6 shadow-sm hover:shadow-md transition-shadow duration-200`}>
+                        <div className="flex items-center">
+                            <div className={`flex-shrink-0 w-10 h-10 rounded-lg ${theme === 'dark' ? 'bg-indigo-900' : 'bg-indigo-100'} flex items-center justify-center`}>
+                                <svg className={`w-5 h-5 ${theme === 'dark' ? 'text-indigo-400' : 'text-indigo-600'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                </svg>
+                            </div>
+                            <div className="ml-4">
+                                <p className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Score</p>
+                                <p className={`text-2xl font-bold ${scoredMarks >= 0 ? (theme === 'dark' ? 'text-green-400' : 'text-green-600') : (theme === 'dark' ? 'text-red-400' : 'text-red-600')}`}>
+                                    {scoredMarks}/{totalMarks}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
 
+                    <div className={`${theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'} rounded-2xl border p-6 shadow-sm hover:shadow-md transition-shadow duration-200`}>
+                        <div className="flex items-center">
+                            <div className={`flex-shrink-0 w-10 h-10 rounded-lg ${theme === 'dark' ? 'bg-blue-900' : 'bg-blue-100'} flex items-center justify-center`}>
+                                <svg className={`w-5 h-5 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <div className="ml-4">
+                                <p className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Percentage</p>
+                                <p className={`text-2xl font-bold ${percentage >= 33 ? (theme === 'dark' ? 'text-green-400' : 'text-green-600') : (theme === 'dark' ? 'text-red-400' : 'text-red-600')}`}>
+                                    {percentage}%
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className={`${theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'} rounded-2xl border p-6 shadow-sm hover:shadow-md transition-shadow duration-200`}>
+                        <div className="flex items-center">
+                            <div className={`flex-shrink-0 w-10 h-10 rounded-lg ${theme === 'dark' ? 'bg-purple-900' : 'bg-purple-100'} flex items-center justify-center`}>
+                                <svg className={`w-5 h-5 ${theme === 'dark' ? 'text-purple-400' : 'text-purple-600'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                </svg>
+                            </div>
+                            <div className="ml-4">
+                                <p className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Rank</p>
+                                <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                    #{resultData.rank}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className={`${theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'} rounded-2xl border p-6 shadow-sm hover:shadow-md transition-shadow duration-200`}>
+                        <div className="flex items-center">
+                            <div className={`flex-shrink-0 w-10 h-10 rounded-lg ${theme === 'dark' ? 'bg-orange-900' : 'bg-orange-100'} flex items-center justify-center`}>
+                                <svg className={`w-5 h-5 ${theme === 'dark' ? 'text-orange-400' : 'text-orange-600'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </div>
+                            <div className="ml-4">
+                                <p className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>Questions</p>
+                                <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                                    {totalQuestions}
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div className="flex space-x-2 mb-4">
-                    <select
-                        className="border rounded px-3 py-1 text-sm"
-                        value={filterType}
-                        onChange={(e) => setFilterType(e.target.value)}
-                    >
-                        <option value="all">All Types</option>
-                        <option value="mcq">Multiple Choice</option>
-                        <option value="msq">Multiple Select</option>
-                        <option value="fill">Fill in the Blank</option>
-                        <option value="tf">True/False</option>
-                        <option value="numerical">Numerical</option>
-                        <option value="match">Match</option>
-                        <option value="comprehension">Comprehension</option>
-                        <option value="code">Coding</option>    
-                    </select>
-
-                    <select
-                        className="border rounded px-3 py-1 text-sm"
-                        value={filterResult}
-                        onChange={(e) => setFilterResult(e.target.value)}
-                    >
-                        <option value="all">All Results</option>
-                        <option value="correct">Correct</option>
-                        <option value="incorrect">Incorrect</option>
-                        <option value="unanswered">Not Answered</option>
-                    </select>
-
-                    <input
-                        type="text"
-                        placeholder="Search questions..."
-                        className="border rounded px-3 py-1 text-sm"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
+                {/* Question Status Overview */}
+                <div className={`${theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'} rounded-2xl border p-6 mb-8 shadow-sm`}>
+                    <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'} mb-4`}>Question Status Overview</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div className="flex items-center">
+                            <div className={`w-4 h-4 rounded-full ${theme === 'dark' ? 'bg-green-500' : 'bg-green-500'} mr-3`}></div>
+                            <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Incorrect: {incorrectCount}</span>
+                        </div>
+                        <div className="flex items-center">
+                            <div className={`w-4 h-4 rounded-full ${theme === 'dark' ? 'bg-gray-500' : 'bg-gray-500'} mr-3`}></div>
+                            <span className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Unanswered: {unansweredCount}</span>
+                        </div>
+                    </div>
                 </div>
 
-                <div className="space-y-4">
-                    {filteredQuestions.length > 0 ? (
-                        filteredQuestions.map((q, index) => {
-                            const result = getQuestionResult(q, userAnswers);
+                {/* Filters and Search */}
+                <div className={`${theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'} rounded-2xl border p-6 mb-8 shadow-sm`}>
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg className={`h-5 w-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                </div>
+                                <input
+                                    type="text"
+                                    placeholder="Search questions, subjects, or chapters..."
+                                    className={`block w-full pl-10 pr-3 py-3 border ${theme === 'dark' ? 'border-gray-700 bg-gray-800 text-white placeholder-gray-400' : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'} rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                            </div>
+                        </div>
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            <div className="flex items-center gap-2">
+                                <label className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Type:</label>
+                                <select
+                                    className={`px-3 py-2 border ${theme === 'dark' ? 'border-gray-700 bg-gray-800 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
+                                    value={filterType}
+                                    onChange={(e) => setFilterType(e.target.value)}
+                                >
+                                    <option value="all">All Types</option>
+                                    <option value="mcq">Multiple Choice</option>
+                                    <option value="msq">Multiple Select</option>
+                                    <option value="fill">Fill in the Blank</option>
+                                    <option value="tf">True/False</option>
+                                    <option value="numerical">Numerical</option>
+                                    <option value="code">Coding</option>
+                                    <option value="match">Match the Following</option>
+                                    <option value="comprehension">Comprehension</option>
+                                </select>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <label className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Result:</label>
+                                <select
+                                    className={`px-3 py-2 border ${theme === 'dark' ? 'border-gray-700 bg-gray-800 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
+                                    value={filterResult}
+                                    onChange={(e) => setFilterResult(e.target.value)}
+                                >
+                                    <option value="all">All Results</option>
+                                    <option value="correct">Correct</option>
+                                    <option value="incorrect">Incorrect</option>
+                                    <option value="unanswered">Unanswered</option>
+                                </select>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <label className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>View:</label>
+                                <select
+                                    className={`px-3 py-2 border ${theme === 'dark' ? 'border-gray-700 bg-gray-800 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
+                                    value={viewMode}
+                                    onChange={(e) => setViewMode(e.target.value)}
+                                >
+                                    <option value="detailed">Detailed</option>
+                                    <option value="compact">Compact</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
+                {/* Questions List */}
+                <div className="space-y-6">
+                    {filteredQuestions.length === 0 ? (
+                        <div className={`${theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'} rounded-2xl border p-12 text-center shadow-sm`}>
+                            <svg className={`mx-auto h-16 w-16 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'} mb-4`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                            <h3 className={`text-lg font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-900'} mb-2`}>No questions found</h3>
+                            <p className={`${theme === 'dark' ? 'text-gray-500' : 'text-gray-600'}`}>
+                                Try adjusting your search terms or filters to find more questions.
+                            </p>
+                        </div>
+                    ) : (
+                        filteredQuestions.map((question, index) => {
+                            const result = getQuestionResult(question, userAnswers);
+                            const isExpanded = expandedQuestion === question.id;
+                            
                             return (
-                                <div key={q.id} className="border rounded-lg overflow-hidden bg-white">
-                                    <div
-                                        className="p-4 bg-gray-50 border-b flex justify-between items-center cursor-pointer"
-                                        onClick={() => toggleExpand(q.id)}
-                                    >
-                                        <div className="flex-1">
-                                            <div className="flex items-center space-x-2">
-                                                <span className="text-gray-500 font-medium">#{questions.findIndex(question => question.id === q.id) + 1}</span>
-                                                <span className="px-2 py-0.5 rounded text-xs uppercase font-medium bg-blue-100 text-blue-800">
-                                                    {getQuestionTypeLabel(q.type)}
-                                                </span>
-                                                <span className={`px-2 py-0.5 rounded text-xs uppercase font-medium ${getDifficultyBadgeClass(q.difficulty)}`}>
-                                                    {q.difficulty}
-                                                </span>
-                                                <span className={`px-2 py-0.5 rounded text-xs uppercase font-medium ${result.class}`}>
-                                                    {result.label}
-                                                </span>
-                                                <span className="text-gray-500 text-sm">
-                                                    {q.type === 'comprehension' && Array.isArray(q.sub_questions)
-                                                        ? `+${q.sub_questions.reduce((sum, sub) => sum + (Number(sub.positive_marks) || 0), 0)} marks`
-                                                        : `+${q.positive_marks} ${q.negative_marks > 0 ? `/ -${q.negative_marks}` : ''} ${q.positive_marks === 1 ? 'mark' : 'marks'}`
-                                                    }
-                                                </span>
-                                            </div>
-                                            <div className="mt-1 font-medium line-clamp-1">
-                                                {q.type === 'comprehension' ? 'Comprehension Question' : q.question_text}
-                                            </div>
-                                            {q.subject && (
-                                                <div className="mt-1 text-sm text-gray-500">
-                                                    {q.subject} {q.chapter ? `• ${q.chapter}` : ''}
+                                <div
+                                    key={question.id}
+                                    className={`${theme === 'dark' ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'} rounded-2xl border shadow-sm hover:shadow-md transition-all duration-200`}
+                                >
+                                    {/* Question Header */}
+                                    <div className="p-6">
+                                        <div className="flex items-start justify-between">
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center flex-wrap gap-2 mb-3">
+                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${result.class}`}>
+                                                        <span className="mr-1">{result.icon}</span>
+                                                        {result.label}
+                                                    </span>
+                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getDifficultyBadgeClass(question.difficulty)}`}>
+                                                        {question.difficulty?.charAt(0).toUpperCase() + question.difficulty?.slice(1)}
+                                                    </span>
+                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${theme === 'dark' ? 'bg-indigo-900 text-indigo-300 border-indigo-700' : 'bg-indigo-100 text-indigo-800 border-indigo-200'} border`}>
+                                                        {getQuestionTypeLabel(question.type)}
+                                                    </span>
+                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${theme === 'dark' ? 'bg-gray-800 text-gray-300 border-gray-600' : 'bg-gray-100 text-gray-700 border-gray-200'} border`}>
+                                                        +{question.positive_marks} / -{question.negative_marks}
+                                                    </span>
                                                 </div>
-                                            )}
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <button className="text-blue-600 hover:text-blue-800">
-                                                {expandedQuestion === q.id ? (
-                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                        <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                                                    </svg>
-                                                ) : (
-                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                        <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                                                    </svg>
+                                                <div className="flex items-center text-sm text-gray-500 mb-4">
+                                                    <span className="font-medium">Q{index + 1}.</span>
+                                                    {question.subject && (
+                                                        <>
+                                                            <span className="mx-2">•</span>
+                                                            <span>{question.subject}</span>
+                                                        </>
+                                                    )}
+                                                    {question.chapter && (
+                                                        <>
+                                                            <span className="mx-2">•</span>
+                                                            <span>{question.chapter}</span>
+                                                        </>
+                                                    )}
+                                                </div>
+                                                
+                                                {/* Question Content Preview */}
+                                                {viewMode === 'detailed' && (
+                                                    <div className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} mb-4`}>
+                                                        {question.type === 'comprehension' && question.passage && (
+                                                            <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'} mb-4`}>
+                                                                <h4 className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} mb-2`}>Passage:</h4>
+                                                                <div className="prose prose-sm max-w-none">
+                                                                    {question.passage.length > 200 && !isExpanded
+                                                                        ? `${question.passage.substring(0, 200)}...`
+                                                                        : question.passage
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        {question.question_text && (
+                                                            <div className="prose prose-sm max-w-none">
+                                                                {question.question_text.length > 150 && !isExpanded
+                                                                    ? `${question.question_text.substring(0, 150)}...`
+                                                                    : question.question_text
+                                                                }
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 )}
+                                                
+                                                {viewMode === 'compact' && (
+                                                    <div className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} text-sm`}>
+                                                        {question.type === 'comprehension' ? 'Comprehension passage with multiple questions' : 
+                                                         question.question_text?.substring(0, 100) + (question.question_text?.length > 100 ? '...' : '')}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            
+                                            {/* Expand/Collapse Button */}
+                                            <button
+                                                onClick={() => toggleExpand(question.id)}
+                                                className={`ml-4 p-2 rounded-lg ${theme === 'dark' ? 'hover:bg-gray-800 text-gray-400 hover:text-gray-300' : 'hover:bg-gray-100 text-gray-500 hover:text-gray-700'} transition-colors duration-200`}
+                                            >
+                                                <svg
+                                                    className={`w-5 h-5 transform transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke="currentColor"
+                                                >
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                                </svg>
                                             </button>
                                         </div>
                                     </div>
 
-                                    {expandedQuestion === q.id && (
-                                        <div className="p-4">
-                                            {/* Show passage for comprehension questions */}
-                                            {q.type === 'comprehension' && q.passage && (
-                                                <div className="mb-4">
-                                                    <h3 className="font-medium text-gray-700 mb-2">Passage:</h3>
-                                                    <div className="pl-4 border-l-4 border-blue-200 py-2 bg-blue-50 text-gray-700">
-                                                        {q.passage}
+                                    {/* Expanded Content */}
+                                    {isExpanded && (
+                                        <div className={`border-t ${theme === 'dark' ? 'border-gray-800' : 'border-gray-200'} p-6`}>
+                                            {/* Question Details */}
+                                            {question.type === 'comprehension' && question.passage && (
+                                                <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'} mb-6`}>
+                                                    <h4 className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} mb-2`}>Passage:</h4>
+                                                    <div className={`prose prose-sm max-w-none ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                                                        {question.passage}
+                                                    </div>
+                                                </div>
+                                            )}
+                                            
+                                            {question.question_text && (
+                                                <div className="mb-6">
+                                                    <h4 className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} mb-2`}>Question:</h4>
+                                                    <div className={`prose prose-sm max-w-none ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                                                        {question.question_text}
                                                     </div>
                                                 </div>
                                             )}
 
-                                            {/* Show regular question */}
-                                            {q.type !== 'comprehension' && (
-                                                <>
-                                                    <div className="mb-4">
-                                                        <h3 className="font-medium text-gray-700 mb-2">Question:</h3>
-                                                        {
-                                                            q.type === 'match' && q.left_items && q.right_items ? (
-                                                                <div className="pl-2 border-l-4 border-gray-200 py-1">
-
-                                                                    <div className="font-medium text-gray-800 mb-2">Match the Following:</div>
-                                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                                        <div>
-                                                                            <h4 className="font-medium text-gray-700 mb-1">Left Items:</h4>
-                                                                            <ul className="list-disc pl-5">
-
-                                                                                {q.left_items.map((item, idx) => (
-                                                                                    <li key={idx} className="text-gray-600">{item}</li>
-                                                                                ))}
-                                                                            </ul>
-                                                                        </div>
-                                                                        <div>
-                                                                            <h4 className="font-medium text-gray-700 mb-1">Right Items:</h4>
-                                                                            <ul className="list-disc pl-5">
-                                                                                {q.right_items.map((item, idx) => (
-                                                                                    <li key={idx} className="text-gray-600">{item}</li>
-                                                                                ))}
-                                                                            </ul>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            ) :
-                                                                (
-                                                                    <div className="pl-2 border-l-4 border-gray-200 py-1">
-                                                                        {q.question_text}
-                                                                    </div>
-                                                                )
-                                                        }
-
-                                                    </div>
-
-                                                    {/* Show user's answer */}
-                                                    <div className="mb-4">
-                                                        <h3 className="font-medium text-gray-700 mb-2">Your Answer:</h3>
-                                                        <div className={`pl-2 border-l-4 py-1 ${result.status === 'correct' ? 'border-green-300 bg-green-50' : result.status === 'incorrect' ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-gray-50'}`}>
-                                                            {userAnswers[q.id] !== undefined && userAnswers[q.id] !== null && userAnswers[q.id] !== '' ? (
-                                                                <>
-                                                                    {q.type === 'mcq' && q.options ? q.options[userAnswers[q.id]] : ''}
-                                                                    {q.type === 'msq' && q.options && Array.isArray(userAnswers[q.id]) ?
-                                                                        userAnswers[q.id].map(idx => q.options[idx]).join(', ') : ''}
-                                                                    {q.type === 'tf' ? (userAnswers[q.id] ? 'True' : 'False') : ''}
-                                                                    {(q.type === 'fill' || q.type === 'numerical') ? userAnswers[q.id] : ''}
-                                                                    {q.type === 'match' && userAnswers[q.id] && Object.entries(userAnswers[q.id]).length > 0 ? (
-                                                                        <div className="space-y-1">
-                                                                            {Object.entries(userAnswers[q.id]).map(([key, value]) => (
-                                                                                <div key={key} className="flex justify-between">
-                                                                                    <span className="text-gray-700">{key}</span>
-                                                                                    <span className="text-gray-700">{value}</span>
-                                                                                </div>
-                                                                            ))}
-                                                                        </div>
-                                                                    ) : ''}
-
-                                                                </>
-                                                            ) : (
-                                                                <span className="text-gray-500 italic">Not answered</span>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                </>
-                                            )}
-
-                                            {/* Show comprehension sub-questions */}
-                                            {q.type === 'comprehension' && Array.isArray(q.sub_questions) && (
-                                                <div className="mb-4">
-                                                    <h3 className="font-medium text-gray-700 mb-3">Questions:</h3>
-                                                    {q.sub_questions.map((sub, idx) => {
-                                                        const subResult = getQuestionResult(sub, userAnswers);
-                                                        const subUserAnswer = userAnswers[sub.id];
-
+                                            {/* Sub-questions for comprehension */}
+                                            {question.type === 'comprehension' && Array.isArray(question.sub_questions) && (
+                                                <div className="space-y-4">
+                                                    {question.sub_questions.map((subQuestion, subIndex) => {
+                                                        const subResult = getQuestionResult(subQuestion, userAnswers);
+                                                        const userAnswer = userAnswers[subQuestion.id];
+                                                        
                                                         return (
-                                                            <div key={sub.id} className="bg-gray-50 border rounded-lg p-4 mb-3">
-                                                                <div className="flex justify-between items-center mb-2">
-                                                                    <div className="font-medium text-gray-800">
-                                                                        Question {idx + 1}: {sub.question_text}
-                                                                    </div>
-                                                                    <div className="flex items-center space-x-2">
-                                                                        <span className={`text-xs px-2 py-1 rounded ${subResult.class}`}>
+                                                            <div key={subQuestion.id} className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'} border-l-4 ${subResult.status === 'correct' ? 'border-green-500' : subResult.status === 'incorrect' ? 'border-red-500' : 'border-gray-400'}`}>
+                                                                <div className="flex items-center justify-between mb-3">
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${subResult.class}`}>
+                                                                            <span className="mr-1">{subResult.icon}</span>
                                                                             {subResult.label}
                                                                         </span>
-                                                                        <span className="text-xs text-gray-500">
-                                                                            +{sub.positive_marks} {sub.negative_marks > 0 ? `/ -${sub.negative_marks}` : ''} marks
+                                                                        <span className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                                                                            Q{index + 1}.{subIndex + 1}
+                                                                        </span>
+                                                                        <span className={`text-xs ${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'}`}>
+                                                                            ({getQuestionTypeLabel(subQuestion.type)})
                                                                         </span>
                                                                     </div>
+                                                                    <span className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                                                                        +{subQuestion.positive_marks} / -{subQuestion.negative_marks}
+                                                                    </span>
+                                                                </div>
+                                                                
+                                                                <div className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} mb-3`}>
+                                                                    {subQuestion.question_text}
                                                                 </div>
 
-                                                                {/* Show options for MCQ/MSQ */}
-                                                                {(sub.type === 'mcq' || sub.type === 'msq') && sub.options && sub.options.length > 0 && (
-                                                                    <div className="mb-3">
-                                                                        <div className="space-y-2">
-                                                                            {sub.options.map((option, i) => {
-                                                                                const isCorrect = sub.type === 'mcq' ? sub.correct_option === i : sub.correct_options?.includes(i);
-                                                                                const isUserAnswer = sub.type === 'mcq' ? subUserAnswer === i : Array.isArray(subUserAnswer) && subUserAnswer.includes(i);
-
-                                                                                return (
-                                                                                    <div
-                                                                                        key={i}
-                                                                                        className={`flex items-center p-2 rounded text-sm ${isCorrect ? 'bg-green-100 border border-green-200' :
-                                                                                            (isUserAnswer && !isCorrect ? 'bg-red-100 border border-red-200' : 'bg-white')
-                                                                                            }`}
-                                                                                    >
-                                                                                        <div className="w-5 h-5 flex items-center justify-center rounded-full bg-gray-200 text-gray-700 mr-2 flex-shrink-0 text-xs">
-                                                                                            {String.fromCharCode(65 + i)}
-                                                                                        </div>
-                                                                                        <div className="flex-1">{option}</div>
-                                                                                        {isCorrect && (
-                                                                                            <div className="ml-auto text-green-600 font-medium text-xs">✓ Correct</div>
-                                                                                        )}
-                                                                                        {isUserAnswer && !isCorrect && (
-                                                                                            <div className="ml-auto text-red-600 font-medium text-xs">✗ Your Choice</div>
-                                                                                        )}
-                                                                                    </div>
-                                                                                );
-                                                                            })}
-                                                                        </div>
-                                                                    </div>
-                                                                )}
-
-                                                                {/* Show correct answer for other question types */}
-                                                                {sub.type === 'tf' && (
-                                                                    <div className="mb-2">
-                                                                        <div className="text-sm text-gray-600">
-                                                                            Your Answer: <span className={`${subResult.status === 'correct' ? 'text-green-600' : subResult.status === 'incorrect' ? 'text-red-600' : 'text-gray-600'}`}>
-                                                                                {subUserAnswer !== undefined && subUserAnswer !== null ? (subUserAnswer ? 'True' : 'False') : 'Not Answered'}
-                                                                            </span>
-                                                                        </div>
-                                                                        <div className="text-sm text-gray-600">
-                                                                            Correct Answer: <span className="text-green-600">{sub.is_true ? 'True' : 'False'}</span>
-                                                                        </div>
-                                                                    </div>
-                                                                )}
-
-                                                                {(sub.type === 'fill' || sub.type === 'numerical') && (
-                                                                    <div className="mb-2">
-                                                                        <div className="text-sm text-gray-600">
-                                                                            Your Answer: <span className={`${subResult.status === 'correct' ? 'text-green-600' : subResult.status === 'incorrect' ? 'text-red-600' : 'text-gray-600'}`}>
-                                                                                {subUserAnswer !== undefined && subUserAnswer !== null && subUserAnswer !== '' ? subUserAnswer : 'Not Answered'}
-                                                                            </span>
-                                                                        </div>
-                                                                        <div className="text-sm text-gray-600">
-                                                                            Correct Answer: <span className="text-green-600">{sub.correct_answer}</span>
-                                                                        </div>
-                                                                    </div>
-                                                                )}
-
-                                                                {sub.type === 'match' && (
-                                                                    <div className="mb-2">
-                                                                        <div className="text-sm text-gray-600">
-                                                                            Your Matches:
-                                                                            <span className={`${subResult.status === 'correct' ? 'text-green-600' : subResult.status === 'incorrect' ? 'text-red-600' : 'text-gray-600'}`}>
-                                                                                {subUserAnswer && Object.entries(subUserAnswer).length > 0 ? (
-                                                                                    <div className="mt-1">
-                                                                                        {Object.entries(subUserAnswer).map(([key, value]) => (
-                                                                                            <div key={key} className="flex justify-between">
-                                                                                                <span className="text-gray-700">{key}</span>
-                                                                                                <span className="text-gray-600">{value}</span>
-                                                                                            </div>
-                                                                                        ))}
-                                                                                    </div>
-                                                                                ) : (
-                                                                                    <span className="italic">Not Answered</span>
-                                                                                )}
-                                                                            </span>
-                                                                        </div>
-                                                                        <div className="text-sm text-gray-600">
-                                                                            Correct Matches:
-                                                                            <span className="text-green-600">
-                                                                                {sub.correct_pairs && Object.entries(sub.correct_pairs).length > 0 ? (
-                                                                                    <div className="mt-1">
-                                                                                        {Object.entries(sub.correct_pairs).map(([key, value]) => (
-                                                                                            <div key={key} className="flex justify-between">
-                                                                                                <span className="text-gray-700">{key}</span>
-                                                                                                <span className="text-gray-600">{value}</span>
-                                                                                            </div>
-                                                                                        ))}
-                                                                                    </div>
-                                                                                ) : (
-                                                                                    <span className="italic">No correct matches</span>
-                                                                                )}
-                                                                            </span>
-                                                                        </div>
-                                                                    </div>
-                                                                )}
-
-
-
-                                                                {/* Show explanation */}
-                                                                {sub.explanation && (
-                                                                    <div className="mt-2">
-                                                                        <div className="text-xs text-gray-600 bg-blue-50 p-2 rounded border-l-4 border-blue-200">
-                                                                            <strong>Explanation:</strong> {sub.explanation}
-                                                                        </div>
-                                                                    </div>
-                                                                )}
+                                                                {/* Sub-question options and answers */}
+                                                                <QuestionContent 
+                                                                    question={subQuestion} 
+                                                                    userAnswer={userAnswer}
+                                                                    result={subResult}
+                                                                    theme={theme}
+                                                                />
                                                             </div>
                                                         );
                                                     })}
                                                 </div>
                                             )}
 
-                                            {/* Show options for regular MCQ and MSQ */}
-                                            {q.type !== 'comprehension' && (q.type === 'mcq' || q.type === 'msq') && q.options && q.options.length > 0 && (
-                                                <div className="mb-4">
-                                                    <h3 className="font-medium text-gray-700 mb-2">Options:</h3>
-                                                    <div className="space-y-2 pl-2">
-                                                        {q.options.map((option, i) => {
-                                                            const isCorrect = q.type === 'mcq' ? q.correct_option === i : q.correct_options?.includes(i);
-                                                            const isUserAnswer = q.type === 'mcq' ? userAnswers[q.id] === i : Array.isArray(userAnswers[q.id]) && userAnswers[q.id].includes(i);
-
-                                                            return (
-                                                                <div
-                                                                    key={i}
-                                                                    className={`flex items-center p-2 rounded ${isCorrect ? 'bg-green-50 border border-green-200' :
-                                                                        (isUserAnswer && !isCorrect ? 'bg-red-50 border border-red-200' : '')
-                                                                        }`}
-                                                                >
-                                                                    <div className="w-6 h-6 flex items-center justify-center rounded-full bg-gray-200 text-gray-700 mr-3 flex-shrink-0">
-                                                                        {String.fromCharCode(65 + i)}
-                                                                    </div>
-                                                                    <div className="flex-1">{option}</div>
-                                                                    {isCorrect && (
-                                                                        <div className="ml-auto text-green-600 font-medium text-sm">✓ Correct</div>
-                                                                    )}
-                                                                    {isUserAnswer && !isCorrect && (
-                                                                        <div className="ml-auto text-red-600 font-medium text-sm">✗ Your Choice</div>
-                                                                    )}
-                                                                </div>
-                                                            );
-                                                        })}
-                                                    </div>
-                                                </div>
+                                            {/* Main question content (for non-comprehension) */}
+                                            {question.type !== 'comprehension' && (
+                                                <QuestionContent 
+                                                    question={question} 
+                                                    userAnswer={userAnswers[question.id]}
+                                                    result={result}
+                                                    theme={theme}
+                                                />
                                             )}
 
-                                            {/* Show correct answer for fill-in-the-blank and numerical */}
-                                            {q.type !== 'comprehension' && (q.type === 'fill' || q.type === 'numerical') && (
-                                                <div className="mb-4">
-                                                    <h3 className="font-medium text-gray-700 mb-2">Correct Answer:</h3>
-                                                    <div className="pl-2 border-l-4 border-green-300 py-1 bg-green-50">
-                                                        {q.correct_answer}
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            {q.type !== 'comprehension' && q.type === 'match' && (
-                                                <div className="mb-4">
-                                                    <h3 className="font-medium text-gray-700 mb-2">Correct Matches:</h3>
-                                                    <div className="pl-2 border-l-4 border-green-300 py-1 bg-green-50">
-                                                        {q.correct_pairs && Object.entries(q.correct_pairs).map(([key, value]) => (
-                                                            <div key={key} className="flex justify-between">
-                                                                <span className="text-gray-700">{key}</span>
-                                                                <span className="text-gray-600">{value}</span>
-
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            )}
-
-
-                                            {/* Show true/false answer */}
-                                            {q.type !== 'comprehension' && q.type === 'tf' && (
-                                                <div className="mb-4">
-                                                    <h3 className="font-medium text-gray-700 mb-2">Correct Answer:</h3>
-                                                    <div className="pl-2 border-l-4 border-green-300 py-1 bg-green-50">
-                                                        {q.is_true ? 'True' : 'False'}
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            {/* Show explanation if available for regular questions */}
-                                            {q.type !== 'comprehension' && q.explanation && (
-                                                <div className="mb-4">
-                                                    <h3 className="font-medium text-gray-700 mb-2">Explanation:</h3>
-                                                    <div className="pl-2 border-l-4 border-blue-200 py-1 text-gray-600 bg-blue-50">
-                                                        {q.explanation}
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            {/* Show explanation for comprehension questions */}
-                                            {q.type === 'comprehension' && q.explanation && (
-                                                <div className="mb-4">
-                                                    <h3 className="font-medium text-gray-700 mb-2">Overall Explanation:</h3>
-                                                    <div className="pl-2 border-l-4 border-blue-200 py-1 text-gray-600 bg-blue-50">
-                                                        {q.explanation}
+                                            {/* Explanation */}
+                                            {question.explanation && (
+                                                <div className={`mt-6 p-4 rounded-lg ${theme === 'dark' ? 'bg-blue-900 bg-opacity-20 border border-blue-800' : 'bg-blue-50 border border-blue-200'}`}>
+                                                    <h4 className={`text-sm font-medium ${theme === 'dark' ? 'text-blue-300' : 'text-blue-800'} mb-2 flex items-center`}>
+                                                        <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                        </svg>
+                                                        Explanation
+                                                    </h4>
+                                                    <div className={`prose prose-sm max-w-none ${theme === 'dark' ? 'text-blue-200' : 'text-blue-800'}`}>
+                                                        {question.explanation}
                                                     </div>
                                                 </div>
                                             )}
@@ -757,11 +757,109 @@ const ResultPage = () => {
                                 </div>
                             );
                         })
-                    ) : (
-                        <div className="bg-gray-100 p-6 rounded text-gray-500 text-center">
-                            No matching questions found. Try adjusting your search or filters.
-                        </div>
                     )}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// Helper component for rendering question content
+const QuestionContent = ({ question, userAnswer, result, theme }) => {
+    const renderAnswer = (answer) => {
+        if (answer === null || answer === undefined) return <span className={`${theme === 'dark' ? 'text-gray-500' : 'text-gray-500'} italic`}>Not answered</span>;
+        if (typeof answer === 'boolean') return answer ? 'True' : 'False';
+        if (Array.isArray(answer)) return answer.join(', ');
+        if (typeof answer === 'object') return JSON.stringify(answer);
+        return answer.toString();
+    };
+
+    return (
+        <div className="space-y-4">
+            {/* Options for MCQ/MSQ */}
+            {(question.type === 'mcq' || question.type === 'msq') && question.options && (
+                <div className="space-y-2">
+                    <h5 className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Options:</h5>
+                    {question.options.map((option, optIndex) => {
+                        const optionLetter = String.fromCharCode(65 + optIndex);
+                        const isCorrect = question.type === 'mcq' 
+                            ? question.correct_option === optionLetter
+                            : question.correct_options?.includes(optionLetter);
+                        const isSelected = question.type === 'mcq'
+                            ? userAnswer === optionLetter
+                            : userAnswer?.includes(optionLetter);
+                        
+                        return (
+                            <div
+                                key={optIndex}
+                                className={`p-3 rounded-lg border ${
+                                    isCorrect 
+                                        ? theme === 'dark' ? 'bg-green-900 border-green-700 text-green-200' : 'bg-green-50 border-green-200 text-green-800'
+                                        : isSelected 
+                                        ? theme === 'dark' ? 'bg-red-900 border-red-700 text-red-200' : 'bg-red-50 border-red-200 text-red-800'
+                                        : theme === 'dark' ? 'bg-gray-800 border-gray-700 text-gray-300' : 'bg-gray-50 border-gray-200 text-gray-700'
+                                }`}
+                            >
+                                <div className="flex items-center">
+                                    <span className="font-medium mr-2">{optionLetter}.</span>
+                                    <span className="flex-1">{option}</span>
+                                    {isCorrect && <span className="text-green-500 ml-2">✓</span>}
+                                    {isSelected && !isCorrect && <span className="text-red-500 ml-2">✗</span>}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
+
+            {/* Match the Following */}
+            {question.type === 'match' && question.left_items && question.right_items && (
+                <div className="space-y-4">
+                    <h5 className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Items to Match:</h5>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <h6 className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} mb-2`}>Left Items:</h6>
+                            <div className="space-y-2">
+                                {question.left_items.map((item, index) => (
+                                    <div key={index} className={`p-2 rounded ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'}`}>
+                                        <span className="font-medium">{item.id}.</span> {item.text}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        <div>
+                            <h6 className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} mb-2`}>Right Items:</h6>
+                            <div className="space-y-2">
+                                {question.right_items.map((item, index) => (
+                                    <div key={index} className={`p-2 rounded ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'}`}>
+                                        <span className="font-medium">{item.id}.</span> {item.text}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Answer Summary */}
+            <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'}`}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <h6 className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} mb-1`}>Your Answer:</h6>
+                        <div className={`text-sm ${userAnswer ? (theme === 'dark' ? 'text-gray-300' : 'text-gray-700') : (theme === 'dark' ? 'text-gray-500' : 'text-gray-500')}`}>
+                            {renderAnswer(userAnswer)}
+                        </div>
+                    </div>
+                    <div>
+                        <h6 className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} mb-1`}>Correct Answer:</h6>
+                        <div className={`text-sm ${theme === 'dark' ? 'text-green-300' : 'text-green-700'}`}>
+                            {question.type === 'mcq' && renderAnswer(question.correct_option)}
+                            {question.type === 'msq' && renderAnswer(question.correct_options)}
+                            {question.type === 'tf' && renderAnswer(question.is_true)}
+                            {(question.type === 'fill' || question.type === 'numerical') && renderAnswer(question.correct_answer)}
+                            {question.type === 'match' && renderAnswer(question.correct_pairs)}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

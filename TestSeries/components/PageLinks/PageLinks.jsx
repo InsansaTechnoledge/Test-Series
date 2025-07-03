@@ -59,6 +59,9 @@ import AboutPage from '../../features/beforeAuth/pages/AboutPage';
 import ContactPage from "../../features/beforeAuth/pages/ContactPage";
 import ProctorSplash from '../../features/afterAuth/components/StudentSide/Landing/ProctorSplash';
 import ProfilePage from '../../features/UserProfile/ProfilePage';
+import ContestRegistrationPage from '../../features/afterAuth/components/StudentSide/Coding-Contests/Registration/ContestRegistrationPage';
+import RegisteredAndScheduledContestPage from '../../features/afterAuth/components/StudentSide/Coding-Contests/RegisteredAndScheduled/RegisteredAndScheduledContestPage';
+import LiveContestPage from '../../features/afterAuth/components/StudentSide/Coding-Contests/LiveContest/LiveContestPage';
 
 // Error Boundary Component
 class ElectronErrorBoundary extends React.Component {
@@ -335,6 +338,9 @@ const PageLinks = () => {
                 <Route path='contest/:contestId' element={<ContestInstructionWindow />} />
                 <Route path='code/:contestId' element={<CodingPlatform />} />
                 <Route path='analysis' element={<Analysis />} />
+                <Route path='register-contest' element={<ContestRegistrationPage/>}/>
+                <Route path='registered-contest' element={<RegisteredAndScheduledContestPage/>}/>
+                <Route path='live-contest' element={<LiveContestPage/>}/>
                 <Route path='*' element={<div>Invalid path</div>} />
               </Route>
             </Route>
