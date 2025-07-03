@@ -7,6 +7,8 @@ import { cards } from '../data/DisplayComponentData';
 import ExamStatsDashboard from '../components/StudentSide/Landing/ExamStatsDashboard';
 import HeadingUtil from '../utility/HeadingUtil';
 import BatchInfoCard from '../components/StudentSide/Landing/BatchInfoCard';
+import ContestRegistrationPage from '../components/StudentSide/Coding-Contests/Registration/ContestRegistrationPage';
+import RegistrationComponent from '../components/StudentSide/Coding-Contests/Registration/components/RegistrationComponent';
 // import ExamComponent from '../components/StudentSide/Landing/ExamComponent';
 
 const StudentLanding = () => {
@@ -30,9 +32,15 @@ const StudentLanding = () => {
         {/* <ExamComponent /> */}
       </div>
 
-      {/* Exam Links section */}
+      <div className="m-4 md:m-10 rounded-4xl overflow-hidden shadow-md flex flex-col lg:flex-row">
+        <RegistrationComponent/>
+        <RegistrationComponent/>
+        <RegistrationComponent/>
 
-      <div className="my-12">
+      </div>
+
+
+      {/* <div className="my-12">
         <HeadingUtil
           heading="Quick Link's to Exams"
           description="View and access all your examination resources"
@@ -40,11 +48,11 @@ const StudentLanding = () => {
         <ExamLinksComponent Data={cards} />
       </div>
 
-      {/* Faculty and Stats section */}
       
+
       <FacultySection />
-      {/* <SubjectCards /> */}
-      <ExamStatsDashboard />
+     
+      <ExamStatsDashboard /> */}
     </>
   );
 };
