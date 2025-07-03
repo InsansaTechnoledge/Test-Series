@@ -11,21 +11,49 @@ import ContestRegistrationPage from '../components/StudentSide/Coding-Contests/R
 import RegistrationComponent from '../components/StudentSide/Coding-Contests/Registration/components/RegistrationComponent';
 // import ExamComponent from '../components/StudentSide/Landing/ExamComponent';
 
+// import Certificates from '../components/StudentSide/Landing/Certificates'
+// import LeaderBoardCard from '../components/StudentSide/Landing/LeaderBoardCard'
+
+
+// import React, { useEffect, useState } from 'react'
+// // import ExamAnalysis from '../components/StudentSide/'
+
+// import useStudentExamResults from '../../../features/afterAuth/components/StudentSide/CompletedExams/useExamResults';
+// import { useUser } from '../../../contexts/currentUserContext';
+// // import WrongQuestionAnalysis from './Components/WrongQuestion/WrongQuestionAnalysis';
+// // import LeaderBoard from '../';
+// import { useExamManagement } from '../../../hooks/UseExam';
+// import { getAllStudentData } from '../../../utils/services/resultPage';
+
+
+
 const StudentLanding = () => {
-  return (
-    <>
-      {/* Student and profile section */}
+    return (
+        <>
 
-      <div className="m-4 md:m-10 rounded-4xl overflow-hidden shadow-md flex flex-col lg:flex-row">
-        <div className="w-full lg:w-1/3 flex-shrink-0">
-          <StudentDetails />
-        </div>
-        <div className="w-full lg:w-2/3 flex-grow">
-          <StudentHero />
-        </div>
-      </div>
 
-      {/* Batch Info section */}
+
+
+
+
+            <div>
+                {/* /student and profiles */}
+                <div className='m-4 md:m-10 rounded-4xl overflow-hidden shadow-md flex flex-col lg:flex-row'>
+
+                    <div className='w-full lg:w-1/3 flex-shrink-0'>
+                        <StudentDetails />
+                    </div>
+
+
+                    <div className='w-full lg:w-2/3 flex-grow'>
+                        <StudentHero />
+                    </div>
+                </div>
+                <div className='m-4 md:m-10 rounded-4xl overflow-hidden shadow-md flex flex-col lg:flex-row'>
+
+<BatchInfoCard/>
+<ExamComponent/>
+                </div>
 
       <div className="m-4 md:m-10 rounded-4xl overflow-hidden shadow-md flex flex-col lg:flex-row">
         <BatchInfoCard />
