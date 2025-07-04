@@ -7,50 +7,73 @@ import {
 } from 'lucide-react';
 import { useUser } from '../../../../../contexts/currentUserContext';
 import { useCachedUser } from '../../../../../hooks/useCachedUser';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useCachedBatches } from '../../../../../hooks/useCachedBatches';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from "../../../../../hooks/useTheme"
+
 const BatchInfoCard = () => {
   const { user } = useUser();
-  const [student, setStudent] = useState(user);
   const { batchMap } = useCachedBatches();
-  const studentBatch = batchMap[user?.batch?.currentBatch];
-  const navigate = useNavigate();
-  const { theme } = useTheme()
-  useEffect(() => {
-    if (user) {
-      setStudent(user);
-    }
-  }, [user])
   const { users } = useCachedUser();
-  const [facultyData, setFacultyData] = useState([]);
+  const navigate = useNavigate();
+  const { theme } = useTheme();
 
-  useEffect(() => {
-    if (users) {
-      setFacultyData(users);
-    }
-  }, [users]);
+  // Use useMemo to derive studentBatch to prevent unnecessary re-renders
+  const studentBatch = useMemo(() => {
+    return batchMap?.[user?.batch?.currentBatch];
+  }, [batchMap, user?.batch?.currentBatch]);
+
+  // Simple loading state based on whether we have the basic data we need
+  const isLoading = !user || !batchMap;
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className={`p-6 transition-all duration-500 `}>
+        <div className={`max-w-4xl rounded-3xl overflow-hidden shadow-xl ${theme === 'light'
+            ? 'bg-white border border-gray-200'
+            : 'bg-gray-800 border border-gray-700'
+          }`}>
+          <div className="p-8 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className={`text-lg ${theme === 'light' ? 'text-gray-600' : 'text-gray-300'}`}>
+              Loading batch information...
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show message if no batch data is available
+  if (!studentBatch) {
+    return (
+      <div className={`p-6 transition-all duration-500 `}>
+        <div className={`max-w-4xl rounded-3xl overflow-hidden shadow-xl ${theme === 'light'
+            ? 'bg-white border border-gray-200'
+            : 'bg-gray-800 border border-gray-700'
+          }`}>
+          <div className="p-8 text-center">
+            <h2 className={`text-xl font-semibold mb-2 ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+              No Batch Information Available
+            </h2>
+            <p className={`text-gray-600 ${theme === 'light' ? 'text-gray-600' : 'text-gray-300'}`}>
+              You don't seem to be enrolled in any batch currently.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-
-
     <div className={`p-6 transition-all duration-500 `}>
-
-
-
       {/* Main Card */}
       <div className={`max-w-4xl  rounded-3xl overflow-hidden shadow-xl transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 ${theme === 'light'
           ? 'bg-white border border-gray-200'
           : 'bg-gray-800 border border-gray-700'
         }`}>
-
-
-
-
-
-
-
-
 
         <div className={`p-8 ${theme === 'light'
             ? 'bg-white'
@@ -61,13 +84,13 @@ const BatchInfoCard = () => {
           <div className="mb-8 text-center sm:text-left">
             <h1 className={`text-3xl sm:text-4xl font-bold mb-2 ${theme === 'light' ? 'text-gray-900' : 'text-white'
               }`}>
-              {studentBatch?.name}
+              {studentBatch?.name || 'Batch Name'}
             </h1>
             <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold ${theme === 'light'
                 ? 'bg-blue-50 text-blue-700 border border-blue-200'
                 : 'bg-blue-900/30 text-blue-300 border border-blue-700'
               }`}>
-              Academic Year: {studentBatch?.year}
+              Academic Year: {studentBatch?.year || 'N/A'}
             </div>
           </div>
 
@@ -79,7 +102,7 @@ const BatchInfoCard = () => {
             </h3>
             <div className="space-y-3">
               <div className="flex flex-wrap gap-2">
-                {studentBatch?.subjects.slice(0, 4).map((subject, idx) => (
+                {studentBatch?.subjects?.slice(0, 4).map((subject, idx) => (
                   <span
                     key={idx}
                     className={`text-sm font-medium px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105 ${theme === 'light'
@@ -89,21 +112,21 @@ const BatchInfoCard = () => {
                   >
                     {subject}
                   </span>
-                ))}
-                {studentBatch?.subjects.length > 4 && (
+                )) || []}
+                {studentBatch?.subjects?.length > 4 && (
                   <button
                     className={`text-sm font-medium px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105 ${theme === 'light'
                         ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                       }`}
                   >
-                    +{studentBatch?.subjects.length - 4} more
+                    +{studentBatch?.subjects?.length - 4} more
                   </button>
                 )}
               </div>
-              {studentBatch?.subjects.length > 4 && (
+              {studentBatch?.subjects?.length > 4 && (
                 <div className="flex flex-wrap gap-2 pt-2 border-t border-dashed border-gray-300">
-                  {studentBatch?.subjects.slice(4).map((subject, idx) => (
+                  {studentBatch?.subjects?.slice(4).map((subject, idx) => (
                     <span
                       key={idx + 4}
                       className={`text-sm font-medium px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105 ${theme === 'light'
@@ -159,64 +182,44 @@ const BatchInfoCard = () => {
             Batch's Faculty
           </h3>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {facultyData.map((faculty, index) => (
-              <div
-                key={index}
-                className={`flex items-start gap-4 p-5 rounded-2xl transition-all duration-300 hover:scale-[1.02] ${theme === 'light'
-                    ? 'bg-gray-50 hover:bg-gray-100 border border-gray-200'
-                    : 'bg-gray-700 hover:bg-gray-600 border border-gray-600'
-                  }`}
-              >
-                <img
-                  src={faculty.profilePhoto}
-                  alt={faculty.name}
-                  className="w-16 h-16 rounded-xl object-cover shadow-md"
-                />
-                <div className="flex-1 min-w-0">
-                  <h4 className={`text-lg font-semibold truncate ${theme === 'light' ? 'text-gray-900' : 'text-white'
-                    }`}>
-                    {faculty.name}
-                  </h4>
-                  <p className={`text-sm mt-1 truncate ${theme === 'light' ? 'text-gray-900' : 'text-gray-100'
-                    }`}>
-                    {faculty.email}
-                  </p>
+            {users?.length > 0 ? (
+              users.map((faculty, index) => (
+                <div
+                  key={index}
+                  className={`flex items-start gap-4 p-5 rounded-2xl transition-all duration-300 hover:scale-[1.02] ${theme === 'light'
+                      ? 'bg-gray-50 hover:bg-gray-100 border border-gray-200'
+                      : 'bg-gray-700 hover:bg-gray-600 border border-gray-600'
+                    }`}
+                >
+                  <img
+                    src={faculty.profilePhoto}
+                    alt={faculty.name}
+                    className="w-16 h-16 rounded-xl object-cover shadow-md"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <h4 className={`text-lg font-semibold truncate ${theme === 'light' ? 'text-gray-900' : 'text-white'
+                      }`}>
+                      {faculty.name}
+                    </h4>
+                    <p className={`text-sm mt-1 truncate ${theme === 'light' ? 'text-gray-900' : 'text-gray-100'
+                      }`}>
+                      {faculty.email}
+                    </p>
+                  </div>
                 </div>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-8">
+                <p className={`text-lg ${theme === 'light' ? 'text-gray-600' : 'text-gray-300'}`}>
+                  No faculty information available
+                </p>
               </div>
-            ))}
-
-
-
+            )}
           </div>
         </div>
       </div>
     </div>
-
-
   )
 }
 
