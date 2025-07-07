@@ -195,14 +195,19 @@ export const studentControlData = [
     icon: '', activeIcon: ''
   },
   {
-    name: "Completed Exams",
+    name: "Exam Results",
     path: "completed-exams",
     icon: '', activeIcon: ''
   },
   {
-    name: "Classroom",
+    name: "Batch Videos",
     path: "classroom",
     icon: '', activeIcon: ''
+  },
+  {
+    name: "Batch Notes",
+    path: "",
+    icon: '' , activeIcon: ''
   },
   {
     name: "New Contests",
@@ -223,7 +228,8 @@ export const studentControlData = [
     name: "Analysis",
     path: "analysis",
     icon: '', activeIcon: ''
-  }
+  },
+
 ];
 
 export const studentCategoryData = [
@@ -232,7 +238,7 @@ export const studentCategoryData = [
     icon: exam,
     features: [
       "Upcoming Exams",
-      "Completed Exams"
+      "Exam Results"
     ]
   },
   {
@@ -243,6 +249,11 @@ export const studentCategoryData = [
   {
     name: "Academics",
     icon: video,
-    features: ["Classroom", "Analysis"]
+    features: ["Analysis"]
+  },
+  {
+    name: "Classroom",
+    icon: exam,
+    features: ["Batch Videos" , "Batch Notes" ]
   }
 ];

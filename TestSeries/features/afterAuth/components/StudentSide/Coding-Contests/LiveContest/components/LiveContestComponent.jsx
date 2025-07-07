@@ -3,11 +3,12 @@ import { Play, Trophy, Users, ArrowRight, Clock, Zap, Target } from 'lucide-reac
 import { useTheme } from '../../../../../../../hooks/useTheme'
 import { useNavigate } from 'react-router-dom'
 
+
+
 const LiveContestComponent = () => {
   const [isHovered, setIsHovered] = useState(false)
   const [timeLeft, setTimeLeft] = useState({ hours: 2, minutes: 45, seconds: 30 })
-  const {theme} = useTheme();
-  
+  const { theme } = useTheme();
   const navigate = useNavigate();
   
   // Timer effect for countdown
@@ -27,6 +28,8 @@ const LiveContestComponent = () => {
     
     return () => clearInterval(timer)
   }, [])
+
+
   
   return (
     <div className="max-w-4xl p-6">

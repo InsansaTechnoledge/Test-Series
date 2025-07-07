@@ -3,7 +3,6 @@ import { languages } from './Data/Language';
 import { useResizable } from './hooks/useResizable';
 import { useVerticalResizable } from './hooks/useVerticleResizable';
 import ProblemDescription from './components/ProblemDescription';
-import DatabaseSchemaView from './components/DataBaseSchemaView';
 import VerticalDragHandle from './components/VerticleDragHandle';
 import CodeEditor from './components/CodeEditor';
 import HorizontalDragHandle from './components/HorizontalDragHandle';
@@ -13,7 +12,6 @@ import { getContestQuestions, runContestCode, runContestTestCases } from '../../
 import { useParams } from 'react-router-dom';
 import CryptoJS from 'crypto-js';
 import { VITE_SECRET_KEY_FOR_CONTEST } from '../../constants/env';
-import { generateCodeTemplate, getFinalCodeForSubmission, getFinalCodeForTestRun } from './Data/starterCode';
 import { useTheme } from '../../../hooks/useTheme';
 
 const CodingPlatform = () => {
@@ -103,11 +101,8 @@ const CodingPlatform = () => {
     setErrors([]);
     try {
       const currentLang = languages.find((l) => l.value === language);
-      const answer = await getFinalCodeForTestRun(currentLang.langSlug, code, problem);
-      console.log("Final Code for Run:", answer.finalCode);
-      console.log("Test Input for Run:", answer.testInput);
-      setTestInput(answer.testInput);
-      const response = await runContestCode(answer.finalCode, currentLang);
+
+      const response = await runContestCode(code,problem, currentLang);
 
 
       if (response.status !== 200) {
@@ -115,7 +110,9 @@ const CodingPlatform = () => {
         setIsRunning(false);
         return;
       }
-      const result = response.data;
+      const {result,testInput} = response.data;
+      console.log("Run Result:", result);
+      setTestInput(testInput || []);
       if (!result) {
         setErrors(['No response from server']);
         setIsRunning(false);
@@ -157,13 +154,13 @@ const CodingPlatform = () => {
         setIsRunning(false);
         return;
       }
-      const answer = await getFinalCodeForSubmission(currentLang.langSlug, code, problem);
-      setTestInput(answer.testInput);
-      const response = await runContestTestCases(answer.finalCode, answer.output, currentLang);
+
+      const response = await runContestTestCases(code,problem, currentLang);
 
       if (response.status === 200) {
         results = response.data.results;
         console.log("Test Results:", results);
+        setTestInput(response.data.testInput || []);
             setOutput(results.fullOutput || '');
         setErrors(response.data.errors || []);
       }

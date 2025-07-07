@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, Settings, ChevronDown, Menu, X, Sun, Moon } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useUser } from '../../../../contexts/currentUserContext';
 // import logo from '../../../../assests/Landing/Navbar/evalvo logo blue 2.svg'
 import logo from '../../../../assests/Logo/Frame 8.svg'
@@ -127,6 +127,7 @@ const Navbar = ({setShowLogoutModal}) => {
       case 'Escape':
         setShowSearchResults(false);
         setSelectedResultIndex(-1);
+        setActiveCategory(''); // Close categories dropdown on escape
         searchInputRef.current?.blur();
         break;
     }
@@ -148,6 +149,8 @@ const Navbar = ({setShowLogoutModal}) => {
     setShowSearchResults(false);
     setShowMobileMenu(false);
     setSelectedResultIndex(-1);
+    // Close categories dropdown after clicking a search result
+    setActiveCategory('');
   };
 
   useEffect(() => {
@@ -156,6 +159,27 @@ const Navbar = ({setShowLogoutModal}) => {
           searchInputRef.current && !searchInputRef.current.contains(event.target)) {
         setShowSearchResults(false);
         setSelectedResultIndex(-1);
+      }
+      
+      // Close categories dropdown when clicking outside
+      const categoryDropdowns = document.querySelectorAll('[data-category-dropdown]');
+      const categoryButtons = document.querySelectorAll('[data-category-button]');
+      
+      let clickedInsideCategory = false;
+      categoryDropdowns.forEach(dropdown => {
+        if (dropdown.contains(event.target)) {
+          clickedInsideCategory = true;
+        }
+      });
+      
+      categoryButtons.forEach(button => {
+        if (button.contains(event.target)) {
+          clickedInsideCategory = true;
+        }
+      });
+      
+      if (!clickedInsideCategory) {
+        setActiveCategory('');
       }
     };
 
@@ -175,7 +199,7 @@ const Navbar = ({setShowLogoutModal}) => {
   const toggleDesktopSearch = () => {
     setShowDesktopSearch(!showDesktopSearch);
     if (!showDesktopSearch) {
-      setActiveCategory('');
+      setActiveCategory(''); // Close categories dropdown when opening search
       setTimeout(() => searchInputRef.current?.focus(), 100);
     } else {
       setSearchQuery('');
@@ -187,7 +211,19 @@ const Navbar = ({setShowLogoutModal}) => {
     const rolePrefix = user.role === 'organization' ? '/institute' : '/student';
     navigate(`${rolePrefix}/${path}`);
     setShowMobileMenu(false); 
+    setActiveCategory(''); // Close categories dropdown after navigation
   };
+
+  // Close categories dropdown when profile dropdown is opened
+  const handleProfileDropdownToggle = () => {
+    setShowProfileDropdown(!showProfileDropdown);
+    if (!showProfileDropdown) {
+      setActiveCategory(''); // Close categories dropdown when opening profile
+    }
+  };
+
+  const location = useLocation();
+  console.log(location)
   
   return (
     <nav className={`z-50 ${themeClasses.nav}`}>
@@ -204,12 +240,21 @@ const Navbar = ({setShowLogoutModal}) => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4">
+
+
+            {
+              user?.role === 'student' && location.pathname != '/student/student-landing' && (
+                <button onClick={() => navigate('/student/student-landing')} className={`${theme === 'light' ? 'bg-indigo-600 text-indigo-100' : 'bg-indigo-400 text-white'} text-xs px-3 py-2 rounded-3xl hover:translate-x-0.5`}>Home</button>
+                )
+            }
+
             {/* Categories Dropdown */}
             {!showDesktopSearch && (
               <div className="relative">
                 {categories.map((category) => (
                   <div key={category.name} className="relative inline-block">
                     <button
+                      data-category-button
                       onClick={() => handleCategoryClick(category.name)}
                       className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                         activeCategory === category.name
@@ -228,7 +273,10 @@ const Navbar = ({setShowLogoutModal}) => {
 
                     {/* Category Dropdown */}
                     {activeCategory === category.name && (
-                      <div className={`absolute top-full left-0 mt-1 w-56 rounded-md ring-1 ring-black ring-opacity-5 z-50 ${themeClasses.dropdown}`}>
+                      <div 
+                        data-category-dropdown
+                        className={`absolute top-full left-0 mt-1 w-56 rounded-md ring-1 ring-black ring-opacity-5 z-50 ${themeClasses.dropdown}`}
+                      >
                         <div className="py-1">
                           {category.features.map((featureName) => {
                             const control = controls.find(c => c.name === featureName);
@@ -250,6 +298,7 @@ const Navbar = ({setShowLogoutModal}) => {
                         </div>
                       </div>
                     )}
+                   
                   </div>
                 ))}
               </div>
@@ -307,7 +356,7 @@ const Navbar = ({setShowLogoutModal}) => {
             {/* Profile Dropdown */}
             <div className="relative">
               <button
-                onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+                onClick={handleProfileDropdownToggle}
                 className="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 <div className="w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center">
@@ -327,7 +376,11 @@ const Navbar = ({setShowLogoutModal}) => {
                     </div>
                     {user?.role === "organization" && (
                       <button
-                        onClick={() => navigate('/institute-subscription')}
+                        onClick={() => {
+                          navigate('/institute-subscription');
+                          setShowProfileDropdown(false);
+                          setActiveCategory(''); // Close categories dropdown
+                        }}
                         className={`block w-full text-left px-4 py-2 text-sm ${themeClasses.dropdownItem}`}
                       >
                         Know Your Plan
@@ -339,6 +392,8 @@ const Navbar = ({setShowLogoutModal}) => {
                           onClick={() => {
                             if (user?._id) {
                               navigate(`/edit-profile/${user._id}`);
+                              setShowProfileDropdown(false);
+                              setActiveCategory(''); // Close categories dropdown
                             }
                           }}
                         className={`block w-full text-left px-4 py-2 text-sm ${themeClasses.dropdownItem}`}
@@ -351,6 +406,7 @@ const Navbar = ({setShowLogoutModal}) => {
                       onClick={() => {
                         setShowLogoutModal(true);
                         setShowProfileDropdown(false);
+                        setActiveCategory(''); // Close categories dropdown
                       }}
                       className={`block w-full text-left px-4 py-2 text-sm ${themeClasses.dropdownItem}`}
                     >
@@ -489,7 +545,11 @@ const Navbar = ({setShowLogoutModal}) => {
               {
                 user?.role === 'organization' && (
                   <button
-                  onClick={() => navigate('/institute-subscription')}
+                  onClick={() => {
+                    navigate('/institute-subscription');
+                    setShowMobileMenu(false);
+                    setActiveCategory(''); // Close categories dropdown
+                  }}
                   className={`block w-full text-left px-3 py-2 text-base font-medium rounded-md ${themeClasses.dropdownItem}`}
                 >
                   Know Your Plan
@@ -503,6 +563,8 @@ const Navbar = ({setShowLogoutModal}) => {
                       onClick={() => {
                         if (user?._id) {
                           navigate(`/edit-profile/${user._id}`);
+                          setShowMobileMenu(false);
+                          setActiveCategory(''); // Close categories dropdown
                         }
                       }}
                     
@@ -517,6 +579,7 @@ const Navbar = ({setShowLogoutModal}) => {
                   onClick={() => {
                     setShowLogoutModal(true);
                     setShowMobileMenu(false);
+                    setActiveCategory(''); // Close categories dropdown
                   }}
                   className={`block w-full text-left px-3 py-2 text-base font-medium rounded-md ${themeClasses.dropdownItem}`}
                 >

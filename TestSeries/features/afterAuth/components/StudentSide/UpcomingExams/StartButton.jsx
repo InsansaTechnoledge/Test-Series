@@ -47,7 +47,7 @@ const StartButton = ({ exam, onStartTest, getStartButtonConfig, proctorStatus, i
         <div style={{ marginTop: '15px' }}>
             <button
                 onClick={onClick}
-                disabled={buttonConfig.disabled || proctorStatus === 'starting'}
+                disabled={buttonConfig.disabled || proctorStatus === 'starting' || exam.go_live === false}
                 style={{
                     padding: '10px 20px',
                     border: 'none',

@@ -14,8 +14,22 @@ import RegisteredComponent from '../components/StudentSide/Coding-Contests/Regis
 import LiveContestComponent from '../components/StudentSide/Coding-Contests/LiveContest/components/LiveContestComponent';
 import OverviewAnalysisCard from "../components/StudentSide/Landing/OverviewAnalysisCard"
 import Certificates from "../components/StudentSide/Landing/Certificates"
+import YouTubeVideos from '../components/StudentSide/ClassroomContent/YouTubeVideos';
+import { useEffect, useState } from 'react';
 const StudentLanding = () => {
   const { theme } = useTheme();
+
+  const [isMobile , setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+        setIsMobile(window.innerWidth <= 768)
+    }
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  },[])
+
   
   return (
     <div className={`min-h-screen ${theme === 'light' ? 'bg-white' : 'bg-gray-950'}`}>
@@ -89,8 +103,7 @@ const StudentLanding = () => {
           <OverviewAnalysisCard />
         </div>
       </div>
-    </div>
-    
+    </div>   
   </div>
 </div>
 
@@ -107,7 +120,7 @@ const StudentLanding = () => {
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center">
                 <div className={`w-1 h-8 ${theme === 'light' ? 'bg-indigo-600' : 'bg-indigo-400'} rounded-full mr-4`}></div>
-                <h2 className={`text-2xl font-bold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>Contest Registrations</h2>
+                <h2 className={`text-2xl font-bold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>Coding Contests</h2>
               </div>
 
             </div>
@@ -119,13 +132,32 @@ const StudentLanding = () => {
               <div className={`${theme === 'light' ? 'bg-white' : 'bg-gray-950'} rounded-2xl p-6 border ${theme === 'light' ? 'border-gray-200' : 'border-gray-800'}`}>
                 <RegisteredComponent />
               </div>
-              <div className={`${theme === 'light' ? 'bg-white' : 'bg-gray-950'} rounded-2xl p-6 border ${theme === 'light' ? 'border-gray-200' : 'border-gray-800'}`}>
-                <LiveContestComponent />
-              </div>
+              {
+                !isMobile && (
+                    <div className={`${theme === 'light' ? 'bg-white' : 'bg-gray-950'} rounded-2xl p-6 border ${theme === 'light' ? 'border-gray-200' : 'border-gray-800'}`}>
+                    <LiveContestComponent isMobile={isMobile} />
+                  </div>
+                )
+              }
             </div>
           </div>
       
         </section>
+
+
+        { /** classroom content */}
+        <div className={`w-full  ${theme === 'light' ? 'bg-white' : 'bg-gray-950'} rounded-2xl border ${theme === 'light' ? 'border-gray-200' : 'border-gray-800'} shadow-lg overflow-hidden`}>
+      <div className="p-6 lg:p-8">
+        <div className="flex items-center mb-6">
+          <div className={`w-1 h-8 ${theme === 'light' ? 'bg-indigo-600' : 'bg-indigo-400'} rounded-full mr-4`}></div>
+          <h3 className={`text-2xl font-bold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>Classroom Content</h3>
+        </div>
+        
+        <div className="h-full">
+          <YouTubeVideos/>
+        </div>
+      </div>
+    </div>
         
 
       </div>
