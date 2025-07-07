@@ -45,30 +45,48 @@ const StartButton = ({ exam, onStartTest, getStartButtonConfig, proctorStatus, i
     
     return (
         <div style={{ marginTop: '15px' }}>
-            <button
-                onClick={onClick}
-                disabled={buttonConfig.disabled || proctorStatus === 'starting' || exam.go_live === false}
-                style={{
-                    padding: '10px 20px',
-                    border: 'none',
-                    borderRadius: '5px',
-                    fontSize: '14px',
-                    fontWeight: 'bold',
-                    cursor: buttonConfig.disabled ? 'not-allowed' : 'pointer',
-                    transition: 'all 0.3s ease',
-                    minWidth: '160px',
-                    ...buttonConfig.style,
-                    ...(proctorStatus === 'starting' && currentExamId === exam.id ? {
-                        backgroundColor: '#ffc107',
-                        color: '#000'
-                    } : {})
-                }}
-            >
-                {proctorStatus === 'starting' && currentExamId === exam.id 
-                    ? '🔄 Starting...' 
-                    : label
-                }
-            </button>
+            {
+                exam.go_live === false ? (
+                    <div style={{
+                        padding: '10px 20px',
+                        backgroundColor: '#adb5bd',
+                        color: '#fff',
+                        borderRadius: '5px',
+                        fontWeight: 'bold',
+                        fontSize: '14px',
+                        minWidth: '160px',
+                        textAlign: 'center'
+                    }}>
+                        🚫 Not Yet Started
+                    </div>
+                ) : (
+                    <button
+                    onClick={onClick}
+                    disabled={buttonConfig.disabled || proctorStatus === 'starting' || exam.go_live === false}
+                    style={{
+                        padding: '10px 20px',
+                        border: 'none',
+                        borderRadius: '5px',
+                        fontSize: '14px',
+                        fontWeight: 'bold',
+                        cursor: buttonConfig.disabled ? 'not-allowed' : 'pointer',
+                        transition: 'all 0.3s ease',
+                        minWidth: '160px',
+                        ...buttonConfig.style,
+                        ...(proctorStatus === 'starting' && currentExamId === exam.id ? {
+                            backgroundColor: '#ffc107',
+                            color: '#000'
+                        } : {})
+                    }}
+                >
+                    {proctorStatus === 'starting' && currentExamId === exam.id 
+                        ? '🔄 Starting...' 
+                        : label
+                    }
+                </button>
+                )
+            }
+           
             
             {isProctored && !isElectronEnv && (
                 <div style={{

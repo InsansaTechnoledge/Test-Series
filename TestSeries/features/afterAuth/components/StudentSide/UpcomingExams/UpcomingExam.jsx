@@ -403,193 +403,235 @@ const UpcomingExam = () => {
   }, []);
 
   return (
-    <div className={`min-h-screen ${theme === 'light' ? 'bg-white' : 'bg-gray-950'}`}>
+    <div className={`${theme === 'light' ? 'bg-white' : 'bg-gray-950'}`}>
       {/* Main Container */}
-      <div className={`max-w-7xl mx-auto px-6 py-8 ${
+      <div className={`mx-auto px-6 py-8 ${
         proctorStatus === 'starting' ? 'opacity-60 pointer-events-none' : 'opacity-100'
       } transition-all duration-300`}>
         
-        {/* Live Exams Section */}
-        <section className="mb-16">
-          <div className="mb-8">
-            <HeadingUtil 
-              heading="Live Exams" 
-              subHeading="Active exams available for immediate participation"
-            />
-          </div>
-          
-          <div className="space-y-6">
-            {liveExams && liveExams.length > 0 ? (
-              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
-                {liveExams.map((exam, idx) => (
-                  <div
-                    key={idx}
-                    className={`
-                      relative overflow-hidden rounded-2xl shadow-lg transition-all duration-300
-                      hover:shadow-2xl hover:scale-[1.02] group
-                      ${theme === 'light' 
-                        ? 'bg-white border-2 border-indigo-600/10 hover:border-indigo-600/20' 
-                        : 'bg-gray-950 border-2 border-indigo-400/10 hover:border-indigo-400/20'
-                      }
-                      ${(proctorStatus === 'starting' && currentExamId !== exam.id) ? 'opacity-40' : 'opacity-100'}
-                    `}
-                  >
-                    {/* Live Badge */}
-                    <div className="absolute top-4 right-4 z-10">
-                      <div className="flex items-center gap-2 px-3 py-1.5 bg-red-500 text-white rounded-full text-xs font-semibold">
-                        <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                        LIVE
-                      </div>
-                    </div>
-                    
-                    {/* Gradient Overlay */}
-                    <div className={`absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-300 ${
-                      theme === 'light' 
-                        ? 'bg-gradient-to-br from-indigo-600 to-purple-600' 
-                        : 'bg-gradient-to-br from-indigo-400 to-purple-400'
-                    }`}></div>
-                    
-                    <div className="relative z-10 p-6">
-                      <ExamBadge exam={exam} theme={theme} />
-                      
-                      <div className="mb-6">
-                        <LiveExamCard 
-                          data={exam} 
-                          onStartTest={() => handleStartTest(exam.id, exam.ai_proctored)}
-                        />
-                      </div>
-                      
-                      <StartButton 
-                        exam={exam} 
-                        onStartTest={handleStartTest}
-                        getStartButtonConfig={getStartButtonConfig}
-                        proctorStatus={proctorStatus}
-                        isElectronEnv={isElectronEnv}
-                        currentExamId={exam.id}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className={`
-                text-center py-16 rounded-2xl border-2 border-dashed
-                ${theme === 'light' 
-                  ? 'bg-indigo-50 border-indigo-200 text-indigo-600' 
-                  : 'bg-indigo-950/30 border-indigo-800 text-indigo-400'
-                }
-              `}>
-                <div className="space-y-4">
-                  <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center ${
-                    theme === 'light' ? 'bg-indigo-100' : 'bg-indigo-900/50'
-                  }`}>
-                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold mb-2">No Live Exams</h3>
-                    <p className="text-sm opacity-70">There are no active exams at the moment. Check back later!</p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </section>
+      <div className='flex h-[calc(100vh-64px)]'>
+      <div className="w-[300px] min-w-[300px] border-r border-gray-200 dark:border-gray-800 p-6 overflow-y-auto sticky top-0 h-screen bg-white dark:bg-gray-900">
+          <HeadingUtil 
+            heading="Exam Security" 
+            subHeading="Understand the measures enforced during your test"
+          />
 
-        {/* Upcoming Exams Section */}
-        <section className="mb-16">
-          <div className="mb-8">
-            <HeadingUtil 
-              heading="Upcoming Exams" 
-              subHeading="Scheduled exams that will be available soon"
-            />
+          <div className="mt-6 space-y-6 text-sm">
+            {/* Non-Proctored Security */}
+            <div className="p-5 rounded-xl border border-yellow-200 dark:border-yellow-700 bg-yellow-50 dark:bg-yellow-900/10 transition-all duration-300">
+              <h3 className="text-base font-semibold text-yellow-800 dark:text-yellow-300 mb-3">
+                Non-Proctored Exam Security
+              </h3>
+              <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-1">
+                <li>Tab switch activity is tracked</li>
+                <li>Print, Save, and View Source operations are blocked</li>
+                <li>Developer tools and shortcut keys are disabled</li>
+                <li>Page refresh and URL tampering attempts are monitored</li>
+                <li>Loss of focus or minimizing triggers alerts</li>
+              </ul>
+            </div>
+
+            {/* Proctored Security */}
+            <div className="p-5 rounded-xl border border-red-200 dark:border-red-600 bg-red-50 dark:bg-red-900/10 transition-all duration-300">
+              <h3 className="text-base font-semibold text-red-800 dark:text-red-300 mb-3">
+                AI-Proctored Exam Security
+              </h3>
+              <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-1">
+                <li>All non-proctored rules apply</li>
+                <li>Facial recognition is used throughout the session</li>
+                <li>Multiple face detection to avoid unauthorized presence</li>
+                <li>Proper lighting and solitary environment are mandatory</li>
+              </ul>
+            </div>
           </div>
-          
-          <div className="space-y-6">
-            {upcomingExams && upcomingExams.length > 0 ? (
-              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
-                {upcomingExams.map((exam, idx) => (
-                  <div
-                    key={idx}
-                    className={`
-                      relative overflow-hidden rounded-2xl shadow-lg transition-all duration-300
-                      hover:shadow-2xl hover:scale-[1.02] group
-                      ${theme === 'light' 
-                        ? 'bg-white border-2 border-indigo-600/10 hover:border-indigo-600/20' 
-                        : 'bg-gray-950 border-2 border-indigo-400/10 hover:border-indigo-400/20'
-                      }
-                      ${(proctorStatus === 'starting' && currentExamId !== exam.id) ? 'opacity-40' : 'opacity-100'}
-                    `}
-                  >
-                    {/* Upcoming Badge */}
-                    <div className="absolute top-4 right-4 z-10">
-                      <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold ${
-                        theme === 'light' 
-                          ? 'bg-indigo-100 text-indigo-700' 
-                          : 'bg-indigo-900/50 text-indigo-300'
-                      }`}>
-                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        UPCOMING
-                      </div>
-                    </div>
-                    
-                    {/* Gradient Overlay */}
-                    <div className={`absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-300 ${
-                      theme === 'light' 
-                        ? 'bg-gradient-to-br from-indigo-600 to-blue-600' 
-                        : 'bg-gradient-to-br from-indigo-400 to-blue-400'
-                    }`}></div>
-                    
-                    <div className="relative z-10 p-6">
-                      <ExamBadge exam={exam} theme={theme} />
-                      
-                      <div className="mb-6">
-                        <UpcomingExamCard 
-                          data={exam} 
-                          onStartTest={() => handleStartTest(exam.id, exam.ai_proctored)}
-                        />
-                      </div>
-                      
-                      <StartButton 
-                        exam={exam} 
-                        onStartTest={handleStartTest}
-                        getStartButtonConfig={getStartButtonConfig}
-                        proctorStatus={proctorStatus}
-                        isElectronEnv={isElectronEnv}
-                        currentExamId={exam.id}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className={`
-                text-center py-16 rounded-2xl border-2 border-dashed
-                ${theme === 'light' 
-                  ? 'bg-indigo-50 border-indigo-200 text-indigo-600' 
-                  : 'bg-indigo-950/30 border-indigo-800 text-indigo-400'
-                }
-              `}>
-                <div className="space-y-4">
-                  <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center ${
-                    theme === 'light' ? 'bg-indigo-100' : 'bg-indigo-900/50'
-                  }`}>
-                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold mb-2">No Upcoming Exams</h3>
-                    <p className="text-sm opacity-70">Your scheduled exams will appear here when available.</p>
-                  </div>
+        </div>
+
+
+        <div className=' flex-1 overflow-y-auto p-6'>
+             {/* Live Exams Section */}
+              <section className="mb-16">
+                <div className="mb-8">
+                  <HeadingUtil 
+                    heading="Live Exams" 
+                    subHeading="Active exams available for immediate participation"
+                  />
                 </div>
-              </div>
-            )}
-          </div>
-        </section>
+                
+                <div className="space-y-6">
+                  {liveExams && liveExams.length > 0 ? (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+                      {liveExams.map((exam, idx) => (
+                        <div
+                          key={idx}
+                          className={`
+                            relative overflow-hidden rounded-2xl shadow-lg transition-all duration-300
+                            hover:shadow-2xl hover:scale-[1.02] group
+                            ${theme === 'light' 
+                              ? 'bg-white border-2 border-indigo-600/10 hover:border-indigo-600/20' 
+                              : 'bg-gray-950 border-2 border-indigo-400/10 hover:border-indigo-400/20'
+                            }
+                            ${(proctorStatus === 'starting' && currentExamId !== exam.id) ? 'opacity-40' : 'opacity-100'}
+                          `}
+                        >
+                          {/* Live Badge */}
+                          <div className="absolute top-4 right-4 z-10">
+                            <div className="flex items-center gap-2 px-3 py-1.5 bg-red-500 text-white rounded-full text-xs font-semibold">
+                              <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                              LIVE
+                            </div>
+                          </div>
+                          
+                          {/* Gradient Overlay */}
+                          <div className={`absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-300 ${
+                            theme === 'light' 
+                              ? 'bg-gradient-to-br from-indigo-600 to-purple-600' 
+                              : 'bg-gradient-to-br from-indigo-400 to-purple-400'
+                          }`}></div>
+                          
+                          <div className="relative z-10 p-6">
+                            <ExamBadge exam={exam} theme={theme} />
+                            
+                            <div className="mb-6">
+                              <LiveExamCard 
+                                data={exam} 
+                                onStartTest={() => handleStartTest(exam.id, exam.ai_proctored)}
+                              />
+                            </div>
+                            
+                            <StartButton 
+                              exam={exam} 
+                              onStartTest={handleStartTest}
+                              getStartButtonConfig={getStartButtonConfig}
+                              proctorStatus={proctorStatus}
+                              isElectronEnv={isElectronEnv}
+                              currentExamId={exam.id}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className={`
+                      text-center py-16 rounded-2xl border-2 border-dashed
+                      ${theme === 'light' 
+                        ? 'bg-indigo-50 border-indigo-200 text-indigo-600' 
+                        : 'bg-indigo-950/30 border-indigo-800 text-indigo-400'
+                      }
+                    `}>
+                      <div className="space-y-4">
+                        <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center ${
+                          theme === 'light' ? 'bg-indigo-100' : 'bg-indigo-900/50'
+                        }`}>
+                          <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-semibold mb-2">No Live Exams</h3>
+                          <p className="text-sm opacity-70">There are no active exams at the moment. Check back later!</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </section>
+
+              {/* Upcoming Exams Section */}
+              <section className="mb-16">
+                <div className="mb-8">
+                  <HeadingUtil 
+                    heading="Upcoming Exams" 
+                    subHeading="Scheduled exams that will be available soon"
+                  />
+                </div>
+                
+                <div className="space-y-6">
+                  {upcomingExams && upcomingExams.length > 0 ? (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+                      {upcomingExams.map((exam, idx) => (
+                        <div
+                          key={idx}
+                          className={`
+                            relative overflow-hidden rounded-2xl shadow-lg transition-all duration-300
+                            hover:shadow-2xl hover:scale-[1.02] group
+                            ${theme === 'light' 
+                              ? 'bg-white border-2 border-indigo-600/10 hover:border-indigo-600/20' 
+                              : 'bg-gray-950 border-2 border-indigo-400/10 hover:border-indigo-400/20'
+                            }
+                            ${(proctorStatus === 'starting' && currentExamId !== exam.id) ? 'opacity-40' : 'opacity-100'}
+                          `}
+                        >
+                          {/* Upcoming Badge */}
+                          <div className="absolute top-4 right-4 z-10">
+                            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold ${
+                              theme === 'light' 
+                                ? 'bg-indigo-100 text-indigo-700' 
+                                : 'bg-indigo-900/50 text-indigo-300'
+                            }`}>
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                              UPCOMING
+                            </div>
+                          </div>
+                          
+                          {/* Gradient Overlay */}
+                          <div className={`absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-300 ${
+                            theme === 'light' 
+                              ? 'bg-gradient-to-br from-indigo-600 to-blue-600' 
+                              : 'bg-gradient-to-br from-indigo-400 to-blue-400'
+                          }`}></div>
+                          
+                          <div className="relative z-10 p-6">
+                            <ExamBadge exam={exam} theme={theme} />
+                            
+                            <div className="mb-6">
+                              <UpcomingExamCard 
+                                data={exam} 
+                                onStartTest={() => handleStartTest(exam.id, exam.ai_proctored)}
+                              />
+                            </div>
+                            
+                            <StartButton 
+                              exam={exam} 
+                              onStartTest={handleStartTest}
+                              getStartButtonConfig={getStartButtonConfig}
+                              proctorStatus={proctorStatus}
+                              isElectronEnv={isElectronEnv}
+                              currentExamId={exam.id}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className={`
+                      text-center py-16 rounded-2xl border-2 border-dashed
+                      ${theme === 'light' 
+                        ? 'bg-indigo-50 border-indigo-200 text-indigo-600' 
+                        : 'bg-indigo-950/30 border-indigo-800 text-indigo-400'
+                      }
+                    `}>
+                      <div className="space-y-4">
+                        <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center ${
+                          theme === 'light' ? 'bg-indigo-100' : 'bg-indigo-900/50'
+                        }`}>
+                          <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-semibold mb-2">No Upcoming Exams</h3>
+                          <p className="text-sm opacity-70">Your scheduled exams will appear here when available.</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </section>
+        </div>
+      </div>
+       
 
         {/* App Required Message */}
         <section>

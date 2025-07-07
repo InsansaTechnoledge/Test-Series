@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-
+import React, { useEffect, useState, useRef } from 'react';
 import CryptoJS from 'crypto-js';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useUser } from '../../contexts/currentUserContext';
@@ -7,7 +6,6 @@ import { useCachedQuestions } from '../../hooks/useCachedQuestions';
 import { useCachedExam } from '../../hooks/useCachedExam';
 import { calculateResult } from './utils/resultCalculator';
 import { submitResult } from '../../utils/services/resultService';
-
 import { VITE_SECRET_KEY_FOR_TESTWINDOW } from '../constants/env';
 import { useTheme } from '../../hooks/useTheme';
 import LoadingTest from './LoadingTest';
@@ -25,11 +23,15 @@ const TestHeader = ({}) => {
   const [allWarnings, setAllWarnings] = useState([]);
   const [showFinalPopup, setShowFinalPopup] = useState(false);
   
-  
   // New proctor-specific states
   const [proctorStatus, setProctorStatus] = useState('Not Started');
   const [proctorEvents, setProctorEvents] = useState([]);
   const [isElectronEnv, setIsElectronEnv] = useState(false);
+  
+  // Add refs to prevent duplicate processing
+  const warningProcessedRef = useRef(new Set());
+  const countdownTimerRef = useRef(null);
+  const warningTimeoutRef = useRef(null);
   
   const { user } = useUser();
   const secretKey = import.meta.env.VITE_SECRET_KEY_FOR_TESTWINDOW || VITE_SECRET_KEY_FOR_TESTWINDOW;
@@ -39,7 +41,6 @@ const TestHeader = ({}) => {
   const examId = searchParams.get('examId');
   const { questions, isError: isExamError, isLoading: isQuestionLoading } = useCachedQuestions(examId);
   const { exam, isLoading: isExamLoading } = useCachedExam(examId);
-
 
   // Check if we're in Electron environment
   useEffect(() => {
@@ -91,16 +92,14 @@ const TestHeader = ({}) => {
         setProctorStatus(data);
       });
 
-      // ✅ FIXED: Pass parameters as a single object with correct structure
       const proctorParams = {
-        userId: user._id,    // This will be mapped to studentId in C++
+        userId: user._id,
         examId: examId,
-        eventId: examId      // Using examId as eventId for now
+        eventId: examId
       };
 
       console.log('🔧 Sending proctor params:', proctorParams);
 
-      // Start the proctor engine
       const result = await window.electronAPI.startProctorEngineAsync(proctorParams);
 
       if (result.success) {
@@ -118,21 +117,52 @@ const TestHeader = ({}) => {
   };
 
   const handleProctorWarning = (data) => {
+    // Create a unique identifier for this warning
+    const warningId = `${data.timestamp || Date.now()}-${data.eventType || 'unknown'}`;
+    
+    // Prevent duplicate processing
+    if (warningProcessedRef.current.has(warningId)) {
+      console.log('⚠️ Duplicate warning ignored:', warningId);
+      return;
+    }
+    
+    warningProcessedRef.current.add(warningId);
+    
+    // Clean up old processed warnings (keep last 20)
+    if (warningProcessedRef.current.size > 20) {
+      const oldWarnings = Array.from(warningProcessedRef.current).slice(0, -20);
+      oldWarnings.forEach(id => warningProcessedRef.current.delete(id));
+    }
+    
     const warningMessage = data.details || data.eventType || 'Unknown warning';
     const timestamp = new Date(data.timestamp || Date.now()).toLocaleTimeString();
     const formattedWarning = `${timestamp}: ${warningMessage}`;
     
+    console.log('🔔 Processing warning:', formattedWarning);
+    
     setWarning(warningMessage);
-    setWarningCount(prev => prev + 1);
+    setWarningCount(prev => {
+      const newCount = prev + 1;
+      console.log('📊 Warning count updated:', newCount);
+      return newCount;
+    });
+    
     setAllWarnings(prev => [...prev, formattedWarning]);
+    
+    // Clear any existing countdown timer
+    if (countdownTimerRef.current) {
+      clearInterval(countdownTimerRef.current);
+      countdownTimerRef.current = null;
+    }
     
     // Handle specific warning types
     if (warningMessage.includes('No face detected')) {
-      setCountdown(10); // 10 second countdown
-      const countdownTimer = setInterval(() => {
+      setCountdown(10);
+      countdownTimerRef.current = setInterval(() => {
         setCountdown(prev => {
           if (prev <= 1) {
-            clearInterval(countdownTimer);
+            clearInterval(countdownTimerRef.current);
+            countdownTimerRef.current = null;
             return null;
           }
           return prev - 1;
@@ -140,24 +170,51 @@ const TestHeader = ({}) => {
       }, 1000);
     }
     
+    // Clear any existing warning timeout
+    if (warningTimeoutRef.current) {
+      clearTimeout(warningTimeoutRef.current);
+    }
+    
     // Auto-clear warning after 5 seconds
-    setTimeout(() => {
+    warningTimeoutRef.current = setTimeout(() => {
       setWarning(null);
       setCountdown(null);
+      if (countdownTimerRef.current) {
+        clearInterval(countdownTimerRef.current);
+        countdownTimerRef.current = null;
+      }
     }, 5000);
     
     // Check if we should show final popup (5 warnings threshold)
-    if (warningCount >= 4) { // 4 because we increment after setting
-      setShowFinalPopup(true);
-    }
+    // Use setTimeout to ensure state is updated before checking
+    setTimeout(() => {
+      setWarningCount(currentCount => {
+        if (currentCount >= 5) {
+          setShowFinalPopup(true);
+        }
+        return currentCount;
+      });
+    }, 0);
   };
 
   const handleProctorEvent = (data) => {
-    setProctorEvents(prev => [...prev.slice(-9), data]); // Keep last 10 events
+    setProctorEvents(prev => [...prev.slice(-9), data]);
   };
-  const {theme} = useTheme()
+
+  const { theme } = useTheme();
   
   const cleanupProctor = () => {
+    // Clean up timers
+    if (countdownTimerRef.current) {
+      clearInterval(countdownTimerRef.current);
+      countdownTimerRef.current = null;
+    }
+    
+    if (warningTimeoutRef.current) {
+      clearTimeout(warningTimeoutRef.current);
+      warningTimeoutRef.current = null;
+    }
+    
     if (window?.electronAPI) {
       window.electronAPI.cleanupProctorListeners();
       if (proctorRunning) {
@@ -168,7 +225,13 @@ const TestHeader = ({}) => {
     }
   };
 
-  // Your existing useEffect hooks remain the same...
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      cleanupProctor();
+    };
+  }, []);
+
   useEffect(() => {
     if (!isExamLoading && !isQuestionLoading && questions && questions.length > 0) {
       for (const quest of questions) {
@@ -209,34 +272,6 @@ const TestHeader = ({}) => {
       }
 
       setSelectedSubject(eventDetails.subjects[0] || "Unspecified");
-    }
-  }, [eventDetails]);
-
-  useEffect(() => {
-    if (eventDetails) {
-      const cached = localStorage.getItem('testQuestions');
-      if (!cached) {
-        const reduced = eventDetails.questions.reduce((acc, quest) => {
-          if (quest.subject.trim() === "") {
-            quest.subject = "Unspecified";
-          }
-
-          if (!acc[quest.subject]) {
-            acc[quest.subject] = [{ ...quest, index: 1, status: 'unanswered', response: null }];
-          } else {
-            acc[quest.subject].push({ ...quest, index: acc[quest.subject].length + 1, status: 'unanswered', response: null });
-          }
-          return acc;
-        }, {});
-
-        setSubjectSpecificQuestions(reduced);
-      } else {
-        const bytes = CryptoJS.AES.decrypt(cached, secretKey);
-        const decrypted = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-        setSubjectSpecificQuestions(decrypted);
-      }
-
-      setSelectedSubject(eventDetails.subjects[0]);
     }
   }, [eventDetails]);
 
@@ -343,40 +378,16 @@ const TestHeader = ({}) => {
   }
 
   return (
- 
-
     <div className={`flex flex-col `}>
       {!eventDetails ? (
         <div className={`flex justify-center items-center h-full text-lg font-medium ${
           theme === 'light' ? 'text-gray-700' : 'text-gray-800'
         }`}>
-    <LoadingTest/>
+          <LoadingTest/>
         </div>
       ) : (
         <>
           <div className="relative flex flex-col w-full sm:px-6">
-
-            {/* Electron Proctor Status - Only show in Electron environment */}
-            {isElectronEnv && (
-              <div className={`fixed top-4 right-4 z-40 px-4 py-2 rounded-xl shadow-lg max-w-xs backdrop-blur-md ${
-                theme === 'light' 
-                  ? 'bg-white/90 text-gray-800 border border-gray-200' 
-                  : 'bg-gray-800/90 text-white border border-gray-700'
-              }`}>
-                <div className="flex items-center gap-2">
-                  <div className={`w-2 h-2 rounded-full ${proctorRunning ? 'bg-green-400' : 'bg-red-400'}`}></div>
-                  <span className="text-sm font-medium">
-                    Proctor: {proctorRunning ? 'Active' : 'Inactive'}
-                  </span>
-                </div>
-                <div className={`text-xs mt-1 ${
-                  theme === 'light' ? 'text-gray-600' : 'text-gray-300'
-                }`}>
-                  {proctorStatus}
-                </div>
-              </div>
-            )}
-
             {/* Warning Banner */}
             {warning && (
               <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-xl shadow-lg text-center w-[90%] sm:w-[500px] font-medium backdrop-blur-md ${
@@ -430,61 +441,22 @@ const TestHeader = ({}) => {
               </div>
             )}
 
-            {/* Proctor Events Log - Only show in Electron environment and when there are events */}
-            {isElectronEnv && proctorEvents.length > 0 && (
-              <div className={`fixed bottom-4 right-4 z-30 p-3 rounded-xl shadow-lg max-w-sm max-h-40 overflow-y-auto backdrop-blur-md ${
-                theme === 'light'
-                  ? 'bg-white/90 text-gray-800 border border-gray-200'
-                  : 'bg-gray-800/90 text-white border border-gray-700'
-              }`}>
-                <h4 className="text-sm font-semibold mb-2">Recent Events</h4>
-                <div className="space-y-1">
-                  {proctorEvents.slice(-5).map((event, idx) => (
-                    <div key={idx} className={`text-xs ${
-                      theme === 'light' ? 'text-gray-600' : 'text-gray-300'
-                    }`}>
-                      <span className="text-amber-500 font-medium">{event?.eventType}:</span> {event?.details}
-                    </div>
-                  ))}
+            {/* Header */}
+            <div className="flex flex-col py-6 px-6 sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6 rounded-xl">
+              {/* warning and timer */}
+              <div className='flex flex-col gap-3 w-full'>
+                <div className={`flex items-center gap-2 font-semibold px-4 py-2 rounded-xl shadow-sm w-full justify-center ${
+                  theme === 'light'
+                    ? 'text-red-700 bg-red-50 border border-red-200'
+                    : 'text-red-300 bg-red-900/20 border border-red-800'
+                }`}>
+                  <span className="text-lg">🚨</span>
+                  Warnings: <span className={`font-bold ${
+                    theme === 'light' ? 'text-red-800' : 'text-red-200'
+                  }`}>{warningCount}</span>/5
                 </div>
               </div>
-            )}
-
-
-
-            {/* Header */}
-            <div className="flex flex-col py-6 px-6 sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6 rounded-xl  ">
-           
-
-
-
-   
-
-
-              {/* warning and timer */}
-<div className='flex flex-col gap-3 w-full'>
-
-              <div className={`flex items-center gap-2 font-semibold px-4 py-2 rounded-xl shadow-sm w-full justify-center ${
-                theme === 'light'
-                  ? 'text-red-700 bg-red-50 border border-red-200'
-                  : 'text-red-300 bg-red-900/20 border border-red-800'
-              }`}>
-                <span className="text-lg">🚨</span>
-                Warnings: <span className={`font-bold ${
-                  theme === 'light' ? 'text-red-800' : 'text-red-200'
-                }`}>{warningCount}</span>/5
-              </div>
-
-              
-
-</div>
-     
-           
-          
             </div>
-
-           
-
           </div>
         </>
       )}
