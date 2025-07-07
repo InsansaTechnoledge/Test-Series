@@ -1,44 +1,28 @@
 import React, { useEffect, useState } from 'react';
 
-import CryptoJS from 'crypto-js';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useUser } from '../../contexts/currentUserContext';
-import { useCachedQuestions } from '../../hooks/useCachedQuestions';
-import { useCachedExam } from '../../hooks/useCachedExam';
-import { calculateResult } from './utils/resultCalculator';
-import { submitResult } from '../../utils/services/resultService';
 
-import { VITE_SECRET_KEY_FOR_TESTWINDOW } from '../constants/env';
+import { useLocation, useNavigate } from 'react-router-dom';
+
 import { useTheme } from '../../hooks/useTheme';
 import LoadingTest from './LoadingTest';
+import { useUser } from '../../contexts/currentUserContext';
 
 const TestHeader = ({}) => {
   const [eventDetails, setEventDetails] = useState();
-  const [selectedQuestion, setSelectedQuestion] = useState();
-  const [subjectSpecificQuestions, setSubjectSpecificQuestions] = useState();
   const [selectedSubject, setSelectedSubject] = useState();
-  const [submitted, setSubmitted] = useState(false);
   const [warning, setWarning] = useState(null);
   const [warningCount, setWarningCount] = useState(0);
   const [proctorRunning, setProctorRunning] = useState(false);
   const [countdown, setCountdown] = useState(null);
   const [allWarnings, setAllWarnings] = useState([]);
   const [showFinalPopup, setShowFinalPopup] = useState(false);
-  
-  
-  // New proctor-specific states
   const [proctorStatus, setProctorStatus] = useState('Not Started');
   const [proctorEvents, setProctorEvents] = useState([]);
   const [isElectronEnv, setIsElectronEnv] = useState(false);
-  
-  const { user } = useUser();
-  const secretKey = import.meta.env.VITE_SECRET_KEY_FOR_TESTWINDOW || VITE_SECRET_KEY_FOR_TESTWINDOW;
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const navigate = useNavigate();
   const examId = searchParams.get('examId');
-  const { questions, isError: isExamError, isLoading: isQuestionLoading } = useCachedQuestions(examId);
-  const { exam, isLoading: isExamLoading } = useCachedExam(examId);
+  const {user} = useUser()
 
 
   // Check if we're in Electron environment
@@ -168,179 +152,20 @@ const TestHeader = ({}) => {
     }
   };
 
-  // Your existing useEffect hooks remain the same...
-  useEffect(() => {
-    if (!isExamLoading && !isQuestionLoading && questions && questions.length > 0) {
-      for (const quest of questions) {
-        if (!quest.subject || quest.subject.trim() === "") {
-          quest.subject = "Unspecified";
-        }
-      }
-      const subjectSet = new Set(questions.map(q => q.subject));
 
-      setEventDetails(prev => ({
-        ...prev,
-        ...exam,
-        questions,
-        subjects: Array.from(subjectSet),
-      }));
-    }
-  }, [questions, isQuestionLoading, isExamLoading]);
 
-  useEffect(() => {
-    if (eventDetails) {
-      const cached = localStorage.getItem('testQuestions');
 
-      if (!cached) {
-        const reduced = eventDetails.questions.reduce((acc, quest) => {
-          if (!acc[quest.subject]) {
-            acc[quest.subject] = [{ ...quest, index: 1, status: 'unanswered', response: null }];
-          } else {
-            acc[quest.subject].push({ ...quest, index: acc[quest.subject].length + 1, status: 'unanswered', response: null });
-          }
-          return acc;
-        }, {});
 
-        setSubjectSpecificQuestions(reduced);
-      } else {
-        const bytes = CryptoJS.AES.decrypt(cached, secretKey);
-        const decrypted = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-        setSubjectSpecificQuestions(decrypted);
-      }
 
-      setSelectedSubject(eventDetails.subjects[0] || "Unspecified");
-    }
-  }, [eventDetails]);
 
-  useEffect(() => {
-    if (eventDetails) {
-      const cached = localStorage.getItem('testQuestions');
-      if (!cached) {
-        const reduced = eventDetails.questions.reduce((acc, quest) => {
-          if (quest.subject.trim() === "") {
-            quest.subject = "Unspecified";
-          }
 
-          if (!acc[quest.subject]) {
-            acc[quest.subject] = [{ ...quest, index: 1, status: 'unanswered', response: null }];
-          } else {
-            acc[quest.subject].push({ ...quest, index: acc[quest.subject].length + 1, status: 'unanswered', response: null });
-          }
-          return acc;
-        }, {});
 
-        setSubjectSpecificQuestions(reduced);
-      } else {
-        const bytes = CryptoJS.AES.decrypt(cached, secretKey);
-        const decrypted = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-        setSubjectSpecificQuestions(decrypted);
-      }
 
-      setSelectedSubject(eventDetails.subjects[0]);
-    }
-  }, [eventDetails]);
 
-  useEffect(() => {
-    if (selectedSubject && subjectSpecificQuestions) {
-      setSelectedQuestion(subjectSpecificQuestions[selectedSubject][0]);
-    }
-  }, [selectedSubject]);
 
-  useEffect(() => {
-    if (submitted) {
-      handleSubmitTest();
-    }
-  }, [submitted]);
 
-  const getCorrectResponse = (question) => {
-    switch (question.question_type) {
-      case "mcq":
-        return question.correct_option;
-      case "msq":
-        return question.correct_options;
-      case "fill":
-      case "numerical":
-        return question.correct_answer;
-      case "tf":
-        return question.is_true;
-      case "match":
-        return question.correct_pairs;
-      case "comprehension":
-        return question.sub_questions.reduce((acc, sub_q) => {
-          const response = getCorrectResponse(sub_q);
-          return {
-            ...acc,
-            [sub_q.id]: [response, sub_q.positive_marks, sub_q.negative_marks, sub_q.question_type]
-          };
-        }, {})
-      default:
-        return question.correct_response;
-    }
-  }
 
-  const handleSubmitTest = async () => {
-    try {
-      // Stop proctor engine before submitting
-      if (isElectronEnv && proctorRunning) {
-        await window.electronAPI?.stopProctorEngineAsync();
-        setProctorRunning(false);
-        setProctorStatus('Stopped');
-      }
 
-      localStorage.removeItem('testQuestions');
-      localStorage.removeItem('encryptedTimeLeft');
-
-      const answers = Object.entries(subjectSpecificQuestions).reduce((acc, [, value]) => {
-        const objs = value.map((val) => ({
-          question_id: val.id,
-          user_response: val.response,
-          correct_response: getCorrectResponse(val),
-          question_type: val.question_type,
-          positive_marks: val.positive_marks,
-          negative_marks: val.negative_marks
-        }));
-
-        return [...acc, ...objs];
-      }, []);
-
-      const result = calculateResult(answers);
-
-      const payload = {
-        studentId: user._id,
-        examId: examId,
-        status: "attempted",
-        wrongAnswers: result.wrongAnswers,
-        unattempted: result.unattempted,
-        marks: result.totalMarks,
-      }
-
-      const response = await submitResult(payload);
-      if (response.status == 200) {
-        navigate('/student/completed-exams');
-      }
-
-    } catch (err) {
-      console.error('Error submitting test:', err);
-    }
-
-    if (window?.electronAPI?.stopProctorEngine) window.electronAPI.stopProctorEngine();
-    if (window?.electronAPI?.closeWindow) window.electronAPI.closeWindow();
-  };
-
-  if (!eventDetails) return <LoadingTest/>;
-
-  if (isExamError) {
-    return <div className='font-bold flex flex-col gap-8 mt-20 text-center'>
-      <span className='text-indigo-900 text-4xl'>
-        Questions not available for this exam!
-      </span>
-      <span className='text-indigo-900 text-xl'>Try contacting your institute for more info</span>
-    </div>
-  }
-
-  if (isExamLoading || isQuestionLoading) {
-    return <div>Loading...🥲</div>
-  }
 
   return (
  
@@ -350,7 +175,7 @@ const TestHeader = ({}) => {
         <div className={`flex justify-center items-center h-full text-lg font-medium ${
           theme === 'light' ? 'text-gray-700' : 'text-gray-800'
         }`}>
-    <LoadingTest/>
+    {/* <LoadingTest/> */}
         </div>
       ) : (
         <>
@@ -455,11 +280,6 @@ const TestHeader = ({}) => {
             {/* Header */}
             <div className="flex flex-col py-6 px-6 sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6 rounded-xl  ">
            
-
-
-
-   
-
 
               {/* warning and timer */}
 <div className='flex flex-col gap-3 w-full'>

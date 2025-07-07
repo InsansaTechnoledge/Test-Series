@@ -20,7 +20,7 @@ const TestWindow = () => {
   const [subjectSpecificQuestions, setSubjectSpecificQuestions] = useState();
   const [selectedSubject, setSelectedSubject] = useState();
   const [submitted, setSubmitted] = useState(false);
-
+  const [isElectronEnv, setIsElectronEnv] = useState(false);
   const { user } = useUser();
   const secretKey = import.meta.env.VITE_SECRET_KEY_FOR_TESTWINDOW || VITE_SECRET_KEY_FOR_TESTWINDOW;
   const location = useLocation();
@@ -30,6 +30,20 @@ const TestWindow = () => {
   const { questions, isError: isExamError, isLoading: isQuestionLoading } = useCachedQuestions(examId);
   const { exam, isLoading: isExamLoading } = useCachedExam(examId);
   const { theme } = useTheme();
+ 
+  useEffect(() => {
+    const checkElectronEnv = () => {
+      const isElectron = window?.electronAPI?.isElectron || false;
+      setIsElectronEnv(isElectron);
+      console.log('🔍 Electron environment detected:', isElectron);
+    };
+    
+    checkElectronEnv();
+  }, []);
+  useEffect(() => {
+    if (eventDetails) console.log("📦 Loaded Event:", eventDetails);
+  }, [eventDetails]);
+
   useEffect(() => {
     if (eventDetails) {
       const cached = localStorage.getItem('testQuestions');
@@ -100,12 +114,26 @@ const TestWindow = () => {
     }
   }, [eventDetails]);
 
-  useEffect(() => {
-    if (selectedSubject && subjectSpecificQuestions) {
-      setSelectedQuestion(subjectSpecificQuestions[selectedSubject][0]);
-    }
-  }, [selectedSubject]);
 
+  useEffect(() => {
+    if (
+      selectedSubject &&
+      subjectSpecificQuestions &&
+      !selectedQuestion // ✅ Only set if none already selected
+    ) {
+      const questionsForSubject = subjectSpecificQuestions[selectedSubject];
+      if (questionsForSubject && questionsForSubject.length > 0) {
+        setSelectedQuestion(questionsForSubject[0]);
+      } else {
+        const availableSubjects = Object.keys(subjectSpecificQuestions);
+        if (availableSubjects.length > 0) {
+          setSelectedSubject(availableSubjects[0]);
+          setSelectedQuestion(subjectSpecificQuestions[availableSubjects[0]][0]);
+        }
+      }
+    }
+  }, [selectedSubject, subjectSpecificQuestions, selectedQuestion]);
+  
   useEffect(() => {
     if (submitted) {
       const timeout = setTimeout(() => {
@@ -135,10 +163,14 @@ const TestWindow = () => {
     }
   };
 
+
   const handleSubmitTest = async () => {
     try {
       localStorage.removeItem('testQuestions');
       localStorage.removeItem('encryptedTimeLeft');
+      // localStorage.removeItem('selectedQuestionId');
+      // sessionStorage.removeItem('subjectSpecificQuestions');
+  
 
       const answers = Object.entries(subjectSpecificQuestions).reduce((acc, [, value]) => {
         const objs = value.map((val) => ({
@@ -166,11 +198,14 @@ const TestWindow = () => {
       const response = await submitResult(payload);
       if (response.status === 200) {
         setSubmitted(true);
+        navigate('/student/completed-exams');
       }
 
     } catch (err) {
       console.error('Error submitting test:', err);
     }
+    if (window?.electronAPI?.stopProctorEngine) window.electronAPI.stopProctorEngine();
+    if (window?.electronAPI?.closeWindow) window.electronAPI.closeWindow();
   };
 
   if (!eventDetails) return <LoadingTest />;
@@ -184,8 +219,9 @@ const TestWindow = () => {
   }
 
   if (isExamLoading || isQuestionLoading) {
-    return <div>Loading...🥲</div>;
+    return <div>Loading</div>;
   }
+ 
 
   return (
     <>
@@ -193,18 +229,25 @@ const TestWindow = () => {
         <div className='w-full lg:w-[80%] p-2 lg:p-4 gap-2 flex flex-col'>
         <div className={`p-4 rounded-md shadow-sm w-full border ${theme === 'light' ? 'bg-white border-gray-200' : 'bg-gray-800 border-gray-700'}`}>
   <div className="flex justify-between items-center">
-    <h1 className={`text-xl xl:text-2xl font-bold leading-snug ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+    <h3 className={`text-l xl:text-2xl font-bold leading-snug ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
       {eventDetails?.batch?.name || 'Test Batch Name'}
-    </h1>
+    
+      <div className='text-xl'>
+
+      {eventDetails?.name || 'Test Batch Name'}
+      </div>
+      
+    </h3>
     <h2 className={`px-3 py-1 rounded-full text-sm font-medium ${theme === 'light' ? 'bg-gray-100 text-gray-700' : 'bg-gray-700 text-gray-300'}`}>
       {eventDetails?.batch?.year || ''}
     </h2>
   </div>
 </div>
 
+
           <div className="lg:hidden">
             <TestHeader />
-            <CountdownTimer initialTime={eventDetails.duration} handleSubmitTest={handleSubmitTest} submitted={submitted} />
+            <CountdownTimer initialTime={eventDetails.duration} handleSubmitTest={handleSubmitTest} submitted={submitted}  examId={examId}/>
           </div>
 
           <QuestionSection 
@@ -222,7 +265,7 @@ const TestWindow = () => {
 
             
             <TestHeader />
-            <CountdownTimer initialTime={eventDetails.duration} handleSubmitTest={handleSubmitTest} submitted={submitted} />
+            <CountdownTimer initialTime={eventDetails.duration} handleSubmitTest={handleSubmitTest} submitted={submitted} examId={examId} />
           </div>
           <div className="w-full py-3 px-2">
             <QuestionListSection 

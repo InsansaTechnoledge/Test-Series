@@ -36,7 +36,7 @@ const QuestionPreview = ({ questions, setQuestions, examDetails }) => {
       'match': 'match the following',
       'comprehension': 'comprehension'
     };
-    return types[type] || type.toUpperCase();
+    return types[type] || type?.toUpperCase();
   };
 
   // Get the difficulty badge class

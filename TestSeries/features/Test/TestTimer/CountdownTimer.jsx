@@ -5,11 +5,12 @@ import { useTheme } from "../../../hooks/useTheme"; // Assuming you have this ho
 
 const ENCRYPTION_KEY = import.meta.env.VITE_SECRET_KEY_FOR_COUNTDOWN_TIMER || VITE_SECRET_KEY_FOR_COUNTDOWN_TIMER;
 
-function CountdownTimer({ initialTime, handleSubmitTest, submitted }) {
+function CountdownTimer({ initialTime, handleSubmitTest, submitted ,examId}) {
   const { theme } = useTheme(); 
   
-  const getInitialSeconds = () => {
-    const encrypted = localStorage.getItem("encryptedTimeLeft");
+  const getInitialSeconds = (id) => {
+    if (submitted) return 0;
+    const encrypted = localStorage.getItem(`encryptedTimeLeft_${id}`);
     if (encrypted) {
       try {
         const decrypted = CryptoJS.AES.decrypt(encrypted, ENCRYPTION_KEY).toString(CryptoJS.enc.Utf8);
@@ -18,36 +19,41 @@ function CountdownTimer({ initialTime, handleSubmitTest, submitted }) {
         return 0;
       }
     }
-    // const [h, m, s] = initialTime.split(":").map(Number);
-    // return h * 3600 + m * 60 + s;
-    
     return initialTime * 60;
   };
+  
 
-  const [time, setTime] = useState(getInitialSeconds);
+  const [time, setTime] = useState(() => getInitialSeconds(examId));
+  useEffect(() => {
+    setTime(getInitialSeconds(examId));
+  }, [examId]);
+  
+
 
   useEffect(() => {
-    if (submitted) {
+    if (submitted || time <= 0) {
+      if (time <= 0) handleSubmitTest();
       return;
     }
-
-    if (time <= 0) {
-      handleSubmitTest();
-      return;
-    }
-
+  
     const interval = setInterval(() => {
       setTime((prev) => {
         const updated = prev - 1;
         const encrypted = CryptoJS.AES.encrypt(updated.toString(), ENCRYPTION_KEY).toString();
-        localStorage.setItem("encryptedTimeLeft", encrypted);
+        localStorage.setItem(`encryptedTimeLeft_${examId}`, encrypted);
         return updated;
       });
     }, 1000);
-
+  
     return () => clearInterval(interval);
-  }, [time, submitted]);
-
+  }, [submitted, examId]);
+  
+  useEffect(() => {
+    if (submitted) {
+      localStorage.removeItem(`encryptedTimeLeft_${examId}`);
+    }
+  }, [submitted, examId]);
+  
   const formatTime = (secs) => {
     const h = String(Math.floor(secs / 3600)).padStart(2, "0");
     const m = String(Math.floor((secs % 3600) / 60)).padStart(2, "0");
