@@ -4,7 +4,7 @@ import { useUser } from '../../../../../contexts/currentUserContext';
 import { useNavigate } from 'react-router-dom';
 import { useExamManagement } from '../../../../../hooks/UseExam';
 import { useTheme } from '../../../../../hooks/useTheme';
-
+import LiveExamCardLanding from "./LiveExamCardLanding"
 
 const ExamComponent = () => {
   const [liveExams, setLiveExams] = useState([]);
@@ -96,13 +96,12 @@ const {theme} = useTheme()
     <div className='!h-full'>
     
 
-    <LiveExamCard 
-
-      data={liveExams[0]} 
-      onStartTest={() => handleStartTest(liveExams[0].id, liveExams[0].ai_proctored)}
-    />
   
+    <LiveExamCardLanding
+       data={liveExams[0]} 
+       onStartTest={() => handleStartTest(liveExams[0].id, liveExams[0].ai_proctored)}
     
+    />
     </div>
   ) : (
     <div className={`

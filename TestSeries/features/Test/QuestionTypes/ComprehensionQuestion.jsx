@@ -5,10 +5,11 @@ import NumericalQuestion from './NumericQuestion';
 import TrueFalseQuestion from './TrueFalseQuestion';
 import MatchingQuestion from './MatchingQuestion';
 import FillInTheBlankQuestion from './FillInTheBlankQuestion';
+import { useTheme } from '../../../hooks/useTheme';
 
 const ComprehensionQuestion = ({ selectedQuestion, option, setOption }) => {
     const [isLoading, setIsLoading] = useState(true);
-
+    const {theme} = useTheme()
     useEffect(() => {
         // Initialize each sub-question response if not already set
         if (selectedQuestion && selectedQuestion.sub_questions) {
@@ -58,22 +59,32 @@ const ComprehensionQuestion = ({ selectedQuestion, option, setOption }) => {
     };
 
     return (
-        <div className="space-y-10 p-6">
-          {/* Comprehension Passage */}
-          <div className="bg-yellow-50 p-6 rounded-xl shadow ring-1 ring-yellow-100">
-            <h3 className="font-bold text-2xl sm:text-3xl text-yellow-800 mb-3 flex items-center gap-2">
-               Comprehension
-            </h3>
-            <p className="text-lg sm:text-xl leading-relaxed text-gray-800 whitespace-pre-line">
-              {selectedQuestion.passage}
-            </p>
-          </div>
-      
-          {/* Sub-Questions */}
-          <div className="space-y-8">
-            {selectedQuestion.sub_questions?.map(renderSubQuestion)}
-          </div>
-        </div>
+       
+        <div className={`space-y-10 p-6 rounded-xl transition-all duration-300
+  ${theme === 'light' ? 'bg-white text-gray-900' : 'bg-gray-900 text-white'}
+`}>
+  {/* Comprehension Passage */}
+  <div className={`p-6 rounded-xl shadow-md ring-1 transition-all duration-200
+    ${theme === 'light'
+      ? 'bg-yellow-50 ring-yellow-100 text-yellow-900'
+      : 'bg-yellow-900 ring-yellow-700 text-yellow-100'}
+  `}>
+    <h3 className="font-bold text-xl sm:text-2xl mb-3">
+      Comprehension
+    </h3>
+    <p className={`text-base sm:text-lg leading-relaxed whitespace-pre-line
+      ${theme === 'light' ? 'text-gray-800' : 'text-gray-200'}
+    `}>
+      {selectedQuestion.passage}
+    </p>
+  </div>
+
+  {/* Sub-Questions */}
+  <div className="space-y-8">
+    {selectedQuestion.sub_questions?.map(renderSubQuestion)}
+  </div>
+</div>
+
       );
       
 };

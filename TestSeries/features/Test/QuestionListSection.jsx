@@ -1,86 +1,133 @@
-import React, { useEffect, useState } from 'react'
-import CorrectAnswerTag from './QuestionNumberTag.jsx/CorrectAnswerTag'
-import UnattemptedTag from './QuestionNumberTag.jsx/UnattemptedTag'
-import MarkedForReview from './QuestionNumberTag.jsx/MarkedForReview'
-import AnsweredAndMarkedForReview from './QuestionNumberTag.jsx/AnsweredAndMarkedForReview'
-import TestSubjectSelectionBar from './TestSubjectSelectionBar'
+import React, { useState } from 'react'
+import { useTheme } from '../../hooks/useTheme'
 
 const QuestionListSection = ({
-  eventDetails,
   selectedQuestion,
   setSelectedQuestion,
   subjectSpecificQuestions,
-  setSubjectSpecificQuestions,
-  selectedSubject,
-  setSelectedSubject
+ 
 }) => {
-  const [subjectSelectionVisible, setSubjectSelectionVisible] = useState(false)
-
   if (!subjectSpecificQuestions || !selectedQuestion) {
     return <div>Loading...</div>
   }
 
+  const { theme } = useTheme()
+  const isDark = theme === 'dark';
+  const [showAllQuestions, setShowAllQuestions] = useState(false);
+  // Get all questions from all subjects in a flat array
+  const allQuestions = [];
+  let questionNumber = 1;
+  
+  Object.keys(subjectSpecificQuestions).forEach(subject => {
+    subjectSpecificQuestions[subject].forEach(ques => {
+      allQuestions.push({
+        ...ques,
+        displayNumber: questionNumber,
+        subject: subject
+      });
+      questionNumber++;
+    });
+  });
+
+  // Calculate status counts
+  const statusCounts = {
+    attempted: allQuestions.filter(q => q.status === 'answered').length,
+    unattempted: allQuestions.filter(q => q.status === 'unanswered').length,
+    markAsReview: allQuestions.filter(q => q.status === 'markedForReview' && !q.response).length,
+    answeredAndMarkAsReview: allQuestions.filter(q => q.status === 'markedForReview' && q.response).length
+  };
+
   return (
-    <div className="flex flex-col lg:flex-row w-full h-full gap-4 px-2">
-      
-      {/* LEFT SIDE */}
-      <div className="lg:w-1/3 flex flex-col space-y-4">
-        {!subjectSelectionVisible ? (
-          <>
-            <div className="p-2 border-2 rounded-md text-center text-sm font-semibold">
-              {eventDetails.subjects.find(subject => subject === selectedSubject)}
-            </div>
-            <button
-              onClick={() => setSubjectSelectionVisible(true)}
-              className="px-4 py-2 bg-blue-900 text-white text-sm rounded-md shadow w-fit"
-            >
-              Select Subject
-            </button>
-          </>
-        ) : (
-          <TestSubjectSelectionBar
-            selectedSubject={selectedSubject}
-            setSelectedSubject={setSelectedSubject}
-            eventDetails={eventDetails}
-            setSubjectSelectionVisible={setSubjectSelectionVisible}
-          />
-        )}
-      </div>
+   
 
-      {/* RIGHT SIDE */}
-      <div className="flex-1 flex flex-col space-y-4 overflow-y-auto max-h-[80vh] border rounded-md p-4 bg-white shadow">
-        
-        {/* Status Tags Row */}
-        <div className="flex flex-wrap justify-start gap-4 text-xs sm:text-sm">
-          <CorrectAnswerTag number={1} />
-          <UnattemptedTag number={1} />
-          <MarkedForReview number={1} />
-          <AnsweredAndMarkedForReview number={1} />
-        </div>
 
-        {/* Question Grid */}
-        <div className="grid grid-cols-5 ">
-        {subjectSpecificQuestions[selectedSubject].map((ques, i) => (
-            <button
-            key={i + 1}
-            onClick={() => setSelectedQuestion(ques)}
-            className="w-full h-full flex items-center justify-center"
-            >
-            {ques.status === 'unanswered' ? (
-                <UnattemptedTag number={i + 1} noText={true} current={ques.id === selectedQuestion.id} />
-            ) : ques.status === 'answered' ? (
-                <CorrectAnswerTag number={i + 1} noText={true} current={ques.id === selectedQuestion.id} />
-            ) : ques.status === 'markedForReview' && !ques.response ? (
-                <MarkedForReview number={i + 1} noText={true} current={ques.id === selectedQuestion.id} />
-            ) : (
-                <AnsweredAndMarkedForReview number={i + 1} noText={true} current={ques.id === selectedQuestion.id} />
-            )}
-            </button>
-        ))}
-        </div>
+  // Your existing component with updated styling to match the image
 
-      </div>
+<div className={`${isDark ? 'bg-gray-800' : 'bg-white'} max-w-4xl mx-auto m-8`}>
+  {/* Header */}
+  <div className="p-6 border-b border-gray-200">
+    <h2 className={`text-xl font-semibold  mb-4  ${isDark ? 'text-gray-300' : 'text-gray-600'} `}>Question Overview</h2>
+    
+    {/* Legend */}
+    <div className="flex flex-wrap gap-6 text-sm">           
+      <div className="flex items-center gap-2">             
+        <div className="w-4 h-4 rounded-full bg-green-500"></div>             
+        <span className={` ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>               
+          Attempted : {statusCounts.attempted}             
+        </span>           
+      </div>           
+      <div className="flex items-center gap-2">             
+        <div className="w-4 h-4 rounded-full bg-gray-400"></div>             
+        <span className={` ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>               
+          Unattempted : {statusCounts.unattempted}             
+        </span>           
+      </div>           
+      <div className="flex items-center gap-2">             
+        <div className="w-4 h-4 rounded-full bg-yellow-400"></div>             
+        <span className={` ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>               
+          Mark As Review : {statusCounts.markAsReview}             
+        </span>           
+      </div>           
+      <div className="flex items-center gap-2">             
+        <div className="w-4 h-4 rounded-full bg-orange-500"></div>             
+        <span className={` ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>               
+          Answered & Mark As Review : {statusCounts.answeredAndMarkAsReview}             
+        </span>           
+      </div>         
     </div>
+  </div>        
+
+  {/* Questions Grid Section */}       
+
+  <div className='p-6'>
+
+
+     <div className="grid grid-cols-5 gap-3 mb-4">
+        {(showAllQuestions ? allQuestions : allQuestions.slice(0, 15)).map((ques, i) => (
+            <div key={i} className="flex justify-center">
+                <button
+                    onClick={() => setSelectedQuestion(ques)}
+                    className={`w-10 h-10 rounded-md flex items-center justify-center text-sm font-semibold transition-all duration-200 hover:scale-105 ${
+                        ques.id === selectedQuestion.id
+                            ? 'ring-2 ring-blue-400 ring-offset-2 ring-offset-gray-700'
+                            : ''
+                    } ${
+                        ques.status === 'unanswered'
+                            ? 'bg-gray-600 text-gray-300 border border-gray-500'
+                            : ques.status === 'answered'
+                            ? 'bg-green-600 text-white'
+                            : ques.status === 'markedForReview' && !ques.response
+                            ? 'bg-yellow-500 text-gray-900'
+                            : 'bg-orange-600 text-white'
+                    }`}
+                >
+                    {ques.displayNumber}
+                </button>
+            </div>
+        ))}
+    </div>
+    
+    {/* View More/Less Button */}
+    {allQuestions.length > 15 && (
+        <div className="flex justify-center">
+            <button 
+                onClick={() => setShowAllQuestions(!showAllQuestions)}
+                className="bg-gray-600 hover:bg-gray-500 text-gray-300 px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2"
+            >
+                {showAllQuestions ? 'View Less' : `View More (${allQuestions.length - 15} more)`}
+                <svg 
+                    className={`w-4 h-4 transition-transform duration-200 ${showAllQuestions ? 'rotate-180' : ''}`} 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+        </div>
+    )}
+   </div>
+</div>
   )
 }
 
