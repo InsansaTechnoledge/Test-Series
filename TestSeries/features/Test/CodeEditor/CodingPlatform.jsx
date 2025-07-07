@@ -124,7 +124,7 @@ const CodingPlatform = () => {
       if (result.run?.stdout) {
         setOutput(
           typeof result.run.stdout === "string"
-            ? (() => { try { return JSON.parse(result.run.stdout); } catch { return result.run.stdout; } })()
+            ? (() => { try { console.log("hertw",JSON.parse(result.run.stdout));return JSON.parse(result.run.stdout); } catch { console.log("hertw",JSON.parse(result.run.stdout)); return result.run.stdout; } })()
             : result.run.stdout
         );
       }
@@ -154,6 +154,7 @@ const CodingPlatform = () => {
         setIsRunning(false);
         return;
       }
+      console.log("Running tests for problem:", problem.title, "in language:", currentLang.value);
 
       const response = await runContestTestCases(code,problem, currentLang);
 

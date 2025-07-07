@@ -32,8 +32,9 @@ function formatParamForJava(value, type) {
   }
 
   // Default fallback
-  if (Array.isArray(value)) {
-    return value.join(", ");
+  if (Array.isArray(value)) { 
+    console.log((typeof value));
+    return `{ ${value.join(", ")}}`;
   }
 
   return JSON.stringify(value);
@@ -42,7 +43,6 @@ function formatParamForJava(value, type) {
 
 function formatJavaInputArray(inputArray, metadataParams) {
   const paramCount = metadataParams.length;
-
   const formattedCases = inputArray.map(testCase => {
     if (!Array.isArray(testCase) || testCase.length !== paramCount) {
       throw new Error(`Expected ${paramCount} parameters, got ${testCase.length}`);
@@ -62,10 +62,18 @@ function formatJavaInputArray(inputArray, metadataParams) {
   }
 
   else if (paramCount === 1) {
-    return `new int[][]{ ${formattedCases.join(', ')} }`;
+    return `{ ${formattedCases.join(', ')} }`;
   }
   else
-    return `new Object[][]{ ${formattedCases.join(', ')} }`;
+ if (
+  paramCount > 1 &&
+  new Set(metadataParams.map(p => p.type)).size === metadataParams.length
+) {
+  return `new Object[][] { ${formattedCases.join(', ')} }`;
+}
+  else {
+    return `{ ${formattedCases.join(', ')} }`;
+  }
 }
 
 
