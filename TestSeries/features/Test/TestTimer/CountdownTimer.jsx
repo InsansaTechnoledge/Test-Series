@@ -5,36 +5,25 @@ import { useTheme } from "../../../hooks/useTheme";
 
 const ENCRYPTION_KEY = import.meta.env.VITE_SECRET_KEY_FOR_COUNTDOWN_TIMER || VITE_SECRET_KEY_FOR_COUNTDOWN_TIMER;
 
-function CountdownTimer({ initialTime, handleSubmitTest, submitted }) {
+function CountdownTimer({ initialTime, handleSubmitTest, submitted, examId }) {
   const { theme } = useTheme();
   
-  const getInitialSeconds = () => {
-    const encrypted = localStorage.getItem("encryptedTimeLeft");
-    const storedTotal = localStorage.getItem("totalInitialTime");
-    const currentTotal = initialTime * 60;
-    
-    if (encrypted && storedTotal) {
+ 
+  const getInitialSeconds = (id) => {
+    if (submitted) return 0;
+    const encrypted = localStorage.getItem(`encryptedTimeLeft_${id}`);
+    if (encrypted) {
       try {
         const decrypted = CryptoJS.AES.decrypt(encrypted, ENCRYPTION_KEY).toString(CryptoJS.enc.Utf8);
-        const timeLeft = parseInt(decrypted, 10);
-        const storedTotalInt = parseInt(storedTotal, 10);
-        
-        // Only use stored time if it's valid and the total matches current initialTime
-        if (timeLeft >= 0 && storedTotalInt === currentTotal && timeLeft <= currentTotal) {
-          return timeLeft;
-        }
+        return parseInt(decrypted, 10) || 0;
       } catch {
-        // If decryption fails, clear the stored data
-        localStorage.removeItem("encryptedTimeLeft");
-        localStorage.removeItem("totalInitialTime");
+        return 0;
       }
     }
-    
-    // If no valid stored time or totals don't match, start fresh
-    return currentTotal;
+    return initialTime * 60;
   };
 
-  const getTotalInitialTime = () => {
+  const getTotalInitialTime = (id) => {
     // Check if we have a stored total time that matches current initialTime
     const storedTotal = localStorage.getItem("totalInitialTime");
     const currentTotal = initialTime * 60;
@@ -65,6 +54,7 @@ function CountdownTimer({ initialTime, handleSubmitTest, submitted }) {
 
   useEffect(() => {
     if (submitted) {
+      localStorage.removeItem(`encryptedTimeLeft_${examId}`);
       return;
     }
 

@@ -1,49 +1,86 @@
+import { useEffect, useState } from "react";
+import { useTheme } from "../../hooks/useTheme";
+import { useNavigate} from "react-router-dom";
+import MCQ from "./QuestionTypes/MCQ";
+import MatchingQuestion from "./QuestionTypes/MatchingQuestion";
+import MSQ from "./QuestionTypes/MSQ";
+import TrueFalseQuestion from "./QuestionTypes/TrueFalseQuestion";
+import CodeQuestion from "./QuestionTypes/CodeQuestion";
+import NumericalQuestion from "./QuestionTypes/NumericQuestion";
+import FillInTheBlankQuestion from "./QuestionTypes/FillInTheBlankQuestion";
 import SubmitModal from './utils/SubmitResultComponent';
-import React, { useEffect, useState } from 'react';
-import MCQ from './QuestionTypes/MCQ';
-import MSQ from './QuestionTypes/MSQ';
-import FillInTheBlankQuestion from './QuestionTypes/FillInTheBlankQuestion';
-import TrueFalseQuestion from './QuestionTypes/TrueFalseQuestion';
-import MatchingQuestion from './QuestionTypes/MatchingQuestion';
-import ComprehensionQuestion from './QuestionTypes/ComprehensionQuestion';
-import NumericalQuestion from './QuestionTypes/NumericQuestion';
-import CodeQuestion from './QuestionTypes/CodeQuestion';
-import { useTheme } from '../../hooks/useTheme';
-import { useNavigate } from "react-router-dom";
-
 
 const QuestionSection = ({ 
     setSelectedQuestion, 
     selectedQuestion, 
     selectedSubject, 
     subjectSpecificQuestions, 
-    setSubjectSpecificQuestions ,
+    setSubjectSpecificQuestions,
     handleSubmitTest
 }) => {
     const [option, setOption] = useState('');
     const { theme } = useTheme();
     const [showSubmitModal, setShowSubmitModal] = useState(false);
-const [submitted, setSubmitted] = useState(false);
-const navigate = useNavigate();
+    const [submitted, setSubmitted] = useState(false);
+    const navigate = useNavigate();
 
 
-useEffect(() => {
-    if (submitted) {
-      const timeout = setTimeout(() => {
-        navigate("/student/completed-exams");
-      }, 2500);
-      return () => clearTimeout(timeout);
-    }
-  }, [submitted, navigate]);
-    // If no question is selected, show a loading message
+   
+    useEffect(() => {
+        const savedData = sessionStorage.getItem('subjectSpecificQuestions');
+        const savedQuestionId = localStorage.getItem('selectedQuestionId');
+    
+        if (savedData) {
+            const parsed = JSON.parse(savedData);
+            setSubjectSpecificQuestions(parsed);
+    
+            if (savedQuestionId) {
+                const allQs = [];
+                Object.keys(parsed).forEach(subject => {
+                    parsed[subject].forEach(ques => {
+                        allQs.push({ ...ques, subject });
+                    });
+                });
+                const restored = allQs.find(q => q.id === savedQuestionId);
+                if (restored) {
+                    setSelectedQuestion(restored);
+                }
+            }
+        }
+    }, []);
+
+    useEffect(() => {
+        if (subjectSpecificQuestions) {
+            sessionStorage.setItem('subjectSpecificQuestions', JSON.stringify(subjectSpecificQuestions));
+        }
+    }, [subjectSpecificQuestions]);
+
+    useEffect(() => {
+        if (selectedQuestion) {
+            localStorage.setItem('selectedQuestionId', selectedQuestion.id);
+        }
+    }, [selectedQuestion]);
+
+    useEffect(() => {
+        if (submitted) {
+            const timeout = setTimeout(() => {
+                sessionStorage.removeItem('subjectSpecificQuestions')
+                localStorage.removeItem('selectedQuestionId')
+                navigate("/student/completed-exams");
+            }, 2500);
+            return () => clearTimeout(timeout);
+        }
+    }, [submitted, navigate]);
+
+
     if (!selectedQuestion) {
         return <div>Loading...</div>;
     }
 
-    // Get all questions from all subjects in a flat array with continuous numbering
+    // Flatten all questions with continuous numbering
     const allQuestions = [];
     let questionCounter = 1;
-    
+
     Object.keys(subjectSpecificQuestions).forEach(subject => {
         subjectSpecificQuestions[subject].forEach(ques => {
             allQuestions.push({
@@ -56,29 +93,26 @@ useEffect(() => {
             questionCounter++;
         });
     });
-    
 
-    // Find current question index in the flat array
     const currentQuestionIndex = allQuestions.findIndex(q => q.id === selectedQuestion.id);
 
-    // Determine if the question has been answered
     const isAnswered = (() => {
         const { question_type, sub_questions } = selectedQuestion;
 
         switch (question_type) {
-            case 'mcq': // option is index (number)
+            case 'mcq':
                 return typeof option === 'number';
-            case 'msq': // option is array of indices
+            case 'msq':
                 return Array.isArray(option) && option.length > 0;
-            case 'fill': // option is string
+            case 'fill':
                 return typeof option === 'string' && option.trim() !== '';
-            case 'tf': // option is boolean
+            case 'tf':
                 return typeof option === 'boolean';
-            case 'numerical': // option is number
+            case 'numerical':
                 return typeof option === 'string' && option.trim() !== '' && !isNaN(option);
-            case 'match': // option is object with keys matching left_items
+            case 'match':
                 return typeof option === 'object' && option !== null && Object.keys(option).length > 0;
-            case 'comprehension': // option is object with subquestion answers
+            case 'comprehension':
                 return typeof option === 'object' && option !== null && sub_questions.every((subQ) => {
                     const subOption = option?.[subQ.id];
                     if (subQ.question_type === 'mcq') return typeof subOption === 'number';
@@ -88,14 +122,13 @@ useEffect(() => {
                     if (subQ.question_type === 'numerical') return typeof subOption === 'string' && subOption.trim() !== '' && !isNaN(subOption);
                     return false;
                 });
-            case 'code': // option is string (code)
+            case 'code':
                 return typeof option === 'string' && option.trim() !== '';
             default:
                 return false;
         }
     })();
 
-    // Navigation Handlers
     const handlePrevious = () => {
         if (currentQuestionIndex > 0) {
             setSelectedQuestion(allQuestions[currentQuestionIndex - 1]);
@@ -103,28 +136,26 @@ useEffect(() => {
     };
 
     const handleNext = () => {
-        // Update current question status
         const currentQuestion = allQuestions[currentQuestionIndex];
         const originalSubject = currentQuestion.originalSubject;
-        
+
         setSubjectSpecificQuestions((prev) => ({
             ...prev,
             [originalSubject]: prev[originalSubject].map((q) =>
                 q.id === selectedQuestion.id
                     ? {
-                          ...q,
-                          response: option,
-                          ...(isAnswered
-                              ? q.status === 'markedForReview'
-                                  ? null
-                                  : { status: 'answered' }
-                              : { status: 'unanswered' }),
-                      }
+                        ...q,
+                        response: option,
+                        ...(isAnswered
+                            ? q.status === 'markedForReview'
+                                ? null
+                                : { status: 'answered' }
+                            : { status: 'unanswered' }),
+                    }
                     : q
             ),
         }));
 
-        // Move to next question
         if (currentQuestionIndex < allQuestions.length - 1) {
             setSelectedQuestion(allQuestions[currentQuestionIndex + 1]);
         }
@@ -133,21 +164,20 @@ useEffect(() => {
     const handleMarkForReview = () => {
         const currentQuestion = allQuestions[currentQuestionIndex];
         const originalSubject = currentQuestion.originalSubject;
-        
+
         setSubjectSpecificQuestions((prev) => ({
             ...prev,
             [originalSubject]: prev[originalSubject].map((q) =>
                 q.id === selectedQuestion.id
                     ? {
-                          ...q,
-                          response: isAnswered ? option : null,
-                          status: 'markedForReview',
-                      }
+                        ...q,
+                        response: isAnswered ? option : null,
+                        status: 'markedForReview',
+                    }
                     : q
             ),
         }));
 
-        // Move to next question
         if (currentQuestionIndex < allQuestions.length - 1) {
             setSelectedQuestion(allQuestions[currentQuestionIndex + 1]);
         }
@@ -156,25 +186,24 @@ useEffect(() => {
     const handleUnMarkForReview = () => {
         const currentQuestion = allQuestions[currentQuestionIndex];
         const originalSubject = currentQuestion.originalSubject;
-        
+
         setSubjectSpecificQuestions((prev) => ({
             ...prev,
             [originalSubject]: prev[originalSubject].map((q) =>
                 q.id === selectedQuestion.id
                     ? {
-                          ...q,
-                          ...(isAnswered ? { status: 'answered' } : { status: 'unanswered' }),
-                      }
+                        ...q,
+                        ...(isAnswered ? { status: 'answered' } : { status: 'unanswered' }),
+                    }
                     : q
             ),
         }));
 
-        // Move to next question
         if (currentQuestionIndex < allQuestions.length - 1) {
             setSelectedQuestion(allQuestions[currentQuestionIndex + 1]);
         }
     };
- 
+
     const handleClearResponse = (selectedQuestion) => {
         const { question_type, sub_questions } = selectedQuestion;
 
@@ -202,16 +231,13 @@ useEffect(() => {
         }
     };
 
-    // Get current question details
     const currentQuestion = allQuestions[currentQuestionIndex];
     const questionNumber = currentQuestion?.displayNumber || 1;
     const questionSubject = currentQuestion?.subject || 'Unknown';
 
-    // Render the appropriate question component
     return (
         <div className={`relative w-full flex flex-col justify-between gap-6 ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
-            
-            {/* Question Header */}
+
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 px-4 py-1">
                 <div className="flex items-center gap-4">
                     <div className={`px-5 py-1 rounded-full text-sm font-medium m-1 ${
@@ -227,8 +253,7 @@ useEffect(() => {
                 </div>
             </div>
 
-            {/* Display the selected question */}
-            <div className={`flex-1  ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'}  rounded-lg`}>
+            <div className={`flex-1 ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'} rounded-lg`}>
                 {(() => {
                     switch (selectedQuestion.question_type) {
                         case 'mcq':
@@ -253,11 +278,7 @@ useEffect(() => {
                 })()}
             </div>
 
-            {/* Navigation Buttons */}
-         
-
             <div className="flex flex-col sm:flex-row justify-between items-center w-full gap-4 text-base sm:text-lg p-8">
-                {/* Left Side - Action Buttons Group */}
                 <div className="flex flex-wrap justify-center sm:justify-start gap-3 items-center order-2 sm:order-1">
                     <button
                         onClick={handlePrevious}
@@ -275,7 +296,6 @@ useEffect(() => {
                         Previous
                     </button>
 
-                    {/* Clear Response */}
                     <button
                         onClick={() => setOption(handleClearResponse(selectedQuestion))}
                         className={`px-4 py-2 rounded-md font-semibold border transition-all duration-200
@@ -287,7 +307,6 @@ useEffect(() => {
                         Clear Response
                     </button>
 
-                    {/* Mark/Unmark for Review */}
                     {selectedQuestion.status === 'markedForReview' ? (
                         <button
                             onClick={handleUnMarkForReview}
@@ -312,7 +331,6 @@ useEffect(() => {
                         </button>
                     )}
 
-                    {/* Next Button */}
                     <button
                         onClick={handleNext}
                         disabled={currentQuestionIndex >= allQuestions.length - 1}
@@ -330,7 +348,6 @@ useEffect(() => {
                     </button>
                 </div>
 
-                {/* Right Side - Submit Button */}
                 <div className="order-1 sm:order-2">
                     <button
                         onClick={() => setShowSubmitModal(true)}
@@ -345,20 +362,18 @@ useEffect(() => {
                 </div>
             </div>
 
-{/* Submit Modal */}
-{showSubmitModal && (
-  <SubmitModal
-    setShowSubmitModal={setShowSubmitModal}
-    setSubmitted={setSubmitted}
-  />
-)}
+            {showSubmitModal && (
+                <SubmitModal
+                    setShowSubmitModal={setShowSubmitModal}
+                    setSubmitted={setSubmitted}
+                />
+            )}
 
-{/* Submission Confirmation */}
-{submitted && (
-        <div className="fixed top-6 right-6 z-50 bg-green-100 border border-green-400 text-green-700 px-6 py-3 rounded-lg shadow-lg animate-fade-in-out transition-all">
-        Your test has been submitted successfully!
-        </div>
-      )}
+            {submitted && (
+                <div className="fixed top-6 right-6 z-50 bg-green-100 border border-green-400 text-green-700 px-6 py-3 rounded-lg shadow-lg animate-fade-in-out transition-all">
+                    Your test has been submitted successfully!
+                </div>
+            )}
         </div>
     );
 };

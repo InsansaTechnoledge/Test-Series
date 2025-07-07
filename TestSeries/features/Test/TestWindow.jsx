@@ -682,6 +682,25 @@ const TestWindow = () => {
   }, [selectedSubject]);
 
   useEffect(() => {
+    if (
+      selectedSubject &&
+      subjectSpecificQuestions &&
+      !selectedQuestion // ✅ Only set if none already selected
+    ) {
+      const questionsForSubject = subjectSpecificQuestions[selectedSubject];
+      if (questionsForSubject && questionsForSubject.length > 0) {
+        setSelectedQuestion(questionsForSubject[0]);
+      } else {
+        const availableSubjects = Object.keys(subjectSpecificQuestions);
+        if (availableSubjects.length > 0) {
+          setSelectedSubject(availableSubjects[0]);
+          setSelectedQuestion(subjectSpecificQuestions[availableSubjects[0]][0]);
+        }
+      }
+    }
+  }, [selectedSubject, subjectSpecificQuestions, selectedQuestion]);
+  
+  useEffect(() => {
     if (submitted) {
       const timeout = setTimeout(() => {
         navigate("/student/completed-exams");
@@ -690,10 +709,14 @@ const TestWindow = () => {
     }
   }, [submitted]);
 
+
   const handleSubmitTest = async () => {
     try {
       localStorage.removeItem('testQuestions');
       localStorage.removeItem('encryptedTimeLeft');
+      // localStorage.removeItem('selectedQuestionId');
+      // sessionStorage.removeItem('subjectSpecificQuestions');
+  
 
       const answers = calculateResultPayload(subjectSpecificQuestions, getCorrectResponse);
       const payload = {
@@ -713,6 +736,8 @@ const TestWindow = () => {
     } catch (err) {
       console.error("Error submitting test:", err);
     }
+    if (window?.electronAPI?.stopProctorEngine) window.electronAPI.stopProctorEngine();
+    if (window?.electronAPI?.closeWindow) window.electronAPI.closeWindow();
   };
 
   if (!eventDetails) return <LoadingTest />;
@@ -753,9 +778,10 @@ const TestWindow = () => {
             </div>
           </div>
 
+
           <div className="lg:hidden">
             <TestHeader />
-            <CountdownTimer initialTime={eventDetails.duration} handleSubmitTest={handleSubmitTest} submitted={submitted} />
+            <CountdownTimer initialTime={eventDetails.duration} handleSubmitTest={handleSubmitTest} submitted={submitted}  examId={examId}/>
           </div>
 
           <QuestionSection
@@ -770,7 +796,7 @@ const TestWindow = () => {
         <div className='w-full lg:w-[25%] lg:block'>
           <div className="hidden lg:block">
             <TestHeader />
-            <CountdownTimer initialTime={eventDetails.duration} handleSubmitTest={handleSubmitTest} submitted={submitted} />
+            <CountdownTimer initialTime={eventDetails.duration} handleSubmitTest={handleSubmitTest} submitted={submitted} examId={examId} />
           </div>
           <div className="w-full py-3 px-2">
             <QuestionListSection
