@@ -15,6 +15,7 @@ import QuestionListSection from './QuestionListSection';
 import TestHeader from './TestWarning';
 import QuestionSection from './QuestionSection';
 import LoadingTest from './LoadingTest';
+import WarningHeaderForExams from './utils/WarningHeaderForExams';
 
 const TestWindow = () => {
   const [eventDetails, setEventDetails] = useState();
@@ -240,22 +241,7 @@ const TestWindow = () => {
       <ToasterComponent />
       
       {/* Top Security Header */}
-      <div className={`fixed top-0 left-0 right-0 z-40 px-4 py-2 text-sm ${
-        theme === 'light' ? 'bg-red-100 text-red-800' : 'bg-red-900 text-red-100'
-      }`}>
-        <div className="flex justify-between items-center">
-          <span>🔒 EXAM MODE ACTIVE - Evalvo's Security Monitoring Enabled</span>
-          <div className="flex items-center gap-4">
-            <span>Violations: {examViolations.length}</span>
-            <span>Warnings: {warningCount}/5</span>
-            {warningCount >= 3 && (
-              <span className="bg-red-500 text-white px-2 py-1 rounded text-xs font-bold animate-pulse">
-                ⚠️ HIGH ALERT
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
+      <WarningHeaderForExams examViolations={examViolations} theme={theme} warningCount={warningCount}/>
 
       {/* Main Exam Interface */}
       <div className={`py-16 flex min-h-screen flex-col lg:flex-row gap-2 mt-8`}>

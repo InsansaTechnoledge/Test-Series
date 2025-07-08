@@ -1,50 +1,6 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
+import ExamToaster from '../Toaster/StandardExamWarningToaster';
 
-// Toaster Component
-const ExamToaster = ({ toasts, onDismiss }) => {
-  if (!toasts || toasts.length === 0) return null;
-
-  return (
-    <div className="fixed top-4 right-4 z-50 space-y-2 max-w-md">
-      {toasts.map((toast) => (
-        <div
-          key={toast.id}
-          className={`p-4 rounded-lg shadow-lg border-l-4 transition-all duration-300 transform ${
-            toast.type === 'warning' 
-              ? 'bg-yellow-50 border-yellow-400 text-yellow-800' 
-              : toast.type === 'error'
-              ? 'bg-red-50 border-red-400 text-red-800'
-              : 'bg-blue-50 border-blue-400 text-blue-800'
-          }`}
-        >
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <div className="flex items-center">
-                <span className="text-lg mr-2">
-                  {toast.type === 'warning' ? '⚠️' : toast.type === 'error' ? '🚨' : 'ℹ️'}
-                </span>
-                <h4 className="font-semibold text-sm">
-                  {toast.type === 'warning' ? 'Security Warning' : 
-                   toast.type === 'error' ? 'Security Violation' : 'Security Notice'}
-                </h4>
-              </div>
-              <p className="text-sm mt-1 whitespace-pre-wrap">{toast.message}</p>
-              {toast.details && (
-                <p className="text-xs mt-1 opacity-75">{toast.details}</p>
-              )}
-            </div>
-            <button
-              onClick={() => onDismiss(toast.id)}
-              className="ml-4 text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-};
 
 export const useExamSecurity = ({
   eventDetails,
@@ -64,6 +20,7 @@ export const useExamSecurity = ({
   // Refs to prevent stale closure issues and manage state
   const warningCountRef = useRef(warningCount);
   const violationCountRef = useRef(0);
+  const issuedWarningsRef = useRef(0); // Track warnings separately
   const isSubmittingRef = useRef(false);
   const lastViolationRef = useRef(null);
   const devToolsCheckRef = useRef(null);
@@ -72,7 +29,7 @@ export const useExamSecurity = ({
   const maxFullscreenAttempts = 3;
   
   // Lenient settings
-  const violationCooldown = 10000; // 10 seconds
+  const violationCooldown = 5000; // 10 seconds
   const violationsPerWarning = 3; // 3 violations = 1 warning
   const maxWarnings = 5; // Maximum 5 warnings before auto-submit
   const lastViolationTimeRef = useRef(0);
@@ -157,9 +114,13 @@ export const useExamSecurity = ({
       );
       
       // Check if we need to show a warning (every 3 violations)
-      if (violationCountRef.current % violationsPerWarning === 0) {
-        const warningNumber = Math.floor(violationCountRef.current / violationsPerWarning);
-        showWarning(`Multiple security violations detected (${violationCountRef.current} total).`, warningNumber);
+      const warningsNeeded = Math.floor(violationCountRef.current / violationsPerWarning);
+      if (warningsNeeded > issuedWarningsRef.current) {
+        issuedWarningsRef.current = warningsNeeded;
+        // Use setTimeout to break the execution chain and prevent infinite loops
+        setTimeout(() => {
+          showWarning(`Multiple security violations detected (${violationCountRef.current} total).`, warningsNeeded);
+        }, 0);
       }
       
     } catch (error) {
@@ -171,35 +132,38 @@ export const useExamSecurity = ({
   // Enhanced warning system with toaster
   const showWarning = useCallback((message, warningNumber) => {
     if (isSubmittingRef.current || submitted) return;
-
+  
     try {
-      setWarningCount(warningNumber);
-      
+      // Only call setWarningCount if value is actually different
+      if (warningCountRef.current !== warningNumber) {
+        warningCountRef.current = warningNumber;  // Update the ref here first
+        setWarningCount(prev => {
+          if (prev === warningNumber) return prev; // Avoid re-setting same value
+          return warningNumber;
+        });
+      }
+  
       const warningMessage = `Security Alert: ${message}\n\nWarning ${warningNumber}/${maxWarnings} - Please follow exam guidelines to avoid automatic submission.`;
-      
-      // Show warning toast
+  
       addToast(
         warningMessage,
         'warning',
         `This is warning ${warningNumber} of ${maxWarnings}`,
-        8000 // Longer duration for warnings
+        8000
       );
-      
-      // Auto-submit after maximum warnings
+  
       if (warningNumber >= maxWarnings && !isSubmittingRef.current) {
         isSubmittingRef.current = true;
-        
+  
         const submitMessage = `EXAM TERMINATED\n\nMaximum security warnings (${maxWarnings}) reached. Your exam will be auto-submitted now.`;
-        
-        // Show critical error toast
+  
         addToast(
           submitMessage,
           'error',
           'Auto-submitting in 2 seconds...',
-          0 // Don't auto-dismiss
+          0
         );
-        
-        // Submit with delay
+  
         setTimeout(() => {
           if (handleSubmitTest && typeof handleSubmitTest === 'function') {
             handleSubmitTest();
@@ -210,7 +174,8 @@ export const useExamSecurity = ({
       console.error('Error showing warning:', error);
       addToast('Error showing security warning', 'error', error.message, 3000);
     }
-  }, [setWarningCount, handleSubmitTest, submitted, addToast]);
+  }, [handleSubmitTest, submitted, addToast]);
+  
 
   // Comprehensive key handler with better detection
   const handleKeyDown = useCallback((e) => {
@@ -472,6 +437,7 @@ export const useExamSecurity = ({
       isInitializedRef.current = false;
       fullscreenAttemptRef.current = 0;
       violationCountRef.current = 0;
+      issuedWarningsRef.current = 0; // Reset issued warnings
       lastViolationTimeRef.current = 0;
     };
   }, [eventDetails, submitted, handleKeyDown, handleContextMenu, handleVisibilityChange, 
@@ -505,4 +471,4 @@ export const useExamSecurity = ({
       />
     )
   };
-};    
+};
