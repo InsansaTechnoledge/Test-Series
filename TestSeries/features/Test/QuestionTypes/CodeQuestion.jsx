@@ -22,6 +22,7 @@ const CodeQuestion = ({ selectedQuestion, option, setOption }) => {
 
   const leftPanel = useResizable(50, 20, 80);
   const outputPanel = useVerticalResizable(200, 100, 500);
+  console.log("Selected Question:", selectedQuestion);
 
   useEffect(() => {
     if (selectedQuestion && selectedQuestion.starter_code) {
@@ -103,7 +104,7 @@ const CodeQuestion = ({ selectedQuestion, option, setOption }) => {
         return;
       }
 
-      const response=await runContestTestCases(code,selectedQuestion.test_cases,cureentlang);
+      const response=await runContestTestCases(code,problem,cureentlang);
       if( response.status === 200) {
         results = response.data.results;
         setErrors(response.data.errors || []);

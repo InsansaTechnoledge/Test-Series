@@ -10,7 +10,7 @@ export const getContestQuestions=async(contestId)=>{
     return response.data;
 }
 
-export const runContestTestCases=async(code, output, currentLang)=>{
+export const runContestTestCases=async(code, problem, currentLang)=>{
     const response = await api.post('/v1/contest/test', {
         code,
         problem,
