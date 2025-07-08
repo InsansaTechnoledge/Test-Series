@@ -24,8 +24,6 @@ const QuestionSection = ({
     const [submitted, setSubmitted] = useState(false);
     const navigate = useNavigate();
 
-
-   
     useEffect(() => {
         const savedData = sessionStorage.getItem('subjectSpecificQuestions');
         const savedQuestionId = localStorage.getItem('selectedQuestionId');
@@ -72,8 +70,8 @@ const QuestionSection = ({
         }
     }, [submitted, navigate]);
 
-
-    if (!selectedQuestion) {
+    // Early return if dependencies are not ready
+    if (!selectedQuestion || !subjectSpecificQuestions) {
         return <div>Loading...</div>;
     }
 

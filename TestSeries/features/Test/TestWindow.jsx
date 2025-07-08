@@ -25,13 +25,24 @@ const TestWindow = () => {
   const [submitted, setSubmitted] = useState(false);
   const [examViolations, setExamViolations] = useState([]);
   const [warningCount, setWarningCount] = useState(0);
+  const [isStateRestored, setIsStateRestored] = useState(false);
 
   const examContainerRef = useRef(null);
   const { user } = useUser();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const examId = searchParams.get('examId');
+  console.log("fs", examId);
+
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!examId) {
+      console.log("Exam Id lost");
+      navigate('/student/student-landing');
+    }
+  }, [examId, navigate]);
+  
 
   const secretKey = import.meta.env.VITE_SECRET_KEY_FOR_TESTWINDOW || VITE_SECRET_KEY_FOR_TESTWINDOW;
   const { questions, isError: isExamError, isLoading: isQuestionLoading } = useCachedQuestions(examId);
@@ -58,6 +69,83 @@ const TestWindow = () => {
     handleSubmitTest: () => handleSubmitTest(),
     examContainerRef
   });
+
+  // Utility functions for state persistence
+  const saveStateToStorage = (key, data) => {
+    try {
+      const encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), secretKey).toString();
+      localStorage.setItem(key, encrypted);
+    } catch (error) {
+      console.error(`Error saving ${key} to storage:`, error);
+    }
+  };
+
+  const loadStateFromStorage = (key) => {
+    try {
+      const encrypted = localStorage.getItem(key);
+      if (encrypted) {
+        const bytes = CryptoJS.AES.decrypt(encrypted, secretKey);
+        return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+      }
+    } catch (error) {
+      console.error(`Error loading ${key} from storage:`, error);
+    }
+    return null;
+  };
+
+  // Restore state on component mount
+  useEffect(() => {
+    if (!isStateRestored && examId) {
+      const savedSelectedSubject = loadStateFromStorage(`selectedSubject_${examId}`);
+      const savedSelectedQuestion = loadStateFromStorage(`selectedQuestion_${examId}`);
+      const savedExamViolations = loadStateFromStorage(`examViolations_${examId}`);
+      const savedWarningCount = loadStateFromStorage(`warningCount_${examId}`);
+
+      if (savedSelectedSubject) {
+        setSelectedSubject(savedSelectedSubject);
+      }
+      if (savedSelectedQuestion) {
+        setSelectedQuestion(savedSelectedQuestion);
+      }
+      if (savedExamViolations) {
+        setExamViolations(savedExamViolations);
+      }
+      if (savedWarningCount !== null) {
+        setWarningCount(savedWarningCount);
+      }
+
+      setIsStateRestored(true);
+    }
+  }, [examId, isStateRestored, secretKey]);
+
+  // Save state whenever it changes
+  useEffect(() => {
+    if (isStateRestored && examId) {
+      if (selectedSubject) {
+        saveStateToStorage(`selectedSubject_${examId}`, selectedSubject);
+      }
+    }
+  }, [selectedSubject, examId, isStateRestored, secretKey]);
+
+  useEffect(() => {
+    if (isStateRestored && examId) {
+      if (selectedQuestion) {
+        saveStateToStorage(`selectedQuestion_${examId}`, selectedQuestion);
+      }
+    }
+  }, [selectedQuestion, examId, isStateRestored, secretKey]);
+
+  useEffect(() => {
+    if (isStateRestored && examId) {
+      saveStateToStorage(`examViolations_${examId}`, examViolations);
+    }
+  }, [examViolations, examId, isStateRestored, secretKey]);
+
+  useEffect(() => {
+    if (isStateRestored && examId) {
+      saveStateToStorage(`warningCount_${examId}`, warningCount);
+    }
+  }, [warningCount, examId, isStateRestored, secretKey]);
 
   // Sync warning count from security hook
   useEffect(() => {
@@ -110,24 +198,31 @@ const TestWindow = () => {
         }
       }
 
-      setSelectedSubject(eventDetails.subjects[0] || "Unspecified");
+      // Only set default subject if no saved subject exists
+      if (!selectedSubject && isStateRestored) {
+        setSelectedSubject(eventDetails.subjects[0] || "Unspecified");
+      }
     }
-  }, [eventDetails, secretKey, addToast]);
+  }, [eventDetails, secretKey, addToast, selectedSubject, isStateRestored]);
 
   useEffect(() => {
     if (selectedSubject && subjectSpecificQuestions) {
       const questionsForSubject = subjectSpecificQuestions[selectedSubject];
       if (questionsForSubject && questionsForSubject.length > 0) {
-        setSelectedQuestion(questionsForSubject[0]);
+        // Only set if no saved question exists or if the saved question is not in current subject
+        if (!selectedQuestion || !questionsForSubject.find(q => q._id === selectedQuestion._id)) {
+          setSelectedQuestion(questionsForSubject[0]);
+        }
       }
     }
-  }, [selectedSubject, subjectSpecificQuestions]);
+  }, [selectedSubject, subjectSpecificQuestions, selectedQuestion]);
 
   useEffect(() => {
     if (
       selectedSubject &&
       subjectSpecificQuestions &&
-      !selectedQuestion // ✅ Only set if none already selected
+      !selectedQuestion && // ✅ Only set if none already selected
+      isStateRestored
     ) {
       const questionsForSubject = subjectSpecificQuestions[selectedSubject];
       if (questionsForSubject && questionsForSubject.length > 0) {
@@ -140,12 +235,18 @@ const TestWindow = () => {
         }
       }
     }
-  }, [selectedSubject, subjectSpecificQuestions, selectedQuestion]);
+  }, [selectedSubject, subjectSpecificQuestions, selectedQuestion, isStateRestored]);
   
   useEffect(() => {
     if (submitted) {
       // Clear all toasts when submitting
       clearAllToasts();
+      
+      // Clear all saved state
+      localStorage.removeItem(`selectedSubject_${examId}`);
+      localStorage.removeItem(`selectedQuestion_${examId}`);
+      localStorage.removeItem(`examViolations_${examId}`);
+      localStorage.removeItem(`warningCount_${examId}`);
       
       // Show submission success toast
       addToast(
@@ -160,7 +261,19 @@ const TestWindow = () => {
       }, 2500);
       return () => clearTimeout(timeout);
     }
-  }, [submitted, navigate, clearAllToasts, addToast]);
+  }, [submitted, navigate, clearAllToasts, addToast, examId]);
+
+  // Save questions to localStorage whenever they change
+  useEffect(() => {
+    if (subjectSpecificQuestions && isStateRestored) {
+      try {
+        const encrypted = CryptoJS.AES.encrypt(JSON.stringify(subjectSpecificQuestions), secretKey).toString();
+        localStorage.setItem('testQuestions', encrypted);
+      } catch (error) {
+        console.error('Error saving questions to storage:', error);
+      }
+    }
+  }, [subjectSpecificQuestions, secretKey, isStateRestored]);
 
   const handleSubmitTest = async () => {
     try {
@@ -174,6 +287,10 @@ const TestWindow = () => {
 
       localStorage.removeItem('testQuestions');
       localStorage.removeItem('encryptedTimeLeft');
+      localStorage.removeItem(`selectedSubject_${examId}`);
+      localStorage.removeItem(`selectedQuestion_${examId}`);
+      localStorage.removeItem(`examViolations_${examId}`);
+      localStorage.removeItem(`warningCount_${examId}`);
 
       const answers = calculateResultPayload(subjectSpecificQuestions, getCorrectResponse);
       const payload = {
@@ -217,8 +334,16 @@ const TestWindow = () => {
     }
   };
 
+  // Add cleanup on component unmount
+  useEffect(() => {
+    return () => {
+      // Optional: Clean up on unmount if needed
+      // You might want to keep the state for page reloads
+    };
+  }, []);
+
   // Show loading state
-  if (!eventDetails) return <LoadingTest />;
+  if (!eventDetails || !isStateRestored) return <LoadingTest />;
   
   // Show error state
   if (isExamError) {
