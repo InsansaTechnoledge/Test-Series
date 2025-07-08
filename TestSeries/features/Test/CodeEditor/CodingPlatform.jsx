@@ -198,9 +198,9 @@ const CodingPlatform = () => {
         return;
       }
       const marksForEachTestCase = (problem.marks / problem.test_cases.length);
-      localStorage.setItem(`contest_${contest_id}_problem_${problem.id}_code`, code);
-      localStorage.setItem(`contest_${contest_id}_problem_${problem.id}_language`, language);
-      localStorage.setItem(`contest_${contest_id}_problem_${problem.id}_testResults`, (testResults.passedCount * marksForEachTestCase) || 0);
+      localStorage.setItem(`contest_${contest_id}_problem_${problem.question_id}_code`, code);
+      localStorage.setItem(`contest_${contest_id}_problem_${problem.question_id}_language`, language);
+      localStorage.setItem(`contest_${contest_id}_problem_${problem.question_id}_testResults`, (testResults.passedCount * marksForEachTestCase) || 0);
 
     } catch (error) {
       console.error('SaveCode error:', error);
