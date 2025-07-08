@@ -27,6 +27,7 @@ const QuestionSection = ({
     const isInitialLoad = useRef(true);
 
    
+
     useEffect(() => {
         if (hasRestored.current || !isInitialLoad.current) return;
         hasRestored.current = true;
@@ -76,8 +77,8 @@ const QuestionSection = ({
         }
     }, [submitted, navigate]);
 
-
-    if (!selectedQuestion) {
+    // Early return if dependencies are not ready
+    if (!selectedQuestion || !subjectSpecificQuestions) {
         return <div>Loading...</div>;
     }
 
@@ -382,7 +383,9 @@ const QuestionSection = ({
     );
 };
 
+
+
+
+
 export default QuestionSection;
-
-
 

@@ -29,7 +29,7 @@ export const useExamSecurity = ({
   const maxFullscreenAttempts = 3;
   
   // Lenient settings
-  const violationCooldown = 5000; // 10 seconds
+  const violationCooldown = 2000; // 10 seconds
   const violationsPerWarning = 3; // 3 violations = 1 warning
   const maxWarnings = 5; // Maximum 5 warnings before auto-submit
   const lastViolationTimeRef = useRef(0);

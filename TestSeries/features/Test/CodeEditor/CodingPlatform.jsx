@@ -130,7 +130,17 @@ const CodingPlatform = () => {
       if (result.run?.stdout) {
         setOutput(
           typeof result.run.stdout === "string"
-            ? (() => { try { console.log("hertw", JSON.parse(result.run.stdout)); return JSON.parse(result.run.stdout); } catch { console.log("hertw", JSON.parse(result.run.stdout)); return result.run.stdout; } })()
+            ? (() => {
+              try {
+                return JSON.parse(result.run.stdout);
+              } catch {
+                try {
+                  return eval(result.run.stdout);
+                } catch {
+                  return result.run.stdout;
+                }
+              }
+            })()
             : result.run.stdout
         );
       }
@@ -211,6 +221,8 @@ const CodingPlatform = () => {
   };
   console.log("Contest ID:", contest_id);
   console.log("Problems:", problems);
+
+  
   const submitContest = async () => {
     const studentResult = {
       results: problems.map((problem) => ({
@@ -233,7 +245,7 @@ const CodingPlatform = () => {
       setResultPageData({ problems, studentResult });
       alert('Contest submitted successfully!');
       setShowResultPage(true);
-      
+
 
     }
     else {
@@ -257,95 +269,95 @@ const CodingPlatform = () => {
 
   return (
     <>
-        {showResultPage && resultPageData && (
+      {showResultPage && resultPageData && (
         <ContestResultComponent
           problems={resultPageData.problems}
           studentResult={resultPageData.studentResult}
         />
       )}
 
-   {!showResultPage && !resultPageData &&( <div className = {` flex flex-col m-6 ${theme === 'light' ? '' : 'bg-gray-700'}`}>
-      <HeaderComponent
-        problems={problems}
-        language={language}
-        setCurrentProblem={setCurrentProblem}
-        setLanguage={setLanguage}
-        currentProblem={currentProblem}
-        languages={languages}
-        runCode={runCode}
-        isRunning={isRunning}
-        runTests={runTests}
-        editorTheme={editorTheme}
-        setEditorTheme={setEditorTheme}
-        saveCode={SaveCode}
-        submitContest={submitContest}
-      />
-      <div className="flex-1 flex overflow-hidden">
-        <div
-          ref={leftPanel.containerRef}
-          className={`border-r flex flex-col ${theme === 'light'
-            ? 'bg-white border-gray-200'
-            : 'bg-gray-800 border-gray-700'
-            }`}
-          style={{ width: `${leftPanel.width}%` }}
-        >
-          <div className={`flex border-b flex-shrink-0 ${theme === 'light' ? 'border-gray-200' : 'border-gray-700'
-            }`}>
-            <button
-              onClick={() => setActiveTab('description')}
-              className={`px-4 py-2 border-b-2 transition-all duration-300 ${activeTab === 'description'
-                ? theme === 'light'
-                  ? 'border-blue-500 text-blue-600 bg-gray-50'
-                  : 'border-blue-400 text-blue-300 bg-gray-700'
-                : theme === 'light'
-                  ? 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                  : 'border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-700'
-                }`}
-            >
-              Description
-            </button>
-
-          </div>
-          <div className="flex-1 overflow-hidden flex flex-col">
-            {activeTab === 'description' && <ProblemDescription problem={problem} />}
-
-          </div>
-        </div>
-        <VerticalDragHandle
-          onMouseDown={leftPanel.startResize}
-          isResizing={leftPanel.isResizing}
+      {!showResultPage && !resultPageData && (<div className={` flex flex-col m-6 ${theme === 'light' ? '' : 'bg-gray-700'}`}>
+        <HeaderComponent
+          problems={problems}
+          language={language}
+          setCurrentProblem={setCurrentProblem}
+          setLanguage={setLanguage}
+          currentProblem={currentProblem}
+          languages={languages}
+          runCode={runCode}
+          isRunning={isRunning}
+          runTests={runTests}
+          editorTheme={editorTheme}
+          setEditorTheme={setEditorTheme}
+          saveCode={SaveCode}
+          submitContest={submitContest}
         />
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 flex overflow-hidden">
           <div
-            style={{ height: `calc(100% - ${outputPanel.height}px)` }}
-            className="overflow-hidden"
+            ref={leftPanel.containerRef}
+            className={`border-r flex flex-col ${theme === 'light'
+              ? 'bg-white border-gray-200'
+              : 'bg-gray-800 border-gray-700'
+              }`}
+            style={{ width: `${leftPanel.width}%` }}
           >
-            <CodeEditor
-              code={code}
-              onChange={setCode}
-              language={language}
-              theme={editorTheme}
-            />
+            <div className={`flex border-b flex-shrink-0 ${theme === 'light' ? 'border-gray-200' : 'border-gray-700'
+              }`}>
+              <button
+                onClick={() => setActiveTab('description')}
+                className={`px-4 py-2 border-b-2 transition-all duration-300 ${activeTab === 'description'
+                  ? theme === 'light'
+                    ? 'border-blue-500 text-blue-600 bg-gray-50'
+                    : 'border-blue-400 text-blue-300 bg-gray-700'
+                  : theme === 'light'
+                    ? 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                    : 'border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-700'
+                  }`}
+              >
+                Description
+              </button>
+
+            </div>
+            <div className="flex-1 overflow-hidden flex flex-col">
+              {activeTab === 'description' && <ProblemDescription problem={problem} />}
+
+            </div>
           </div>
-          <HorizontalDragHandle
-            onMouseDown={outputPanel.startResize}
-            isResizing={outputPanel.isResizing}
+          <VerticalDragHandle
+            onMouseDown={leftPanel.startResize}
+            isResizing={leftPanel.isResizing}
           />
-          <div style={{ height: `${outputPanel.height}px` }}>
-            <OutputPanel
-              activeTab={outputTab}
-              setActiveTab={setOutputTab}
-              testResults={testResults}
-              isRunning={isRunning}
-              output={output}
-              errors={errors}
-              height={outputPanel.height}
-              testInput={testinput}
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <div
+              style={{ height: `calc(100% - ${outputPanel.height}px)` }}
+              className="overflow-hidden"
+            >
+              <CodeEditor
+                code={code}
+                onChange={setCode}
+                language={language}
+                theme={editorTheme}
+              />
+            </div>
+            <HorizontalDragHandle
+              onMouseDown={outputPanel.startResize}
+              isResizing={outputPanel.isResizing}
             />
+            <div style={{ height: `${outputPanel.height}px` }}>
+              <OutputPanel
+                activeTab={outputTab}
+                setActiveTab={setOutputTab}
+                testResults={testResults}
+                isRunning={isRunning}
+                output={output}
+                errors={errors}
+                height={outputPanel.height}
+                testInput={testinput}
+              />
+            </div>
           </div>
         </div>
-      </div>
-    </div>)}
+      </div>)}
     </>
   );
 };
