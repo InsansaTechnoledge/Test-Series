@@ -1,4 +1,50 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
+
+// Toaster Component
+const ExamToaster = ({ toasts, onDismiss }) => {
+  if (!toasts || toasts.length === 0) return null;
+
+  return (
+    <div className="fixed top-4 right-4 z-50 space-y-2 max-w-md">
+      {toasts.map((toast) => (
+        <div
+          key={toast.id}
+          className={`p-4 rounded-lg shadow-lg border-l-4 transition-all duration-300 transform ${
+            toast.type === 'warning' 
+              ? 'bg-yellow-50 border-yellow-400 text-yellow-800' 
+              : toast.type === 'error'
+              ? 'bg-red-50 border-red-400 text-red-800'
+              : 'bg-blue-50 border-blue-400 text-blue-800'
+          }`}
+        >
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <div className="flex items-center">
+                <span className="text-lg mr-2">
+                  {toast.type === 'warning' ? '⚠️' : toast.type === 'error' ? '🚨' : 'ℹ️'}
+                </span>
+                <h4 className="font-semibold text-sm">
+                  {toast.type === 'warning' ? 'Security Warning' : 
+                   toast.type === 'error' ? 'Security Violation' : 'Security Notice'}
+                </h4>
+              </div>
+              <p className="text-sm mt-1 whitespace-pre-wrap">{toast.message}</p>
+              {toast.details && (
+                <p className="text-xs mt-1 opacity-75">{toast.details}</p>
+              )}
+            </div>
+            <button
+              onClick={() => onDismiss(toast.id)}
+              className="ml-4 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 export const useExamSecurity = ({
   eventDetails,
@@ -11,356 +57,452 @@ export const useExamSecurity = ({
   handleSubmitTest,
   examContainerRef
 }) => {
-  // Refs to prevent stale closure issues and infinite loops
+  // Toaster state
+  const [toasts, setToasts] = useState([]);
+  const toastIdRef = useRef(0);
+
+  // Refs to prevent stale closure issues and manage state
   const warningCountRef = useRef(warningCount);
-  const violationTimeoutRef = useRef(null);
-  const devToolsCheckRef = useRef(null);
+  const violationCountRef = useRef(0);
   const isSubmittingRef = useRef(false);
   const lastViolationRef = useRef(null);
-  const fullscreenRetryRef = useRef(null);
+  const devToolsCheckRef = useRef(null);
   const isInitializedRef = useRef(false);
+  const fullscreenAttemptRef = useRef(0);
+  const maxFullscreenAttempts = 3;
+  
+  // Lenient settings
+  const violationCooldown = 10000; // 10 seconds
+  const violationsPerWarning = 3; // 3 violations = 1 warning
+  const maxWarnings = 5; // Maximum 5 warnings before auto-submit
+  const lastViolationTimeRef = useRef(0);
 
   // Update warning count ref whenever it changes
   useEffect(() => {
     warningCountRef.current = warningCount;
   }, [warningCount]);
 
-  // Debounced violation logger to prevent spam
-  const logViolation = useCallback((type) => {
-    // Prevent duplicate violations within 1 second
+  // Update submitting ref when submitted changes
+  useEffect(() => {
+    if (submitted) {
+      isSubmittingRef.current = true;
+    }
+  }, [submitted]);
+
+  // Toaster functions
+  const addToast = useCallback((message, type = 'info', details = '', duration = 5000) => {
+    const id = ++toastIdRef.current;
+    const toast = {
+      id,
+      message,
+      type,
+      details,
+      timestamp: Date.now()
+    };
+
+    setToasts(prev => [...prev, toast]);
+
+    // Auto-dismiss after duration (except for critical warnings)
+    if (type !== 'error' && duration > 0) {
+      setTimeout(() => {
+        setToasts(prev => prev.filter(t => t.id !== id));
+      }, duration);
+    }
+
+    return id;
+  }, []);
+
+  const dismissToast = useCallback((id) => {
+    setToasts(prev => prev.filter(t => t.id !== id));
+  }, []);
+
+  const clearAllToasts = useCallback(() => {
+    setToasts([]);
+  }, []);
+
+  // Enhanced violation logger with toaster integration
+  const logViolation = useCallback((type, details = '') => {
+    if (isSubmittingRef.current || submitted) return;
+
     const now = Date.now();
-    if (lastViolationRef.current && 
-        lastViolationRef.current.type === type && 
-        now - lastViolationRef.current.timestamp < 1000) {
+    const timeSinceLastViolation = now - lastViolationTimeRef.current;
+    
+    // Check if we're still in cooldown period
+    if (timeSinceLastViolation < violationCooldown) {
+      console.log(`Violation ignored - in cooldown period (${Math.ceil((violationCooldown - timeSinceLastViolation) / 1000)}s remaining)`);
       return;
     }
 
     const violation = {
       type,
+      details,
       timestamp: now,
       userId,
       examId,
     };
 
-    lastViolationRef.current = violation;
+    lastViolationTimeRef.current = now;
+    violationCountRef.current++;
     
     try {
-      setExamViolations(prev => {
-        // Prevent duplicate violations
-        if (prev.some(v => v.type === type && Math.abs(v.timestamp - now) < 1000)) {
-          return prev;
-        }
-        return [...prev, violation];
-      });
-      console.warn('Violation:', violation);
+      setExamViolations(prev => [...prev, violation]);
+      console.warn(`Security Violation #${violationCountRef.current}:`, violation);
+      
+      // Show violation toast
+      addToast(
+        `Security violation detected: ${type}`,
+        'info',
+        `${details} (Violation #${violationCountRef.current})`,
+        4000
+      );
+      
+      // Check if we need to show a warning (every 3 violations)
+      if (violationCountRef.current % violationsPerWarning === 0) {
+        const warningNumber = Math.floor(violationCountRef.current / violationsPerWarning);
+        showWarning(`Multiple security violations detected (${violationCountRef.current} total).`, warningNumber);
+      }
+      
     } catch (error) {
       console.error('Error logging violation:', error);
+      addToast('Error logging security violation', 'error', error.message, 3000);
     }
-  }, [setExamViolations, userId, examId]);
+  }, [setExamViolations, userId, examId, submitted, addToast]);
 
-  // Debounced warning system
-  const showWarning = useCallback((message) => {
+  // Enhanced warning system with toaster
+  const showWarning = useCallback((message, warningNumber) => {
     if (isSubmittingRef.current || submitted) return;
 
-    // Clear any existing timeout
-    if (violationTimeoutRef.current) {
-      clearTimeout(violationTimeoutRef.current);
-    }
-
-    violationTimeoutRef.current = setTimeout(() => {
-      try {
-        const currentCount = warningCountRef.current;
-        const nextCount = currentCount + 1;
+    try {
+      setWarningCount(warningNumber);
+      
+      const warningMessage = `Security Alert: ${message}\n\nWarning ${warningNumber}/${maxWarnings} - Please follow exam guidelines to avoid automatic submission.`;
+      
+      // Show warning toast
+      addToast(
+        warningMessage,
+        'warning',
+        `This is warning ${warningNumber} of ${maxWarnings}`,
+        8000 // Longer duration for warnings
+      );
+      
+      // Auto-submit after maximum warnings
+      if (warningNumber >= maxWarnings && !isSubmittingRef.current) {
+        isSubmittingRef.current = true;
         
-        setWarningCount(nextCount);
+        const submitMessage = `EXAM TERMINATED\n\nMaximum security warnings (${maxWarnings}) reached. Your exam will be auto-submitted now.`;
         
-        const warningMessage = `⚠️ WARNING: ${message}\n\nThis is warning ${nextCount}. Multiple violations may result in exam termination.`;
+        // Show critical error toast
+        addToast(
+          submitMessage,
+          'error',
+          'Auto-submitting in 2 seconds...',
+          0 // Don't auto-dismiss
+        );
         
-        // Use a more user-friendly notification system if available
-        if (window.showExamWarning) {
-          window.showExamWarning(warningMessage);
-        } else {
-          alert(warningMessage);
-        }
-        
-        // Auto-submit after 3 warnings with additional safety checks
-        if (nextCount >= 3 && !isSubmittingRef.current) {
-          isSubmittingRef.current = true;
-          const submitMessage = 'Too many violations. Exam will be auto-submitted.';
-          
-          if (window.showExamWarning) {
-            window.showExamWarning(submitMessage);
-          } else {
-            alert(submitMessage);
+        // Submit with delay
+        setTimeout(() => {
+          if (handleSubmitTest && typeof handleSubmitTest === 'function') {
+            handleSubmitTest();
           }
-          
-          setTimeout(() => {
-            if (handleSubmitTest && typeof handleSubmitTest === 'function') {
-              handleSubmitTest();
-            }
-          }, 2000);
-        }
-      } catch (error) {
-        console.error('Error showing warning:', error);
+        }, 2000);
       }
-    }, 500); // 500ms debounce
-  }, [setWarningCount, handleSubmitTest, submitted]);
+    } catch (error) {
+      console.error('Error showing warning:', error);
+      addToast('Error showing security warning', 'error', error.message, 3000);
+    }
+  }, [setWarningCount, handleSubmitTest, submitted, addToast]);
 
-  // Optimized key handler with debouncing
-  const disableKeys = useCallback((e) => {
-    if (submitted || isSubmittingRef.current) return;
+  // Comprehensive key handler with better detection
+  const handleKeyDown = useCallback((e) => {
+    if (isSubmittingRef.current || submitted) return;
 
     const violations = [
-      { combo: e.key === 'F12', label: 'F12 key' },
-      { combo: e.ctrlKey && e.shiftKey && e.key === 'I', label: 'Ctrl+Shift+I' },
-      { combo: e.ctrlKey && e.shiftKey && e.key === 'J', label: 'Ctrl+Shift+J' },
-      { combo: e.ctrlKey && e.shiftKey && e.key === 'C', label: 'Ctrl+Shift+C' },
-      { combo: e.ctrlKey && e.key === 'u', label: 'Ctrl+U' },
-      { combo: e.ctrlKey && e.key === 's', label: 'Ctrl+S' },
-      { combo: e.ctrlKey && e.key === 'p', label: 'Ctrl+P' },
-      { combo: e.altKey && e.key === 'Tab', label: 'Alt+Tab' },
-      { combo: e.ctrlKey && e.key === 'Tab', label: 'Ctrl+Tab' },
-      { combo: e.key === 'Meta', label: 'Windows key' },
-      { combo: e.ctrlKey && e.key === 'n', label: 'Ctrl+N' },
-      { combo: e.ctrlKey && e.key === 't', label: 'Ctrl+T' },
-      { combo: e.ctrlKey && e.key === 'w', label: 'Ctrl+W' },
-      { combo: e.ctrlKey && e.key === 'r', label: 'Ctrl+R' },
-      { combo: e.key === 'F5', label: 'F5' }
+      // Developer tools
+      { condition: e.key === 'F12', label: 'F12 (Dev Tools)' },
+      { condition: e.ctrlKey && e.shiftKey && e.key === 'I', label: 'Ctrl+Shift+I (Dev Tools)' },
+      { condition: e.ctrlKey && e.shiftKey && e.key === 'J', label: 'Ctrl+Shift+J (Console)' },
+      { condition: e.ctrlKey && e.shiftKey && e.key === 'C', label: 'Ctrl+Shift+C (Inspector)' },
+      { condition: e.ctrlKey && e.shiftKey && e.key === 'K', label: 'Ctrl+Shift+K (Console)' },
+      
+      // Source/save/print
+      { condition: e.ctrlKey && e.key === 'u', label: 'Ctrl+U (View Source)' },
+      { condition: e.ctrlKey && e.key === 's', label: 'Ctrl+S (Save Page)' },
+      { condition: e.ctrlKey && e.key === 'p', label: 'Ctrl+P (Print)' },
+      
+      // Navigation
+      { condition: e.altKey && e.key === 'Tab', label: 'Alt+Tab (Switch Window)' },
+      { condition: e.ctrlKey && e.key === 'Tab', label: 'Ctrl+Tab (Switch Tab)' },
+      { condition: e.ctrlKey && e.shiftKey && e.key === 'Tab', label: 'Ctrl+Shift+Tab (Switch Tab)' },
+      { condition: e.key === 'Meta' || e.key === 'Cmd', label: 'Windows/Cmd Key' },
+      
+      // Browser controls
+      { condition: e.ctrlKey && e.key === 'n', label: 'Ctrl+N (New Window)' },
+      { condition: e.ctrlKey && e.key === 't', label: 'Ctrl+T (New Tab)' },
+      { condition: e.ctrlKey && e.key === 'w', label: 'Ctrl+W (Close Tab)' },
+      { condition: e.ctrlKey && e.key === 'r', label: 'Ctrl+R (Refresh)' },
+      { condition: e.ctrlKey && e.key === 'l', label: 'Ctrl+L (Address Bar)' },
+      { condition: e.key === 'F5', label: 'F5 (Refresh)' },
+      
+      // Function keys
+      { condition: e.key === 'F1', label: 'F1 (Help)' },
+      { condition: e.key === 'F6', label: 'F6 (Address Bar)' },
+      { condition: e.key === 'F11', label: 'F11 (Fullscreen Toggle)' },
     ];
 
-    const violation = violations.find(v => v.combo);
+    const violation = violations.find(v => v.condition);
     if (violation) {
       e.preventDefault();
       e.stopPropagation();
-      logViolation(`${violation.label} pressed`);
-      showWarning(`${violation.label} is disabled during the exam.`);
+      e.stopImmediatePropagation();
+      
+      logViolation('Restricted Key Pressed', violation.label);
     }
-  }, [submitted, logViolation, showWarning]);
+  }, [submitted, logViolation]);
 
-  // Copy/paste prevention
-  const preventCopyPaste = useCallback((e) => {
-    if (submitted || isSubmittingRef.current) return;
-
-    if (e.ctrlKey && ['c', 'v', 'x', 'a'].includes(e.key)) {
-      e.preventDefault();
-      e.stopPropagation();
-      logViolation(`Copy/Paste/Select (${e.key}) attempted`);
-      showWarning(`Keyboard shortcuts like Ctrl+${e.key.toUpperCase()} are disabled.`);
-    }
-  }, [submitted, logViolation, showWarning]);
-
-  // Throttled dev tools detection
+  // Dev tools detection with toaster feedback
   const checkDevTools = useCallback(() => {
-    if (submitted || isSubmittingRef.current) return;
+    if (isSubmittingRef.current || submitted) return;
 
     try {
-      const threshold = 160;
+      const threshold = 200;
       const heightDiff = window.outerHeight - window.innerHeight;
       const widthDiff = window.outerWidth - window.innerWidth;
       
+      // Check for unusual window dimensions
       if (heightDiff > threshold || widthDiff > threshold) {
-        logViolation('Developer tools detected');
-        showWarning('Developer tools usage is not allowed.');
+        logViolation('Developer Tools Detected', `Height: ${heightDiff}, Width: ${widthDiff}`);
+      }
+
+      // Console detection
+      let devtools = { open: false };
+      const element = new Image();
+      element.__defineGetter__('id', function() {
+        devtools.open = true;
+      });
+      
+      console.log('%c', element);
+      
+      if (devtools.open) {
+        logViolation('Console Access Detected', 'Console opened');
       }
     } catch (error) {
-      console.error('Error checking dev tools:', error);
+      // Silently handle errors in dev tools detection
     }
-  }, [submitted, logViolation, showWarning]);
+  }, [submitted, logViolation]);
 
-  // Window focus handlers
+  // Window focus/blur handlers
   const handleWindowBlur = useCallback(() => {
-    if (submitted || isSubmittingRef.current) return;
-    logViolation('Window lost focus');
-    showWarning('You switched away from the exam window!');
-  }, [submitted, logViolation, showWarning]);
+    if (isSubmittingRef.current || submitted) return;
+    logViolation('Window Focus Lost', 'User switched away from exam');
+  }, [submitted, logViolation]);
 
   const handleVisibilityChange = useCallback(() => {
-    if (submitted || isSubmittingRef.current) return;
+    if (isSubmittingRef.current || submitted) return;
     if (document.hidden) {
-      logViolation('Page became hidden');
-      showWarning('You switched tabs or minimized the window!');
+      logViolation('Tab Hidden', 'Tab became hidden or minimized');
     }
-  }, [submitted, logViolation, showWarning]);
+  }, [submitted, logViolation]);
 
-  // Fullscreen management with retry logic
+  // Fullscreen management
   const enterFullscreen = useCallback(() => {
-    if (!examContainerRef?.current || submitted || isSubmittingRef.current) return;
+    if (!examContainerRef?.current || isSubmittingRef.current || submitted) return;
+    
+    if (fullscreenAttemptRef.current >= maxFullscreenAttempts) {
+      logViolation('Fullscreen Enforcement Failed', 'Maximum attempts exceeded');
+      return;
+    }
 
     try {
       const el = examContainerRef.current;
       const requestFullscreen = el.requestFullscreen || 
                                el.webkitRequestFullscreen || 
+                               el.mozRequestFullScreen ||
                                el.msRequestFullscreen;
       
       if (requestFullscreen) {
+        fullscreenAttemptRef.current++;
         requestFullscreen.call(el).catch(err => {
           console.warn('Fullscreen request failed:', err);
+          logViolation('Fullscreen Request Failed', err.message);
         });
+      } else {
+        logViolation('Fullscreen Not Supported', 'Browser does not support fullscreen');
       }
     } catch (error) {
       console.error('Error entering fullscreen:', error);
+      logViolation('Fullscreen Error', error.message);
     }
-  }, [examContainerRef, submitted]);
+  }, [examContainerRef, submitted, logViolation]);
 
   const handleFullscreenChange = useCallback(() => {
-    if (submitted || isSubmittingRef.current) return;
+    if (isSubmittingRef.current || submitted) return;
 
-    if (!document.fullscreenElement) {
-      logViolation('Exited fullscreen mode');
-      showWarning('You must stay in fullscreen during the exam.');
+    const isFullscreen = !!(document.fullscreenElement || 
+                           document.webkitFullscreenElement || 
+                           document.mozFullScreenElement || 
+                           document.msFullscreenElement);
+
+    if (!isFullscreen && fullscreenAttemptRef.current < maxFullscreenAttempts) {
+      logViolation('Fullscreen Exited', 'User exited fullscreen mode');
       
-      // Retry fullscreen with exponential backoff
-      if (fullscreenRetryRef.current) {
-        clearTimeout(fullscreenRetryRef.current);
-      }
-      
-      fullscreenRetryRef.current = setTimeout(() => {
-        enterFullscreen();
-      }, 1000);
+      setTimeout(() => {
+        if (!isSubmittingRef.current && !submitted) {
+          enterFullscreen();
+        }
+      }, 3000);
     }
-  }, [submitted, logViolation, showWarning, enterFullscreen]);
+  }, [submitted, logViolation, enterFullscreen]);
 
-  // Context menu and drag/drop handlers
-  const disableContextMenu = useCallback((e) => {
-    if (submitted || isSubmittingRef.current) return;
+  // Context menu handler
+  const handleContextMenu = useCallback((e) => {
+    if (isSubmittingRef.current || submitted) return;
     e.preventDefault();
-    logViolation('Right-click attempted');
+    logViolation('Right Click Attempted', 'Context menu blocked');
   }, [submitted, logViolation]);
 
-  const disableDragDrop = useCallback((e) => {
-    if (submitted || isSubmittingRef.current) return;
+  // Drag and drop handlers
+  const handleDragStart = useCallback((e) => {
+    if (isSubmittingRef.current || submitted) return;
+    if (e.target.tagName === 'IMG' || e.target.tagName === 'VIDEO') {
+      e.preventDefault();
+      logViolation('Drag Operation Attempted', 'Media drag blocked');
+    }
+  }, [submitted, logViolation]);
+
+  const handleDrop = useCallback((e) => {
+    if (isSubmittingRef.current || submitted) return;
     e.preventDefault();
-    logViolation('Drag/Drop attempted');
+    logViolation('Drop Operation Attempted', 'Drop blocked');
   }, [submitted, logViolation]);
 
   // Navigation handlers
   const handlePopState = useCallback((e) => {
-    if (submitted || isSubmittingRef.current) return;
-    e.preventDefault();
-    logViolation('Back button pressed');
-    showWarning('Back navigation is disabled!');
+    if (isSubmittingRef.current || submitted) return;
     
-    // Restore current state
+    logViolation('Navigation Attempted', 'Back button pressed');
+    
     try {
       window.history.pushState(null, null, window.location.pathname);
     } catch (error) {
-      console.error('Error handling popstate:', error);
+      console.error('Error preventing navigation:', error);
     }
-  }, [submitted, logViolation, showWarning]);
+  }, [submitted, logViolation]);
 
   const handleBeforeUnload = useCallback((e) => {
-    if (submitted || isSubmittingRef.current) return;
-    logViolation('Page refresh/close attempted');
+    if (isSubmittingRef.current || submitted) return;
+    
+    logViolation('Page Unload Attempted', 'User tried to leave page');
+    const message = 'Are you sure you want to leave? Your exam progress will be lost.';
     e.preventDefault();
-    e.returnValue = 'Are you sure you want to leave? Your test will be lost.';
+    e.returnValue = message;
+    return message;
   }, [submitted, logViolation]);
 
   // Main effect for security initialization
   useEffect(() => {
     if (!eventDetails || submitted || isInitializedRef.current) return;
 
+    console.log('🔒 Initializing exam security measures with toaster...');
     isInitializedRef.current = true;
-    console.log('Initializing exam security...');
 
-    // Initialize history state
+    // Show initialization toast
+    addToast(
+      'Exam security measures activated',
+      'info',
+      'Security monitoring is now active. Please remain in fullscreen mode.',
+      4000
+    );
+
+    // Initialize browser history
     try {
       window.history.pushState(null, null, window.location.pathname);
     } catch (error) {
       console.error('Error initializing history:', error);
     }
 
-    // Add all event listeners
-    const cleanup = [];
-    
-    try {
-      document.addEventListener('contextmenu', disableContextMenu, { passive: false });
-      cleanup.push(() => document.removeEventListener('contextmenu', disableContextMenu));
+    // Event listener options
+    const eventOptions = { passive: false, capture: true };
+    const passiveOptions = { passive: true };
 
-      document.addEventListener('keydown', disableKeys, { passive: false });
-      cleanup.push(() => document.removeEventListener('keydown', disableKeys));
+    // Add event listeners
+    document.addEventListener('keydown', handleKeyDown, eventOptions);
+    document.addEventListener('contextmenu', handleContextMenu, eventOptions);
+    document.addEventListener('visibilitychange', handleVisibilityChange, passiveOptions);
+    document.addEventListener('fullscreenchange', handleFullscreenChange, passiveOptions);
+    document.addEventListener('dragstart', handleDragStart, eventOptions);
+    document.addEventListener('drop', handleDrop, eventOptions);
+    window.addEventListener('blur', handleWindowBlur, passiveOptions);
+    window.addEventListener('popstate', handlePopState, eventOptions);
+    window.addEventListener('beforeunload', handleBeforeUnload, eventOptions);
 
-      document.addEventListener('keydown', preventCopyPaste, { passive: false });
-      cleanup.push(() => document.removeEventListener('keydown', preventCopyPaste));
+    // Dev tools monitoring
+    devToolsCheckRef.current = setInterval(checkDevTools, 5000);
 
-      document.addEventListener('visibilitychange', handleVisibilityChange);
-      cleanup.push(() => document.removeEventListener('visibilitychange', handleVisibilityChange));
-
-      document.addEventListener('fullscreenchange', handleFullscreenChange);
-      cleanup.push(() => document.removeEventListener('fullscreenchange', handleFullscreenChange));
-
-      document.addEventListener('dragstart', disableDragDrop, { passive: false });
-      cleanup.push(() => document.removeEventListener('dragstart', disableDragDrop));
-
-      document.addEventListener('drop', disableDragDrop, { passive: false });
-      cleanup.push(() => document.removeEventListener('drop', disableDragDrop));
-
-      window.addEventListener('blur', handleWindowBlur);
-      cleanup.push(() => window.removeEventListener('blur', handleWindowBlur));
-
-      window.addEventListener('popstate', handlePopState);
-      cleanup.push(() => window.removeEventListener('popstate', handlePopState));
-
-      window.addEventListener('beforeunload', handleBeforeUnload);
-      cleanup.push(() => window.removeEventListener('beforeunload', handleBeforeUnload));
-
-      // Start dev tools monitoring with throttling
-      devToolsCheckRef.current = setInterval(checkDevTools, 2000);
-      cleanup.push(() => {
-        if (devToolsCheckRef.current) {
-          clearInterval(devToolsCheckRef.current);
-        }
-      });
-
-      // Enter fullscreen after a brief delay
-      setTimeout(() => {
-        if (!submitted && !isSubmittingRef.current) {
-          enterFullscreen();
-        }
-      }, 500);
-
-    } catch (error) {
-      console.error('Error setting up security listeners:', error);
-    }
+    // Fullscreen initialization
+    const fullscreenTimeout = setTimeout(() => {
+      if (!isSubmittingRef.current && !submitted) {
+        enterFullscreen();
+      }
+    }, 2000);
 
     // Cleanup function
     return () => {
-      console.log('Cleaning up exam security...');
-      isInitializedRef.current = false;
+      console.log('🔓 Cleaning up exam security measures...');
       
-      cleanup.forEach(fn => {
-        try {
-          fn();
-        } catch (error) {
-          console.error('Error during cleanup:', error);
-        }
-      });
+      // Remove event listeners
+      document.removeEventListener('keydown', handleKeyDown, eventOptions);
+      document.removeEventListener('contextmenu', handleContextMenu, eventOptions);
+      document.removeEventListener('visibilitychange', handleVisibilityChange, passiveOptions);
+      document.removeEventListener('fullscreenchange', handleFullscreenChange, passiveOptions);
+      document.removeEventListener('dragstart', handleDragStart, eventOptions);
+      document.removeEventListener('drop', handleDrop, eventOptions);
+      window.removeEventListener('blur', handleWindowBlur, passiveOptions);
+      window.removeEventListener('popstate', handlePopState, eventOptions);
+      window.removeEventListener('beforeunload', handleBeforeUnload, eventOptions);
 
-      // Clear all timeouts
-      if (violationTimeoutRef.current) {
-        clearTimeout(violationTimeoutRef.current);
-      }
-      if (fullscreenRetryRef.current) {
-        clearTimeout(fullscreenRetryRef.current);
-      }
+      // Clear intervals and timeouts
       if (devToolsCheckRef.current) {
         clearInterval(devToolsCheckRef.current);
+        devToolsCheckRef.current = null;
       }
+      
+      clearTimeout(fullscreenTimeout);
+      
+      // Reset refs
+      isInitializedRef.current = false;
+      fullscreenAttemptRef.current = 0;
+      violationCountRef.current = 0;
+      lastViolationTimeRef.current = 0;
     };
-  }, [eventDetails, submitted]);
+  }, [eventDetails, submitted, handleKeyDown, handleContextMenu, handleVisibilityChange, 
+      handleFullscreenChange, handleDragStart, handleDrop, handleWindowBlur, 
+      handlePopState, handleBeforeUnload, checkDevTools, enterFullscreen, addToast]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
       isSubmittingRef.current = false;
-      if (violationTimeoutRef.current) {
-        clearTimeout(violationTimeoutRef.current);
-      }
-      if (fullscreenRetryRef.current) {
-        clearTimeout(fullscreenRetryRef.current);
-      }
       if (devToolsCheckRef.current) {
         clearInterval(devToolsCheckRef.current);
       }
+      clearAllToasts();
     };
-  }, []);
-};
+  }, [clearAllToasts]);
+
+  // Return components and utilities
+  return {
+    violationCount: violationCountRef.current,
+    warningCount: warningCountRef.current,
+    toasts,
+    addToast,
+    dismissToast,
+    clearAllToasts,
+    // Toaster component to render
+    ToasterComponent: () => (
+      <ExamToaster 
+        toasts={toasts} 
+        onDismiss={dismissToast} 
+      />
+    )
+  };
+};    

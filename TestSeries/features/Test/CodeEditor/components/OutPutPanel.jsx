@@ -207,6 +207,7 @@ const OutputPanel = ({
               <pre className={outputTextClass}>
                 {output ? (
 <>
+{console.log("🎀🎀🎀🎀22,",output)}
 
   {testInput.length === output.length
     ? testInput?.map((input, index) => (
@@ -220,7 +221,7 @@ const OutputPanel = ({
           <div className="mb-2">
             <span className={labelClass}>Output:</span> 
             <div className={outputTextClass}>
-              {typeof output === 'string'?output: JSON.stringify(output[index]) }
+              {typeof output === 'string'? output: JSON.stringify(output[index]) }
            
             </div>
           </div>

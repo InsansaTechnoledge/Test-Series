@@ -50,3 +50,11 @@ export const ToggleContest = async (id) => {
     return response.data;
 
 }
+
+export const submitContestService = async (contest_id, studentResult) => {
+    const response = await api.post('/v1/contest/submit', {
+        contest_id,
+        results:studentResult
+    });
+    return response.data;
+}

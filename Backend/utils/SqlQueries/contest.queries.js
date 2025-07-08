@@ -1,3 +1,4 @@
+import { submitContest } from "../../controllers/SupabaseDB/contest.controllers.js";
 import { getSupabaseClient } from "../../database/SupabaseDB.js";
 
 const supabase = getSupabaseClient();
@@ -181,3 +182,43 @@ export const toggleContestLive = async (contestID) => {
 
   return { data: updatedData };
 };
+
+export const submitContestQuery = async (contest_id, userId, results) => {
+
+    const cleanResults = results.results.map(r => ({
+      questionId: r.questionId || '',
+      obtainedMarks: Number(r.obtainedMarks || 0)
+    }));
+
+    const cleanScore = {
+      results: cleanResults,
+      totalMarks: Number(results.totalMarks || 0),
+      totalObtainedMarks: Number(results.totalObtainedMarks || 0)
+    };
+
+    const payload = {
+      contest_id: contest_id,
+      participant_id: userId.toString(),
+      score: cleanScore,
+      status: 'submitted'
+    };
+
+  const response = await supabase
+  .from('contestxparticipant')
+  .upsert(payload, {
+    onConflict: ['contest_id', 'participant_id']
+  })
+  .select(); // ✅ required to get non-null data
+
+if (!response) throw new Error('No response from Supabase');
+
+const { data, error } = response;
+
+if (error) throw error;
+
+console.log("Contest submission response:", data);
+return data;
+
+};
+
+
