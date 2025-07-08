@@ -1,7 +1,7 @@
 import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
 import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
 // import { createContestQuery, deleteContest, fetchContest } from "../../utils/SqlQueries/contest.queries.js";
-import { createContestQuery, enrollStudentToContestQuery, fetchContest, deleteContest, getContestCount, toggleContestLive } from "../../utils/SqlQueries/contest.queries.js";
+import { createContestQuery, enrollStudentToContestQuery, fetchContest, deleteContest, getContestCount, toggleContestLive, submitContestQuery } from "../../utils/SqlQueries/contest.queries.js";
 import { saveContestQuestion } from "../../utils/SqlQueries/contestQuestion.queries.js";
 
 export const createContest = async (req, res) => {
@@ -154,3 +154,24 @@ export const toggleLiveContest = async (req, res) => {
         return new APIError(500 , ['Failed to toggle this contest', e.message]).send(res);
     }
 }
+
+export const submitContest = async (req, res) => {
+    const { contest_id, results } = req.body;
+
+    if (!contest_id || !results ) {
+        return new APIError(400, 'Contest ID and results are required').send(res);
+    }
+
+    try {
+        const response = await submitContestQuery(contest_id, req.user._id, results);
+console.log("Contest submission response:", response);
+        if (response.error) {
+            throw new Error(response.error.message);
+        }
+
+        return new APIResponse(200, response, 'Contest submitted successfully').send(res);
+    } catch (error) {
+        console.error("Error submitting contest:", error);
+        return new APIError(500, ['Failed to submit contest', error.message]).send(res);
+    }
+};

@@ -13,6 +13,9 @@ import { useParams } from 'react-router-dom';
 import CryptoJS from 'crypto-js';
 import { VITE_SECRET_KEY_FOR_CONTEST } from '../../constants/env';
 import { useTheme } from '../../../hooks/useTheme';
+import { Save } from 'lucide-react';
+import { submitContestService } from '../../../utils/services/contestService';
+import ContestResultComponent from '../../afterAuth/components/StudentSide/Coding-Contests/contestResult/contestResultComponent';
 
 const CodingPlatform = () => {
   const { contestId } = useParams();
@@ -28,6 +31,9 @@ const CodingPlatform = () => {
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [testinput, setTestInput] = useState([]);
+  const [showResultPage, setShowResultPage] = useState(false);
+  const [resultPageData, setResultPageData] = useState(null);
+
 
 
   const [editorTheme, setEditorTheme] = useState('vs-dark');
@@ -102,7 +108,7 @@ const CodingPlatform = () => {
     try {
       const currentLang = languages.find((l) => l.value === language);
 
-      const response = await runContestCode(code,problem, currentLang);
+      const response = await runContestCode(code, problem, currentLang);
 
 
       if (response.status !== 200) {
@@ -110,7 +116,7 @@ const CodingPlatform = () => {
         setIsRunning(false);
         return;
       }
-      const {result,testInput} = response.data;
+      const { result, testInput } = response.data;
       console.log("Run Result:", result);
       setTestInput(testInput || []);
       if (!result) {
@@ -124,7 +130,7 @@ const CodingPlatform = () => {
       if (result.run?.stdout) {
         setOutput(
           typeof result.run.stdout === "string"
-            ? (() => { try { console.log("hertw",JSON.parse(result.run.stdout));return JSON.parse(result.run.stdout); } catch { console.log("hertw",JSON.parse(result.run.stdout)); return result.run.stdout; } })()
+            ? (() => { try { console.log("hertw", JSON.parse(result.run.stdout)); return JSON.parse(result.run.stdout); } catch { console.log("hertw", JSON.parse(result.run.stdout)); return result.run.stdout; } })()
             : result.run.stdout
         );
       }
@@ -156,13 +162,13 @@ const CodingPlatform = () => {
       }
       console.log("Running tests for problem:", problem.title, "in language:", currentLang.value);
 
-      const response = await runContestTestCases(code,problem, currentLang);
+      const response = await runContestTestCases(code, problem, currentLang);
 
       if (response.status === 200) {
         results = response.data.results;
         console.log("Test Results:", results);
         setTestInput(response.data.testInput || []);
-            setOutput(results.fullOutput || '');
+        setOutput(results.fullOutput || '');
         setErrors(response.data.errors || []);
       }
     } catch (error) {
@@ -173,6 +179,67 @@ const CodingPlatform = () => {
 
     setIsRunning(false);
     setOutputTab('testcase');
+
+  };
+
+  const SaveCode = async () => {
+    setIsRunning(true);
+    setErrors([]);
+    try {
+      if (!problem || !problem.code_snippets) {
+        setErrors(['No problem or code snippets defined!']);
+        setIsRunning(false);
+        return;
+      }
+      const currentLang = languages.find((l) => l.value === language);
+      if (!currentLang) {
+        setErrors(['Unsupported language selected!']);
+        setIsRunning(false);
+        return;
+      }
+      const marksForEachTestCase = (problem.marks / problem.test_cases.length);
+      localStorage.setItem(`contest_${contest_id}_problem_${problem.id}_code`, code);
+      localStorage.setItem(`contest_${contest_id}_problem_${problem.id}_language`, language);
+      localStorage.setItem(`contest_${contest_id}_problem_${problem.id}_testResults`, (testResults.passedCount * marksForEachTestCase) || 0);
+
+    } catch (error) {
+      console.error('SaveCode error:', error);
+      setErrors(['Code saving failed: ' + error.message]);
+    } finally {
+      setIsRunning(false);
+    }
+  };
+  console.log("Contest ID:", contest_id);
+  console.log("Problems:", problems);
+  const submitContest = async () => {
+    const studentResult = {
+      results: problems.map((problem) => ({
+        questionId: problem.question_id,
+        obtainedMarks:
+          parseFloat(localStorage.getItem(`contest_${contest_id}_problem_${problem.question_id}_testResults`)) || 0,
+      })),
+      totalMarks: problems.reduce((total, problem) => total + problem.marks, 0),
+      totalObtainedMarks: problems.reduce(
+        (total, problem) =>
+          total +
+          (parseFloat(localStorage.getItem(`contest_${contest_id}_problem_${problem.question_id}_testResults`)) || 0),
+        0
+      ),
+    };
+    console.log("Submitting Contest with ID:", contest_id);
+    console.log("Student Result:", studentResult);
+    const response = await submitContestService(contest_id, studentResult);
+    if (response.status === 200) {
+      setResultPageData({ problems, studentResult });
+      alert('Contest submitted successfully!');
+      setShowResultPage(true);
+      
+
+    }
+    else {
+      alert('Failed to submit contest: ' + response.statusText);
+    }
+
 
   };
 
@@ -189,8 +256,15 @@ const CodingPlatform = () => {
   }
 
   return (
-    <div className={` flex flex-col m-6 ${theme === 'light' ? '' : 'bg-gray-700'
-      }`}>
+    <>
+        {showResultPage && resultPageData && (
+        <ContestResultComponent
+          problems={resultPageData.problems}
+          studentResult={resultPageData.studentResult}
+        />
+      )}
+
+   {!showResultPage && !resultPageData &&( <div className = {` flex flex-col m-6 ${theme === 'light' ? '' : 'bg-gray-700'}`}>
       <HeaderComponent
         problems={problems}
         language={language}
@@ -203,13 +277,15 @@ const CodingPlatform = () => {
         runTests={runTests}
         editorTheme={editorTheme}
         setEditorTheme={setEditorTheme}
+        saveCode={SaveCode}
+        submitContest={submitContest}
       />
       <div className="flex-1 flex overflow-hidden">
         <div
           ref={leftPanel.containerRef}
           className={`border-r flex flex-col ${theme === 'light'
-              ? 'bg-white border-gray-200'
-              : 'bg-gray-800 border-gray-700'
+            ? 'bg-white border-gray-200'
+            : 'bg-gray-800 border-gray-700'
             }`}
           style={{ width: `${leftPanel.width}%` }}
         >
@@ -218,12 +294,12 @@ const CodingPlatform = () => {
             <button
               onClick={() => setActiveTab('description')}
               className={`px-4 py-2 border-b-2 transition-all duration-300 ${activeTab === 'description'
-                  ? theme === 'light'
-                    ? 'border-blue-500 text-blue-600 bg-gray-50'
-                    : 'border-blue-400 text-blue-300 bg-gray-700'
-                  : theme === 'light'
-                    ? 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                    : 'border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-700'
+                ? theme === 'light'
+                  ? 'border-blue-500 text-blue-600 bg-gray-50'
+                  : 'border-blue-400 text-blue-300 bg-gray-700'
+                : theme === 'light'
+                  ? 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  : 'border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-700'
                 }`}
             >
               Description
@@ -269,7 +345,8 @@ const CodingPlatform = () => {
           </div>
         </div>
       </div>
-    </div>
+    </div>)}
+    </>
   );
 };
 

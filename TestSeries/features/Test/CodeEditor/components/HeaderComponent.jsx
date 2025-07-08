@@ -13,7 +13,9 @@ const HeaderComponent = ({
   isRunning, 
   runTests,
   editorTheme,
-  setEditorTheme
+  setEditorTheme,
+  saveCode,
+  submitContest
 }) => {
   const currentProblemData = problems[currentProblem];
   
@@ -176,7 +178,28 @@ const HeaderComponent = ({
               className={submitButtonStyles}
             >
               <Send className="w-4 h-4" />
-              <span>{isRunning ? 'Running Test Cases' : 'Submit Test'}</span>
+              <span>{isRunning ? 'Running Test Cases' : 'Submit Test Cases'}</span>
+            </button>
+            <button
+              onClick={saveCode}
+              disabled={isRunning}
+              className={submitButtonStyles}
+            >
+              <Send className="w-4 h-4" />
+              <span>
+                'Save this Code'
+              </span>
+            </button>
+
+             <button
+              onClick={submitContest}
+              disabled={isRunning}
+              className={submitButtonStyles}
+            >
+              <Send className="w-4 h-4" />
+              <span>
+                'Submit this Contest'
+              </span>
             </button>
           </div>
         </div>
