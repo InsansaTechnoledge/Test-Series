@@ -15,9 +15,13 @@ const QuestionListSection = ({
   const { theme } = useTheme()
   const isDark = theme === 'dark';
   const [showAllQuestions, setShowAllQuestions] = useState(false);
+ 
+
   // Get all questions from all subjects in a flat array
   const allQuestions = [];
   let questionNumber = 1;
+
+ 
   
   Object.keys(subjectSpecificQuestions).forEach(subject => {
     subjectSpecificQuestions[subject].forEach(ques => {
@@ -29,6 +33,15 @@ const QuestionListSection = ({
       questionNumber++;
     });
   });
+
+  const [currentPage , setCurrentPage] = useState(1);
+  const questionsPerPage = 15;
+  const totalPages = Math.ceil(allQuestions.length/questionsPerPage);
+
+  const startIndex = (currentPage - 1) * questionsPerPage;
+  const endIndex = startIndex + questionsPerPage;
+  const paginatedQuestions = allQuestions.slice(startIndex, endIndex);
+
 
   // Calculate status counts
   const statusCounts = {
@@ -84,7 +97,7 @@ const QuestionListSection = ({
 
 
      <div className="grid grid-cols-5 gap-3 mb-4">
-        {(showAllQuestions ? allQuestions : allQuestions.slice(0, 15)).map((ques, i) => (
+        {/* {(showAllQuestions ? allQuestions : allQuestions.slice(0, 15)).map((ques, i) => (
             <div key={i} className="flex justify-center">
                 <button
                     onClick={() => setSelectedQuestion(ques)}
@@ -105,28 +118,63 @@ const QuestionListSection = ({
                     {ques.displayNumber}
                 </button>
             </div>
+        ))} */}
+
+        {paginatedQuestions.map((ques, i) => (
+          <div key={i} className="flex justify-center">
+            <button
+              onClick={() => setSelectedQuestion(ques)}
+              className={`w-10 h-10 rounded-md flex items-center justify-center text-sm font-semibold transition-all duration-200 hover:scale-105 ${
+                ques.id === selectedQuestion.id
+                  ? 'ring-2 ring-blue-400 ring-offset-2 ring-offset-gray-700'
+                  : ''
+              } ${
+                ques.status === 'unanswered'
+                  ? 'bg-gray-600 text-gray-300 border border-gray-500'
+                  : ques.status === 'answered'
+                  ? 'bg-green-600 text-white'
+                  : ques.status === 'markedForReview' && !ques.response
+                  ? 'bg-yellow-500 text-gray-900'
+                  : 'bg-orange-600 text-white'
+              }`}
+            >
+              {ques.displayNumber}
+            </button>
+          </div>
         ))}
+
     </div>
     
-    {/* View More/Less Button */}
-    {allQuestions.length > 15 && (
-        <div className="flex justify-center">
-            <button 
-                onClick={() => setShowAllQuestions(!showAllQuestions)}
-                className="bg-gray-600 hover:bg-gray-500 text-gray-300 px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2"
-            >
-                {showAllQuestions ? 'View Less' : `View More (${allQuestions.length - 15} more)`}
-                <svg 
-                    className={`w-4 h-4 transition-transform duration-200 ${showAllQuestions ? 'rotate-180' : ''}`} 
-                    fill="none" 
-                    stroke="currentColor" 
-                    viewBox="0 0 24 24"
-                >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-            </button>
-        </div>
-    )}
+        <div className="flex justify-center items-center gap-4 mt-4">
+      <button
+        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+        disabled={currentPage === 1}
+        className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+          currentPage === 1
+            ? 'bg-gray-400 cursor-not-allowed'
+            : 'bg-blue-600 text-white hover:bg-blue-500'
+        }`}
+      >
+        Previous
+      </button>
+
+      <span className={`${isDark ? 'text-gray-300' : 'text-gray-700'} text-sm`}>
+        Page {currentPage} of {totalPages}
+      </span>
+
+      <button
+        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+        disabled={currentPage === totalPages}
+        className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+          currentPage === totalPages
+            ? 'bg-gray-400 cursor-not-allowed'
+            : 'bg-blue-600 text-white hover:bg-blue-500'
+        }`}
+      >
+        Next
+      </button>
+    </div>
+
    </div>
 </div>
   )
