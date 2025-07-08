@@ -1,14 +1,14 @@
-import React, { useEffect, useState, useRef } from 'react';
 import CryptoJS from 'crypto-js';
+import React, { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useUser } from '../../contexts/currentUserContext';
-import { useCachedQuestions } from '../../hooks/useCachedQuestions';
 import { useCachedExam } from '../../hooks/useCachedExam';
-import { calculateResult } from './utils/resultCalculator';
+import { useCachedQuestions } from '../../hooks/useCachedQuestions';
+import { useTheme } from '../../hooks/useTheme';
 import { submitResult } from '../../utils/services/resultService';
 import { VITE_SECRET_KEY_FOR_TESTWINDOW } from '../constants/env';
-import { useTheme } from '../../hooks/useTheme';
 import LoadingTest from './LoadingTest';
+import { calculateResult } from './utils/resultCalculator';
 
 const TestHeader = ({}) => {
   const [eventDetails, setEventDetails] = useState();
