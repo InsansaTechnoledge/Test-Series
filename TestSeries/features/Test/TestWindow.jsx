@@ -70,29 +70,6 @@ const TestWindow = () => {
     examContainerRef
   });
 
-  // Utility functions for state persistence
-  const saveStateToStorage = (key, data) => {
-    try {
-      const encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), secretKey).toString();
-      localStorage.setItem(key, encrypted);
-    } catch (error) {
-      console.error(`Error saving ${key} to storage:`, error);
-    }
-  };
-
-  const loadStateFromStorage = (key) => {
-    try {
-      const encrypted = localStorage.getItem(key);
-      if (encrypted) {
-        const bytes = CryptoJS.AES.decrypt(encrypted, secretKey);
-        return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-      }
-    } catch (error) {
-      console.error(`Error loading ${key} from storage:`, error);
-    }
-    return null;
-  };
-
   // Restore state on component mount
   useEffect(() => {
     if (!isStateRestored && examId) {
