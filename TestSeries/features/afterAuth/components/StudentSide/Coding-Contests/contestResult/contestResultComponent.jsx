@@ -19,7 +19,7 @@ const ContestResultComponent = ({ problems = [], studentResult }) => {
   const percentage = totalMarks > 0 ? ((totalObtained / totalMarks) * 100).toFixed(2) : 0;
 
   return (
-    <div className="max-w-3xl mx-auto bg-white shadow rounded-xl p-6">
+    <div className="max-w-3xl mx-auto bg-white shadow rounded-xl p-6 h-screen">
       <h2 className="text-xl font-bold text-gray-800 mb-4">Contest Results</h2>
 
       <div className="space-y-3">
