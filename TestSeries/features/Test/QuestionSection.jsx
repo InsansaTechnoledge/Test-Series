@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTheme } from "../../hooks/useTheme";
 import { useNavigate} from "react-router-dom";
 import MCQ from "./QuestionTypes/MCQ";
@@ -23,17 +23,22 @@ const QuestionSection = ({
     const [showSubmitModal, setShowSubmitModal] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const navigate = useNavigate();
-
+    const hasRestored = useRef(false);
+    const isInitialLoad = useRef(true);
 
    
     useEffect(() => {
+        if (hasRestored.current || !isInitialLoad.current) return;
+        hasRestored.current = true;
+        isInitialLoad.current = false;
+      
         const savedData = sessionStorage.getItem('subjectSpecificQuestions');
         const savedQuestionId = localStorage.getItem('selectedQuestionId');
-    
+      
         if (savedData) {
             const parsed = JSON.parse(savedData);
             setSubjectSpecificQuestions(parsed);
-    
+      
             if (savedQuestionId) {
                 const allQs = [];
                 Object.keys(parsed).forEach(subject => {
@@ -47,8 +52,7 @@ const QuestionSection = ({
                 }
             }
         }
-    }, []);
-
+    }, []); 
     useEffect(() => {
         if (subjectSpecificQuestions) {
             sessionStorage.setItem('subjectSpecificQuestions', JSON.stringify(subjectSpecificQuestions));
@@ -379,3 +383,6 @@ const QuestionSection = ({
 };
 
 export default QuestionSection;
+
+
+

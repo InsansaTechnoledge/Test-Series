@@ -59,7 +59,7 @@ const TestWindow = () => {
     examContainerRef
   });
 
-  // Sync warning count from security hook
+  //Sync warning count from security hook
   useEffect(() => {
     if (securityWarningCount !== warningCount) {
       setWarningCount(securityWarningCount);
@@ -112,16 +112,17 @@ const TestWindow = () => {
 
       setSelectedSubject(eventDetails.subjects[0] || "Unspecified");
     }
-  }, [eventDetails, secretKey, addToast]);
+  }, [eventDetails, secretKey,addToast]);
 
   useEffect(() => {
-    if (selectedSubject && subjectSpecificQuestions) {
+    if (selectedSubject && subjectSpecificQuestions && !selectedQuestion) {
       const questionsForSubject = subjectSpecificQuestions[selectedSubject];
       if (questionsForSubject && questionsForSubject.length > 0) {
         setSelectedQuestion(questionsForSubject[0]);
       }
     }
-  }, [selectedSubject, subjectSpecificQuestions]);
+  }, [selectedSubject, subjectSpecificQuestions, selectedQuestion]);
+  
 
   useEffect(() => {
     if (
@@ -160,7 +161,7 @@ const TestWindow = () => {
       }, 2500);
       return () => clearTimeout(timeout);
     }
-  }, [submitted, navigate, clearAllToasts, addToast]);
+  }, [submitted, navigate,clearAllToasts, addToast]);
 
   const handleSubmitTest = async () => {
     try {
@@ -250,11 +251,17 @@ const TestWindow = () => {
             theme === 'light' ? 'bg-white border-gray-200' : 'bg-gray-800 border-gray-700'
           }`}>
             <div className="flex justify-between items-center">
-              <h1 className={`text-xl xl:text-2xl font-bold leading-snug ${
+              <h2 className={`text-xl xl:text-2xl font-bold leading-snug flex flex-col ${
                 theme === 'light' ? 'text-gray-900' : 'text-white'
               }`}>
-                {eventDetails?.batch?.name || 'Test Batch Name'}
-              </h1>
+                {eventDetails?.batch?.name || 'Batch Name'}
+                <h2 className={`text-xl xl:text-2xl font-bold leading-snug flex flex-col ${
+                theme === 'light' ? 'text-gray-900' : 'text-white'
+              }`}> 
+
+                {eventDetails?.name || 'Test Name'}
+                </h2>
+              </h2>
               <div className="flex items-center gap-2">
                 <h2 className={`px-3 py-1 rounded-full text-sm font-medium ${
                   theme === 'light' ? 'bg-gray-100 text-gray-700' : 'bg-gray-700 text-gray-300'

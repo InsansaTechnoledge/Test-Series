@@ -7,7 +7,8 @@ const ENCRYPTION_KEY = import.meta.env.VITE_SECRET_KEY_FOR_COUNTDOWN_TIMER || VI
 
 function CountdownTimer({ initialTime, handleSubmitTest, submitted, examId }) {
   const { theme } = useTheme();
-  
+  // const encrypted = localStorage.getItem(`encryptedTimeLeft_${examId}`);
+
  
   const getInitialSeconds = (id) => {
     if (submitted) return 0;
@@ -37,8 +38,8 @@ function CountdownTimer({ initialTime, handleSubmitTest, submitted, examId }) {
     return currentTotal;
   };
 
-  const [time, setTime] = useState(getInitialSeconds);
-  const totalInitialTime = useMemo(() => getTotalInitialTime(), [initialTime]);
+  const [time, setTime] = useState(() => getInitialSeconds(examId));
+  const totalInitialTime = useMemo(() => getTotalInitialTime(examId), [initialTime]);
   
   // Debug logging - you can remove this after testing
   console.log("Current time:", time, "Total initial time:", totalInitialTime, "Percentage:", (time / totalInitialTime) * 100);
@@ -67,7 +68,7 @@ function CountdownTimer({ initialTime, handleSubmitTest, submitted, examId }) {
       setTime((prev) => {
         const updated = prev - 1;
         const encrypted = CryptoJS.AES.encrypt(updated.toString(), ENCRYPTION_KEY).toString();
-        localStorage.setItem("encryptedTimeLeft", encrypted);
+        localStorage.setItem(`encryptedTimeLeft_${examId}`, encrypted);
         return updated;
       });
     }, 1000);
