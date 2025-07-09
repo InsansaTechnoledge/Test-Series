@@ -87,11 +87,24 @@ const LeaderBoard = () => {
   }, [leaderBoardData, user]);
 
   // Prepare data for line chart
-  const chartData = progress.map((entry) => ({
-    contest: contestMap[entry.contest_id]?.name || 'Unnamed Contest',
-    obtained: entry.total_score.totalObtainedMarks,
-    total: entry.total_score.totalMarks,
-  }));
+  const chartData = progress.map((entry) => {
+    const contestId = entry.contest_id;
+    const contestName = contestMap[contestId]?.name || 'Unnamed Contest';
+  
+    // Calculate total received by summing scores of all participants in that contest
+    const allParticipants = groupedByContest[contestId] || [];
+    const totalReceived = allParticipants.reduce((acc, cur) => {
+      return acc + (cur.total_score?.totalObtainedMarks || 0);
+    }, 0);
+  
+    return {
+      contest: contestName,
+      obtained: entry.total_score.totalObtainedMarks,
+      total: entry.total_score.totalMarks,
+      totalReceived,
+    };
+  });
+  
   
 
   const getRankDisplay = (index) => {
@@ -126,7 +139,7 @@ const LeaderBoard = () => {
         {/* Student Progress Line Chart */}
         {progress.length > 0 && (
           <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-lg border ${isDark ? 'border-gray-700' : 'border-gray-200'} overflow-hidden transition-all duration-300`}>
-            <div className="p-6 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}">
+            <div className={`p-6 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
               <h2 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'} mb-2`}>
                 Your Progress Journey
               </h2>
@@ -161,7 +174,7 @@ const LeaderBoard = () => {
                     dataKey="obtained"
                     stroke={colors.success}
                     strokeWidth={3}
-                    name="Obtained Marks"
+                    name="Your Score"
                     dot={{ fill: colors.success, strokeWidth: 2, r: 4 }}
                   />
                   <Line
@@ -173,6 +186,15 @@ const LeaderBoard = () => {
                     name="Total Marks"
                     dot={{ fill: colors.primary, strokeWidth: 2, r: 4 }}
                   />
+                  <Line
+                    type="monotone"
+                    dataKey="totalReceived"
+                    stroke={colors.warning}
+                    strokeWidth={3}
+                    strokeDasharray="3 3"
+                    name="Total Received (All)"
+                    dot={{ fill: colors.warning, strokeWidth: 2, r: 4 }}
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -182,7 +204,7 @@ const LeaderBoard = () => {
         {/* Performance Breakdown Pie Charts */}
         {progress.length > 0 && (
           <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-lg border ${isDark ? 'border-gray-700' : 'border-gray-200'} overflow-hidden`}>
-            <div className="p-6 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}">
+            <div className={`p-6 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
               <h2 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'} mb-2`}>
                 Performance Breakdown
               </h2>
@@ -214,9 +236,9 @@ const LeaderBoard = () => {
                             {totalObtainedMarks}/{totalMarks} points
                           </span>
                           <span className={`text-sm font-medium px-2 py-1 rounded-full ${
-                            percentage >= 80 ? 'bg-green-100 text-green-800' :
-                            percentage >= 60 ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-red-100 text-red-800'
+                            percentage >= 80 ? (isDark ? 'bg-green-900 text-green-100' : 'bg-green-100 text-green-800') :
+                            percentage >= 60 ? (isDark ? 'bg-yellow-900 text-yellow-100' : 'bg-yellow-100 text-yellow-800') :
+                            (isDark ? 'bg-red-900 text-red-100' : 'bg-red-100 text-red-800')
                           }`}>
                             {percentage}%
                           </span>
@@ -271,41 +293,54 @@ const LeaderBoard = () => {
           </div>
 
           {/* Contest Selector */}
-          {Object.keys(groupedByContest).length > 0 && (
-            <div className="flex justify-center">
-              <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl p-2 shadow-lg border ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
-                <div className="flex space-x-2 overflow-x-auto">
-                  {Object.keys(groupedByContest).map((contestId) => (
-                    <button
-                      key={contestId}
-                      onClick={() => setSelectedContest(contestId)}
-                      className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 whitespace-nowrap ${
-                        selectedContest === contestId
-                          ? 'bg-indigo-600 text-white shadow-md'
-                          : isDark 
-                          ? 'text-gray-300 hover:bg-gray-700' 
-                          : 'text-gray-600 hover:bg-gray-100'
-                      }`}
-                    >
-                      {contestMap[contestId]?.name || 'Contest'}
-                    </button>
-                  ))}
+          
+            {Object.keys(groupedByContest).length > 0 && (
+              <div className="flex justify-center">
+                <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl p-2 shadow-lg border ${isDark ? 'border-gray-700' : 'border-gray-200'} max-w-4xl w-full`}>
+                  <div className="flex space-x-2 overflow-x-auto scrollbar-hide pb-2">
+                    {Object.keys(groupedByContest).map((contestId) => (
+                      <button
+                        key={contestId}
+                        onClick={() => setSelectedContest(contestId)}
+                        className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 whitespace-nowrap flex-shrink-0 ${
+                          selectedContest === contestId
+                            ? 'bg-indigo-600 text-white shadow-md scale-105'
+                            : isDark 
+                            ? 'text-gray-300 hover:bg-gray-700 hover:text-white' 
+                            : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                        }`}
+                      >
+                        {contestMap[contestId]?.name || `Contest ${contestId.slice(-4)}`}
+                      </button>
+                    ))}
+                  </div>
+                  
+                  {/* Scroll indicator for many contests */}
+                  {Object.keys(groupedByContest).length > 5 && (
+                    <div className="flex justify-center mt-2">
+                      <div className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'} flex items-center gap-1`}>
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                        </svg>
+                        Scroll to see more contests
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
           {/* Leaderboard Display */}
           {selectedContest && groupedByContest[selectedContest] && (
             <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-lg border ${isDark ? 'border-gray-700' : 'border-gray-200'} overflow-hidden`}>
               {/* Contest Header */}
-              <div className={ ` ${theme === 'light' ? 'bg-indigo-600' : 'bg-indigo-400'} p-6 text-white`}>
+              <div className={`${isDark ? 'bg-indigo-700' : 'bg-indigo-600'} p-6 text-white`}>
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="text-2xl font-bold mb-2">
                       {contestMap[selectedContest]?.name || 'Unknown Contest'}
                     </h3>
-                    <p className="text-indigo-100">
+                    <p className={`${isDark ? 'text-indigo-200' : 'text-indigo-100'}`}>
                       {groupedByContest[selectedContest].length} participants competing
                     </p>
                   </div>
@@ -314,13 +349,13 @@ const LeaderBoard = () => {
                       {groupedByContest[selectedContest].reduce((max, p) => 
                         Math.max(max, p.total_score.totalMarks), 0)}
                     </div>
-                    <div className="text-indigo-200 text-sm">Max Points</div>
+                    <div className={`${isDark ? 'text-indigo-200' : 'text-indigo-200'} text-sm`}>Max Points</div>
                   </div>
                 </div>
               </div>
 
               {/* Top 3 Podium */}
-              <div className="p-6 bg-gradient-to-b from-gray-50 to-white">
+              <div className={`p-6 ${isDark ? 'bg-gray-700' : 'bg-gradient-to-b from-gray-50 to-white'}`}>
                 <div className="flex justify-center items-end space-x-4 mb-8">
                   {[...groupedByContest[selectedContest]]
                     .sort((a, b) => b.total_score.totalObtainedMarks - a.total_score.totalObtainedMarks)
@@ -344,8 +379,8 @@ const LeaderBoard = () => {
                           </div>
                           <div className={`mt-2 px-3 py-1 rounded-full text-sm font-medium ${
                             isCurrentUser 
-                              ? 'bg-indigo-100 text-indigo-800 border-2 border-indigo-300' 
-                              : 'bg-gray-100 text-gray-700'
+                              ? (isDark ? 'bg-indigo-900 text-indigo-100 border-2 border-indigo-600' : 'bg-indigo-100 text-indigo-800 border-2 border-indigo-300')
+                              : (isDark ? 'bg-gray-600 text-gray-100' : 'bg-gray-100 text-gray-700')
                           }`}>
                             {isCurrentUser ? 'You' : 'Student'}
                           </div>
@@ -375,25 +410,23 @@ const LeaderBoard = () => {
                           key={participant.participant_id}
                           className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-200 ${
                             isCurrentUser
-                              ? 'bg-indigo-50 border-indigo-200 ring-2 ring-indigo-100'
-                              : isDark 
-                              ? 'bg-gray-900 border-gray-700 hover:bg-gray-800' 
-                              : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                              ? (isDark ? 'bg-indigo-900 border-indigo-600 ring-2 ring-indigo-700' : 'bg-indigo-50 border-indigo-200 ring-2 ring-indigo-100')
+                              : (isDark ? 'bg-gray-900 border-gray-700 hover:bg-gray-800' : 'bg-gray-50 border-gray-200 hover:bg-gray-100')
                           }`}
                         >
                           <div className="flex items-center space-x-4">
                             <div className={`flex items-center justify-center w-10 h-10 rounded-full font-bold ${
                               index < 3 
                                 ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white' 
-                                : isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-600'
+                                : (isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-600')
                             }`}>
                               {index < 3 ? getRankIcon(index) : index + 1}
                             </div>
                             <div>
                               <div className={`font-medium ${
                                 isCurrentUser 
-                                  ? 'text-indigo-700' 
-                                  : isDark ? 'text-gray-300' : 'text-gray-900'
+                                  ? (isDark ? 'text-indigo-300' : 'text-indigo-700')
+                                  : (isDark ? 'text-gray-300' : 'text-gray-900')
                               }`}>
                                 {isCurrentUser ? 'You' : 'Student'}
                               </div>
@@ -407,8 +440,8 @@ const LeaderBoard = () => {
                             <div className="text-right">
                               <div className={`text-lg font-bold ${
                                 isCurrentUser 
-                                  ? 'text-indigo-600' 
-                                  : isDark ? 'text-green-400' : 'text-green-600'
+                                  ? (isDark ? 'text-indigo-300' : 'text-indigo-600')
+                                  : (isDark ? 'text-green-400' : 'text-green-600')
                               }`}>
                                 {participant.total_score.totalObtainedMarks}
                               </div>
@@ -418,9 +451,9 @@ const LeaderBoard = () => {
                             </div>
                             
                             <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-                              percentage >= 80 ? 'bg-green-100 text-green-800' :
-                              percentage >= 60 ? 'bg-yellow-100 text-yellow-800' :
-                              'bg-red-100 text-red-800'
+                              percentage >= 80 ? (isDark ? 'bg-green-900 text-green-100' : 'bg-green-100 text-green-800') :
+                              percentage >= 60 ? (isDark ? 'bg-yellow-900 text-yellow-100' : 'bg-yellow-100 text-yellow-800') :
+                              (isDark ? 'bg-red-900 text-red-100' : 'bg-red-100 text-red-800')
                             }`}>
                               {percentage}%
                             </div>
