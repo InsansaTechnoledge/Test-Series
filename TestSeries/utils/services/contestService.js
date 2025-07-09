@@ -58,3 +58,8 @@ export const submitContestService = async (contest_id, studentResult) => {
     });
     return response.data;
 }
+
+export const getLeaderBoard = async () => {
+    const response = await api.get('/v1/contest/leader-board');
+    return response.data;
+}

@@ -227,12 +227,22 @@ const OutputPanel = ({
           </div>
         </div>
       ))
-    : testInput?.map((input, index) => (
+    : testInput?.map((input, index) => {
+      let rawValue=input;
+      let cleaned='';
+      if (typeof rawValue === 'object') {
+        cleaned = JSON.stringify(rawValue);
+      } else if (typeof rawValue === 'string') {
+        cleaned = rawValue;
+      } else {
+        cleaned = JSON.parse(rawValue);
+      }
+      return(
         <div key={index} className="mb-4">
           <div className="mb-2">
             <span className={labelClass}>Input:</span>
             <div className={inputClass}>
-              {JSON.stringify(input)}
+              {cleaned}
             </div>
           </div>
           <div className="mb-2">
@@ -242,7 +252,7 @@ const OutputPanel = ({
             </div>
           </div>
         </div>
-      ))
+      )})
   }
 </>
 
