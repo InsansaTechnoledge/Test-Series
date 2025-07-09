@@ -8,7 +8,7 @@ import { PerformanceChart } from './components/PerformanceCharts';
 import { ScoreDistributionChart } from './components/ScoreDistribution';
 import { ActivityChart } from './components/ActivityChart';
 import { ExamPerformanceTable } from './components/ExamPerformanceTable';
-
+import { useTheme } from '../../../../hooks/useTheme';
 const ExamAnalysis = ({ results }) => {
   
   const {
@@ -23,11 +23,14 @@ const ExamAnalysis = ({ results }) => {
   } = useExamFilters(results);
 
   const analytics = useExamAnalytics(processedData);
-
+  const {theme} = useTheme()
   if (!results || results.length === 0) {
     return (
       <div className="p-6  rounded-lg">
-        <h2 className="text-2xl font-bold mb-4">Cumulative Exam Analysis</h2>
+  
+        <h2 className={`text-2xl font-bold mb-4 ${theme == 'light' ? 'text-indigo-100' : 'text-gray-800'} mb-4`}>
+        Cumulative Exam Analysis
+        </h2>
         <p className="text-gray-600">No exam data available for analysis.</p>
       </div>
     );
@@ -35,8 +38,10 @@ const ExamAnalysis = ({ results }) => {
 
   return (
     <div className="p-6  min-h-screen">
-      <h1 className="text-3xl font-bold mb-6 text-gray-800">Cumulative Exam Analysis</h1>
-      
+ 
+      <h1 className={`text-2xl font-bold mb-4 ${theme == 'light' ? 'text-indigo-800' : 'text-gray-300'} mb-4`}>
+        Cumulative Exam Analysis
+        </h1>
       <FilterPanel
         dateRange={dateRange}
         setDateRange={setDateRange}

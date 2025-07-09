@@ -6,6 +6,7 @@ import WrongQuestionAnalysis from './Components/WrongQuestion/WrongQuestionAnaly
 import LeaderBoard from './Components/LeaderBoard.jsx/LeaderBoard';
 import { useExamManagement } from '../../hooks/UseExam';
 import { getAllStudentData } from '../../utils/services/resultPage';
+import { useTheme } from '../../hooks/useTheme';
 
 const Analysis = () => {
     const {user} = useUser()
@@ -16,7 +17,7 @@ const Analysis = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [examQuestions, setExamQuestions] = useState([])
-
+  const {theme} = useTheme()
   
   useEffect(() => {
     if (exams.length > 0 && !exam) {
@@ -50,36 +51,47 @@ const Analysis = () => {
 
   return (
     <div>
-      <h1 className='font-bold text-center py-8 text-gray-800 text-4xl'>Detailed Analysis</h1>
+   
+      <h1 className={`font-bold text-center py-8 text-4xl ${
+                    theme === 'light' ? 'text-gray-800' : 'text-gray-200'
+                  }`}>Detailed Analysis</h1>
 
       <ExamAnalysis results={results}/>
 
                   <div className=" mb-8">
                 <div className=" gap-3 mb-4">
-                    <h1 className="text-4xl font-bold text-center text-gray-800">Exam Wise Analysis</h1>
+ 
+                    <h1 className={`font-bold text-center py-8 text-4xl ${
+                    theme === 'light' ? 'text-gray-800' : 'text-gray-200'
+                  }`}>Exam Wise Analysis</h1>
                 </div>
                
             </div>
-
-       <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
-
-
-                <label className="block text-lg font-semibold text-gray-700 mb-3">
-                    Switch Exam Leaderboard
-                </label>
-                <select
-                    value={exam}
-                    onChange={(e) => setExam(e.target.value)}
-                    className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none transition-colors text-lg"
-                    disabled={loading}
-                >
-                    {exams.map((m) => (
-                        <option key={m.id} value={m.id}>
-                            {m.name}
-                        </option>
-                    ))}
-                </select>
-            </div>
+            <div className={`rounded-2xl shadow-lg p-6 mb-8 ${
+    theme === 'light' ? 'bg-white' : 'bg-gray-800'
+}`}>                   
+    <label className={`block text-lg font-semibold mb-3 ${
+        theme === 'light' ? 'text-gray-700' : 'text-gray-200'
+    }`}>                     
+        Switch Exam Leaderboard                 
+    </label>                 
+    <select                     
+        value={exam}                     
+        onChange={(e) => setExam(e.target.value)}                     
+        className={`w-full p-4 border-2 rounded-xl focus:outline-none transition-colors text-lg ${
+            theme === 'light' 
+                ? 'border-gray-200 bg-white text-gray-900 focus:border-orange-500' 
+                : 'border-gray-600 bg-gray-700 text-gray-200 focus:border-orange-400'
+        }`}                     
+        disabled={loading}                 
+    >                     
+        {exams.map((m) => (                         
+            <option key={m.id} value={m.id}>                             
+                {m.name}                         
+            </option>                     
+        ))}                 
+    </select>             
+</div>
 
      <LeaderBoard
      exams={exams}
