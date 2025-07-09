@@ -27,6 +27,8 @@ const ResultsPage = () => {
         return matchesSearch && matchesStatus
     })
 
+    console.log("Filtered Results:", filteredResults)
+
     // Calculate statistics
     const stats = {
         total: results.length,
@@ -320,7 +322,7 @@ const ResultsPage = () => {
                                             </td>
                                             <td className="px-6 py-4 text-center">
                                                 <button
-                                                    onClick={() => navigate(`/student/result/${result.examId}?name=${encodeURIComponent(result.examName)}`)}
+                                                    onClick={() => navigate(`/student/result/${result.examId}?name=${encodeURIComponent(result.examName)}&resultId=${result._id}`)}
                                                     className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                                                         theme === 'dark' 
                                                             ? 'bg-indigo-400 hover:bg-indigo-300 text-gray-900 focus:ring-indigo-400 focus:ring-offset-gray-900' 
