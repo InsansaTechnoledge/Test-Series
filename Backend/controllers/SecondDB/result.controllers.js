@@ -1,4 +1,3 @@
-import { calculateResult } from "../../../TestSeries/features/Test/utils/resultCalculator.js";
 import Result from "../../models/SecondDB/result.model.js";
 import Student from "../../models/FirstDB/student.model.js";
 import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
@@ -9,9 +8,10 @@ import { fetchQuestionsSelectively } from "../../utils/SqlQueries/questions.quer
 export const addResult = async (req, res) => {
     try {
         const resultData = req.body;
+        console.log("Result Data:", resultData);
 
         const result = await Result.create(resultData);
-
+        console.log("Result Created:", result);
         // await updateRanksForExam(resultData.examId);
         return new APIResponse(200, result, "Result added successfully!").send(res);
     }
@@ -130,6 +130,7 @@ export const fetchAllResultsForExam = async (req, res) => {
       const studentId = req.user._id;
       const { examId } = req.params;
       const forAllStudents = req.query.forAllStudents === 'true';
+      const resultId = req.query.resultId;
 
   if(forAllStudents){
     // const results = await Result.find({ examId }).populate('studentId', 'name studentId');
@@ -160,16 +161,16 @@ export const fetchAllResultsForExam = async (req, res) => {
 
   }
   else{
-      const result = await Result.findOne({ studentId, examId });
-  
+    console.log("Exam ID:", examId);
+    console.log("Result ID:", resultId);
+      const result = await Result.findById(resultId);
+  console.log("Result:", result);
       if (!result) {
         return new APIError(404, ["Result not found"]).send(res);
       }
   
       // ✅ Fetch questions from Supabase
       const questions = await fetchQuestionsSelectively({ exam_id: examId });
-
-
   
       // ✅ Return result + questions + exam name
       return new APIResponse(

@@ -42,7 +42,7 @@ function CountdownTimer({ initialTime, handleSubmitTest, submitted, examId }) {
   const totalInitialTime = useMemo(() => getTotalInitialTime(examId), [initialTime]);
   
   // Debug logging - you can remove this after testing
-  console.log("Current time:", time, "Total initial time:", totalInitialTime, "Percentage:", (time / totalInitialTime) * 100);
+    // console.log("Current time:", time, "Total initial time:", totalInitialTime, "Percentage:", (time / totalInitialTime) * 100);
   
   // Calculate if we're in the critical time period (last 10%)
   const isInCriticalTime = useMemo(() => {

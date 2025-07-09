@@ -71,6 +71,8 @@ const QuestionSection = ({
             const timeout = setTimeout(() => {
                 sessionStorage.removeItem('subjectSpecificQuestions')
                 localStorage.removeItem('selectedQuestionId')
+                console.log("Submitting test...");
+                handleSubmitTest();
                 navigate("/student/completed-exams");
             }, 2500);
             return () => clearTimeout(timeout);

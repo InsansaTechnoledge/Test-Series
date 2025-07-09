@@ -17,12 +17,17 @@ const ResultPage = () => {
     
     const [searchParams] = useSearchParams();
     const examName = searchParams.get('name');
+    const resultId = searchParams.get('resultId');
+    console.log("Result ID:", resultId);
+
+    console.log("Exam ID:", examId);
 
     useEffect(() => {
         const fetchResultData = async () => {
             try {
                 setLoading(true);
-                const data = await getResultDetail(examId, false);
+                const data = await getResultDetail(examId, false,resultId);
+                console.log("Fetched Result Data:", data);
                 setResultData(data);
             } catch (err) {
                 setError(err.message || 'Failed to fetch result data');

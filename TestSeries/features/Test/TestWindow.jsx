@@ -338,6 +338,8 @@ const TestWindow = () => {
         'Please wait while we process your submission',
         0 // Don't auto-dismiss
       );
+      console.log("Submitting test with examId:", examId);
+      console.log("🎀🎀🥲🥲🤍🤍")
 
       localStorage.removeItem('testQuestions');
       localStorage.removeItem('encryptedTimeLeft');
@@ -345,8 +347,10 @@ const TestWindow = () => {
       localStorage.removeItem(`selectedQuestion_${examId}`);
       localStorage.removeItem(`examViolations_${examId}`);
       localStorage.removeItem(`warningCount_${examId}`);
-
+console.log("Submitting test with examId:", examId);
+console.log("Subject Specific Questions:", subjectSpecificQuestions);
       const answers = calculateResultPayload(subjectSpecificQuestions, getCorrectResponse);
+      console.log("Calculated answers:", answers);
       const payload = {
         studentId: user._id,
         examId,
@@ -355,7 +359,7 @@ const TestWindow = () => {
         violations: examViolations,
         warningCount,
       };
-
+console.log("Payload for submission:", payload);
       const response = await submitResult(payload);
       if (response.status === 200) {
         setSubmitted(true);
@@ -462,7 +466,16 @@ const TestWindow = () => {
           </div>
 
           <div className="lg:hidden">
-            <TestHeader />
+            <TestHeader 
+            handleSubmitTest={handleSubmitTest}
+            selectedSubject={selectedSubject}
+            setSelectedSubject={setSelectedSubject} 
+            subjectSpecificQuestions={subjectSpecificQuestions}
+            setSubjectSpecificQuestions={setSubjectSpecificQuestions}
+            selectedQuestion={selectedQuestion}
+            setSelectedQuestion={setSelectedQuestion}
+            />
+
             <CountdownTimer 
               initialTime={eventDetails.duration} 
               handleSubmitTest={handleSubmitTest} 
@@ -477,12 +490,21 @@ const TestWindow = () => {
             subjectSpecificQuestions={subjectSpecificQuestions}
             setSubjectSpecificQuestions={setSubjectSpecificQuestions}
             selectedSubject={selectedSubject}
+            handleSubmitTest={handleSubmitTest}
           />
         </div>
 
         <div className='w-full lg:w-[25%] lg:block'>
           <div className="hidden lg:block">
-            <TestHeader />
+                       <TestHeader 
+            handleSubmitTest={handleSubmitTest}
+            selectedSubject={selectedSubject}
+            setSelectedSubject={setSelectedSubject} 
+            subjectSpecificQuestions={subjectSpecificQuestions}
+            setSubjectSpecificQuestions={setSubjectSpecificQuestions}
+            selectedQuestion={selectedQuestion}
+            setSelectedQuestion={setSelectedQuestion}
+            />
             <CountdownTimer 
               initialTime={eventDetails.duration} 
               handleSubmitTest={handleSubmitTest} 
