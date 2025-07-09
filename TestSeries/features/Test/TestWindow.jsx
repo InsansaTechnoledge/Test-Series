@@ -441,15 +441,7 @@ console.log("Payload for submission:", payload);
           </div>
 
           <div className="lg:hidden">
-            <TestHeader 
-            handleSubmitTest={handleSubmitTest}
-            selectedSubject={selectedSubject}
-            setSelectedSubject={setSelectedSubject} 
-            subjectSpecificQuestions={subjectSpecificQuestions}
-            setSubjectSpecificQuestions={setSubjectSpecificQuestions}
-            selectedQuestion={selectedQuestion}
-            setSelectedQuestion={setSelectedQuestion}
-            />
+            <TestHeader />
 
             <CountdownTimer 
               initialTime={eventDetails.duration} 
@@ -471,15 +463,7 @@ console.log("Payload for submission:", payload);
 
         <div className='w-full lg:w-[25%] lg:block'>
           <div className="hidden lg:block">
-                       <TestHeader 
-            handleSubmitTest={handleSubmitTest}
-            selectedSubject={selectedSubject}
-            setSelectedSubject={setSelectedSubject} 
-            subjectSpecificQuestions={subjectSpecificQuestions}
-            setSubjectSpecificQuestions={setSubjectSpecificQuestions}
-            selectedQuestion={selectedQuestion}
-            setSelectedQuestion={setSelectedQuestion}
-            />
+                       <TestHeader />
             <CountdownTimer 
               initialTime={eventDetails.duration} 
               handleSubmitTest={handleSubmitTest} 
