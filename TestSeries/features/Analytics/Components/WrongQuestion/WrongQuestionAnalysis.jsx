@@ -93,7 +93,7 @@ const WrongQuestionAnalysis = ({ examData, currentStudentId, examQuestions }) =>
   }
 
   return (
-    <div className="mt-10 px-4 sm:px-8">
+<div className="mt-10 px-4 sm:px-8">
   <h2 className={`text-3xl font-bold mb-6 ${
     theme === 'dark' ? 'text-gray-200' : 'text-gray-800'
   }`}>

@@ -193,12 +193,27 @@ const TestWindow = () => {
 
       // Create fresh questions if no valid cached data
       if (!questionsData) {
+        // questionsData = eventDetails.questions.reduce((acc, quest) => {
+        //   if (!quest.subject || quest.subject.trim() === "") quest.subject = "Unspecified";
+        //   acc[quest.subject] = acc[quest.subject] || [];
+        //   acc[quest.subject].push({ ...quest, index: acc[quest.subject].length + 1, status: 'unanswered', response: null });
+        //   return acc;
+        function shuffle(array) {
+          return array.sort(() => Math.random() - 0.5);
+        }
+        
         questionsData = eventDetails.questions.reduce((acc, quest) => {
-          if (!quest.subject || quest.subject.trim() === "") quest.subject = "Unspecified";
-          acc[quest.subject] = acc[quest.subject] || [];
-          acc[quest.subject].push({ ...quest, index: acc[quest.subject].length + 1, status: 'unanswered', response: null });
+          const subject = quest.subject?.trim() || "Unspecified";
+          acc[subject] = acc[subject] || [];
+          acc[subject].push({ ...quest, status: 'unanswered', response: null });
           return acc;
         }, {});
+        
+        Object.keys(questionsData).forEach(subject => {
+          questionsData[subject] = shuffle(questionsData[subject]);
+        });
+        
+    
       }
 
       setSubjectSpecificQuestions(questionsData);
