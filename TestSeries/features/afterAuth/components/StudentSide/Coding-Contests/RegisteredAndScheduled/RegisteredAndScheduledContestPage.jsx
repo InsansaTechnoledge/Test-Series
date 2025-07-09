@@ -22,7 +22,7 @@ const RegisteredAndScheduledContestPage = () => {
   const {theme } = useTheme();
 
   return (
-    <div className="min-h-screen p-6 bg-gray-100">
+    <div className="min-h-screen">
       <div className="relative overflow-hidden">
             <div className={`absolute inset-0 ${
               theme === 'dark' 
