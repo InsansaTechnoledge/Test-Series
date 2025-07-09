@@ -1,7 +1,6 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import ExamToaster from '../Toaster/StandardExamWarningToaster';
 
-
 export const useExamSecurity = ({
   eventDetails,
   submitted,
@@ -20,18 +19,19 @@ export const useExamSecurity = ({
   // Refs to prevent stale closure issues and manage state
   const warningCountRef = useRef(warningCount);
   const violationCountRef = useRef(0);
-  const issuedWarningsRef = useRef(0); // Track warnings separately
+  const issuedWarningsRef = useRef(0);
   const isSubmittingRef = useRef(false);
   const lastViolationRef = useRef(null);
   const devToolsCheckRef = useRef(null);
   const isInitializedRef = useRef(false);
   const fullscreenAttemptRef = useRef(0);
+  const windowCheckIntervalRef = useRef(null); // New ref for window monitoring
   const maxFullscreenAttempts = 3;
   
   // Lenient settings
-  const violationCooldown = 2000; // 10 seconds
-  const violationsPerWarning = 3; // 3 violations = 1 warning
-  const maxWarnings = 5; // Maximum 5 warnings before auto-submit
+  const violationCooldown = 2000;
+  const violationsPerWarning = 3;
+  const maxWarnings = 5;
   const lastViolationTimeRef = useRef(0);
 
   // Update warning count ref whenever it changes
@@ -59,7 +59,6 @@ export const useExamSecurity = ({
 
     setToasts(prev => [...prev, toast]);
 
-    // Auto-dismiss after duration (except for critical warnings)
     if (type !== 'error' && duration > 0) {
       setTimeout(() => {
         setToasts(prev => prev.filter(t => t.id !== id));
@@ -77,14 +76,13 @@ export const useExamSecurity = ({
     setToasts([]);
   }, []);
 
-  // Enhanced violation logger with toaster integration
+  // Enhanced violation logger
   const logViolation = useCallback((type, details = '') => {
     if (isSubmittingRef.current || submitted) return;
 
     const now = Date.now();
     const timeSinceLastViolation = now - lastViolationTimeRef.current;
     
-    // Check if we're still in cooldown period
     if (timeSinceLastViolation < violationCooldown) {
       console.log(`Violation ignored - in cooldown period (${Math.ceil((violationCooldown - timeSinceLastViolation) / 1000)}s remaining)`);
       return;
@@ -105,7 +103,6 @@ export const useExamSecurity = ({
       setExamViolations(prev => [...prev, violation]);
       console.warn(`Security Violation #${violationCountRef.current}:`, violation);
       
-      // Show violation toast
       addToast(
         `Security violation detected: ${type}`,
         'info',
@@ -113,11 +110,9 @@ export const useExamSecurity = ({
         4000
       );
       
-      // Check if we need to show a warning (every 3 violations)
       const warningsNeeded = Math.floor(violationCountRef.current / violationsPerWarning);
       if (warningsNeeded > issuedWarningsRef.current) {
         issuedWarningsRef.current = warningsNeeded;
-        // Use setTimeout to break the execution chain and prevent infinite loops
         setTimeout(() => {
           showWarning(`Multiple security violations detected (${violationCountRef.current} total).`, warningsNeeded);
         }, 0);
@@ -129,16 +124,15 @@ export const useExamSecurity = ({
     }
   }, [setExamViolations, userId, examId, submitted, addToast]);
 
-  // Enhanced warning system with toaster
+  // Enhanced warning system
   const showWarning = useCallback((message, warningNumber) => {
     if (isSubmittingRef.current || submitted) return;
   
     try {
-      // Only call setWarningCount if value is actually different
       if (warningCountRef.current !== warningNumber) {
-        warningCountRef.current = warningNumber;  // Update the ref here first
+        warningCountRef.current = warningNumber;
         setWarningCount(prev => {
-          if (prev === warningNumber) return prev; // Avoid re-setting same value
+          if (prev === warningNumber) return prev;
           return warningNumber;
         });
       }
@@ -175,40 +169,132 @@ export const useExamSecurity = ({
       addToast('Error showing security warning', 'error', error.message, 3000);
     }
   }, [handleSubmitTest, submitted, addToast]);
-  
 
-  // Comprehensive key handler with better detection
+  // NEW: Window maximization function
+  const maximizeWindow = useCallback(() => {
+    if (isSubmittingRef.current || submitted) return;
+
+    try {
+      // Focus the window first
+      window.focus();
+      
+      // Try to maximize using different methods
+      if (window.screen && window.screen.availWidth && window.screen.availHeight) {
+        // Method 1: Resize to screen dimensions
+        window.resizeTo(window.screen.availWidth, window.screen.availHeight);
+        window.moveTo(0, 0);
+      }
+      
+      // Method 2: Try to trigger fullscreen if available
+      if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
+        enterFullscreen();
+      }
+      
+      console.log('Window maximized/focused');
+      
+    } catch (error) {
+      console.warn('Could not maximize window:', error);
+      // Fallback: at least try to focus
+      try {
+        window.focus();
+      } catch (focusError) {
+        console.warn('Could not focus window:', focusError);
+      }
+    }
+  }, [submitted]);
+
+  // NEW: Window state monitoring
+  const checkWindowState = useCallback(() => {
+    if (isSubmittingRef.current || submitted) return;
+
+    try {
+      // Check if window is minimized or not focused
+      const isMinimized = document.hidden || 
+                         document.visibilityState === 'hidden' ||
+                         !document.hasFocus();
+      
+      // Check window dimensions (might indicate minimized state)
+      const isSmallWindow = window.innerWidth < 800 || window.innerHeight < 600;
+      
+      if (isMinimized || isSmallWindow) {
+        console.log('Window appears minimized or small, attempting to maximize...');
+        maximizeWindow();
+        
+        // Log violation for minimization
+        if (isMinimized) {
+          logViolation('Window Minimized', 'Window was minimized or lost focus');
+        }
+      }
+      
+    } catch (error) {
+      console.warn('Error checking window state:', error);
+    }
+  }, [submitted, maximizeWindow, logViolation]);
+
+  // Enhanced window focus/blur handlers
+  const handleWindowBlur = useCallback(() => {
+    if (isSubmittingRef.current || submitted) return;
+    
+    logViolation('Window Focus Lost', 'User switched away from exam');
+    
+    // Attempt to regain focus after a short delay
+    setTimeout(() => {
+      if (!isSubmittingRef.current && !submitted) {
+        maximizeWindow();
+      }
+    }, 1000);
+  }, [submitted, logViolation, maximizeWindow]);
+
+  const handleWindowFocus = useCallback(() => {
+    if (isSubmittingRef.current || submitted) return;
+    
+    // Ensure window is maximized when it gains focus
+    setTimeout(() => {
+      if (!isSubmittingRef.current && !submitted) {
+        maximizeWindow();
+      }
+    }, 100);
+  }, [submitted, maximizeWindow]);
+
+  // Enhanced visibility change handler
+  const handleVisibilityChange = useCallback(() => {
+    if (isSubmittingRef.current || submitted) return;
+    
+    if (document.hidden) {
+      logViolation('Tab Hidden', 'Tab became hidden or minimized');
+    } else {
+      // When tab becomes visible again, maximize the window
+      setTimeout(() => {
+        if (!isSubmittingRef.current && !submitted) {
+          maximizeWindow();
+        }
+      }, 100);
+    }
+  }, [submitted, logViolation, maximizeWindow]);
+
+  // Key handler (unchanged)
   const handleKeyDown = useCallback((e) => {
     if (isSubmittingRef.current || submitted) return;
 
     const violations = [
-      // Developer tools
       { condition: e.key === 'F12', label: 'F12 (Dev Tools)' },
       { condition: e.ctrlKey && e.shiftKey && e.key === 'I', label: 'Ctrl+Shift+I (Dev Tools)' },
       { condition: e.ctrlKey && e.shiftKey && e.key === 'J', label: 'Ctrl+Shift+J (Console)' },
       { condition: e.ctrlKey && e.shiftKey && e.key === 'C', label: 'Ctrl+Shift+C (Inspector)' },
       { condition: e.ctrlKey && e.shiftKey && e.key === 'K', label: 'Ctrl+Shift+K (Console)' },
-      
-      // Source/save/print
       { condition: e.ctrlKey && e.key === 'u', label: 'Ctrl+U (View Source)' },
       { condition: e.ctrlKey && e.key === 's', label: 'Ctrl+S (Save Page)' },
       { condition: e.ctrlKey && e.key === 'p', label: 'Ctrl+P (Print)' },
-      
-      // Navigation
       { condition: e.altKey && e.key === 'Tab', label: 'Alt+Tab (Switch Window)' },
       { condition: e.ctrlKey && e.key === 'Tab', label: 'Ctrl+Tab (Switch Tab)' },
       { condition: e.ctrlKey && e.shiftKey && e.key === 'Tab', label: 'Ctrl+Shift+Tab (Switch Tab)' },
       { condition: e.key === 'Meta' || e.key === 'Cmd', label: 'Windows/Cmd Key' },
-      
-      // Browser controls
       { condition: e.ctrlKey && e.key === 'n', label: 'Ctrl+N (New Window)' },
       { condition: e.ctrlKey && e.key === 't', label: 'Ctrl+T (New Tab)' },
       { condition: e.ctrlKey && e.key === 'w', label: 'Ctrl+W (Close Tab)' },
       { condition: e.ctrlKey && e.key === 'r', label: 'Ctrl+R (Refresh)' },
       { condition: e.ctrlKey && e.key === 'l', label: 'Ctrl+L (Address Bar)' },
       { condition: e.key === 'F5', label: 'F5 (Refresh)' },
-      
-      // Function keys
       { condition: e.key === 'F1', label: 'F1 (Help)' },
       { condition: e.key === 'F6', label: 'F6 (Address Bar)' },
       { condition: e.key === 'F11', label: 'F11 (Fullscreen Toggle)' },
@@ -224,7 +310,7 @@ export const useExamSecurity = ({
     }
   }, [submitted, logViolation]);
 
-  // Dev tools detection with toaster feedback
+  // Dev tools detection (unchanged)
   const checkDevTools = useCallback(() => {
     if (isSubmittingRef.current || submitted) return;
 
@@ -233,12 +319,10 @@ export const useExamSecurity = ({
       const heightDiff = window.outerHeight - window.innerHeight;
       const widthDiff = window.outerWidth - window.innerWidth;
       
-      // Check for unusual window dimensions
       if (heightDiff > threshold || widthDiff > threshold) {
         logViolation('Developer Tools Detected', `Height: ${heightDiff}, Width: ${widthDiff}`);
       }
 
-      // Console detection
       let devtools = { open: false };
       const element = new Image();
       element.__defineGetter__('id', function() {
@@ -251,24 +335,11 @@ export const useExamSecurity = ({
         logViolation('Console Access Detected', 'Console opened');
       }
     } catch (error) {
-      // Silently handle errors in dev tools detection
+      // Silently handle errors
     }
   }, [submitted, logViolation]);
 
-  // Window focus/blur handlers
-  const handleWindowBlur = useCallback(() => {
-    if (isSubmittingRef.current || submitted) return;
-    logViolation('Window Focus Lost', 'User switched away from exam');
-  }, [submitted, logViolation]);
-
-  const handleVisibilityChange = useCallback(() => {
-    if (isSubmittingRef.current || submitted) return;
-    if (document.hidden) {
-      logViolation('Tab Hidden', 'Tab became hidden or minimized');
-    }
-  }, [submitted, logViolation]);
-
-  // Fullscreen management
+  // Fullscreen management (unchanged)
   const enterFullscreen = useCallback(() => {
     if (!examContainerRef?.current || isSubmittingRef.current || submitted) return;
     
@@ -318,14 +389,13 @@ export const useExamSecurity = ({
     }
   }, [submitted, logViolation, enterFullscreen]);
 
-  // Context menu handler
+  // Other handlers (unchanged)
   const handleContextMenu = useCallback((e) => {
     if (isSubmittingRef.current || submitted) return;
     e.preventDefault();
     logViolation('Right Click Attempted', 'Context menu blocked');
   }, [submitted, logViolation]);
 
-  // Drag and drop handlers
   const handleDragStart = useCallback((e) => {
     if (isSubmittingRef.current || submitted) return;
     if (e.target.tagName === 'IMG' || e.target.tagName === 'VIDEO') {
@@ -340,7 +410,6 @@ export const useExamSecurity = ({
     logViolation('Drop Operation Attempted', 'Drop blocked');
   }, [submitted, logViolation]);
 
-  // Navigation handlers
   const handlePopState = useCallback((e) => {
     if (isSubmittingRef.current || submitted) return;
     
@@ -363,29 +432,26 @@ export const useExamSecurity = ({
     return message;
   }, [submitted, logViolation]);
 
-  // Main effect for security initialization
+  // Main effect with enhanced window monitoring
   useEffect(() => {
     if (!eventDetails || submitted || isInitializedRef.current) return;
 
-    console.log('🔒 Initializing exam security measures with toaster...');
+    console.log('🔒 Initializing exam security measures with window maximization...');
     isInitializedRef.current = true;
 
-    // Show initialization toast
     addToast(
       'Exam security measures activated',
       'info',
-      'Security monitoring is now active. Please remain in fullscreen mode.',
+      'Security monitoring is now active. Window will be kept maximized.',
       4000
     );
 
-    // Initialize browser history
     try {
       window.history.pushState(null, null, window.location.pathname);
     } catch (error) {
       console.error('Error initializing history:', error);
     }
 
-    // Event listener options
     const eventOptions = { passive: false, capture: true };
     const passiveOptions = { passive: true };
 
@@ -397,18 +463,21 @@ export const useExamSecurity = ({
     document.addEventListener('dragstart', handleDragStart, eventOptions);
     document.addEventListener('drop', handleDrop, eventOptions);
     window.addEventListener('blur', handleWindowBlur, passiveOptions);
+    window.addEventListener('focus', handleWindowFocus, passiveOptions); // NEW
     window.addEventListener('popstate', handlePopState, eventOptions);
     window.addEventListener('beforeunload', handleBeforeUnload, eventOptions);
 
-    // Dev tools monitoring
+    // Start monitoring intervals
     devToolsCheckRef.current = setInterval(checkDevTools, 5000);
+    windowCheckIntervalRef.current = setInterval(checkWindowState, 2000); // NEW: Check window state every 2 seconds
 
-    // Fullscreen initialization
-    const fullscreenTimeout = setTimeout(() => {
+    // Initial setup
+    const setupTimeout = setTimeout(() => {
       if (!isSubmittingRef.current && !submitted) {
+        maximizeWindow();
         enterFullscreen();
       }
-    }, 2000);
+    }, 1000);
 
     // Cleanup function
     return () => {
@@ -422,27 +491,34 @@ export const useExamSecurity = ({
       document.removeEventListener('dragstart', handleDragStart, eventOptions);
       document.removeEventListener('drop', handleDrop, eventOptions);
       window.removeEventListener('blur', handleWindowBlur, passiveOptions);
+      window.removeEventListener('focus', handleWindowFocus, passiveOptions);
       window.removeEventListener('popstate', handlePopState, eventOptions);
       window.removeEventListener('beforeunload', handleBeforeUnload, eventOptions);
 
-      // Clear intervals and timeouts
+      // Clear intervals
       if (devToolsCheckRef.current) {
         clearInterval(devToolsCheckRef.current);
         devToolsCheckRef.current = null;
       }
       
-      clearTimeout(fullscreenTimeout);
+      if (windowCheckIntervalRef.current) {
+        clearInterval(windowCheckIntervalRef.current);
+        windowCheckIntervalRef.current = null;
+      }
+      
+      clearTimeout(setupTimeout);
       
       // Reset refs
       isInitializedRef.current = false;
       fullscreenAttemptRef.current = 0;
       violationCountRef.current = 0;
-      issuedWarningsRef.current = 0; // Reset issued warnings
+      issuedWarningsRef.current = 0;
       lastViolationTimeRef.current = 0;
     };
   }, [eventDetails, submitted, handleKeyDown, handleContextMenu, handleVisibilityChange, 
-      handleFullscreenChange, handleDragStart, handleDrop, handleWindowBlur, 
-      handlePopState, handleBeforeUnload, checkDevTools, enterFullscreen, addToast]);
+      handleFullscreenChange, handleDragStart, handleDrop, handleWindowBlur, handleWindowFocus,
+      handlePopState, handleBeforeUnload, checkDevTools, checkWindowState, enterFullscreen, 
+      maximizeWindow, addToast]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -450,6 +526,9 @@ export const useExamSecurity = ({
       isSubmittingRef.current = false;
       if (devToolsCheckRef.current) {
         clearInterval(devToolsCheckRef.current);
+      }
+      if (windowCheckIntervalRef.current) {
+        clearInterval(windowCheckIntervalRef.current);
       }
       clearAllToasts();
     };
@@ -463,7 +542,7 @@ export const useExamSecurity = ({
     addToast,
     dismissToast,
     clearAllToasts,
-    // Toaster component to render
+    maximizeWindow, // NEW: Expose maximize function
     ToasterComponent: () => (
       <ExamToaster 
         toasts={toasts} 

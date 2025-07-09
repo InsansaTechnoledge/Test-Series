@@ -441,18 +441,23 @@ if (warningCount >= 5 && !showFinalPopup) {
             {/* Header */}
             <div className="flex flex-col py-6 px-6 sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6 rounded-xl">
               {/* warning and timer */}
-              <div className='flex flex-col gap-3 w-full'>
-                <div className={`flex items-center gap-2 font-semibold px-4 py-2 rounded-xl shadow-sm w-full justify-center ${
-                  theme === 'light'
-                    ? 'text-red-700 bg-red-50 border border-red-200'
-                    : 'text-red-300 bg-red-900/20 border border-red-800'
-                }`}>
-                  <span className="text-lg">🚨</span>
-                  Warnings: <span className={`font-bold ${
-                    theme === 'light' ? 'text-red-800' : 'text-red-200'
-                  }`}>{warningCount}</span>/5
-                </div>
-              </div>
+              {
+                isElectronEnv && (
+                  <div className='flex flex-col gap-3 w-full'>
+                    <div className={`flex items-center gap-2 font-semibold px-4 py-2 rounded-xl shadow-sm w-full justify-center ${
+                      theme === 'light'
+                        ? 'text-red-700 bg-red-50 border border-red-200'
+                        : 'text-red-300 bg-red-900/20 border border-red-800'
+                    }`}>
+                      <span className="text-lg">🚨</span>
+                      Warnings: <span className={`font-bold ${
+                        theme === 'light' ? 'text-red-800' : 'text-red-200'
+                      }`}>{warningCount}</span>/5
+                    </div>
+                  </div>
+                )
+              }
+              
             </div>
           </div>
         </>

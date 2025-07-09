@@ -26,6 +26,8 @@ const TestWindow = () => {
   const [examViolations, setExamViolations] = useState([]);
   const [warningCount, setWarningCount] = useState(0);
   const [isStateRestored, setIsStateRestored] = useState(false);
+  const [isInitialSetupComplete, setIsInitialSetupComplete] = useState(false);
+  const [isSecurityHookInitialized, setIsSecurityHookInitialized] = useState(false);
 
   const examContainerRef = useRef(null);
   const { user } = useUser();
@@ -42,7 +44,6 @@ const TestWindow = () => {
       navigate('/student/student-landing');
     }
   }, [examId, navigate]);
-  
 
   const secretKey = import.meta.env.VITE_SECRET_KEY_FOR_TESTWINDOW || VITE_SECRET_KEY_FOR_TESTWINDOW;
   const { questions, isError: isExamError, isLoading: isQuestionLoading } = useCachedQuestions(examId);
@@ -69,60 +70,6 @@ const TestWindow = () => {
     handleSubmitTest: () => handleSubmitTest(),
     examContainerRef
   });
-
-  // Restore state on component mount
-  useEffect(() => {
-    if (!isStateRestored && examId) {
-      const savedSelectedSubject = loadStateFromStorage(`selectedSubject_${examId}`);
-      const savedSelectedQuestion = loadStateFromStorage(`selectedQuestion_${examId}`);
-      const savedExamViolations = loadStateFromStorage(`examViolations_${examId}`);
-      const savedWarningCount = loadStateFromStorage(`warningCount_${examId}`);
-
-      if (savedSelectedSubject) {
-        setSelectedSubject(savedSelectedSubject);
-      }
-      if (savedSelectedQuestion) {
-        setSelectedQuestion(savedSelectedQuestion);
-      }
-      if (savedExamViolations) {
-        setExamViolations(savedExamViolations);
-      }
-      if (savedWarningCount !== null) {
-        setWarningCount(savedWarningCount);
-      }
-
-      setIsStateRestored(true);
-    }
-  }, [examId, isStateRestored, secretKey]);
-
-  // Save state whenever it changes
-  useEffect(() => {
-    if (isStateRestored && examId) {
-      if (selectedSubject) {
-        saveStateToStorage(`selectedSubject_${examId}`, selectedSubject);
-      }
-    }
-  }, [selectedSubject, examId, isStateRestored, secretKey]);
-
-  useEffect(() => {
-    if (isStateRestored && examId) {
-      if (selectedQuestion) {
-        saveStateToStorage(`selectedQuestion_${examId}`, selectedQuestion);
-      }
-    }
-  }, [selectedQuestion, examId, isStateRestored, secretKey]);
-
-  useEffect(() => {
-    if (isStateRestored && examId) {
-      saveStateToStorage(`examViolations_${examId}`, examViolations);
-    }
-  }, [examViolations, examId, isStateRestored, secretKey]);
-
-  useEffect(() => {
-    if (isStateRestored && examId) {
-      saveStateToStorage(`warningCount_${examId}`, warningCount);
-    }
-  }, [warningCount, examId, isStateRestored, secretKey]);
 
   // Utility functions for state persistence
   const saveStateToStorage = (key, data) => {
@@ -161,52 +108,50 @@ const TestWindow = () => {
       if (savedSelectedQuestion) {
         setSelectedQuestion(savedSelectedQuestion);
       }
-      if (savedExamViolations) {
+      if (savedExamViolations && Array.isArray(savedExamViolations)) {
         setExamViolations(savedExamViolations);
       }
-      if (savedWarningCount !== null) {
-        setWarningCount(savedWarningCount);
-      }
-
+      // Don't restore warning count - let security hook handle it
+      // This prevents conflicts between cached state and security monitoring
+      
       setIsStateRestored(true);
     }
-  }, [examId, isStateRestored, secretKey]);
+  }, [examId, isStateRestored]);
 
-  // Save state whenever it changes
+  // Save state whenever it changes (only after state is restored and security hook is initialized)
   useEffect(() => {
-    if (isStateRestored && examId) {
-      if (selectedSubject) {
-        saveStateToStorage(`selectedSubject_${examId}`, selectedSubject);
-      }
+    if (isStateRestored && isSecurityHookInitialized && examId && selectedSubject) {
+      saveStateToStorage(`selectedSubject_${examId}`, selectedSubject);
     }
-  }, [selectedSubject, examId, isStateRestored, secretKey]);
+  }, [selectedSubject, examId, isStateRestored, isSecurityHookInitialized]);
 
   useEffect(() => {
-    if (isStateRestored && examId) {
-      if (selectedQuestion) {
-        saveStateToStorage(`selectedQuestion_${examId}`, selectedQuestion);
-      }
+    if (isStateRestored && isSecurityHookInitialized && examId && selectedQuestion) {
+      saveStateToStorage(`selectedQuestion_${examId}`, selectedQuestion);
     }
-  }, [selectedQuestion, examId, isStateRestored, secretKey]);
+  }, [selectedQuestion, examId, isStateRestored, isSecurityHookInitialized]);
 
   useEffect(() => {
-    if (isStateRestored && examId) {
+    if (isStateRestored && isSecurityHookInitialized && examId && Array.isArray(examViolations)) {
       saveStateToStorage(`examViolations_${examId}`, examViolations);
     }
-  }, [examViolations, examId, isStateRestored, secretKey]);
+  }, [examViolations, examId, isStateRestored, isSecurityHookInitialized]);
 
   useEffect(() => {
-    if (isStateRestored && examId) {
+    if (isStateRestored && isSecurityHookInitialized && examId && typeof warningCount === 'number') {
       saveStateToStorage(`warningCount_${examId}`, warningCount);
     }
-  }, [warningCount, examId, isStateRestored, secretKey]);
+  }, [warningCount, examId, isStateRestored, isSecurityHookInitialized]);
 
-  //Sync warning count from security hook
+  //Sync warning count from security hook with proper initialization
   useEffect(() => {
-    if (securityWarningCount !== warningCount) {
+    if (!isSecurityHookInitialized && securityWarningCount !== undefined) {
+      setIsSecurityHookInitialized(true);
+      setWarningCount(securityWarningCount);
+    } else if (isSecurityHookInitialized && securityWarningCount !== warningCount) {
       setWarningCount(securityWarningCount);
     }
-  }, [securityWarningCount, warningCount]);
+  }, [securityWarningCount, warningCount, isSecurityHookInitialized]);
 
   // Fetch and organize questions
   useEffect(() => {
@@ -220,77 +165,88 @@ const TestWindow = () => {
     }
   }, [questions, isExamLoading, isQuestionLoading, exam]);
 
+  // Setup subject-specific questions with better caching logic
   useEffect(() => {
-    if (eventDetails) {
+    if (eventDetails && isStateRestored && !isInitialSetupComplete) {
       const cached = localStorage.getItem('testQuestions');
+      let questionsData = null;
 
-      if (!cached) {
-        const reduced = eventDetails.questions.reduce((acc, quest) => {
+      if (cached) {
+        try {
+          const bytes = CryptoJS.AES.decrypt(cached, secretKey);
+          const decrypted = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+          
+          // Validate cached data structure
+          if (typeof decrypted === 'object' && decrypted !== null && !Array.isArray(decrypted)) {
+            questionsData = decrypted;
+          } else {
+            console.warn('Invalid cached questions format, creating fresh questions');
+          }
+        } catch (error) {
+          console.error('Error decrypting cached questions:', error);
+          addToast('Error loading cached questions', 'error', 'Starting fresh exam session', 3000);
+        }
+      }
+
+      // Create fresh questions if no valid cached data
+      if (!questionsData) {
+        questionsData = eventDetails.questions.reduce((acc, quest) => {
           if (!quest.subject || quest.subject.trim() === "") quest.subject = "Unspecified";
           acc[quest.subject] = acc[quest.subject] || [];
           acc[quest.subject].push({ ...quest, index: acc[quest.subject].length + 1, status: 'unanswered', response: null });
           return acc;
         }, {});
-        setSubjectSpecificQuestions(reduced);
-      } else {
-        try {
-          const bytes = CryptoJS.AES.decrypt(cached, secretKey);
-          const decrypted = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-          setSubjectSpecificQuestions(decrypted);
-        } catch (error) {
-          console.error('Error decrypting cached questions:', error);
-          addToast('Error loading cached questions', 'error', 'Starting fresh exam session', 3000);
-          
-          // Fallback to fresh questions
-          const reduced = eventDetails.questions.reduce((acc, quest) => {
-            if (!quest.subject || quest.subject.trim() === "") quest.subject = "Unspecified";
-            acc[quest.subject] = acc[quest.subject] || [];
-            acc[quest.subject].push({ ...quest, index: acc[quest.subject].length + 1, status: 'unanswered', response: null });
-            return acc;
-          }, {});
-          setSubjectSpecificQuestions(reduced);
-        }
       }
 
-      // Only set default subject if no saved subject exists
-      if (!selectedSubject && isStateRestored) {
-        setSelectedSubject(eventDetails.subjects[0] || "Unspecified");
-      }
+      setSubjectSpecificQuestions(questionsData);
+      setIsInitialSetupComplete(true);
     }
-  }, [eventDetails, secretKey, addToast, selectedSubject, isStateRestored]);
+  }, [eventDetails, isStateRestored, isInitialSetupComplete, secretKey, addToast]);
 
+  // Set default subject if none selected (only run once after initial setup)
   useEffect(() => {
-    if (selectedSubject && subjectSpecificQuestions && !selectedQuestion) {
-      const questionsForSubject = subjectSpecificQuestions[selectedSubject];
-      if (questionsForSubject && questionsForSubject.length > 0) {
-        // Only set if no saved question exists or if the saved question is not in current subject
-        if (!selectedQuestion || !questionsForSubject.find(q => q._id === selectedQuestion._id)) {
-          setSelectedQuestion(questionsForSubject[0]);
-        }
-      }
+    if (eventDetails && isInitialSetupComplete && !selectedSubject) {
+      const defaultSubject = eventDetails.subjects[0] || "Unspecified";
+      setSelectedSubject(defaultSubject);
     }
-  }, [selectedSubject, subjectSpecificQuestions, selectedQuestion]);
+  }, [eventDetails, isInitialSetupComplete, selectedSubject]);
 
+  // FIXED: Handle question selection logic - removed infinite loop
   useEffect(() => {
     if (
       selectedSubject &&
       subjectSpecificQuestions &&
-      !selectedQuestion && // ✅ Only set if none already selected
-      isStateRestored
+      isInitialSetupComplete &&
+      !selectedQuestion // Only run if no question is selected
     ) {
       const questionsForSubject = subjectSpecificQuestions[selectedSubject];
       if (questionsForSubject && questionsForSubject.length > 0) {
         setSelectedQuestion(questionsForSubject[0]);
-      } else {
-        const availableSubjects = Object.keys(subjectSpecificQuestions);
-        if (availableSubjects.length > 0) {
-          setSelectedSubject(availableSubjects[0]);
-          setSelectedQuestion(subjectSpecificQuestions[availableSubjects[0]][0]);
+      }
+    }
+  }, [selectedSubject, subjectSpecificQuestions, isInitialSetupComplete]); // Removed selectedQuestion from deps
+
+  // Handle subject change - ensure valid question is selected
+  useEffect(() => {
+    if (
+      selectedSubject &&
+      subjectSpecificQuestions &&
+      selectedQuestion &&
+      isInitialSetupComplete
+    ) {
+      const questionsForSubject = subjectSpecificQuestions[selectedSubject];
+      if (questionsForSubject && questionsForSubject.length > 0) {
+        // Check if current question belongs to selected subject
+        const questionExists = questionsForSubject.find(q => q._id === selectedQuestion._id);
+        if (!questionExists) {
+          // Current question doesn't belong to selected subject, select first question
+          setSelectedQuestion(questionsForSubject[0]);
         }
       }
     }
-  }, [selectedSubject, subjectSpecificQuestions, selectedQuestion, isStateRestored]);
-  
+  }, [selectedSubject, subjectSpecificQuestions, isInitialSetupComplete]); // Only depend on subject and questions, not selectedQuestion
+
+  // Handle submission cleanup
   useEffect(() => {
     if (submitted) {
       // Clear all toasts when submitting
@@ -317,17 +273,20 @@ const TestWindow = () => {
     }
   }, [submitted, navigate, clearAllToasts, addToast, examId]);
 
-  // Save questions to localStorage whenever they change
+  // Save questions to localStorage with validation
   useEffect(() => {
-    if (subjectSpecificQuestions && isStateRestored) {
+    if (subjectSpecificQuestions && isInitialSetupComplete && isSecurityHookInitialized) {
       try {
-        const encrypted = CryptoJS.AES.encrypt(JSON.stringify(subjectSpecificQuestions), secretKey).toString();
-        localStorage.setItem('testQuestions', encrypted);
+        // Validate questions structure before saving
+        if (typeof subjectSpecificQuestions === 'object' && subjectSpecificQuestions !== null && !Array.isArray(subjectSpecificQuestions)) {
+          const encrypted = CryptoJS.AES.encrypt(JSON.stringify(subjectSpecificQuestions), secretKey).toString();
+          localStorage.setItem('testQuestions', encrypted);
+        }
       } catch (error) {
         console.error('Error saving questions to storage:', error);
       }
     }
-  }, [subjectSpecificQuestions, secretKey, isStateRestored]);
+  }, [subjectSpecificQuestions, secretKey, isInitialSetupComplete, isSecurityHookInitialized]);
 
   const handleSubmitTest = async () => {
     try {
@@ -341,6 +300,7 @@ const TestWindow = () => {
       console.log("Submitting test with examId:", examId);
       console.log("🎀🎀🥲🥲🤍🤍")
 
+      // Clear all saved state immediately
       localStorage.removeItem('testQuestions');
       localStorage.removeItem('encryptedTimeLeft');
       localStorage.removeItem(`selectedSubject_${examId}`);
@@ -401,7 +361,7 @@ console.log("Payload for submission:", payload);
   }, []);
 
   // Show loading state
-  if (!eventDetails || !isStateRestored) return <LoadingTest />;
+  if (!eventDetails || !isStateRestored || !isInitialSetupComplete || !isSecurityHookInitialized) return <LoadingTest />;
   
   // Show error state
   if (isExamError) {
