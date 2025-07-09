@@ -345,7 +345,7 @@ const StudentListPage = () => {
         </div>
 
         {/* Student Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12 ">
           {sortedStudents?.map((student, idx) => (
             <div
               key={student._id || idx}
@@ -362,7 +362,7 @@ const StudentListPage = () => {
 <div className={`inset-0 ${theme === 'light' ? 'bg-indigo-100' : 'bg-gray-800'} bg-opacity-5 backdrop-blur-sm -z-10 absolute  bg-opacity-10`}></div>
 
 
-<div className='flex justify-between items-center p-6  '>
+<div className='flex justify-between items-center px-3  py-4 '>
 <div className="flex gap-2 justify-center items-center ">
                   <input
                     type="checkbox"
@@ -370,7 +370,7 @@ const StudentListPage = () => {
                     onChange={() => toggleStudentSelection(student._id)}
                     className="w-5 h-5 z-10 cursor-pointer rounded-lg text-white bg-white bg-opacity-20 border-2 border-white focus:ring-white"
                   />
-                    <h3 className="text-white font-bold text-xl leading-snug line-clamp-2">
+                    <h3 className="text-white font-bold text-md leading-snug line-clamp-2">
   {student.name}
   </h3>
                 </div>
@@ -379,7 +379,7 @@ const StudentListPage = () => {
 </div>
 
 <div className="">
-  <div className="bg-white text-indigo-700 text-xs font-bold px-3 py-1 rounded-full shadow backdrop-blur-md border border-white border-opacity-30 flex items-center gap-1">
+  <div className="bg-white text-indigo-700 text-xs font-bold px-2 py-1 rounded-full shadow backdrop-blur-md border border-white border-opacity-30 flex items-center gap-1">
   {batchMap[student.batch?.currentBatch]?.name || 'No Batch'}
   </div>
 </div>
