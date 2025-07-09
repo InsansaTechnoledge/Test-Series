@@ -655,13 +655,13 @@ const UpcomingExam = () => {
                             <h3 className={`text-2xl font-bold mb-3 ${
                               theme === 'light' ? 'text-gray-800' : 'text-white'
                             }`}>
-                              {exam.title || 'Untitled Exam'}
+                              {exam.name || 'Untitled Exam'}
                             </h3>
-                            <p className={`text-base leading-relaxed ${
+                            {/* <p className={`text-base leading-relaxed ${
                               theme === 'light' ? 'text-gray-600' : 'text-gray-300'
                             }`}>
                               {exam.description || 'No description available'}
-                            </p>
+                            </p> */}
                           </div>
 
                           <div className="space-y-4 mb-8">
@@ -691,7 +691,7 @@ const UpcomingExam = () => {
                               <span className={`text-sm font-medium ${
                                 theme === 'light' ? 'text-gray-700' : 'text-gray-300'
                               }`}>
-                                Questions: {exam.total_questions || 'N/A'}
+                                Marks: {exam.total_marks || 'N/A'}
                               </span>
                             </div>
                           </div>
@@ -800,13 +800,13 @@ const UpcomingExam = () => {
                             <h3 className={`text-2xl font-bold mb-3 ${
                               theme === 'light' ? 'text-gray-800' : 'text-white'
                             }`}>
-                              {exam.title || 'Untitled Exam'}
+                              {exam.name || 'Untitled Exam'}
                             </h3>
-                            <p className={`text-base leading-relaxed ${
+                            {/* <p className={`text-base leading-relaxed ${
                               theme === 'light' ? 'text-gray-600' : 'text-gray-300'
                             }`}>
                               {exam.description || 'No description available'}
-                            </p>
+                            </p> */}
                           </div>
 
                           <div className="space-y-4 mb-8">
@@ -836,7 +836,7 @@ const UpcomingExam = () => {
                               <span className={`text-sm font-medium ${
                                 theme === 'light' ? 'text-gray-700' : 'text-gray-300'
                               }`}>
-                                Questions: {exam.total_questions || 'N/A'}
+                                Marks: {exam.total_marks || 'N/A'}
                               </span>
                             </div>
 

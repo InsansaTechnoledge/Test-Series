@@ -39,7 +39,17 @@ export const testContestQuestion = async (req, res) => {
         const result = await response.json();
         console.log(result);
         const runOutput = typeof result.run.stdout === "string"
-            ? (() => { try { return JSON.parse(result.run.stdout); } catch { return result.run.stdout; } })()
+            ? (() => {
+              try {
+                return JSON.parse(result.run.stdout);
+              } catch {
+                try {
+                  return eval(result.run.stdout);
+                } catch {
+                  return result.run.stdout;
+                }
+              }
+            })()
             : result.run.stdout
         const compileError = result.compile?.stderr || '';
         const runtimeError = result.run?.stderr || '';

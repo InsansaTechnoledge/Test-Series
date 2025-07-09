@@ -1,7 +1,7 @@
 import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
 import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
 // import { createContestQuery, deleteContest, fetchContest } from "../../utils/SqlQueries/contest.queries.js";
-import { createContestQuery, enrollStudentToContestQuery, fetchContest, deleteContest, getContestCount, toggleContestLive, submitContestQuery } from "../../utils/SqlQueries/contest.queries.js";
+import { createContestQuery, enrollStudentToContestQuery, fetchContest, deleteContest, getContestCount, toggleContestLive, submitContestQuery, getLeaderBoardQuery } from "../../utils/SqlQueries/contest.queries.js";
 import { saveContestQuestion } from "../../utils/SqlQueries/contestQuestion.queries.js";
 
 export const createContest = async (req, res) => {
@@ -175,3 +175,19 @@ console.log("Contest submission response:", response);
         return new APIError(500, ['Failed to submit contest', error.message]).send(res);
     }
 };
+
+export const getleaderBoard=async (req, res) => {
+
+    try {
+        const leaderBoard = await getLeaderBoardQuery(req.user._id);
+
+        if (!leaderBoard || leaderBoard.length === 0) {
+            return new APIError(404, 'No leaderboard data found for this contest').send(res);
+        }
+
+        return new APIResponse(200, leaderBoard, 'Leaderboard fetched successfully').send(res);
+    } catch (error) {
+        console.error("Error fetching leaderboard:", error);
+        return new APIError(500, ['Failed to fetch leaderboard', error.message]).send(res);
+    }
+}

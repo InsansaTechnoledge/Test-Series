@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTheme } from '../../../../../hooks/useTheme';
 
 export const ExamPerformanceTable = ({ examStats }) => {
   const getScoreColorClass = (score) => {
@@ -13,27 +14,71 @@ export const ExamPerformanceTable = ({ examStats }) => {
         ? 'bg-yellow-100 text-yellow-800' 
         : 'bg-red-100 text-red-800';
   };
-
+const {theme} = useTheme()
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm">
-      <h3 className="text-xl font-semibold mb-4 text-gray-800">Exam Performance Summary</h3>
+   
+    <div className={`p-6 rounded-lg shadow-sm transition-all duration-300 ${
+      theme === 'light' ? 'bg-white' : 'bg-gray-900'
+    }`}>
+      <h3 className={`text-xl font-semibold mb-4 ${
+        theme === 'light' ? 'text-gray-800' : 'text-gray-100'
+      }`}>
+        Exam Performance Summary
+      </h3>
       <div className="overflow-x-auto">
         <table className="w-full table-auto">
           <thead>
-            <tr className="border-b">
-              <th className="text-left py-2 px-4">Exam Name</th>
-              <th className="text-left py-2 px-4">Attempts</th>
-              <th className="text-left py-2 px-4">Avg Score</th>
-              <th className="text-left py-2 px-4">Best Score</th>
-              <th className="text-left py-2 px-4">Worst Score</th>
-              <th className="text-left py-2 px-4">All Attempts</th>
+            <tr className={`border-b ${
+              theme === 'light' ? 'border-gray-200' : 'border-gray-700'
+            }`}>
+              <th className={`text-left py-2 px-4 ${
+                theme === 'light' ? 'text-gray-900' : 'text-gray-100'
+              }`}>
+                Exam Name
+              </th>
+              <th className={`text-left py-2 px-4 ${
+                theme === 'light' ? 'text-gray-900' : 'text-gray-100'
+              }`}>
+                Attempts
+              </th>
+              <th className={`text-left py-2 px-4 ${
+                theme === 'light' ? 'text-gray-900' : 'text-gray-100'
+              }`}>
+                Avg Score
+              </th>
+              <th className={`text-left py-2 px-4 ${
+                theme === 'light' ? 'text-gray-900' : 'text-gray-100'
+              }`}>
+                Best Score
+              </th>
+              <th className={`text-left py-2 px-4 ${
+                theme === 'light' ? 'text-gray-900' : 'text-gray-100'
+              }`}>
+                Worst Score
+              </th>
+              <th className={`text-left py-2 px-4 ${
+                theme === 'light' ? 'text-gray-900' : 'text-gray-100'
+              }`}>
+                All Attempts
+              </th>
             </tr>
           </thead>
           <tbody>
             {examStats?.map((exam, index) => (
-              <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                <td className="py-2 px-4 font-medium">{exam.examName}</td>
-                <td className="py-2 px-4">{exam.attempts}</td>
+              <tr key={index} className={index % 2 === 0 
+                ? (theme === 'light' ? 'bg-gray-50' : 'bg-gray-800') 
+                : (theme === 'light' ? 'bg-white' : 'bg-gray-900')
+              }>
+                <td className={`py-2 px-4 font-medium ${
+                  theme === 'light' ? 'text-gray-900' : 'text-gray-100'
+                }`}>
+                  {exam.examName}
+                </td>
+                <td className={`py-2 px-4 ${
+                  theme === 'light' ? 'text-gray-900' : 'text-gray-100'
+                }`}>
+                  {exam.attempts}
+                </td>
                 <td className="py-2 px-4">
                   <span className={`font-semibold ${getScoreColorClass(parseFloat(exam.avgScore))}`}>
                     {exam.avgScore}

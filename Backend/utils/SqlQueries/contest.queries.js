@@ -222,3 +222,13 @@ return data;
 };
 
 
+export const getLeaderBoardQuery = async (userId) => {
+
+  const { data, error } = await supabase.rpc('get_leaderboard_for_student_contests', {
+  student_id: userId,
+});
+
+  if (error) throw error;
+  return data;
+};
+
