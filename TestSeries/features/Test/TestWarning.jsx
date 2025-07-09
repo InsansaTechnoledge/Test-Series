@@ -187,8 +187,13 @@ const TestHeader = ({handleSubmitTest,subjectSpecificQuestions,setSubjectSpecifi
     // Check if we should show final popup (5 warnings threshold)
     // Use setTimeout to ensure state is updated before checking
 setTimeout(() => {
-  setWarningCount(count => (count < 5 ? count + 1 : count));
-}, 5000);
+  setWarningCount(count => {
+    if(count>=5){
+      setShowFinalPopup(true);
+    }
+    count;
+});
+}, 0);
 
 
 // Show popup if threshold is reached
