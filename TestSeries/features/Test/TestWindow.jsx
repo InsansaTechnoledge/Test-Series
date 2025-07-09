@@ -16,6 +16,8 @@ import TestHeader from './TestWarning';
 import QuestionSection from './QuestionSection';
 import LoadingTest from './LoadingTest';
 import WarningHeaderForExams from './utils/WarningHeaderForExams';
+import { useCallback } from 'react';
+import { use } from 'react';
 
 const TestWindow = () => {
   const [eventDetails, setEventDetails] = useState();
@@ -49,6 +51,7 @@ const TestWindow = () => {
   const { questions, isError: isExamError, isLoading: isQuestionLoading } = useCachedQuestions(examId);
   const { exam, isLoading: isExamLoading } = useCachedExam(examId);
   const { theme } = useTheme();
+  const handleSubmitRef = useRef(null);
 
   // Enhanced useExamSecurity hook with toaster
   const {
@@ -67,7 +70,7 @@ const TestWindow = () => {
     warningCount,
     userId: user?._id,
     examId,
-    handleSubmitTest: () => handleSubmitTest(),
+    handleSubmitTest:() => handleSubmitRef.current?.(),
     examContainerRef
   });
 
@@ -288,77 +291,69 @@ const TestWindow = () => {
     }
   }, [subjectSpecificQuestions, secretKey, isInitialSetupComplete, isSecurityHookInitialized]);
 
-  const handleSubmitTest = async () => {
-    try {
-      // Show submitting toast
-      addToast(
-        'Submitting exam...',
-        'info',
-        'Please wait while we process your submission',
-        0 // Don't auto-dismiss
-      );
-      console.log("Submitting test with examId:", examId);
-      console.log("🎀🎀🥲🥲🤍🤍")
+  const handleSubmitTest = useCallback(async () => {
+  try {
+    addToast(
+      'Submitting exam...',
+      'info',
+      'Please wait while we process your submission',
+      0
+    );
 
-      // Clear all saved state immediately
-      localStorage.removeItem('testQuestions');
-      localStorage.removeItem('encryptedTimeLeft');
-      localStorage.removeItem(`selectedSubject_${examId}`);
-      localStorage.removeItem(`selectedQuestion_${examId}`);
-      localStorage.removeItem(`examViolations_${examId}`);
-      localStorage.removeItem(`warningCount_${examId}`);
-console.log("Submitting test with examId:", examId);
-console.log("Subject Specific Questions:", subjectSpecificQuestions);
-      const answers = calculateResultPayload(subjectSpecificQuestions, getCorrectResponse);
-      console.log("Calculated answers:", answers);
-      const payload = {
-        studentId: user._id,
-        examId,
-        status: "attempted",
-        ...answers,
-        violations: examViolations,
-        warningCount,
-      };
-console.log("Payload for submission:", payload);
-      const response = await submitResult(payload);
-      if (response.status === 200) {
-        setSubmitted(true);
-        if (document.fullscreenElement) {
-          try {
-            await document.exitFullscreen();
-          } catch (error) {
-            console.warn('Error exiting fullscreen:', error);
-          }
-        }
-      } else {
-        throw new Error(`Submission failed with status ${response.status}`);
-      }
-    } catch (err) {
-      console.error("Error submitting test:", err);
-      addToast(
-        'Error submitting exam',
-        'error',
-        `Please try again. Error: ${err.message}`,
-        0 // Don't auto-dismiss errors
-      );
-    }
-    
-    // Clean up external resources
-    if (window?.electronAPI?.stopProctorEngine) {
-      window.electronAPI.stopProctorEngine();
-    }
-    if (window?.electronAPI?.closeWindow) {
-      window.electronAPI.closeWindow();
-    }
-  };
+    console.log("Submitting test with examId:", examId);
+    console.log("Subject Specific Questions:", subjectSpecificQuestions);
 
-  // Add cleanup on component unmount
-  useEffect(() => {
-    return () => {
-      // Optional: Clean up on unmount if needed
-      // You might want to keep the state for page reloads
+    localStorage.removeItem('testQuestions');
+    localStorage.removeItem('encryptedTimeLeft');
+    localStorage.removeItem(`selectedSubject_${examId}`);
+    localStorage.removeItem(`selectedQuestion_${examId}`);
+    localStorage.removeItem(`examViolations_${examId}`);
+    localStorage.removeItem(`warningCount_${examId}`);
+
+    const answers = calculateResultPayload(subjectSpecificQuestions, getCorrectResponse);
+    const payload = {
+      studentId: user._id,
+      examId,
+      status: "attempted",
+      ...answers,
+      violations: examViolations,
+      warningCount,
     };
-  }, []);
+
+    const response = await submitResult(payload);
+    if (response.status === 200) {
+      setSubmitted(true);
+      if (document.fullscreenElement) {
+        try {
+          await document.exitFullscreen();
+        } catch (error) {
+          console.warn('Error exiting fullscreen:', error);
+        }
+      }
+    } else {
+      throw new Error(`Submission failed with status ${response.status}`);
+    }
+  } catch (err) {
+    console.error("Error submitting test:", err);
+    addToast(
+      'Error submitting exam',
+      'error',
+      `Please try again. Error: ${err.message}`,
+      0
+    );
+  }
+
+  if (window?.electronAPI?.stopProctorEngine) {
+    window.electronAPI.stopProctorEngine();
+  }
+  if (window?.electronAPI?.closeWindow) {
+    window.electronAPI.closeWindow();
+  }
+}, [examId, subjectSpecificQuestions, getCorrectResponse, examViolations, warningCount, user._id, setSubmitted, addToast, submitResult]);
+
+useEffect(() => {
+  handleSubmitRef.current = handleSubmitTest;
+}, [handleSubmitTest]);
 
   // Show loading state
   if (!eventDetails || !isStateRestored || !isInitialSetupComplete || !isSecurityHookInitialized) return <LoadingTest />;
