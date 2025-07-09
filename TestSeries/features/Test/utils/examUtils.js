@@ -48,8 +48,8 @@ export const calculateResultPayload = (subjectSpecificQuestions, getCorrectRespo
     console.error('Invalid subjectSpecificQuestions provided');
     return {
       marks: 0,
-      wrongAnswers: 0,
-      unattempted: 0,
+      wrongAnswers: [],
+      unattempted: [],
     };
   }
 
@@ -87,21 +87,21 @@ export const calculateResultPayload = (subjectSpecificQuestions, getCorrectRespo
     console.error('Error creating response array:', error);
     return {
       marks: 0,
-      wrongAnswers: 0,
-      unattempted: 0,
+      wrongAnswers: [],
+      unattempted: [],
     };
   }
 
   let totalMarks = 0;
-  let wrongAnswers = 0;
-  let unattempted = 0;
+  let wrongAnswers = [];
+  let unattempted = [];
 
   for (let q of allResponses) {
     try {
       const attempted = isAttempted(q.user_response);
       
       if (!attempted) {
-        unattempted += 1;
+        unattempted.push(q.question_id);
         continue;
       }
 
@@ -111,12 +111,15 @@ export const calculateResultPayload = (subjectSpecificQuestions, getCorrectRespo
         totalMarks += q.positive_marks;
       } else {
         totalMarks -= q.negative_marks;
-        wrongAnswers += 1;
+        wrongAnswers.push({
+          questionId: q.question_id,
+          response: q.user_response,
+        })
       }
     } catch (error) {
       console.error('Error calculating result for question:', q.question_id, error);
       // Treat as unattempted on error
-      unattempted += 1;
+      unattempted .push(q.question_id);
     }
   }
 

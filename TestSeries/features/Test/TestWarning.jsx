@@ -10,12 +10,11 @@ import { VITE_SECRET_KEY_FOR_TESTWINDOW } from '../constants/env';
 import LoadingTest from './LoadingTest';
 import { calculateResult } from './utils/resultCalculator';
 
-const TestHeader = ({}) => {
+const TestHeader = ({handleSubmitTest,subjectSpecificQuestions,setSubjectSpecificQuestions,selectedSubject,setSelectedSubject,setSelectedQuestion,selectedQuestion}) => {
   const [eventDetails, setEventDetails] = useState();
-  const [selectedQuestion, setSelectedQuestion] = useState();
-  const [subjectSpecificQuestions, setSubjectSpecificQuestions] = useState();
-  const [selectedSubject, setSelectedSubject] = useState();
-  const [submitted, setSubmitted] = useState(false);
+  // const [selectedQuestion, setSelectedQuestion] = useState();
+//  --> const [subjectSpecificQuestions, setSubjectSpecificQuestions] = useState();
+//  --> const [selectedSubject, setSelectedSubject] = useState();
   const [warning, setWarning] = useState(null);
   const [warningCount, setWarningCount] = useState(0);
   const [proctorRunning, setProctorRunning] = useState(false);
@@ -187,14 +186,21 @@ const TestHeader = ({}) => {
     
     // Check if we should show final popup (5 warnings threshold)
     // Use setTimeout to ensure state is updated before checking
-    setTimeout(() => {
-      setWarningCount(currentCount => {
-        if (currentCount >= 5) {
-          setShowFinalPopup(true);
-        }
-        return currentCount;
-      });
-    }, 0);
+setTimeout(() => {
+  setWarningCount(count => {
+    if(count>=5){
+      setShowFinalPopup(true);
+    }
+    count;
+});
+}, 0);
+
+
+// Show popup if threshold is reached
+if (warningCount >= 5 && !showFinalPopup) {
+  setShowFinalPopup(true);
+  console.log('🚨 Showing final popup due to multiple warnings');
+}
   };
 
   const handleProctorEvent = (data) => {
@@ -281,12 +287,6 @@ const TestHeader = ({}) => {
     }
   }, [selectedSubject]);
 
-  useEffect(() => {
-    if (submitted) {
-      handleSubmitTest();
-    }
-  }, [submitted]);
-
   const getCorrectResponse = (question) => {
     switch (question.question_type) {
       case "mcq":
@@ -313,7 +313,7 @@ const TestHeader = ({}) => {
     }
   }
 
-  const handleSubmitTest = async () => {
+  const handleSubmit = async () => {
     try {
       // Stop proctor engine before submitting
       if (isElectronEnv && proctorRunning) {
@@ -325,34 +325,36 @@ const TestHeader = ({}) => {
       localStorage.removeItem('testQuestions');
       localStorage.removeItem('encryptedTimeLeft');
 
-      const answers = Object.entries(subjectSpecificQuestions).reduce((acc, [, value]) => {
-        const objs = value.map((val) => ({
-          question_id: val.id,
-          user_response: val.response,
-          correct_response: getCorrectResponse(val),
-          question_type: val.question_type,
-          positive_marks: val.positive_marks,
-          negative_marks: val.negative_marks
-        }));
+      handleSubmitTest();
+      navigate('/student/completed-exams');
+      // const answers = Object.entries(subjectSpecificQuestions).reduce((acc, [, value]) => {
+      //   const objs = value.map((val) => ({
+      //     question_id: val.id,
+      //     user_response: val.response,
+      //     correct_response: getCorrectResponse(val),
+      //     question_type: val.question_type,
+      //     positive_marks: val.positive_marks,
+      //     negative_marks: val.negative_marks
+      //   }));
 
-        return [...acc, ...objs];
-      }, []);
+      //   return [...acc, ...objs];
+      // }, []);
 
-      const result = calculateResult(answers);
+      // const result = calculateResult(answers);
 
-      const payload = {
-        studentId: user._id,
-        examId: examId,
-        status: "attempted",
-        wrongAnswers: result.wrongAnswers,
-        unattempted: result.unattempted,
-        marks: result.totalMarks,
-      }
+      // const payload = {
+      //   studentId: user._id,
+      //   examId: examId,
+      //   status: "attempted",
+      //   wrongAnswers: result.wrongAnswers,
+      //   unattempted: result.unattempted,
+      //   marks: result.totalMarks,
+      // }
 
-      const response = await submitResult(payload);
-      if (response.status == 200) {
-        navigate('/student/completed-exams');
-      }
+      // const response = await submitResult(payload);
+      // if (response.status == 200) {
+      //   navigate('/student/completed-exams');
+      // }
 
     } catch (err) {
       console.error('Error submitting test:', err);
@@ -431,7 +433,7 @@ const TestHeader = ({}) => {
                   </ul>
                   <div className="mt-6 text-center">
                     <button
-                      onClick={handleSubmitTest}
+                      onClick={handleSubmit}
                       className="inline-flex items-center justify-center px-6 py-2.5 text-white bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 rounded-lg text-base font-semibold transition duration-200 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
                     >
                       Okay, Close Test

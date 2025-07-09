@@ -225,6 +225,11 @@ export const studentControlData = [
     icon: '', activeIcon: ''
   },
   {
+    name: "Enter LeaderBoards",
+    path: "leader-board",
+    icon: '' , activeIcon: ''
+  },
+  {
     name: "Analysis",
     path: "analysis",
     icon: '', activeIcon: ''
@@ -244,7 +249,7 @@ export const studentCategoryData = [
   {
     name: "Contests",
     icon: contest,
-    features: ["New Contests", "Registered Contests", "Live Contests"]
+    features: ["New Contests", "Registered Contests", "Live Contests" , "Enter LeaderBoards"]
   },
   {
     name: "Academics",
