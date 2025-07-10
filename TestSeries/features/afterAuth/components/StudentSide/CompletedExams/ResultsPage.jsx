@@ -117,7 +117,7 @@ const ResultsPage = () => {
                                     theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
                                 }`}>Avg Score</p>
                                 <p className="text-3xl font-bold text-purple-600">
-                                    {stats.avgMarks.toFixed(1)}%
+                                    {stats.avgMarks.toFixed(1)}
                                 </p>
                             </div>
                             
@@ -297,7 +297,7 @@ const ResultsPage = () => {
                                                                 ? 'text-yellow-600' 
                                                                 : 'text-red-600'
                                                         }`}>
-                                                            {result.marks}%
+                                                            {result.marks}
                                                         </span>
                                                     </div>
                                                 ) : (

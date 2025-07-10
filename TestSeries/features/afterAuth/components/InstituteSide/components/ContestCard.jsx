@@ -4,7 +4,6 @@ import { Calendar, Clock, Users, Play, Trash2, AlertCircle, CheckCircle } from '
 import { deleteContest, ToggleContest } from '../../../../../utils/services/contestService';
 
 const ContestCard = ({ contest, setContest , theme}) => {
-  // const [theme, setTheme] = useState('light');
   const [loadingDelete, setLoadingDelete] = useState({});
   const [loadingGoLive, setLoadingGoLive] = useState({});
 

@@ -13,7 +13,7 @@ import useLimitAccess from '../../../../hooks/useLimitAccess'
 import { useLocation } from 'react-router-dom'
 import { useCachedOrganization } from '../../../../hooks/useCachedOrganization'
 import { useTheme } from '../../../../hooks/useTheme'
-
+import { useToast, ToastContainer } from "../../../../utils/Toaster";
 const AddStudent = () => {
   const { user, getFeatureKeyFromLocation } = useUser();
   const [batch, setBatch] = useState('')
@@ -32,7 +32,7 @@ const AddStudent = () => {
     : null;
 
   const canAddMoreStudents = useLimitAccess(getFeatureKeyFromLocation(location.pathname), "totalStudents")
-
+  const { toasts, showToast, removeToast } = useToast();
   console.log(batch)
 
   useEffect(() => {
@@ -168,11 +168,13 @@ const AddStudent = () => {
       }
     } catch (error) {
       if (error.response && error.response.status === 404) {
-        alert('Student not found');
+     
+        showToast("Student not found", "info");
       }
       else {
         console.error('Error fetching students:', error);
-        alert('Something went wrong while fetching students');
+    
+        showToast("Something went wrong while fetching students", "error");
       }
     }
   }, [importBatch]);
@@ -231,7 +233,7 @@ const AddStudent = () => {
         setExcelData(processedData);
       } catch (error) {
         console.error('Error parsing Excel file:', error)
-        alert('Error parsing Excel file. Please check the format.')
+        showToast("Error parsing Excel file. Please check the format.", "error");
       }
     }
     reader.readAsBinaryString(file)
@@ -260,7 +262,7 @@ const AddStudent = () => {
   const handleSubmit = useCallback(async () => {
     try {
       if (!batch) {
-        alert('Please select a batch before submitting.');
+        showToast("Please select a batch before submitting.", "warning");
         return;
       }
       if (activeTab === 'manual') {
@@ -275,20 +277,20 @@ const AddStudent = () => {
           parentPhone: s.pnumber
         }));
         await addSingleStudent(preparedStudents);
-        alert('Students added successfully!');
+        showToast("Students added successfully!", "success");
         setStudents([getEmptyStudent()]);
         setErrors('')
         queryClient.invalidateQueries(['Students', user._id])
       }
       if (activeTab === 'bulk') {
-        if (!excelData.length) return alert('No Excel data to upload');
+        if (!excelData.length) return showToast('No Excel data to upload',"error");
         const fileInput = document.getElementById('excel-upload');
-        if (!fileInput.files[0]) return alert('No file selected');
+        if (!fileInput.files[0]) return showToast('No file selected',"warning");
         await uploadStudentExcel(fileInput.files[0], batch);
-        alert('Excel uploaded successfully!');
+        showToast('Excel uploaded successfully!',"success");
       }
       if (activeTab === 'import') {
-        if (!importedStudents.length) return alert('No students to import from the selected batch');
+        if (!importedStudents.length) return showToast('No students to import from the selected batch',"warning");
         const preparedStudents = importedStudents.map(s => s._id);
         const currentBatchId = batch;
         const previousBatchId = importBatch;
@@ -298,7 +300,7 @@ const AddStudent = () => {
           previousBatchId
         })
         if (response.status === 200) {
-          alert('Students imported successfully!');
+          showToast('Students imported successfully!',"success");
           setImportedStudents([]);
           setImportBatch('');
         };
@@ -306,7 +308,7 @@ const AddStudent = () => {
       };
     } catch (error) {
       console.error('Submission failed:', error);
-      alert('Something went wrong during submission');
+      showToast('Something went wrong during submission',"error");
     }
   }, [batch, activeTab, students, excelData, importedStudents, importBatch, user, queryClient]);
 
@@ -317,6 +319,8 @@ const AddStudent = () => {
   const {theme} = useTheme();
 
   return (
+    <>
+
     <div className="min-h-screen">
       {/* Hero Header */}
       <div className="relative overflow-hidden rounded-xl h-80">
@@ -885,9 +889,10 @@ const AddStudent = () => {
             )}
           </button>
         </div>
-
       </div>
     </div>
+        <ToastContainer toasts={toasts} onRemove={removeToast} />
+    </>
   )
 }
 

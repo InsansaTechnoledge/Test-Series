@@ -1,8 +1,31 @@
 import { Award, Calendar } from 'lucide-react'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
-const MostActiveBatch = ({ theme }) => {
+const MostActiveBatch = ({ theme, examBatchAnalytics, batchMap }) => {
   const isDark = theme === 'dark';
+  const [groupedByBatch, setGroupedByBatch] = useState({});
+
+  useEffect(() => {
+  const grouped = Object.values(
+    examBatchAnalytics.reduce((acc, item) => {
+      if (!acc[item.batch_id]) {
+        acc[item.batch_id] = { batch_id: item.batch_id, exams: 0 };
+      }
+      acc[item.batch_id].exams += item.exams;
+      return acc;
+    }, {})
+  );
+
+  const maxBatch = grouped.reduce(
+    (max, batch) => (batch.exams > max.exams ? batch : max),
+    { batch_id: null, exams: -Infinity }
+  );
+
+  setGroupedByBatch(maxBatch);
+}, [examBatchAnalytics]);
+
+console.log('Grouped By Batch:', groupedByBatch);
+
 
   return (
     <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-indigo-100'} rounded-2xl p-6 border`}>
@@ -17,9 +40,9 @@ const MostActiveBatch = ({ theme }) => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Card 1 */}
         <div className={`${isDark ? 'bg-gray-700' : 'bg-white'} rounded-xl p-4 text-center shadow-sm`}>
-          <div className={`text-2xl font-bold ${isDark ? 'text-indigo-100' : 'text-indigo-600'} `}>Engineering Batch A</div>
+          <div className={`text-xl font-bold ${isDark ? 'text-indigo-100' : 'text-indigo-600'} `}>{batchMap?.[groupedByBatch?.batch_id]?.name}</div>
           <div className={`text-sm mt-1 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-            Most Active This Month
+            Most Active Batch
           </div>
         </div>
 
@@ -33,7 +56,7 @@ const MostActiveBatch = ({ theme }) => {
 
         {/* Card 3 */}
         <div className={`${isDark ? 'bg-gray-700' : 'bg-white'} rounded-xl p-4 text-center shadow-sm`}>
-          <div className="text-2xl font-bold text-blue-600">28</div>
+          <div className="text-2xl font-bold text-blue-600">{groupedByBatch.exams}</div>
           <div className={`text-sm mt-1 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
             Exams Completed
           </div>
