@@ -97,7 +97,7 @@ const WrongQuestionAnalysis = ({ examData, currentStudentId, examQuestions }) =>
   <h2 className={`text-3xl font-bold mb-6 ${
     theme === 'dark' ? 'text-gray-200' : 'text-gray-800'
   }`}>
-    Wrong Question Analysis
+    Global Wrong Question Analysis
   </h2>
   <div className={`overflow-x-auto rounded-xl shadow-md border ${
     theme === 'dark' 
@@ -113,7 +113,7 @@ const WrongQuestionAnalysis = ({ examData, currentStudentId, examQuestions }) =>
         }`}>
           <th className="py-3 px-6 font-semibold">Question</th>
           <th className="py-3 px-6 font-semibold">Correct Answer</th>
-          <th className="py-3 px-6 font-semibold">Your Response</th>
+          <th className="py-3 px-6 font-semibold">Global Wrong Responses</th>
           <th className="py-3 px-6 font-semibold">Wrong %</th>
           <th className="py-3 px-6 font-semibold">Insight</th>
         </tr>

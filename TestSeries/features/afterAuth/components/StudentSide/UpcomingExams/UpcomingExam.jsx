@@ -13,6 +13,7 @@ import { useTheme } from '../../../../../hooks/useTheme';
 const UpcomingExam = () => {
   const [liveExams, setLiveExams] = useState([]);
   const [upcomingExams, setUpcomingExams] = useState([]);
+  const [attemptedExams , setAttemptedExams] = useState([]);
   const [isElectronEnv, setIsElectronEnv] = useState(false);
   const [proctorStatus, setProctorStatus] = useState('idle'); // idle, starting, running, stopping
   const [currentExamId, setCurrentExamId] = useState(null); // Track which exam is being proctored
@@ -73,10 +74,15 @@ const UpcomingExam = () => {
     console.log("test", exams);
 
     const upcoming = exams.filter(exam => exam.go_live === false || exam.go_live === "FALSE");
-    const live = exams.filter(exam => exam.go_live === true || exam.go_live === "TRUE");
+    const live = exams.filter(
+      exam => (exam.go_live === true || exam.go_live === "TRUE") && exam.hasAttempted !== true
+    );
+    const attempted = exams.filter(exam => exam.hasAttempted === true);
 
     setUpcomingExams(upcoming);
     setLiveExams(live);
+    setAttemptedExams(attempted);
+
   }, [JSON.stringify(exams)]);
 
   const showProctorWarning = (warning) => {
@@ -240,7 +246,7 @@ const UpcomingExam = () => {
     return true;
   };
 
-  // Helper function to get start button text and style
+
   const getStartButtonConfig = (exam) => {
     const isProctored = isAiProctored(exam);
     const canStart = canStartExam(exam);
@@ -268,6 +274,12 @@ const UpcomingExam = () => {
       };
     }
     
+    if(exam.hasAttempted === true) {
+     return {
+       text: 'Already attempted'
+     }
+    }
+
     return {
       text: "Start Exam",
       disabled: false,
@@ -408,6 +420,11 @@ const UpcomingExam = () => {
     const eventId = 'default';
     navigate(`/student/test?userId=${userId}&examId=${examId}&eventId=${eventId}`);
   };
+
+  const handleNavigateToResult = (examId) => {
+    navigate(`/student/result/${examId}`);
+  };
+  
 
   const ExamBadge = ({ exam, theme }) => {
     const isProctored = isAiProctored(exam);
@@ -641,12 +658,17 @@ const UpcomingExam = () => {
                         </div>
                         
                         {/* Live Badge */}
-                        <div className="absolute top-6 right-6 z-10">
-                          <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-full text-xs font-bold uppercase tracking-wider shadow-lg animate-pulse">
-                            <span className="w-2 h-2 bg-white rounded-full animate-ping"></span>
-                            Live Now
+                        {
+                          exam.hasAttempted !== true && (
+                            <div className="absolute top-6 right-6 z-10">
+                            <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-full text-xs font-bold uppercase tracking-wider shadow-lg animate-pulse">
+                              <span className="w-2 h-2 bg-white rounded-full animate-ping"></span>
+                              Live Now
+                            </div>
                           </div>
-                        </div>
+                          )
+                        }
+                      
 
                         <div className="relative z-10 p-8">
                           <ExamBadge exam={exam} theme={theme} />
@@ -697,19 +719,20 @@ const UpcomingExam = () => {
                           </div>
 
                           <button
-                            onClick={() => handleStartTest(exam.id || exam._id, exam.ai_proctored)}
-                            disabled={!canStartExam(exam)}
-                            className={`
-                              w-full py-4 px-6 rounded-2xl font-bold text-lg transition-all duration-300
-                              transform hover:scale-105 hover:shadow-xl active:scale-95
-                              ${canStartExam(exam) 
-                                ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg hover:from-green-600 hover:to-emerald-600' 
-                                : 'bg-gray-400 text-gray-700 cursor-not-allowed opacity-60'
-                              }
-                            `}
-                          >
-                            {getStartButtonConfig(exam).text}
-                          </button>
+                          onClick={() => handleStartTest(exam.id || exam._id, exam.ai_proctored)}
+                          disabled={!canStartExam(exam) || exam.hasAttempted === true}
+                          className={`
+                            w-full py-4 px-6 rounded-2xl font-bold text-lg transition-all duration-300
+                            transform hover:scale-105 hover:shadow-xl active:scale-95
+                            ${!canStartExam(exam) || exam.hasAttempted
+                              ? 'bg-gray-400 text-gray-700 cursor-not-allowed opacity-60'
+                              : 'bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg hover:from-green-600 hover:to-emerald-600'
+                            }
+                          `}
+                        >
+                          {getStartButtonConfig(exam).text}
+                        </button>
+
                         </div>
                       </div>
                     ))}
@@ -895,6 +918,136 @@ const UpcomingExam = () => {
                       theme === 'light' ? 'text-gray-500' : 'text-gray-500'
                     }`}>
                       There are no scheduled exams at the moment. Check with your instructor for updates.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </section>
+
+            {/* Attempted Exams Section */}
+            <section className="mb-20 mt-12">
+              <div className="mb-10">
+                <HeadingUtil 
+                  heading="Attempted Exams" 
+                  subHeading="Active exams available for immediate participation"
+                />
+              </div>
+              
+              <div className="space-y-8  ">
+                {attemptedExams && attemptedExams.length > 0 ? (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+                    {attemptedExams.map((exam, idx) => (
+                      <div
+                        key={idx}
+                        className={`
+                          relative overflow-hidden rounded-3xl shadow-2xl transition-all duration-500
+                          hover:shadow-3xl hover:scale-[1.03] group cursor-pointer
+                          ${theme === 'light' 
+                            ? 'bg-white/90 border-2 border-indigo-100 hover:border-indigo-200 backdrop-blur-sm' 
+                            : 'bg-gray-900/90 border-2 border-indigo-800/50 hover:border-indigo-700/50 backdrop-blur-sm'
+                          }
+                          ${(proctorStatus === 'starting' && currentExamId !== exam.id) ? 'opacity-40' : 'opacity-100'}
+                        `}
+                        style={{
+                          animationDelay: `${idx * 100}ms`,
+                          animation: 'fadeInUp 0.6s ease-out both'
+                        }}
+                      >
+                       
+                       
+                      
+
+                        <div className="relative z-10 p-8">
+                          <ExamBadge exam={exam} theme={theme} />
+                          
+                          <div className="mb-6">
+                            <h3 className={`text-2xl font-bold mb-3 ${
+                              theme === 'light' ? 'text-gray-800' : 'text-white'
+                            }`}>
+                              {exam.name || 'Untitled Exam'}
+                            </h3>
+                            {/* <p className={`text-base leading-relaxed ${
+                              theme === 'light' ? 'text-gray-600' : 'text-gray-300'
+                            }`}>
+                              {exam.description || 'No description available'}
+                            </p> */}
+                          </div>
+
+                          <div className="space-y-4 mb-8">
+                            <div className="flex items-center gap-3">
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                                theme === 'light' ? 'bg-blue-100' : 'bg-blue-900/50'
+                              }`}>
+                                <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                              </div>
+                              <span className={`text-sm font-medium ${
+                                theme === 'light' ? 'text-gray-700' : 'text-gray-300'
+                              }`}>
+                                Duration: {exam.duration || 'N/A'} minutes
+                              </span>
+                            </div>
+                            
+                            <div className="flex items-center gap-3">
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                                theme === 'light' ? 'bg-green-100' : 'bg-green-900/50'
+                              }`}>
+                                <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                              </div>
+                              <span className={`text-sm font-medium ${
+                                theme === 'light' ? 'text-gray-700' : 'text-gray-300'
+                              }`}>
+                                Marks: {exam.total_marks || 'N/A'}
+                              </span>
+                            </div>
+                          </div>
+
+                          <button
+                          onClick={() => handleNavigateToResult(exam.id)}
+                          disabled={!canStartExam(exam) || exam.hasAttempted === true}
+                          className={`
+                            w-full py-4 px-6 rounded-2xl font-bold text-lg transition-all duration-300
+                            transform hover:scale-105 hover:shadow-xl active:scale-95
+                            ${!canStartExam(exam) || exam.hasAttempted
+                              ? 'bg-gray-400 text-gray-700 cursor-not-allowed opacity-60'
+                              : 'bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg hover:from-green-600 hover:to-emerald-600'
+                            }
+                          `}
+                        >
+                          {getStartButtonConfig(exam).text}
+                        </button>
+
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className={`
+                    text-center py-20 px-8 rounded-3xl border-2 border-dashed transition-all duration-300
+                    ${theme === 'light' 
+                      ? 'border-gray-300 bg-gray-50/50' 
+                      : 'border-gray-600 bg-gray-800/50'
+                    }
+                  `}>
+                    <div className="mb-6">
+                      <svg className={`w-16 h-16 mx-auto ${
+                        theme === 'light' ? 'text-gray-400' : 'text-gray-500'
+                      }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                      </svg>
+                    </div>
+                    <h3 className={`text-xl font-bold mb-2 ${
+                      theme === 'light' ? 'text-gray-600' : 'text-gray-400'
+                    }`}>
+                      No Live Exams Available
+                    </h3>
+                    <p className={`text-base ${
+                      theme === 'light' ? 'text-gray-500' : 'text-gray-500'
+                    }`}>
+                      There are currently no active exams. Check back later or view upcoming exams below.
                     </p>
                   </div>
                 )}

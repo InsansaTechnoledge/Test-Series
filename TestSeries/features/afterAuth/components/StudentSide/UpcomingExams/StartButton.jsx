@@ -1,7 +1,12 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
 const StartButton = ({ exam, onStartTest, getStartButtonConfig, proctorStatus, isElectronEnv, currentExamId }) => {
 
+    useEffect(() => {
+        console.log("exam3" , exam);
+        
+    },[])
+    
     const isAiProctored = (exam) => {
         return exam.ai_proctored === true || 
                exam.ai_proctored === "TRUE" || 
@@ -62,7 +67,7 @@ const StartButton = ({ exam, onStartTest, getStartButtonConfig, proctorStatus, i
                 ) : (
                     <button
                     onClick={onClick}
-                    disabled={buttonConfig.disabled || proctorStatus === 'starting' || exam.go_live === false}
+                    disabled={buttonConfig.disabled || proctorStatus === 'starting' || exam.go_live === false || exam.hasAttempted === "true"}
                     style={{
                         padding: '10px 20px',
                         border: 'none',

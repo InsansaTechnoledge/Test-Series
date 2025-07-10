@@ -1,5 +1,14 @@
 import axios from 'axios';
 
+// Array of production server URLs for failover
+const PRODUCTION_SERVERS = [
+  "https://test-series-1new.onrender.com/api",
+  "https://backup-server-1.onrender.com/api",
+  "https://backup-server-2.onrender.com/api"
+];
+
+let currentServerIndex = 0;
+
 // Dynamic baseURL based on environment
 const getBaseURL = () => {
   // Use environment variable if available, otherwise fallback to location-based detection
@@ -11,8 +20,8 @@ const getBaseURL = () => {
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
     return "http://localhost:8000/api";
   }
-  // Production URL
-  return "https://test-series-1new.onrender.com/api";
+  // Production URL - use current server from array
+  return PRODUCTION_SERVERS[currentServerIndex];
 };
 
 const api = axios.create({
@@ -36,10 +45,37 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor to handle errors globally
+// Response interceptor to handle errors globally with failover
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
+    const originalRequest = error.config;
+    
+    // Check if this is a server error and we're in production with multiple servers
+    const isServerError = error.response?.status >= 500 || !error.response;
+    const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+    const hasMoreServers = currentServerIndex < PRODUCTION_SERVERS.length - 1;
+    
+    if (isServerError && isProduction && hasMoreServers && !originalRequest._retry) {
+      console.warn(`Server ${PRODUCTION_SERVERS[currentServerIndex]} failed, switching to backup...`);
+      
+      // Switch to next server
+      currentServerIndex++;
+      const newBaseURL = PRODUCTION_SERVERS[currentServerIndex];
+      
+      // Update the axios instance baseURL
+      api.defaults.baseURL = newBaseURL;
+      
+      // Mark this request as retry to prevent infinite loops
+      originalRequest._retry = true;
+      originalRequest.baseURL = newBaseURL;
+      
+      console.log(`Retrying request with server: ${newBaseURL}`);
+      
+      // Retry the original request with new server
+      return api(originalRequest);
+    }
+    
     if (error.response) {
       // Server responded with a status outside 2xx
       const { status, data } = error.response;
