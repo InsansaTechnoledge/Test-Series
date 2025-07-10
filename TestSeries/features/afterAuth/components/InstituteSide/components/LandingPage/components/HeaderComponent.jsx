@@ -5,9 +5,9 @@ const Header = ({user , theme}) => (
     <div className={`relative ${theme === 'light' ? "bg-gradient-to-br from-indigo-600 via-indigo-700 to-indigo-800 " : "bg-indigo-600"} rounded-2xl p-8 text-white overflow-hidden`}>
       <div className="absolute inset-0 bg-black/20"></div>
       <div className="relative z-10">
-        <div className="flex flex-col md:flex-row items-center gap-6 mb-8">
+        <div className="flex flex-col md:flex-row items-center gap-6 mb-8 ">
           {user.logoUrl && (
-            <img src={user.logoUrl} alt="Logo" className={`w-20 h-20 rounded-full border-4 ${theme === 'light' ? ' border-white/30' : 'border-indigo-200'} shadow-xl`}/>
+            <img src={user.logoUrl} alt="Logo" className={`w-20 h-20 rounded-full border-4 ${theme === 'light' ? ' border-white/30' : 'border-indigo-200'} shadow-xl object-contain`}/>
           )}
           <div className="text-center md:text-left">
             <h1 className={`text-3xl md:text-4xl font-bold mb-2 ${theme === 'light' ? '' : 'text-gray-100'}`}>{user.name}</h1>
