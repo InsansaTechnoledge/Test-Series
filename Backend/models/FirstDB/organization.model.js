@@ -79,7 +79,7 @@ user:{
     googleId: { type: String, required: true },
     name: { type: String, required: true },
     profilePhoto: { type: String, required: true },
-    email: { type: String, required: true, unique: true}
+    email: { type: String, required: true}
 
 },
   tokens:{
@@ -256,5 +256,8 @@ OrganizationSchema.set('toObject', { virtuals: false });
 OrganizationSchema.set('toJSON', { virtuals: true });
 
 
+
+
 export const Organization = connOne.model('Organization' , OrganizationSchema)
+
 

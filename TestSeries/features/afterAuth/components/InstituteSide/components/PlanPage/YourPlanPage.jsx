@@ -100,7 +100,7 @@ const YourPlanPage = () => {
                 <div className={`w-3 h-3 rounded-full mr-2 sm:mr-3 ${
                   subscription.status === 'trialing' ? 'bg-yellow-900' : 'bg-white'
                 }`}></div>
-                {subscription.status === 'trialing' ? 'FREE TRIAL' : 'PREMIUM'}
+                {subscription.status === 'trialing' ? 'FREE TRIAL' : (subscription.status === 'active'?'ACTIVE PLAN':'INACTIVE PLAN')}
               </span>
             </div>
           </div>
@@ -120,6 +120,7 @@ const YourPlanPage = () => {
               </div>
               <div className="text-3xl sm:text-4xl font-bold text-white mb-2">{user?.metaData?.totalStudents || 0}</div>
               <div className="text-base sm:text-lg font-medium text-gray-400">Total Students</div>
+              <div className="text-sm sm:text-shadow-xs text-gray-500 mt-1">Available Students in your plan : {user?.planFeatures?.student_feature?.value-user?.metaData?.totalStudents}</div>
             </div>
             
             <div className="bg-gray-900 rounded-lg p-6 sm:p-8 text-center hover:bg-gray-800 transition-all duration-300 border border-gray-800 hover:border-indigo-600">
@@ -128,6 +129,7 @@ const YourPlanPage = () => {
               </div>
               <div className="text-3xl sm:text-4xl font-bold text-white mb-2">{user?.metaData?.totalBatches || 0}</div>
               <div className="text-base sm:text-lg font-medium text-gray-400">Enrolled Batches</div>
+              <div className="text-sm sm:text-shadow-xs text-gray-500 mt-1">Available Batches in your plan : {user?.planFeatures?.batch_feature?.value-user?.metaData?.totalBatches}</div>
             </div>
             
             <div className="bg-gray-900 rounded-lg p-6 sm:p-8 text-center hover:bg-gray-800 transition-all duration-300 border border-gray-800 hover:border-indigo-600">
@@ -136,6 +138,7 @@ const YourPlanPage = () => {
               </div>
               <div className="text-3xl sm:text-4xl font-bold text-white mb-2">{user?.metaData?.totalExams || 0}</div>
               <div className="text-base sm:text-lg font-medium text-gray-400">Exams conducted</div>
+              <div className="text-sm sm:text-shadow-xs text-gray-500 mt-1">Available Exams in your plan : {user?.planFeatures?.exam_feature?.value-user?.metaData?.totalExams}</div>
             </div>
             
             <div className="bg-gray-900 rounded-lg p-6 sm:p-8 text-center hover:bg-gray-800 transition-all duration-300 border border-gray-800 hover:border-indigo-600">
@@ -143,7 +146,8 @@ const YourPlanPage = () => {
                 <User/>
               </div>
               <div className="text-3xl sm:text-4xl font-bold text-white mb-2">{user?.metaData?.totalUsers || 0}</div>
-              <div className="text-base sm:text-lg font-medium text-gray-400">Available Users</div>
+              <div className="text-base sm:text-lg font-medium text-gray-400">Created Users</div>
+               <div className="text-sm sm:text-shadow-xs text-gray-500 mt-1">Available Users in your plan : {user?.planFeatures?.user_feature?.value-user?.metaData?.totalUsers}</div>
             </div>
           </div>
         </div>

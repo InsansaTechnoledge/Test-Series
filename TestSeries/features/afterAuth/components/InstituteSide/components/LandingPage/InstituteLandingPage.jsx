@@ -16,13 +16,9 @@ const InstituteLandingPage = () => {
   const {batches,batchMap} = useCachedBatches();
 
   const {examBatchAnalytics}=useExamBatchAnalytics(); 
-  
-  console.log("Exam Batch Analytics Data:", examBatchAnalytics);
+  console.log("examBatchAnalytics", examBatchAnalytics);
+
   const {theme} = useTheme();
-  console.log(" Exam:", examBatchAnalytics);
-  console.log(" Batch map",    batches);
-  console.log(" Exam:",examBatchAnalytics);
-  console.log(" Batch map", batches);
 
   // if (!user?.planPurchased) {
   //   return (
@@ -51,7 +47,7 @@ else
         <Header user={user} theme={theme} />
         <QuickSteps theme={theme} />
         <Analytics examBatchAnalytics={examBatchAnalytics}  theme={theme} batches={batches} />
-        <MostActiveBatch theme={theme} />
+        <MostActiveBatch theme={theme} examBatchAnalytics={examBatchAnalytics} batchMap={batchMap}/>
         <Features theme={theme}/>
       
       </div>

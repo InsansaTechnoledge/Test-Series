@@ -32,8 +32,24 @@ const batchData = batches?.map((batch,index) => {
   const tooltipStyle = {
     backgroundColor: isDark ? '#1e293b' : '#ffffff',         // dark slate or white
     border: `1px solid ${isDark ? '#475569' : '#e5e7eb'}`,   // slate-600 or gray-200
-    color: isDark ? '#f8fafc' : '#1e293b'                    // light text or dark text
+    color: isDark ? '#ffffff' : '#1e293b'                    // light text or dark text
   };
+
+  const CustomPieTooltipForPieChart = ({ active, payload }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div
+        className={`rounded-lg p-2 shadow-lg `}
+        style={tooltipStyle}
+      >
+        <p>{payload[0].name}: {payload[0].value}</p>
+      </div>
+    );
+  }
+
+  return null;
+};
+
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -73,7 +89,7 @@ const batchData = batches?.map((batch,index) => {
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
             </Pie>
-            <Tooltip contentStyle={tooltipStyle} />
+            <Tooltip content={<CustomPieTooltipForPieChart />} />
           </PieChart>
         </ResponsiveContainer>
         <div className="flex flex-wrap gap-2 mt-4">
