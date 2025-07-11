@@ -1047,7 +1047,7 @@ const UpcomingExam = () => {
                     <p className={`text-base ${
                       theme === 'light' ? 'text-gray-500' : 'text-gray-500'
                     }`}>
-                      There are currently no active exams. Check back later or view upcoming exams below.
+                      There are currently no attempted exams.
                     </p>
                   </div>
                 )}
