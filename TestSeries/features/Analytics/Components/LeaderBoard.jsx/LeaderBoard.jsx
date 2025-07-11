@@ -169,13 +169,13 @@ const {theme} = useTheme()
                             <td className="px-6 py-4">
                               <div className="flex items-center gap-3">
                                 {getRankIcon(rank)}
-                                <span className={`font-bold text-lg ${rank <= 3 ? (rank === 1 ? 'text-white' : 'text-gray-800') : (theme === 'light' ? 'text-gray-700' : 'text-gray-300')}`}>
+                                <span className={`font-bold text-lg ${rank <= 3 ? (rank === 1 ? 'text-white' : 'text-gray-800') : (theme === 'light' ? 'text-gray-700' : 'text-gray-700')}`}>
                                   #{rank}
                                 </span>
                               </div>
                             </td>
                             <td className="px-6 py-4">
-                              <div className={`font-semibold text-lg ${rank === 1 ? 'text-white' : (theme === 'light' ? 'text-gray-800' : 'text-gray-200')}`}>
+                              <div className={`font-semibold text-lg ${rank === 1 ? 'text-white' : (theme === 'light' ? 'text-gray-800' : 'text-gray-700')}`}>
                                 {entry.studentName || 'Unknown Student'}
                               </div>
                             </td>
