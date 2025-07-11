@@ -12,13 +12,23 @@ const app = express();
 app.set('trust proxy', 1);
 
 // CORS configuration
+const allowedOrigins = process.env.CLIENT_URL.split(',');
+
 app.use(cors({
-    origin: process.env.CLIENT_URL, // Ensure CLIENT_URL is correctly set
-    credentials: true, // Allow cookies to be sent with cross-origin requests
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS' , 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
-    exposedHeaders: ['Set-Cookie']
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+  exposedHeaders: ['Set-Cookie']
 }));
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
