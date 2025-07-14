@@ -20,7 +20,7 @@ const ExamForm = ({ canCreateMoreExams, onSubmit, initialData = {
   total_marks: '',
   duration: '',
   batch_id: '',
-  autoSubmit: true,
+  auto_submittable: true,
   ai_proctored: false,
 } }) => {
 
