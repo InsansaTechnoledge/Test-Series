@@ -38,7 +38,7 @@ export const fetchEventsBasedOnAnomalies = async (req, res) => {
       });
   
       if (!data || data.length === 0) {
-        return new APIError('No anomalies found').send(res);
+        return new APIError(404 , data ,'No anomalies found').send(res);
       }
   
       return new APIResponse(200, data, 'Anomalies found successfully').send(res);
