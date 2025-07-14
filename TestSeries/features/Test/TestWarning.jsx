@@ -187,9 +187,12 @@ const TestHeader = ({}) => {
     
     // Check if we should show final popup (5 warnings threshold)
     // Use setTimeout to ensure state is updated before checking
+
+    const MAX_WARNINGS_ALLOWED = 5;
+
 setTimeout(() => {
       setWarningCount(currentCount => {
-        if (currentCount >= 5) {
+        if (currentCount >= MAX_WARNINGS_ALLOWED) {
           setShowFinalPopup(true);
         }
         return currentCount;
@@ -357,7 +360,7 @@ setTimeout(() => {
         navigate('/student/completed-exams');
       }
 
-    } catch (err) {
+    } catch (err) { 
       console.error('Error submitting test:', err);
     }
 

@@ -105,6 +105,10 @@
     "typeinfo": "cpp",
     "unordered_map": "cpp",
     "variant": "cpp",
-    "vector": "cpp"
+    "vector": "cpp",
+    "csignal": "cpp",
+    "complex": "cpp",
+    "memory": "cpp",
+    "algorithm": "cpp"
   }
 }
