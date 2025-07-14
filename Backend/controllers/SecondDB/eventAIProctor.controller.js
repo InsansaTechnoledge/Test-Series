@@ -63,7 +63,7 @@ export const stopExamForStudent = async (req, res) => {
       );
   
       if (result.modifiedCount === 0) {
-        return new APIError(404, 'No matching records found to update').send(res);
+        return new APIError(404, result ,  'No matching records found to update').send(res);
       }
   
       return new APIResponse(200, result, 'Exam stopped for student successfully').send(res);
