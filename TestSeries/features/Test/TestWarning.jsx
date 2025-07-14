@@ -398,7 +398,7 @@ const TestHeader = ({isAutoSubmittable}) => {
       } catch (err) {
         console.error('Failed to check stopExam flag:', err);
       }
-    }, 10000); // every 10 seconds
+    }, 1000); 
   
     return () => clearInterval(intervalId);
   }, [warningCount, autoSubmittable, user?._id]);
