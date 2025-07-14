@@ -75,10 +75,12 @@ const UpcomingExam = () => {
 
     const upcoming = exams.filter(exam => exam.go_live === false || exam.go_live === "FALSE");
     const live = exams.filter(
-      exam => (exam.go_live === true || exam.go_live === "TRUE") && exam.hasAttempted !== true
+      exam => (exam.go_live === true || exam.go_live === "TRUE") && exam.hasAttempted !== true || exam.reapplicable === true
     );
-    const attempted = exams.filter(exam => exam.hasAttempted === true);
-
+    const attempted = exams.filter(exam => 
+      exam.hasAttempted === true && (exam.reapplicable === false || exam.reapplicable == null)
+    );
+    
     setUpcomingExams(upcoming);
     setLiveExams(live);
     setAttemptedExams(attempted);
@@ -250,46 +252,75 @@ const UpcomingExam = () => {
   const getStartButtonConfig = (exam) => {
     const isProctored = isAiProctored(exam);
     const canStart = canStartExam(exam);
-    
+  
+    // 1. Exam is proctored but running in browser — disallow
     if (isProctored && !isElectronEnv) {
       return {
-        text: "Requires Desktop App",
+        text: "Desktop App Required",
+        tooltip: "This exam requires the Evalvo Proctor desktop app.",
         disabled: true,
         style: {
-          backgroundColor: '#6c757d',
+          backgroundColor: '#9ca3af', // Gray
+          color: '#ffffff',
           cursor: 'not-allowed',
-          opacity: 0.6
+          opacity: 0.7
         }
       };
     }
-    
+  
+    // 2. AI-Proctored + Electron — allow
     if (isProctored && isElectronEnv) {
       return {
-        text: "Start AI-Proctored Exam",
-        disabled: false,
+        text: "Launch Proctored Exam",
+        tooltip: "AI-based proctoring is active for this exam.",
+        disabled: !canStart,
         style: {
-          backgroundColor: '#dc3545',
-          color: 'white'
+          backgroundColor: '#b91c1c', // Red
+          color: '#ffffff',
+          border: 'none'
         }
       };
     }
-    
-    if(exam.hasAttempted === true) {
-     return {
-       text: 'Already attempted'
-     }
+  
+    // 3. Attempted and NOT reapplicable — block
+    if (exam.hasAttempted === true && exam.reapplicable !== true) {
+      return {
+        text: "Attempt Completed",
+        tooltip: "You have already attempted this exam.",
+        disabled: true,
+        style: {
+          backgroundColor: '#d1d5db', // Light gray
+          color: '#6b7280',
+          cursor: 'not-allowed'
+        }
+      };
     }
-
+  
+    // 4. Attempted but reapplicable — allow retry
+    if (exam.hasAttempted === true && exam.reapplicable === true) {
+      return {
+        text: "Retake Exam",
+        tooltip: "You can reattempt this exam.",
+        disabled: !canStart,
+        style: {
+          backgroundColor: '#2563eb', // Blue
+          color: '#ffffff'
+        }
+      };
+    }
+  
+    // 5. Default case — start exam
     return {
-      text: "Start Exam",
-      disabled: false,
+      text: "Begin Exam",
+      tooltip: "Start your exam now.",
+      disabled: !canStart,
       style: {
-        backgroundColor: '#28a745',
-        color: 'white'
+        backgroundColor: '#16a34a', // Green
+        color: '#ffffff'
       }
     };
   };
-
+  
   const handleStartTest = async (examId, isAiProctoredFlag) => {
     const eventId = 'default';
   
@@ -492,7 +523,7 @@ const UpcomingExam = () => {
         : 'bg-gradient-to-br from-gray-950 via-gray-900 to-slate-950'
     }`}>
 
-      <AppRequiredMessage/>
+      <AppRequiredMessage isElectronEnv={isElectronEnv}/>
       {/* Main Container */}
       <div className={`mx-auto px-6 py-8 ${
         proctorStatus === 'starting' ? 'opacity-60 pointer-events-none' : 'opacity-100'
@@ -720,11 +751,11 @@ const UpcomingExam = () => {
 
                           <button
                           onClick={() => handleStartTest(exam.id || exam._id, exam.ai_proctored)}
-                          disabled={!canStartExam(exam) || exam.hasAttempted === true}
+                          disabled={!canStartExam(exam) || (exam.hasAttempted === true && exam.reapplicable === false)}
                           className={`
                             w-full py-4 px-6 rounded-2xl font-bold text-lg transition-all duration-300
                             transform hover:scale-105 hover:shadow-xl active:scale-95
-                            ${!canStartExam(exam) || exam.hasAttempted
+                            ${!canStartExam(exam) || (exam.hasAttempted === true && exam.reapplicable === false)
                               ? 'bg-gray-400 text-gray-700 cursor-not-allowed opacity-60'
                               : 'bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg hover:from-green-600 hover:to-emerald-600'
                             }
@@ -1007,7 +1038,7 @@ const UpcomingExam = () => {
 
                           <button
                           onClick={() => handleNavigateToResult(exam.id)}
-                          disabled={!canStartExam(exam) || exam.hasAttempted === true}
+                          disabled={!canStartExam(exam) || (exam.hasAttempted === true && exam.reapplicable === false)}
                           className={`
                             w-full py-4 px-6 rounded-2xl font-bold text-lg transition-all duration-300
                             transform hover:scale-105 hover:shadow-xl active:scale-95

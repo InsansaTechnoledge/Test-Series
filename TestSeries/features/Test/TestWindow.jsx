@@ -18,6 +18,8 @@ import LoadingTest from './LoadingTest';
 import WarningHeaderForExams from './utils/WarningHeaderForExams';
 import { useCallback } from 'react';
 import { use } from 'react';
+import { useExamManagement } from '../../hooks/UseExam';
+
 
 const TestWindow = () => {
   const [eventDetails, setEventDetails] = useState();
@@ -36,6 +38,14 @@ const TestWindow = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const examId = searchParams.get('examId');
+  const {exams } = useExamManagement();
+
+  const currentExam = exams.find(exam => exam.id === examId);
+
+  const isAutoSubmittable = currentExam?.auto_submittable
+
+  console.log("Current Exam Data:", currentExam.auto_submittable);
+
   console.log("fs", examId);
 
   const navigate = useNavigate();
@@ -436,7 +446,7 @@ useEffect(() => {
           </div>
 
           <div className="lg:hidden">
-            <TestHeader />
+            <TestHeader isAutoSubmittable={isAutoSubmittable}/>
 
             <CountdownTimer 
               initialTime={eventDetails.duration} 
