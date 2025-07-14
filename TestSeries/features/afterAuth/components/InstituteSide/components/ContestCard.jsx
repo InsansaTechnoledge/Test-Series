@@ -310,9 +310,7 @@ const ContestCard = ({ contest, setContest, theme }) => {
                     <div className="pt-2">
                       <button
                         onClick={() => {
-                          console.log("Go Live button clicked for contest:", contestItem.id);
-                          console.log("Can make go live:", canMakeGoLive);
-                          if (contestItem.go_live && canMakeGoLive) {
+                          if (contestItem.go_live) {
                             handlePause(contestItem);
                           } else if (!contestItem.go_live) {
                             handleGoLive(contestItem);
