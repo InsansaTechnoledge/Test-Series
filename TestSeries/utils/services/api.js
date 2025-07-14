@@ -2,8 +2,8 @@ import axios from 'axios';
 
 // Array of production server URLs for failover
 const PRODUCTION_SERVERS = [
-  "https://test-series-1new.onrender.com/api",
-  "https://test-series-backup-server1.onrender.com/api",
+  // "https://test-series-1new.onrender.com/api",
+  // "https://test-series-backup-server1.onrender.com/api",
   "https://backup-server-test-series2.onrender.com/api"
 ];
 
@@ -18,7 +18,8 @@ const getBaseURL = () => {
   
   // Fallback: Check if we're in development (localhost)
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    return "https://test-series-backup-server1.onrender.com/api";
+    // return "https://test-series-backup-server1.onrender.com/api";
+    return "http://localhost:8000/api"
   }
   // Production URL - use current server from array
   return PRODUCTION_SERVERS[currentServerIndex];

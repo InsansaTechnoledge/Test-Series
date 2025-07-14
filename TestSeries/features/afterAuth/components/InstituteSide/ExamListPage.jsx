@@ -3,7 +3,7 @@ import { Clock, Users, CheckCircle, PlayCircle, Loader2, BookOpen, CirclePause, 
 import NeedHelpComponent from './components/NeedHelpComponent';
 import usePendingExams from '../../../../hooks/useExamData';
 import { useNavigate } from 'react-router-dom';
-import DeleteExamModal from './ExamFlow/DeleteExamModal';
+import DeleteExamModal from './ExamFlow/components/DeleteExamModal';
 import { useExamManagement } from '../../../../hooks/UseExam';
 import Banner from "../../../../assests/Institute/exam list.svg"
 import { usePageAccess } from '../../../../contexts/PageAccessContext';
