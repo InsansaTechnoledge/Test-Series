@@ -6,12 +6,13 @@ import CodeCreatorForm from './codeCreatorForm';
 import { useTheme } from '../../../../hooks/useTheme';
 import { useEffect } from 'react';
 import { fetchCodingQuestion, fetchCodingQuestions } from '../../../../utils/services/contestService';
-import { useSearchParams } from 'react-router-dom';
+import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 
 export default function QuestionCreator() {
   const { theme } = useTheme();
   const [searchParams] = useSearchParams();
   const contestId = searchParams.get("contestId");
+  const navigate=useNavigate();
   // const contestId = "demo-contest-id"; 
   
   const [difficulty, setDifficulty] = useState("Easy");
@@ -84,6 +85,7 @@ export default function QuestionCreator() {
       alert("Contest created successfully!");
       setSelectedQuestions([]);
       setFullDetails(null);
+      navigate(`/institute/contest-list`);
     } else {
       alert("Failed to create contest. Please try again.");
     }

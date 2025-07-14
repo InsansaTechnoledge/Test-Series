@@ -3,8 +3,13 @@ import { Play, Trophy, ArrowRight, Clock, Calendar } from 'lucide-react';
 import { useTheme } from '../../../../../../../hooks/useTheme';
 import { useNavigate } from 'react-router-dom';
 
-const LiveContestCard = ({ contests }) => {
+const LiveContestCard = ({ contests,status }) => {
   console.log("contests in LiveContestCard:", contests);
+
+  if(status === "submitted")
+  contests = contests.filter(contest => contest.go_live === true && contest.isEnrolled === true && contest.status === "submitted");
+  else
+  contests = contests.filter(contest => contest.go_live === true && contest.isEnrolled === true && contest.status !== "submitted");
   
   const { theme } = useTheme();
   const navigate = useNavigate();
@@ -150,14 +155,14 @@ const LiveContestCard = ({ contests }) => {
                 <div className="flex flex-col space-y-2">
                   {contest.go_live ? (
                     <>
-                      <button
+                     {status !=="submitted" && ( <button
                         onClick={() => navigate(`/student/contest/${contest.id}`)}
                         className="group relative px-6 py-3 bg-red-600 text-white font-bold rounded-lg transform transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg flex items-center justify-center space-x-2"
                       >
                         <Play className="w-4 h-4" />
                         <span>{contest.isEnrolled ? 'Enter Contest' : 'Join Contest'}</span>
                         <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                      </button>
+                      </button>)}
                       <button
                         onClick={() => navigate(`/student/leaderboard/${contest.id}`)}
                         className="group relative px-6 py-3 bg-orange-600 text-white font-bold rounded-lg transform transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg flex items-center justify-center space-x-2"

@@ -5,11 +5,12 @@ import LiveContestCard from './components/LiveContestCard';
 const LiveContestPage = () => {
   const { contestList } = useCachedContests();
   const [liveContest, setLiveContest] = useState([]);
+
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const checkScreenSize = () => {
-      setIsMobile(window.innerWidth < 768); 
+      setIsMobile(window.innerWidth < 768);
     };
 
     checkScreenSize();
@@ -21,7 +22,7 @@ const LiveContestPage = () => {
   useEffect(() => {
     if (contestList && Array.isArray(contestList)) {
       const filteredContest = contestList.filter(
-        (contest) => contest.go_live === true && contest.isEnrolled === true
+        (contest) => contest.go_live === true && contest.isEnrolled === true 
       );
       setLiveContest(filteredContest);
     }
@@ -48,14 +49,33 @@ const LiveContestPage = () => {
 
   return (
     <div className="min-h-screen px-4 py-8">
-      <h1 className="text-3xl font-bold text-center text-indigo-800 mb-6">Live Contests</h1>
-      {liveContest.length === 0 ? (
-        <div className="text-center text-gray-500 mt-8">
-          <p>No live contests available at the moment.</p>
-        </div>
-      ) : (
-        <LiveContestCard contests={liveContest} />
-      )}
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-3xl font-bold text-center text-indigo-800 mb-6">Live Contests</h1>
+        {liveContest.length === 0 ? (
+          <div className="text-center text-gray-500 mt-8">
+            <p>No live contests available at the moment.</p>
+          </div>
+        ) : (
+          <LiveContestCard contests={liveContest} status={"enrolled"}/>
+        )}
+      </div>
+      <div className="mt-12 border-t pt-8">
+               <h1 className="text-3xl font-bold text-center text-indigo-800 mb-6">Completed Contests</h1>
+        <p className="text-center text-gray-600 mb-4">  
+          Here are the contests you have completed. You can view your submissions and scores.
+        </p>
+
+            
+
+        {liveContest.length === 0 ? (
+          <div className="text-center text-gray-500 mt-8">
+            <p>No live contests available at the moment.</p>
+          </div>
+        ) : (
+          <LiveContestCard contests={liveContest} status={"submitted"}/>
+        )}
+      </div>
+      
     </div>
   );
 };
