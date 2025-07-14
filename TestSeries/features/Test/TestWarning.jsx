@@ -9,6 +9,7 @@ import { submitResult } from '../../utils/services/resultService';
 import { VITE_SECRET_KEY_FOR_TESTWINDOW } from '../constants/env';
 import LoadingTest from './LoadingTest';
 import { calculateResult } from './utils/resultCalculator';
+import { checkToStopExamForStudent } from '../../utils/services/proctorService';
 
 const TestHeader = ({isAutoSubmittable}) => {
   const [eventDetails, setEventDetails] = useState();
@@ -384,6 +385,25 @@ const TestHeader = ({isAutoSubmittable}) => {
     if (window?.electronAPI?.closeWindow) window.electronAPI.closeWindow();
   };
 
+  useEffect(() => {
+    if (autoSubmittable || warningCount < 5 || !user?._id) return;
+  
+    const intervalId = setInterval(async () => {
+      try {
+        const result = await checkToStopExamForStudent(user._id);
+        if (result?.stopExam === true) {
+          console.log("⛔ Exam manually stopped by proctor");
+          setShowManualReviewMessage(true); 
+        }
+      } catch (err) {
+        console.error('Failed to check stopExam flag:', err);
+      }
+    }, 10000); // every 10 seconds
+  
+    return () => clearInterval(intervalId);
+  }, [warningCount, autoSubmittable, user?._id]);
+
+  
   const dismissManualReviewMessage = () => {
     setShowManualReviewMessage(false);
   };

@@ -178,7 +178,7 @@ const RegisteredAndScheduledCard = ({ registeredContest , theme }) => {
                         {contest.isEnrolled || contest.type === 'scheduled' ? (
                           <>
                             <CheckCircle className="w-4 h-4" />
-                            Enrolled
+                            {contest.status === "submitted" ? "Completed": "Enrolled"}
                           </>
                         ) : (
                           <>
