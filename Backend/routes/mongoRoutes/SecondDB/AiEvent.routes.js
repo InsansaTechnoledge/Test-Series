@@ -1,10 +1,12 @@
 import express from 'express'
-import { fetchEventsBasedOnAnomalies, receiveProctorEvent} from '../../../controllers/SecondDB/eventAIProctor.controller.js'
+import { checkToStopExamForStudent, fetchEventsBasedOnAnomalies, receiveProctorEvent, stopExamForStudent} from '../../../controllers/SecondDB/eventAIProctor.controller.js'
 
 const router = express.Router()
 
 router.post('/emit-event' , receiveProctorEvent)
 router.get('/get-events' , fetchEventsBasedOnAnomalies)
+router.patch('/stop/:studentId', stopExamForStudent);
+router.get('/check-stop/:studentId', checkToStopExamForStudent);
 
 // router.post('/emit-event-with-screenshot', uploadScreenshot, receiveProctorEventWithScreenshot);
 

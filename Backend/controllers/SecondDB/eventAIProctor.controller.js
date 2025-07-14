@@ -48,6 +48,46 @@ export const fetchEventsBasedOnAnomalies = async (req, res) => {
     }
   };
   
+  
+export const stopExamForStudent = async (req, res) => {
+    try {
+      const { studentId } = req.params;
+  
+      if (!studentId) {
+        return new APIError(404, 'No student ID provided').send(res);
+      }
+  
+      const result = await ProctorEvent.updateMany(
+        { studentId },
+        { $set: { stopExam: true } }
+      );
+  
+      if (result.modifiedCount === 0) {
+        return new APIError(404, 'No matching records found to update').send(res);
+      }
+  
+      return new APIResponse(200, result, 'Exam stopped for student successfully').send(res);
+    } catch (e) {
+      return new APIError(500, ['Something went wrong', e.message]).send(res);
+    }
+  };
+
+  export const checkToStopExamForStudent = async (req, res) => {
+    try {
+      const { studentId } = req.params;
+  
+      if (!studentId) {
+        return new APIError(400, 'Student ID is required').send(res);
+      }
+  
+      // Check if any event has stopExam: true for this student
+      const shouldStop = await ProctorEvent.exists({ studentId, stopExam: true });
+  
+      return new APIResponse(200, { stopExam: !!shouldStop }, 'Checked stop exam status').send(res);
+    } catch (e) {
+      return new APIError(500, ['Failed to check stop exam status', e.message]).send(res);
+    }
+  };
 
 // import ProctorEvent from "../../models/SecondDB/AiProctorEvent.model.js";
 // import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
