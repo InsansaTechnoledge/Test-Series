@@ -99,8 +99,8 @@ const LeaderBoard = () => {
   
     return {
       contest: contestName,
-      obtained: entry.total_score.totalObtainedMarks,
-      total: entry.total_score.totalMarks,
+      obtained: entry.total_score?.totalObtainedMarks,
+      total: entry.total_score?.totalMarks,
       totalReceived,
     };
   });
@@ -347,7 +347,7 @@ const LeaderBoard = () => {
                   <div className="text-right">
                     <div className="text-3xl font-bold">
                       {groupedByContest[selectedContest].reduce((max, p) => 
-                        Math.max(max, p.total_score.totalMarks), 0)}
+                        Math.max(max, p.total_score?.totalMarks), 0)}
                     </div>
                     <div className={`${isDark ? 'text-indigo-200' : 'text-indigo-200'} text-sm`}>Max Points</div>
                   </div>
@@ -358,7 +358,7 @@ const LeaderBoard = () => {
               <div className={`p-6 ${isDark ? 'bg-gray-700' : 'bg-gradient-to-b from-gray-50 to-white'}`}>
                 <div className="flex justify-center items-end space-x-4 mb-8">
                   {[...groupedByContest[selectedContest]]
-                    .sort((a, b) => b.total_score.totalObtainedMarks - a.total_score.totalObtainedMarks)
+                    .sort((a, b) => b.total_score?.totalObtainedMarks - a.total_score?.totalObtainedMarks)
                     .slice(0, 3)
                     .map((participant, index) => {
                       const isCurrentUser = participant.participant_id === user?._id;
@@ -374,7 +374,7 @@ const LeaderBoard = () => {
                             'bg-gradient-to-t from-orange-500 to-orange-400'
                           }`}>
                             <div className="text-2xl mb-1">{getRankIcon(actualIndex)}</div>
-                            <div className="text-lg">{participant.total_score.totalObtainedMarks}</div>
+                            <div className="text-lg">{participant.total_score?.totalObtainedMarks}</div>
                             <div className="text-xs opacity-90">points</div>
                           </div>
                           <div className={`mt-2 px-3 py-1 rounded-full text-sm font-medium ${
@@ -397,12 +397,12 @@ const LeaderBoard = () => {
                 </h4>
                 <div className="space-y-2">
                   {[...groupedByContest[selectedContest]]
-                    .sort((a, b) => b.total_score.totalObtainedMarks - a.total_score.totalObtainedMarks)
+                    .sort((a, b) => b.total_score?.totalObtainedMarks - a.total_score?.totalObtainedMarks)
                     .map((participant, index) => {
                       const isCurrentUser = participant.participant_id === user?._id;
                       const percentage = getScorePercentage(
-                        participant.total_score.totalObtainedMarks,
-                        participant.total_score.totalMarks
+                        participant.total_score?.totalObtainedMarks,
+                        participant.total_score?.totalMarks
                       );
 
                       return (
@@ -443,10 +443,10 @@ const LeaderBoard = () => {
                                   ? (isDark ? 'text-indigo-300' : 'text-indigo-600')
                                   : (isDark ? 'text-green-400' : 'text-green-600')
                               }`}>
-                                {participant.total_score.totalObtainedMarks}
+                                {participant.total_score?.totalObtainedMarks}
                               </div>
                               <div className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
-                                /{participant.total_score.totalMarks} points
+                                /{participant.total_score?.totalMarks} points
                               </div>
                             </div>
                             
