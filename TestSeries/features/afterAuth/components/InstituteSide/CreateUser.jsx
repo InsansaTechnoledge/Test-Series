@@ -13,7 +13,7 @@ import { usePageAccess } from "../../../../contexts/PageAccessContext";
 import useLimitAccess from "../../../../hooks/useLimitAccess";
 import { useLocation } from "react-router-dom";
 import { useCachedOrganization } from "../../../../hooks/useCachedOrganization";
-import {useTheme} from "../../../../hooks/useTheme"
+import { useTheme } from "../../../../hooks/useTheme"
 
 const CreateUser = () => {
     const { batches, isLoading, isError } = useCachedBatches();
@@ -26,13 +26,13 @@ const CreateUser = () => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [showBatches, setShowBatches] = useState([]);
     const [error, setError] = useState({});
-    const {theme} = useTheme()
-    
+    const { theme } = useTheme()
+
     // Add state for dynamic user count tracking
     const [createdUsersCount, setCreatedUsersCount] = useState(0);
-    
+
     const queryClient = useQueryClient();
-   
+
     const { user, getFeatureKeyFromLocation } = useUser();
     const location = useLocation();
 
@@ -44,8 +44,8 @@ const CreateUser = () => {
         : null;
 
     // Get current total users from the actual source (user or organization metadata)
-    const currentTotalUsers = user?.role === 'organization' 
-        ? user.metaData?.totalUsers || 0 
+    const currentTotalUsers = user?.role === 'organization'
+        ? user.metaData?.totalUsers || 0
         : organization?.metaData?.totalUsers || 0;
 
     // Dynamic calculation that includes newly created users in current session
@@ -70,7 +70,7 @@ const CreateUser = () => {
 
     const validateField = (name, value, currentErrors) => {
         const newErrors = { ...currentErrors };
-        
+
         switch (name) {
             case "firstName":
                 return value.length >= 3 && value.length <= 32
@@ -129,7 +129,7 @@ const CreateUser = () => {
 
         setError((prev) => {
             const newErrors = { ...prev, [name]: fieldError };
-            
+
             // Handle password confirmation cross-validation
             if (name === "password" && prev.confirm_password) {
                 const confirmError = validateField("confirm_password", prev.confirm_password || "", newErrors);
@@ -140,7 +140,7 @@ const CreateUser = () => {
                     newErrors.password = passwordError;
                 }
             }
-            
+
             return newErrors;
         });
     };
@@ -157,11 +157,10 @@ const CreateUser = () => {
             }
         });
     };
-    const inputCommon = `p-4 rounded-2xl transition-all duration-300 text-lg w-full pr-14 ${
-        theme === 'light'
-          ? 'bg-white text-gray-900 border-2 border-gray-200 focus:ring-indigo-200 focus:border-indigo-400 placeholder-gray-400'
-          : 'bg-gray-800 text-indigo-100 border-2 border-gray-600 focus:ring-indigo-500 focus:border-indigo-300 placeholder-indigo-300'
-      }`;
+    const inputCommon = `p-4 rounded-2xl transition-all duration-300 text-lg w-full pr-14 ${theme === 'light'
+            ? 'bg-white text-gray-900 border-2 border-gray-200 focus:ring-indigo-200 focus:border-indigo-400 placeholder-gray-400'
+            : 'bg-gray-800 text-indigo-100 border-2 border-gray-600 focus:ring-indigo-500 focus:border-indigo-300 placeholder-indigo-300'
+        }`;
     // Separate useEffect for batch selection
     useEffect(() => {
         setFormData((prev) => ({
@@ -177,11 +176,11 @@ const CreateUser = () => {
             password: password,
             confirm_password: password,
         }));
-        
+
         // Safely update DOM elements
         const passwordInput = document.getElementById("password");
         const confirmPasswordInput = document.getElementById("confirm_password");
-        
+
         if (passwordInput) passwordInput.value = password;
         if (confirmPasswordInput) confirmPasswordInput.value = password;
 
@@ -193,7 +192,7 @@ const CreateUser = () => {
     }
 
     const onsubmitForm = async () => {
-        console.log("Submitting form with data:", formData); 
+        console.log("Submitting form with data:", formData);
         // Check if limit is exceeded before processing
         if (isLimitExceeded) {
             setError(prev => ({ ...prev, form: "User creation limit exceeded. Please upgrade your plan." }));
@@ -203,7 +202,7 @@ const CreateUser = () => {
         // Validate all required fields before submission
         const requiredFields = ['firstName', 'lastName', 'email', 'password', 'confirm_password', 'userId', 'gender'];
         const validationErrors = {};
-        
+
         requiredFields.forEach(field => {
             const fieldValue = formData[field] || '';
             const fieldError = validateField(field, fieldValue, error);
@@ -219,7 +218,7 @@ const CreateUser = () => {
 
         const payload = new FormData();
         payload.append("name", `${formData.firstName} ${formData.lastName}`);
-        
+
         selectedBatches.forEach((batch) => {
             payload.append("batch[]", batch.id);
         });
@@ -229,35 +228,35 @@ const CreateUser = () => {
                 payload.append(key, formData[key]);
             }
         }
-        
+
         if (profile) {
             payload.append("profilePhoto", profile);
         }
-        
+
         try {
             console.log("Creating user with payload:", payload);
             const response = await createUser(payload);
 
             if (response.status === 200) {
-               
+
                 alert("User created successfully!");
-                
+
                 // Increment the created users count for dynamic limit calculation
                 setCreatedUsersCount(prev => prev + 1);
-                
+
                 // Reset form
                 setSelectedBatches([]);
                 setFormData({});
                 setError({});
                 setProfile(null);
-                
+
                 // Clear form inputs
                 const form = document.querySelector('form');
                 if (form) form.reset();
-                
+
                 // Invalidate queries to refresh the data from server
                 await queryClient.invalidateQueries(["Users", user._id]);
-                
+
                 // If using organization context, also invalidate organization data
                 if (user.role !== 'organization') {
                     await queryClient.invalidateQueries(["organization", user.organizationId._id]);
@@ -270,10 +269,10 @@ const CreateUser = () => {
             }
         } catch (error) {
             console.error("Error creating user:", error);
-            const errorMessage = error?.response?.data?.errors?.[0] || 
-                               error?.response?.data?.message || 
-                               error?.message || 
-                               "An unexpected error occurred";
+            const errorMessage = error?.response?.data?.errors?.[0] ||
+                error?.response?.data?.message ||
+                error?.message ||
+                "An unexpected error occurred";
             setError(prev => ({ ...prev, form: errorMessage }));
         }
     };
@@ -282,20 +281,19 @@ const CreateUser = () => {
         <div className={`${theme === 'light' ? 'bg-gradient-to-br from-gray-50 via-white to-indigo-50' : ''} min-h-screen `}>
             {/* Hero Header */}
             <div className="relative overflow-hidden rounded-xl h-80">
-                <img 
-                    src={Banner} 
+                <img
+                    src={Banner}
                     alt="Upload Banner"
                     className="absolute w-full h-full object-cover"
                 />
-                
-                <div className={`absolute inset-0 ${
-                theme === 'dark' 
-                    ? 'bg-gray-900/60' 
-                    : 'bg-black/20'
-                }`}/>
-        
+
+                <div className={`absolute inset-0 ${theme === 'dark'
+                        ? 'bg-gray-900/60'
+                        : 'bg-black/20'
+                    }`} />
+
                 <div className="absolute"></div>
-                
+
                 {/* Content */}
                 <div className="relative z-10 flex items-center justify-center h-full px-6 text-center">
                     <div>
@@ -305,7 +303,7 @@ const CreateUser = () => {
                         <p className="text-xl text-white/90 max-w-2xl mx-auto drop-shadow-md">
                             Create new users and assign them specific roles in your institute
                         </p>
-         
+
                         <div className="flex items-center justify-center">
                             <p className="mt-8 text-indigo-700 bg-indigo-50 border border-indigo-100 px-5 py-4 rounded-2xl text-base flex items-center gap-3 shadow-sm backdrop-blur-sm">
                                 <AlertTriangle className="w-5 h-5 text-indigo-400" />
@@ -325,7 +323,7 @@ const CreateUser = () => {
             {/* Main Form Container */}
             <div className="max-w-6xl mx-auto px-6 -mt-8 relative z-20 pb-12">
                 <div className={` rounded-3xl shadow-2xl  overflow-hidden  ${theme === 'light' ? '  bg-gray-100' : 'bg-gray-800 text-gray-100'} `}>
-           
+
                     {/* Profile Section */}
                     <div className={` p-8  {theme === 'light' ? '  border-gray-100' : 'bg-gray-800'} `}>
                         <div className="flex flex-col md:flex-row gap-8 items-center">
@@ -339,12 +337,11 @@ const CreateUser = () => {
                             </div>
 
                             <div className="flex flex-col items-center md:items-start">
-                                <label className={`py-3 px-6 rounded-2xl cursor-pointer text-sm font-bold transition-all duration-300 ${
-                                    isLimitExceeded 
-                                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                                <label className={`py-3 px-6 rounded-2xl cursor-pointer text-sm font-bold transition-all duration-300 ${isLimitExceeded
+                                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                         :
-                                         'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:shadow-xl hover:scale-105 transform'
-                                }`}>
+                                        'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:shadow-xl hover:scale-105 transform'
+                                    }`}>
                                     {profile ? "Change Profile Photo" : "Upload Profile Photo"}
                                     <input
                                         type="file"
@@ -371,7 +368,7 @@ const CreateUser = () => {
                             </div>
                         </div>
                     </div>
-                    
+
                     {isLimitExceeded && (
                         <div className="mx-8 mt-6">
                             <p className={`text-center text-sm  px-4 py-2 rounded-xl shadow-sm backdrop-blur-sm  ${theme === 'light' ? 'bg-red-100 border text-red-600 border-red-200' : 'bg-red-600 text-gray-100'}`}>
@@ -396,11 +393,10 @@ const CreateUser = () => {
                                     value={formData.firstName || ""}
                                     onChange={onChangeHandler}
                                     disabled={isLimitExceeded}
-                                    className={`w-full p-4 rounded-2xl border-2 transition-all duration-300 font-medium ${
-                                        isLimitExceeded 
-                                            ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed' 
+                                    className={`w-full p-4 rounded-2xl border-2 transition-all duration-300 font-medium ${isLimitExceeded
+                                            ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
                                             : 'bg-gray-50 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400'
-                                    } ${inputCommon}`}
+                                        } ${inputCommon}`}
                                     placeholder="Enter first name"
                                 />
                                 {error.firstName && (
@@ -420,11 +416,10 @@ const CreateUser = () => {
                                     value={formData.lastName || ""}
                                     onChange={onChangeHandler}
                                     disabled={isLimitExceeded}
-                                    className={`w-full p-4 rounded-2xl border-2 transition-all duration-300 font-medium ${
-                                        isLimitExceeded 
-                                            ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed' 
+                                    className={`w-full p-4 rounded-2xl border-2 transition-all duration-300 font-medium ${isLimitExceeded
+                                            ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
                                             : 'bg-gray-50 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400'
-                                    } ${inputCommon}`}
+                                        } ${inputCommon}`}
                                     placeholder="Enter last name"
                                 />
                                 {error.lastName && (
@@ -444,11 +439,10 @@ const CreateUser = () => {
                                     value={formData.email || ""}
                                     onChange={onChangeHandler}
                                     disabled={isLimitExceeded}
-                                    className={`w-full p-4 rounded-2xl border-2 transition-all duration-300 font-medium ${
-                                        isLimitExceeded 
-                                            ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed' 
+                                    className={`w-full p-4 rounded-2xl border-2 transition-all duration-300 font-medium ${isLimitExceeded
+                                            ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
                                             : 'bg-gray-50 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400'
-                                    } ${inputCommon}`}
+                                        } ${inputCommon}`}
                                     placeholder="Enter email address"
                                 />
                                 {error.email && (
@@ -470,20 +464,18 @@ const CreateUser = () => {
                                             value={formData.password || ""}
                                             onChange={onChangeHandler}
                                             disabled={isLimitExceeded}
-                                            className={`w-full p-4 rounded-2xl border-2 transition-all duration-300 font-medium pr-12 ${
-                                                isLimitExceeded 
-                                                    ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed' 
+                                            className={`w-full p-4 rounded-2xl border-2 transition-all duration-300 font-medium pr-12 ${isLimitExceeded
+                                                    ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
                                                     : 'bg-gray-50 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400'
-                                            }   ${inputCommon}'} rounded-2xl  text-lg font-medium`}
+                                                }   ${inputCommon}'} rounded-2xl  text-lg font-medium`}
                                             placeholder="Enter password or generate"
                                         />
                                         <button
                                             type="button"
-                                            className={`absolute right-4 top-1/2 transform -translate-y-1/2 transition-colors ${
-                                                isLimitExceeded 
-                                                    ? 'text-gray-400 cursor-not-allowed' 
+                                            className={`absolute right-4 top-1/2 transform -translate-y-1/2 transition-colors ${isLimitExceeded
+                                                    ? 'text-gray-400 cursor-not-allowed'
                                                     : 'text-gray-500 hover:text-gray-700'
-                                            }`}
+                                                }`}
                                             disabled={isLimitExceeded}
                                             onClick={() => !isLimitExceeded && setShowPassword(!showPassword)}
                                         >
@@ -494,11 +486,10 @@ const CreateUser = () => {
                                         type="button"
                                         onClick={generateRandomPassword}
                                         disabled={isLimitExceeded}
-                                        className={`p-4 rounded-2xl transition-all duration-300 ${
-                                            isLimitExceeded 
-                                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                                        className={`p-4 rounded-2xl transition-all duration-300 ${isLimitExceeded
+                                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                                                 : 'bg-gradient-to-r from-indigo-100 to-purple-100 hover:from-indigo-200 hover:to-purple-200 hover:scale-105 transform'
-                                        }`}
+                                            }`}
                                         title="Generate Random Password"
                                     >
                                         <RefreshCcw className={`w-5 h-5 ${isLimitExceeded ? 'text-gray-400' : 'text-indigo-600'}`} />
@@ -522,20 +513,18 @@ const CreateUser = () => {
                                         value={formData.confirm_password || ""}
                                         onChange={onChangeHandler}
                                         disabled={isLimitExceeded}
-                                        className={`w-full p-4 rounded-2xl border-2 transition-all duration-300 font-medium pr-12 ${
-                                            isLimitExceeded 
-                                                ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed' 
+                                        className={`w-full p-4 rounded-2xl border-2 transition-all duration-300 font-medium pr-12 ${isLimitExceeded
+                                                ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
                                                 : 'bg-gray-50 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400'
-                                        } ${inputCommon}`}
+                                            } ${inputCommon}`}
                                         placeholder="Confirm password"
                                     />
                                     <button
                                         type="button"
-                                        className={`absolute right-4 top-1/2 transform -translate-y-1/2 transition-colors ${
-                                            isLimitExceeded 
-                                                ? 'text-gray-400 cursor-not-allowed' 
+                                        className={`absolute right-4 top-1/2 transform -translate-y-1/2 transition-colors ${isLimitExceeded
+                                                ? 'text-gray-400 cursor-not-allowed'
                                                 : 'text-gray-500 hover:text-gray-700'
-                                        }`}
+                                            }`}
                                         disabled={isLimitExceeded}
                                         onClick={() => !isLimitExceeded && setShowConfirmPassword(!showConfirmPassword)}
                                     >
@@ -559,11 +548,10 @@ const CreateUser = () => {
                                     value={formData.userId || ""}
                                     onChange={onChangeHandler}
                                     disabled={isLimitExceeded}
-                                    className={`w-full p-4 rounded-2xl border-2 transition-all duration-300 font-medium ${
-                                        isLimitExceeded 
-                                            ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed' 
+                                    className={`w-full p-4 rounded-2xl border-2 transition-all duration-300 font-medium ${isLimitExceeded
+                                            ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
                                             : 'bg-gray-50 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400'
-                                    } ${inputCommon}`}
+                                        } ${inputCommon}`}
                                     placeholder="Enter User ID provided by institute"
                                 />
                                 {error.userId && (
@@ -582,11 +570,10 @@ const CreateUser = () => {
                                     value={formData.gender || ""}
                                     onChange={onChangeHandler}
                                     disabled={isLimitExceeded}
-                                    className={`w-full p-4 rounded-2xl border-2 transition-all duration-300 font-medium ${
-                                        isLimitExceeded 
-                                            ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed' 
+                                    className={`w-full p-4 rounded-2xl border-2 transition-all duration-300 font-medium ${isLimitExceeded
+                                            ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
                                             : 'bg-gray-50 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400'
-                                    } ${inputCommon}`}
+                                        } ${inputCommon}`}
                                 >
                                     <option value="">Select Gender</option>
                                     <option value="Male">Male</option>
@@ -600,7 +587,7 @@ const CreateUser = () => {
 
                             {/* Role Group */}
                             <div className="group">
-                                <label className={ `block text-sm font-bold  mb-2  ${theme === 'light' ? ' text-gray-700' : 'text-gray-100'}`}>
+                                <label className={`block text-sm font-bold  mb-2  ${theme === 'light' ? ' text-gray-700' : 'text-gray-100'}`}>
                                     Role Group <span className="text-red-500">*</span>
                                 </label>
                                 <select
@@ -609,11 +596,10 @@ const CreateUser = () => {
                                     onChange={onChangeHandler}
                                     id="roleId"
                                     disabled={isLimitExceeded}
-                                    className={`w-full p-4 rounded-2xl border-2 transition-all duration-300 font-medium ${
-                                        isLimitExceeded 
-                                            ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed' 
+                                    className={`w-full p-4 rounded-2xl border-2 transition-all duration-300 font-medium ${isLimitExceeded
+                                            ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
                                             : 'bg-gray-50 border-gray-200 focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400'
-                                    } ${inputCommon}`}
+                                        } ${inputCommon}`}
                                 >
                                     <option value="">Select Role</option>
                                     {roleGroups && roleGroups.map((role, idx) => (
@@ -634,16 +620,15 @@ const CreateUser = () => {
                                 <label className={`block text-lg font-bold  mb-6  ${theme === 'light' ? 'text-gray-800' : ' text-gray-200'} `}>
                                     Assign Batches
                                 </label>
-                                
+
                                 <button
                                     type="button"
                                     onClick={() => !isLimitExceeded && setBatchesVisible(!batchesVisible)}
                                     disabled={isLimitExceeded}
-                                    className={`py-3 px-8 rounded-2xl font-bold transition-all duration-300 mb-6 ${
-                                        isLimitExceeded 
-                                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                                    className={`py-3 px-8 rounded-2xl font-bold transition-all duration-300 mb-6 ${isLimitExceeded
+                                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                             : 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:shadow-xl hover:scale-105 transform'
-                                    } ${theme === 'light' ? 'border-2 border-gray-200 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300  bg-gray-50 group-hover:bg-white' : 'border-2 border-indigo-400 transition-all duration-300  bg-indigo-100 group-hover:bg-indigo-50 text-gray-800'} rounded-2xl  text-lg font-medium`}
+                                        } ${theme === 'light' ? 'border-2 border-gray-200 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300  bg-gray-50 group-hover:bg-white' : 'border-2 border-indigo-400 transition-all duration-300  bg-indigo-100 group-hover:bg-indigo-50 text-gray-800'} rounded-2xl  text-lg font-medium`}
                                 >
                                     {batchesVisible ? "Hide All Batches" : "Show All Batches"}
                                 </button>
@@ -656,13 +641,14 @@ const CreateUser = () => {
                                                 type="button"
                                                 onClick={() => !isLimitExceeded && toggleBatch(batch)}
                                                 disabled={isLimitExceeded}
-                                                className={`px-6 py-3 rounded-2xl font-bold transition-all duration-300  ${
-                                                    selectedBatches.some((b) => b.id === batch.id)
+                                                className={`px-6 py-3 rounded-2xl font-bold transition-all duration-300  ${selectedBatches.some((b) => b.id === batch.id)
                                                         ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg'
                                                         : isLimitExceeded
-                                                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                                        : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-indigo-300 hover:shadow-md'
-                                                }  ${theme === 'light' ? 'bg-indigo-600 text-white' : 'bg-indigo-600 text-white'}`}
+                                                            ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                                            : 'bg-black text-gray-700 border-2 border-gray-200 hover:border-indigo-300 hover:shadow-md'
+
+                                                    }  ${theme === 'light' ? 'bg-indigo-600 text-white' : ' bg-gray-800 text-indigo-100 font-medium  focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 '}`}
+
                                             >
                                                 {batch.name}
                                             </button>
@@ -706,12 +692,11 @@ const CreateUser = () => {
                                 type="button"
                                 onClick={onsubmitForm}
                                 disabled={isLimitExceeded}
-                                className={`py-4 px-12 rounded-2xl font-black text-lg transition-all duration-300 ${
-                                    isLimitExceeded 
-                                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
-                                        : 
+                                className={`py-4 px-12 rounded-2xl font-black text-lg transition-all duration-300 ${isLimitExceeded
+                                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                        :
                                         'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:shadow-2xl hover:scale-105 transform'
-                                }`}
+                                    }`}
                             >
                                 {isLimitExceeded ? 'Limit Exceeded' : 'Create User'}
                             </button>

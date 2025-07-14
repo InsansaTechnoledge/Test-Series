@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useTheme } from "../../hooks/useTheme";
-import { useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import MCQ from "./QuestionTypes/MCQ";
 import MatchingQuestion from "./QuestionTypes/MatchingQuestion";
 import MSQ from "./QuestionTypes/MSQ";
@@ -10,11 +10,11 @@ import NumericalQuestion from "./QuestionTypes/NumericQuestion";
 import FillInTheBlankQuestion from "./QuestionTypes/FillInTheBlankQuestion";
 import SubmitModal from './utils/SubmitResultComponent';
 
-const QuestionSection = ({ 
-    setSelectedQuestion, 
-    selectedQuestion, 
-    selectedSubject, 
-    subjectSpecificQuestions, 
+const QuestionSection = ({
+    setSelectedQuestion,
+    selectedQuestion,
+    selectedSubject,
+    subjectSpecificQuestions,
     setSubjectSpecificQuestions,
     handleSubmitTest
 }) => {
@@ -26,20 +26,20 @@ const QuestionSection = ({
     const hasRestored = useRef(false);
     const isInitialLoad = useRef(true);
 
-   
+
 
     useEffect(() => {
         if (hasRestored.current || !isInitialLoad.current) return;
         hasRestored.current = true;
         isInitialLoad.current = false;
-      
+
         const savedData = sessionStorage.getItem('subjectSpecificQuestions');
         const savedQuestionId = localStorage.getItem('selectedQuestionId');
-      
+
         if (savedData) {
             const parsed = JSON.parse(savedData);
             setSubjectSpecificQuestions(parsed);
-      
+
             if (savedQuestionId) {
                 const allQs = [];
                 Object.keys(parsed).forEach(subject => {
@@ -53,7 +53,7 @@ const QuestionSection = ({
                 }
             }
         }
-    }, []); 
+    }, []);
     useEffect(() => {
         if (subjectSpecificQuestions) {
             sessionStorage.setItem('subjectSpecificQuestions', JSON.stringify(subjectSpecificQuestions));
@@ -78,6 +78,30 @@ const QuestionSection = ({
             return () => clearTimeout(timeout);
         }
     }, [submitted, navigate]);
+    useEffect(() => {
+        if (!selectedQuestion || !subjectSpecificQuestions) return;
+
+        const currentQuestion = selectedQuestion;
+        const originalSubject = currentQuestion.originalSubject || currentQuestion.subject;
+
+        setSubjectSpecificQuestions((prev) => ({
+            ...prev,
+            [originalSubject]: prev[originalSubject].map((q) =>
+                q.id === currentQuestion.id
+                    ? {
+                        ...q,
+                        response: option,
+                        ...(isAnswered
+                            ? q.status === 'markedForReview'
+                                ? { status: 'markedForReview' }
+                                : { status: 'answered' }
+                            : { status: 'unanswered' }),
+                    }
+                    : q
+            ),
+        }));
+    }, [option]);
+
 
     // Early return if dependencies are not ready
     if (!selectedQuestion || !subjectSpecificQuestions) {
@@ -247,11 +271,10 @@ const QuestionSection = ({
 
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 px-4 py-1">
                 <div className="flex items-center gap-4">
-                    <div className={`px-5 py-1 rounded-full text-sm font-medium m-1 ${
-                        theme === 'dark' 
-                            ? 'bg-blue-900 text-blue-200 border border-blue-700' 
+                    <div className={`px-5 py-1 rounded-full text-sm font-medium m-1 ${theme === 'dark'
+                            ? 'bg-blue-900 text-blue-200 border border-blue-700'
                             : 'bg-blue-100 text-blue-800 border border-blue-300'
-                    }`}>
+                        }`}>
                         {questionSubject}
                     </div>
                 </div>
@@ -360,8 +383,8 @@ const QuestionSection = ({
                         onClick={() => setShowSubmitModal(true)}
                         className={`px-6 py-2 rounded-md text-lg font-semibold shadow transition-all duration-200
                           ${theme === 'light'
-                            ? 'bg-blue-900 text-white hover:bg-blue-800'
-                            : 'bg-blue-700 text-white hover:bg-blue-600'}
+                                ? 'bg-blue-900 text-white hover:bg-blue-800'
+                                : 'bg-blue-700 text-white hover:bg-blue-600'}
                         `}
                     >
                         Submit Test

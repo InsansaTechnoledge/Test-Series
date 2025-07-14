@@ -40,7 +40,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
     type: 'mcq',
     question_text: '',
     options: ['', '', '', ''],
-    correct_option: 0,
+    correct_option: null,
     correct_options: [],
     correct_answer: '',
     left_items: ['', '', '', ''],
@@ -60,7 +60,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
       type: 'mcq',
       question_text: '',
       options: ['', '', '', ''],
-      correct_option: 0,
+      correct_option: null,
       correct_options: [],
       correct_answer: '',
       is_true: true,
@@ -259,45 +259,62 @@ const LabelCommon =`text-lg font-bold ${
       </div>
 
       {/* MCQ / MSQ Options */}
+     
       {(form.type === 'mcq' || form.type === 'msq') && (
         <div className="space-y-2">
           <label className={LabelCommon}>Options</label>
-          {form.options.map((opt, i) => (
-            <input
-              key={i}
-              className={inputCommon}
-              placeholder={`Option ${i + 1}`}
-              value={opt}
-              onChange={(e) => handleOptionsChange(i, e.target.value)}
-            />
-          ))}
+          <div>
+            <span className="text-sm text-white">Select Correct Option</span>
+          </div>
+          {form.options.map((opt, i) => {
+            const isChecked =
+              form.type === 'mcq'
+                ? form.correct_option === i
+                : form.correct_options.includes(i);
+
+            return (
+              <div
+                key={i}
+                className={`flex items-center gap-3 p-2 rounded-xl transition-all cursor-pointer ${isChecked ? 'bg-green-100 border border-green-600' : ''
+                  }`}
+                onClick={() => {
+                  if (form.type === 'mcq') {
+                    setForm((prev) => ({
+                      ...prev,
+                      correct_option: i,
+                    }));
+                  } else if (form.type === 'msq') {
+                    const newSelections = isChecked
+                      ? form.correct_options.filter((index) => index !== i)
+                      : [...form.correct_options, i];
+
+                    setForm((prev) => ({
+                      ...prev,
+                      correct_options: newSelections,
+                    }));
+                  }
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={isChecked}
+                  readOnly
+                />
+                <input
+                  className={inputCommon}
+                  placeholder={`Option ${i + 1}`}
+                  value={opt}
+                  onClick={(e) => e.stopPropagation()} // stop outer div click
+                  onChange={(e) => handleOptionsChange(i, e.target.value)}
+                />
+              </div>
+            );
+          })}
         </div>
       )}
 
-      {/* Correct Option(s) */}
-      {form.type === 'mcq' && (
-        <input
-          className={inputCommon}
-          type="number"
-          name="correct_option"
-          value={form.correct_option}
-          onChange={handleChange}
-          placeholder="Correct Option Index (0-based)"
-          min={0}
-          max={form.options.length - 1}
-        />
-      )}
 
-      {form.type === 'msq' && (
-        <input
-          className={inputCommon}
-          placeholder="Correct Option Indexes (comma-separated)"
-          onChange={(e) => {
-            const values = e.target.value.split(',').map(v => parseInt(v.trim())).filter(v => !isNaN(v));
-            setForm(prev => ({ ...prev, correct_options: values }));
-          }}
-        />
-      )}
+
 
       {/* Fill / Numerical Answer */}
       {(form.type === 'fill' || form.type === 'numerical') && (
