@@ -15,7 +15,6 @@ const HeaderComponent = ({
   runTests,
   editorTheme,
   setEditorTheme,
-  saveCode,
   submitContest
 }) => {
   const currentProblemData = problems[currentProblem];
@@ -178,15 +177,6 @@ const HeaderComponent = ({
             >
               <TerminalSquare className="w-4 h-4" />
               <span>{isRunning ? 'Running Test Cases' : 'Submit Test Cases'}</span>
-            </button>
-
-            <button
-              onClick={saveCode}
-              disabled={isRunning}
-              className={secondaryButtonStyles}
-            >
-              <Save className="w-4 h-4" />
-              <span>Save this Code</span>
             </button>
 
             <button

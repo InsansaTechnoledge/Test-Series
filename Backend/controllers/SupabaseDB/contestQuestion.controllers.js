@@ -15,7 +15,7 @@ export const testContestQuestion = async (req, res) => {
 
         const final = await getFinalCodeForSubmission(currentLang.langSlug, code, problem);
         const { finalCode, output, testInput } = final;
-        
+
         if (!final || !final.finalCode) {
             return new APIError(400, ["Failed to generate final code for submission"]).send(res);
         }
@@ -40,15 +40,15 @@ export const testContestQuestion = async (req, res) => {
         console.log(result);
         const runOutput = typeof result.run.stdout === "string"
             ? (() => {
-              try {
-                return JSON.parse(result.run.stdout);
-              } catch {
                 try {
-                  return eval(result.run.stdout);
+                    return JSON.parse(result.run.stdout);
                 } catch {
-                  return result.run.stdout;
+                    try {
+                        return eval(result.run.stdout);
+                    } catch {
+                        return result.run.stdout;
+                    }
                 }
-              }
             })()
             : result.run.stdout
         const compileError = result.compile?.stderr || '';
@@ -61,12 +61,21 @@ export const testContestQuestion = async (req, res) => {
             errors.push(runtimeError);
         }
 
-
+        const detailedResults = [];
+        let passedCount = 0;
+        if (runtimeError || compileError) {
+            return new APIError(400,
+                {
+                    results: detailedResults,
+                    passedCount,
+                    total: output.length,
+                    fullOutput: runOutput,
+                }, "Contest question test failed").send(res);
+        }
 
         const actualTestOutputs = runOutput.slice(-output.length);
 
-        const detailedResults = [];
-        let passedCount = 0;
+
 
         for (let i = 0; i < output.length; i++) {
             const expected = output[i];
