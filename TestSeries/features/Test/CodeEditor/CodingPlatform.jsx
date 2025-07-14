@@ -13,7 +13,6 @@ import { useParams } from 'react-router-dom';
 import CryptoJS from 'crypto-js';
 import { VITE_SECRET_KEY_FOR_CONTEST } from '../../constants/env';
 import { useTheme } from '../../../hooks/useTheme';
-import { Save } from 'lucide-react';
 import { submitContestService } from '../../../utils/services/contestService';
 import ContestResultComponent from '../../afterAuth/components/StudentSide/Coding-Contests/contestResult/contestResultComponent';
 
@@ -101,6 +100,10 @@ const CodingPlatform = () => {
   }, [theme]);
 
   const runCode = async () => {
+    if (code.trim() === '') {
+      setErrors(['Code cannot be empty!']);
+      return;
+    }
     //  setTestInput([]);
     setIsRunning(true);
     setOutput('');
@@ -148,12 +151,24 @@ const CodingPlatform = () => {
     } catch (error) {
       setErrors(['Network error: ' + error.message]);
     } finally {
+
+      const currentLang = languages.find((l) => l.value === language);
+      if (!currentLang) {
+        setErrors(['Unsupported language selected!']);
+        setIsRunning(false);
+        return;
+      }
+      localStorage.setItem(`contest_${contest_id}_problem_${problem.question_id}_language_${language}_code_`, code);
       setIsRunning(false);
 
     }
   };
 
   const runTests = async () => {
+    if(code.trim() === '') {
+      setErrors(['Code cannot be empty!']);
+      return;
+    }
     setTestInput([])
     setIsRunning(true);
     let results = [];
@@ -178,50 +193,27 @@ const CodingPlatform = () => {
         results = response.data.results;
         console.log("Test Results:", results);
         setTestInput(response.data.testInput || []);
+        setTestResults(results);
         setOutput(results.fullOutput || '');
         setErrors(response.data.errors || []);
       }
     } catch (error) {
       console.error('runTests error:', error);
-      setErrors(['Test execution failed: ' + error.message]);
+      setErrors(['Test execution failed: ' + error.response?.data?.message || error.message]);
+      setOutput('');
+      setTestResults([]);
     }
-    setTestResults(results);
+finally{
 
+        const marksForEachTestCase = (problem.marks / problem.test_cases.length);
+
+          localStorage.setItem(`contest_${contest_id}_problem_${problem.question_id}_testResults`, (testResults.passedCount * marksForEachTestCase) || 0);
+}
     setIsRunning(false);
     setOutputTab('testcase');
 
+
   };
-
-  const SaveCode = async () => {
-    setIsRunning(true);
-    setErrors([]);
-    try {
-      if (!problem || !problem.code_snippets) {
-        setErrors(['No problem or code snippets defined!']);
-        setIsRunning(false);
-        return;
-      }
-      const currentLang = languages.find((l) => l.value === language);
-      if (!currentLang) {
-        setErrors(['Unsupported language selected!']);
-        setIsRunning(false);
-        return;
-      }
-      const marksForEachTestCase = (problem.marks / problem.test_cases.length);
-      localStorage.setItem(`contest_${contest_id}_problem_${problem.question_id}_code`, code);
-      localStorage.setItem(`contest_${contest_id}_problem_${problem.question_id}_language`, language);
-      localStorage.setItem(`contest_${contest_id}_problem_${problem.question_id}_testResults`, (testResults.passedCount * marksForEachTestCase) || 0);
-
-    } catch (error) {
-      console.error('SaveCode error:', error);
-      setErrors(['Code saving failed: ' + error.message]);
-    } finally {
-      setIsRunning(false);
-    }
-  };
-  console.log("Contest ID:", contest_id);
-  console.log("Problems:", problems);
-
   
   const submitContest = async () => {
     const studentResult = {
@@ -238,8 +230,7 @@ const CodingPlatform = () => {
         0
       ),
     };
-    console.log("Submitting Contest with ID:", contest_id);
-    console.log("Student Result:", studentResult);
+
     const response = await submitContestService(contest_id, studentResult);
     if (response.status === 200) {
       setResultPageData({ problems, studentResult });
@@ -289,7 +280,6 @@ const CodingPlatform = () => {
           runTests={runTests}
           editorTheme={editorTheme}
           setEditorTheme={setEditorTheme}
-          saveCode={SaveCode}
           submitContest={submitContest}
         />
         <div className="flex-1 flex overflow-hidden">
@@ -337,6 +327,8 @@ const CodingPlatform = () => {
                 onChange={setCode}
                 language={language}
                 theme={editorTheme}
+                contest_id={contest_id}
+                question_id={problem?.question_id || ''}
               />
             </div>
             <HorizontalDragHandle
