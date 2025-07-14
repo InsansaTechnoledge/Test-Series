@@ -92,7 +92,7 @@ export const fetchContest = async (organizationId, batchId,userId) => {
   if (batchId && userId) {
     const [batchRes, participantRes] = await Promise.all([
       supabase.from('batchxcontest').select('contest_id').eq('batch_id', batchId),
-      supabase.from('contestxparticipant').select('contest_id').eq('participant_id', userId)
+      supabase.from('contestxparticipant').select('contest_id, status').eq('participant_id', userId)
     ]);
 
     if (batchRes.error) throw batchRes.error;
@@ -105,6 +105,7 @@ export const fetchContest = async (organizationId, batchId,userId) => {
 
     for (const contest of batches.data) {
       contest.isEnrolled = participantRes.data.some(item => item.contest_id === contest.id);
+      contest.status= participantRes.data.some(item => item.contest_id === contest.id && item.status === 'submitted') ? 'submitted': '';
     }
     data = batches.data;
     error = batches.error;

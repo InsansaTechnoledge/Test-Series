@@ -10,6 +10,7 @@ const connectDB = async () => {
   // Connect to MONGODB1 (connOne)
   try {
     connOne = mongoose.createConnection(process.env.MONGODB1_URL);
+    if(connOne)
     console.log("✅ connOne (MONGODB1) connected");
 
   } catch (err) {
@@ -21,6 +22,7 @@ const connectDB = async () => {
   // Connect to MONGODB2 (connTwo)
   try {
     connTwo =  mongoose.createConnection(process.env.MONGODB2_URL);
+    if(connTwo)
     console.log("✅ connTwo (MONGODB2) connected");
 
   } catch (err) {
