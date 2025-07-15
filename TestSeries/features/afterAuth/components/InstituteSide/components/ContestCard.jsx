@@ -1,26 +1,38 @@
-
-import React, { useState } from 'react';
-import { Calendar, Clock, Users, Play, Trash2, AlertCircle, CheckCircle } from 'lucide-react';
-import { deleteContest, ToggleContest } from '../../../../../utils/services/contestService';
+import React, { useState } from "react";
+import {
+  Calendar,
+  Clock,
+  Users,
+  Play,
+  Trash2,
+  AlertCircle,
+  CheckCircle,
+} from "lucide-react";
+import {
+  deleteContest,
+  ToggleContest,
+} from "../../../../../utils/services/contestService";
+import { useToast, ToastContainer } from "../../../../../utils/Toaster";
 
 const ContestCard = ({ contest, setContest, theme }) => {
   const [loadingDelete, setLoadingDelete] = useState({});
   const [loadingGoLive, setLoadingGoLive] = useState({});
+  const { toasts, showToast, showConfirmToast, removeToast } = useToast();
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
     });
   };
 
   const formatDateTime = (dateString) => {
-    return new Date(dateString).toLocaleString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return new Date(dateString).toLocaleString("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -35,9 +47,9 @@ const ContestCard = ({ contest, setContest, theme }) => {
   const canGoLive = (contestItem) => {
     const now = new Date();
 
-    if (contestItem.type === 'participation_based') {
+    if (contestItem.type === "participation_based") {
       return isValidityActive(contestItem.validity);
-    } else if (contestItem.type === 'scheduled') {
+    } else if (contestItem.type === "scheduled") {
       const scheduled = new Date(contestItem.schedule);
       const timeDiff = Math.abs(now - scheduled);
       const minutesDiff = Math.ceil(timeDiff / (1000 * 60));
@@ -54,40 +66,56 @@ const ContestCard = ({ contest, setContest, theme }) => {
 
     setLoadingDelete(prev => ({ ...prev, [id]: true }));
 
+    showConfirmToast(
+      "Are you sure you want to delete this contest? This action cannot be undone.",
+      () => {
+        showToast("Contest deleted successfully", "success");
+      },
+      () => {
+        showToast("Delete cancelled", "info");
+      }
+    );
+
     try {
 
-      await deleteContest(id)
 
-      setContest((prevContests) => prevContests.filter((item) => item.id !== id));
-      alert('Contest deleted successfully');
+      await deleteContest(id);
+
+      setContest((prevContests) =>
+        prevContests.filter((item) => item.id !== id)
+      );
+      showToast("Contest deleted successfully", "error");
     } catch (error) {
-      alert('Failed to delete contest. Please try again.');
+      showToast("Failed to delete contest. Please try again.", "error");
     } finally {
-      setLoadingDelete(prev => ({ ...prev, [id]: false }));
+      setLoadingDelete((prev) => ({ ...prev, [id]: false }));
     }
   };
 
   const handleGoLive = async (contestItem) => {
     if (!canGoLive(contestItem)) {
-      alert('Contest cannot go live at this time. Please check the validity period or schedule.');
+      showToast(
+        "Contest cannot go live at this time. Please check the validity period or schedule."
+      );
       return;
     }
 
     setLoadingGoLive(prev => ({ ...prev, [contestItem.id]: true }));
 
     try {
+      console.log("Making contest live:", contestItem.id);
       await ToggleContest(contestItem.id)
 
-      setContest(prevContests =>
-        prevContests.map(item =>
+      setContest((prevContests) =>
+        prevContests.map((item) =>
           item.id === contestItem.id ? { ...item, go_live: true } : item
         )
       );
-      alert('Contest is now live!');
+      showToast("Contest is now live!");
     } catch (error) {
-      alert('Failed to make contest live. Please try again.');
+      showToast("Failed to make contest live. Please try again.", "error");
     } finally {
-      setLoadingGoLive(prev => ({ ...prev, [contestItem.id]: false }));
+      setLoadingGoLive((prev) => ({ ...prev, [contestItem.id]: false }));
     }
   };
 
@@ -103,9 +131,9 @@ const ContestCard = ({ contest, setContest, theme }) => {
           item.id === contestItem.id ? { ...item, go_live: false } : item
         )
       );
-      alert('Contest has been paused.');
+      showToast('Contest has been paused.', "warning");
     } catch (error) {
-      alert('Failed to pause contest. Please try again.');
+      showToast('Failed to pause contest. Please try again.', "error");
     } finally {
       setLoadingGoLive(prev => ({ ...prev, [contestItem.id]: false }));
     }
@@ -114,7 +142,7 @@ const ContestCard = ({ contest, setContest, theme }) => {
   const getContestStatus = (contestItem) => {
     if (contestItem.go_live) return { text: 'LIVE', color: 'text-emerald-600 bg-emerald-50 border-emerald-200', icon: CheckCircle };
 
-    if (contestItem.type === 'participation_based') {
+    if (contestItem.type === "participation_based") {
       const active = isValidityActive(contestItem.validity);
       return active
         ? { text: 'ACTIVE', color: 'text-blue-600 bg-blue-50 border-blue-200', icon: Play }
@@ -130,7 +158,7 @@ const ContestCard = ({ contest, setContest, theme }) => {
 
   const contestData = contest || [];
 
-  return (
+return (
     <div className="p-6">
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -374,6 +402,7 @@ const ContestCard = ({ contest, setContest, theme }) => {
           <p className="text-sm">Create your first contest to get started.</p>
         </div>
       )}
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
     </div>
   );
 };

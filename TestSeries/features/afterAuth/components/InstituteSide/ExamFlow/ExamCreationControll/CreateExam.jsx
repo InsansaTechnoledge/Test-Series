@@ -1,20 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Banner from "../../../../../../assests/Institute/create exam.svg";
-import { useUser } from '../../../../../../contexts/currentUserContext';
-import { useCachedOrganization } from '../../../../../../hooks/useCachedOrganization';
-import useLimitAccess from '../../../../../../hooks/useLimitAccess';
-import { fetchExamById } from '../../../../../../utils/services/examService';
-import { uploadExamQuestions } from '../../../../../../utils/services/questionUploadService';
-import NeedHelpComponent from '../../components/NeedHelpComponent';
-import BulkUpload from '../components/BulkUpload';
-import DeleteExamModal from '../components/DeleteExamModal';
-import ExamForm from './ExamForm';
-import ManualQuestionForm from '../components/ManualQuestionsForm';
-import QuestionPreview from '../components/QuestionPreview';
-import { useTheme } from '../../../../../../hooks/useTheme';
-import ExamPageIntroHeader from '../ExamHeaderComponents/ExamPageIntroHeader';
-
+import { useUser } from "../../../../../../contexts/currentUserContext";
+import { useCachedOrganization } from "../../../../../../hooks/useCachedOrganization";
+import useLimitAccess from "../../../../../../hooks/useLimitAccess";
+import { fetchExamById } from "../../../../../../utils/services/examService";
+import { uploadExamQuestions } from "../../../../../../utils/services/questionUploadService";
+import NeedHelpComponent from "../../components/NeedHelpComponent";
+import BulkUpload from "../components/BulkUpload";
+import DeleteExamModal from "../components/DeleteExamModal";
+import ExamForm from "./ExamForm";
+import ManualQuestionForm from "../components/ManualQuestionsForm";
+import QuestionPreview from "../components/QuestionPreview";
+import { useTheme } from "../../../../../../hooks/useTheme";
+import ExamPageIntroHeader from "../ExamHeaderComponents/ExamPageIntroHeader";
+import { useToast, ToastContainer } from "../../../../../../utils/Toaster";
 const CreateExam = () => {
   const [examDetails, setExamDetails] = useState(null);
   const [questions, setQuestions] = useState([]);
@@ -25,29 +25,35 @@ const CreateExam = () => {
   const [editingExam, setEditingExam] = useState(false);
   const { user, getFeatureKeyFromLocation, hasRoleAccess } = useUser();
   const location = useLocation();
-  const { theme } = useTheme()
-  const canCreateMoreExams = useLimitAccess(getFeatureKeyFromLocation(location.pathname), "totalExams");
+  const { theme } = useTheme();
+  const { toasts, showToast, removeToast } = useToast();
+  const canCreateMoreExams = useLimitAccess(
+    getFeatureKeyFromLocation(location.pathname),
+    "totalExams"
+  );
   const canEditExams = hasRoleAccess({
-    keyFromPageOrAction: 'actions.editExam',
-    location: location.pathname
+    keyFromPageOrAction: "actions.editExam",
+    location: location.pathname,
   });
   const canDeleteExams = hasRoleAccess({
-    keyFromPageOrAction: 'actions.deleteExam',
-    location: location.pathname
+    keyFromPageOrAction: "actions.deleteExam",
+    location: location.pathname,
   });
 
   const organization =
-    user.role !== 'organization'
-      ? useCachedOrganization({ userId: user._id, orgId: user.organizationId._id })?.organization
+    user.role !== "organization"
+      ? useCachedOrganization({
+          userId: user._id,
+          orgId: user.organizationId._id,
+        })?.organization
       : null;
 
-  const Total_Exams = user?.role === 'organization'
-    ? user.metaData?.totalExams
-    : (
-      organization?.metaData?.totalExams
-    );
+  const Total_Exams =
+    user?.role === "organization"
+      ? user.metaData?.totalExams
+      : organization?.metaData?.totalExams;
 
-  const Creation_Limit = user?.planFeatures?.exam_feature?.value
+  const Creation_Limit = user?.planFeatures?.exam_feature?.value;
 
   const Available_Limit = Creation_Limit - Total_Exams;
 
@@ -58,15 +64,14 @@ const CreateExam = () => {
 
   useEffect(() => {
     const loadExamIfNeeded = async () => {
-
       if (examId) {
         try {
           const res = await fetchExamById(examId);
 
-          const matchedExam = res.data.find(e => e.id === examId);
+          const matchedExam = res.data.find((e) => e.id === examId);
 
           if (!matchedExam) {
-            console.warn('⚠️ No matching exam found!');
+            console.warn("⚠️ No matching exam found!");
           } else {
             // console.log('✅ organization_id:', matchedExam.organization_id);
           }
@@ -82,11 +87,12 @@ const CreateExam = () => {
     loadExamIfNeeded();
   }, [examId]); // ✅ remove examDetails dependency
 
-
-
   const handleSubmitExam = async () => {
     if (!examDetails || questions.length === 0) {
-      alert('Please complete exam details and add at least one question.');
+      showToast(
+        "Please complete exam details and add at least one question.",
+        "warning"
+      );
       return;
     }
 
@@ -96,41 +102,38 @@ const CreateExam = () => {
       // Ensure every question has organization_id
       const enrichedQuestions = questions.map((q) => ({
         ...q,
-        organization_id: examDetails.organization_id
+        organization_id: examDetails.organization_id,
       }));
 
       const res = await uploadExamQuestions({
         exam_id: examDetails.id,
         organization_id: examDetails.organization_id,
-        questions: enrichedQuestions
+        questions: enrichedQuestions,
       });
 
-      alert('✅ Questions submitted successfully!');
-      navigate('/institute/exam-list');
+      showToast("✅ Questions submitted successfully!");
+      navigate("/institute/exam-list");
     } catch (err) {
-      console.error('❌ Error uploading exam:', err);
-      alert(err?.response?.data?.message || '❌ Upload failed');
+      console.error("❌ Error uploading exam:", err);
+      showToast(err?.response?.data?.message || "❌ Upload failed", "error");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-
   return (
     <div className="p-6  mx-auto ">
-
-      <ExamPageIntroHeader 
-        Banner={Banner} 
-        Available_Limit={Available_Limit} 
-        NeedHelpComponent={NeedHelpComponent} 
-        canCreateMoreExams={canCreateMoreExams} 
+      <ExamPageIntroHeader
+        Banner={Banner}
+        Available_Limit={Available_Limit}
+        NeedHelpComponent={NeedHelpComponent}
+        canCreateMoreExams={canCreateMoreExams}
       />
 
       {!examDetails || editingExam ? (
         <ExamForm
           canCreateMoreExams={canCreateMoreExams}
           onSubmit={(updatedExam) => {
-
             setExamDetails(updatedExam);
             setEditingExam(false);
             // If it's a new exam, redirect to its page
@@ -138,13 +141,15 @@ const CreateExam = () => {
               handleNewExam(updatedExam);
             }
           }}
-          initialData={examDetails || {
-            name: '',
-            date: '',
-            total_marks: '',
-            duration: '',
-            batch_id: '',
-          }} // for edit form
+          initialData={
+            examDetails || {
+              name: "",
+              date: "",
+              total_marks: "",
+              duration: "",
+              batch_id: "",
+            }
+          } // for edit form
         />
       ) : (
         // <div className="bg-blue-50 p-6 rounded-3xl mb-6 shadow-lg ">
@@ -165,115 +170,190 @@ const CreateExam = () => {
         //     </button>
         //   </div>
         // </div>
-        <div className={`p-6 rounded-3xl mb-6 shadow-lg ${theme === 'light'
-            ? 'bg-blue-50'
-            : 'bg-gray-800'
-          }`}>
+        <div
+          className={`p-6 rounded-3xl mb-6 shadow-lg ${
+            theme === "light" ? "bg-blue-50" : "bg-gray-800"
+          }`}
+        >
           <div className="flex justify-between items-center">
-            <div className=''>
-              <h2 className={`text-xl font-semibold ${theme === 'light'
-                  ? 'text-gray-800'
-                  : 'text-white'
-                }`}>
+            <div className="">
+              <h2
+                className={`text-xl font-semibold ${
+                  theme === "light" ? "text-gray-800" : "text-white"
+                }`}
+              >
                 {examDetails.name}
               </h2>
-              <p className={`${theme === 'light'
-                  ? 'text-gray-600'
-                  : 'text-gray-300'
-                }`}>
-                Date: {examDetails.date} |
-                Duration: {examDetails.duration} mins |
-                Total Marks: {examDetails.total_marks}
+              <p
+                className={`${
+                  theme === "light" ? "text-gray-600" : "text-gray-300"
+                }`}
+              >
+                Date: {examDetails.date} | Duration: {examDetails.duration} mins
+                | Total Marks: {examDetails.total_marks}
               </p>
             </div>
-            {canEditExams && (<button
-              disabled={!canEditExams}
-              onClick={() => setEditingExam(true)}
-              className={`transition-colors duration-300 ${theme === 'light'
-                  ? 'text-blue-600 hover:text-blue-800'
-                  : 'text-blue-400 hover:text-blue-300'
+            {canEditExams && (
+              <button
+                disabled={!canEditExams}
+                onClick={() => setEditingExam(true)}
+                className={`transition-colors duration-300 ${
+                  theme === "light"
+                    ? "text-blue-600 hover:text-blue-800"
+                    : "text-blue-400 hover:text-blue-300"
                 }`}
-            >
-              Edit
-            </button>)}
+              >
+                Edit
+              </button>
+            )}
           </div>
         </div>
       )}
 
-
       {examDetails && !editingExam && (
         <>
           <div className={`mt-6 border-t pt-6 c`}>
-            <h2 className={`text-xl font-semibold mb-4 ${theme == 'light' ? "text-black" : "text-gray-100"} `}>Add Questions</h2>
+            <h2
+              className={`text-xl font-semibold mb-4 ${
+                theme == "light" ? "text-black" : "text-gray-100"
+              } `}
+            >
+              Add Questions
+            </h2>
 
-            <div className={` p-6 rounded-lg mb-6 ${theme == 'light' ? "bg-gray-50" : "bg-gray-800"}`}>
-              <div className={`flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4  ${theme == 'light' ? "bg-gray-50" : "bg-gray-800"}`}>
-                <div className={`flex-1  rounded-xl p-6 shadow-2xl transition ${theme == 'light' ? "bg-gray-50" : "bg-gray-800"}`}>
-                  <h3 className={`text-lg font-medium mb-2  ${theme == 'light' ? "text-black" : "text-gray-100"}`}>Option 1: Manual Entry</h3>
-                  <p className={`mb-4 ${theme == 'light' ? "text-gray-500" : "text-gray-500"}`} >Create questions one by one with full control over each question's details.</p>
+            <div
+              className={` p-6 rounded-lg mb-6 ${
+                theme == "light" ? "bg-gray-50" : "bg-gray-800"
+              }`}
+            >
+              <div
+                className={`flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4  ${
+                  theme == "light" ? "bg-gray-50" : "bg-gray-800"
+                }`}
+              >
+                <div
+                  className={`flex-1  rounded-xl p-6 shadow-2xl transition ${
+                    theme == "light" ? "bg-gray-50" : "bg-gray-800"
+                  }`}
+                >
+                  <h3
+                    className={`text-lg font-medium mb-2  ${
+                      theme == "light" ? "text-black" : "text-gray-100"
+                    }`}
+                  >
+                    Option 1: Manual Entry
+                  </h3>
+                  <p
+                    className={`mb-4 ${
+                      theme == "light" ? "text-gray-500" : "text-gray-500"
+                    }`}
+                  >
+                    Create questions one by one with full control over each
+                    question's details.
+                  </p>
                   <ManualQuestionForm
                     setQuestions={setQuestions}
                     organizationId={examDetails.organization_id} // ✅ pass this down!
                   />
-
                 </div>
 
-                <div className={`flex-1 shadow-2xl  rounded-lg p-6 transition    ${theme == 'light' ? "bg-gray-50" : "bg-gray-800 border-gray-800 border"}`}>
-                  <h3 className={`text-lg font-medium mb-2  ${theme == 'light' ? "text-black" : "text-gray-100"}`}>Option 2: Bulk Upload</h3>
-                  <p className={`mb-4 ${theme == 'light' ? "text-gray-500" : "text-gray-500"}`}>Upload multiple questions at once using an Excel spreadsheet.</p>
-                  <BulkUpload setQuestions={setQuestions} organizationId={examDetails.organization_id} />
+                <div
+                  className={`flex-1 shadow-2xl  rounded-lg p-6 transition    ${
+                    theme == "light"
+                      ? "bg-gray-50"
+                      : "bg-gray-800 border-gray-800 border"
+                  }`}
+                >
+                  <h3
+                    className={`text-lg font-medium mb-2  ${
+                      theme == "light" ? "text-black" : "text-gray-100"
+                    }`}
+                  >
+                    Option 2: Bulk Upload
+                  </h3>
+                  <p
+                    className={`mb-4 ${
+                      theme == "light" ? "text-gray-500" : "text-gray-500"
+                    }`}
+                  >
+                    Upload multiple questions at once using an Excel
+                    spreadsheet.
+                  </p>
+                  <BulkUpload
+                    setQuestions={setQuestions}
+                    organizationId={examDetails.organization_id}
+                  />
                 </div>
               </div>
             </div>
           </div>
 
-          <QuestionPreview questions={questions} setQuestions={setQuestions} examDetails={examDetails} />
-          <div className='flex justify-center flex-col gap-2 max-w-2l items-center'>
-
-
-
-
+          <QuestionPreview
+            questions={questions}
+            setQuestions={setQuestions}
+            examDetails={examDetails}
+          />
+          <div className="flex justify-center flex-col gap-2 max-w-2l items-center">
             <button
               onClick={handleSubmitExam}
               disabled={isSubmitting}
-              className={`mt-6 font-semibold ${isSubmitting ? 'bg-gray-300 cursor-not-allowed' : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 hover:scale-105 hover:shadow-2x p-2'} text-white px-6 py-3 rounded transition w-full md:w-auto flex items-center justify-center`}
+              className={`mt-6 font-semibold ${
+                isSubmitting
+                  ? "bg-gray-300 cursor-not-allowed"
+                  : "bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 hover:scale-105 hover:shadow-2x p-2"
+              } text-white px-6 py-3 rounded transition w-full md:w-auto flex items-center justify-center`}
             >
               {isSubmitting ? (
                 <>
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <svg
+                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
                   </svg>
                   Submitting...
                 </>
               ) : (
-                'Submit Exam'
+                "Submit Exam"
               )}
             </button>
 
-            {canDeleteExams && (<button
-              disabled={!canDeleteExams}
-              onClick={() => {
-                setShowDeleteModal(true);
-              }}
-              className="text-red-600 border-red-600 border px-4 py-2 mt-4 rounded hover:bg-red-700 transition hover:text-white font-semibold"
-            >
-              Delete exam
-            </button>)}
+            {canDeleteExams && (
+              <button
+                disabled={!canDeleteExams}
+                onClick={() => {
+                  setShowDeleteModal(true);
+                }}
+                className="text-red-600 border-red-600 border px-4 py-2 mt-4 rounded hover:bg-red-700 transition hover:text-white font-semibold"
+              >
+                Delete exam
+              </button>
+            )}
           </div>
         </>
-
       )}
-      {
-        showDeleteModal && (
-          <DeleteExamModal
-            examId={examDetails?.id}
-            setShowDeleteModal={setShowDeleteModal}
-          />
-        )
-      }
+      {showDeleteModal && (
+        <DeleteExamModal
+          examId={examDetails?.id}
+          setShowDeleteModal={setShowDeleteModal}
+        />
+      )}
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
     </div>
-
   );
 };
 
