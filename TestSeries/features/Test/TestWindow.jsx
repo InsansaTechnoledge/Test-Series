@@ -397,7 +397,157 @@ useEffect(() => {
   if (isExamLoading || isQuestionLoading) {
     return <div>Loading...🥲</div>;
   }
-
+  const handleBioBreak = async (durationInMs) => {
+    const eventId = 'bio-break';
+    
+    try {
+      console.log("🔍 Starting bio break process...");
+      
+      // First, check if the proctor engine is actually running
+      let proctorStatus = null;
+      if (window?.electronAPI?.getProctorStatus) {
+        proctorStatus = await window.electronAPI.getProctorStatus();
+        console.log("📊 Current proctor status:", proctorStatus);
+      }
+      
+      // Add toast notification for bio break start
+      addToast(
+        'Bio break initiated',
+        'info',
+        `Attempting to pause proctor for ${durationInMs / 60000} minutes`,
+        3000
+      );
+  
+      // Try to stop the proctor engine with detailed logging
+      if (window?.electronAPI?.stopProctorEngine) {
+        console.log("⏸️ Calling stopProctorEngine...");
+        
+        // Call the function and wait for response
+        const stopResult = await window.electronAPI.stopProctorEngine();
+        console.log("📋 Stop result:", stopResult);
+        
+        // Verify the proctor actually stopped
+        if (window?.electronAPI?.getProctorStatus) {
+          const newStatus = await window.electronAPI.getProctorStatus();
+          console.log("📊 Status after stop:", newStatus);
+          
+          if (newStatus?.isRunning === false || newStatus?.status === 'stopped') {
+            console.log("✅ Proctor engine successfully stopped");
+            addToast(
+              'Bio break active',
+              'success',
+              `Proctor monitoring paused for ${durationInMs / 60000} minutes`,
+              durationInMs
+            );
+          } else {
+            console.error("❌ Proctor engine did not stop properly");
+            addToast(
+              'Warning',
+              'warning',
+              'Proctor engine may still be running during bio break',
+              5000
+            );
+          }
+        } else {
+          // If we can't check status, assume it worked but warn user
+          console.log("⚠️ Cannot verify proctor stop status");
+          addToast(
+            'Bio break started',
+            'info',
+            `Proctor stop requested for ${durationInMs / 60000} minutes`,
+            3000
+          );
+        }
+      } else {
+        console.error("❌ stopProctorEngine function not available");
+        addToast(
+          'Error',
+          'error',
+          'Proctor control not available - bio break may not work',
+          5000
+        );
+        return;
+      }
+  
+      // Set a timeout to restart the proctor engine
+      const restartTimeout = setTimeout(async () => {
+        try {
+          console.log("🔄 Bio break time ended, restarting proctor...");
+          
+          if (window?.electronAPI?.startProctorEngine) {
+            console.log("▶️ Calling startProctorEngine...");
+            
+            const startResult = await window.electronAPI.startProctorEngine(examId, eventId);
+            console.log("📋 Start result:", startResult);
+            
+            // Verify the proctor actually started
+            if (window?.electronAPI?.getProctorStatus) {
+              const newStatus = await window.electronAPI.getProctorStatus();
+              console.log("📊 Status after start:", newStatus);
+              
+              if (newStatus?.isRunning === true || newStatus?.status === 'running') {
+                console.log("✅ Proctor engine successfully restarted");
+                addToast(
+                  'Bio break ended',
+                  'success',
+                  'Proctor monitoring resumed',
+                  3000
+                );
+              } else {
+                console.error("❌ Proctor engine did not restart properly");
+                addToast(
+                  'Error',
+                  'error',
+                  'Failed to restart proctor monitoring',
+                  5000
+                );
+              }
+            } else {
+              console.log("⚠️ Cannot verify proctor start status");
+              addToast(
+                'Bio break ended',
+                'info',
+                'Proctor restart requested',
+                3000
+              );
+            }
+          } else {
+            console.error("❌ startProctorEngine function not available");
+            addToast(
+              'Error',
+              'error',
+              'Cannot restart proctor engine',
+              5000
+            );
+          }
+        } catch (error) {
+          console.error("❌ Error restarting proctor engine:", error);
+          addToast(
+            'Error',
+            'error',
+            `Failed to restart proctor: ${error.message}`,
+            5000
+          );
+        }
+      }, durationInMs);
+  
+      // Store the timeout ID for cleanup
+      window.bioBreakTimeout = restartTimeout;
+  
+    } catch (error) {
+      console.error("❌ Error during bio break:", error);
+      addToast(
+        'Error',
+        'error',
+        `Bio break failed: ${error.message}`,
+        5000
+      );
+    }
+  };
+  
+  
+  
+  
   return (
     <div ref={examContainerRef} className="exam-container">
       {/* Render Security Toaster */}
@@ -430,6 +580,44 @@ useEffect(() => {
                 }`}>
                   {eventDetails?.batch?.year || ''}
                 </h2>
+
+                {/** BIO Break */}
+
+                {
+                  window?.electronAPI && (
+                    <div className="flex items-center justify-center">
+                      <div className={`rounded-xl shadow-sm px-4 py-2 w-full max-w-xs transition-all ${
+                        theme === 'light' ? 'bg-green-100 text-green-800' : 'bg-green-800 text-green-100'
+                      }`}>
+                        <label htmlFor="bio-break-select" className="block text-sm font-semibold mb-1">
+                          Request a Bio Break
+                        </label>
+                        <select
+                          id="bio-break-select"
+                          className={`w-full px-3 py-2 rounded-lg border outline-none transition-all text-sm font-medium shadow-sm ${
+                            theme === 'light'
+                              ? 'bg-white border-gray-300 text-gray-800 focus:ring-2 focus:ring-green-400'
+                              : 'bg-gray-700 border-gray-600 text-white focus:ring-2 focus:ring-green-500'
+                          }`}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (value === 'bio1') {
+                              handleBioBreak(3 * 60 * 1000); // 3 min
+                            } else if (value === 'bio2') {
+                              handleBioBreak(5 * 60 * 1000); // 5 min
+                            }
+                          }}
+                        >
+                          <option value="">Choose a Reason</option>
+                          <option value="bio1">Bio Break - Short (3 min)</option>
+                          <option value="bio2">Bio Break - Long (5 min)</option>
+                        </select>
+                      </div>
+                    </div>
+                  )
+                }
+
+
                 {/* Security Status Indicator */}
                 <div className={`px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${
                   warningCount >= 3 

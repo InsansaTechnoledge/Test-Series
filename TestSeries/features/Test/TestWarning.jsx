@@ -25,6 +25,10 @@ const TestHeader = ({isAutoSubmittable}) => {
   const [showFinalPopup, setShowFinalPopup] = useState(false);
   const [showManualReviewMessage, setShowManualReviewMessage] = useState(false);
   
+  // Organization stop toast states
+  const [showOrgStopToast, setShowOrgStopToast] = useState(false);
+  const [orgStopCountdown, setOrgStopCountdown] = useState(5);
+  
   // New proctor-specific states
   const [proctorStatus, setProctorStatus] = useState('Not Started');
   const [proctorEvents, setProctorEvents] = useState([]);
@@ -35,6 +39,7 @@ const TestHeader = ({isAutoSubmittable}) => {
   const countdownTimerRef = useRef(null);
   const warningTimeoutRef = useRef(null);
   const autoSubmitTriggeredRef = useRef(false);
+  const orgStopTimerRef = useRef(null);
   
   const { user } = useUser();
   const secretKey = import.meta.env.VITE_SECRET_KEY_FOR_TESTWINDOW || VITE_SECRET_KEY_FOR_TESTWINDOW;
@@ -238,6 +243,12 @@ const TestHeader = ({isAutoSubmittable}) => {
       warningTimeoutRef.current = null;
     }
     
+    // Add cleanup for organization stop timer
+    if (orgStopTimerRef.current) {
+      clearInterval(orgStopTimerRef.current);
+      orgStopTimerRef.current = null;
+    }
+    
     if (window?.electronAPI) {
       window.electronAPI.cleanupProctorListeners();
       if (proctorRunning) {
@@ -385,25 +396,67 @@ const TestHeader = ({isAutoSubmittable}) => {
     if (window?.electronAPI?.closeWindow) window.electronAPI.closeWindow();
   };
 
+  // Enhanced useEffect with toast notification for organization stop
   useEffect(() => {
-    if (autoSubmittable || warningCount < 5 || !user?._id) return;
-  
+    // Only start polling if autoSubmittable is false AND warning count >= 5
+    if (autoSubmittable || warningCount < 5 || !user?._id) {
+      return; // Exit early if conditions aren't met
+    }
+
+    console.log("🔄 Starting stopExam polling - warningCount:", warningCount, "autoSubmittable:", autoSubmittable);
+
     const intervalId = setInterval(async () => {
       try {
         const result = await checkToStopExamForStudent(user._id);
-        if (result?.stopExam === true) {
-          console.log("⛔ Exam manually stopped by proctor");
-          setShowManualReviewMessage(true); 
+        
+        const stopExamValue = result?.stopExam || result?.data?.stopExam || result?.response?.stopExam;
+        console.log("📊 stopExamValue:", stopExamValue, "type:", typeof stopExamValue);
+        
+        if (stopExamValue === true || stopExamValue === "true" || stopExamValue === 1 || stopExamValue === "1") {
+          console.log("⛔ Exam manually stopped by proctor - showing toast notification");
+          
+          
+          clearInterval(intervalId);
+          
+         
+          setShowOrgStopToast(true);
+          setOrgStopCountdown(15);
+          
+          // Start countdown timer
+          orgStopTimerRef.current = setInterval(() => {
+            setOrgStopCountdown(prev => {
+              if (prev <= 1) {
+                // When countdown reaches 0, submit the test
+                clearInterval(orgStopTimerRef.current);
+                orgStopTimerRef.current = null;
+                setShowOrgStopToast(false);
+                
+                console.log("🚀 Countdown finished - submitting test");
+                handleSubmitTest();
+                return 0;
+              }
+              return prev - 1;
+            });
+          }, 1000);
         }
       } catch (err) {
-        console.error('Failed to check stopExam flag:', err);
+        console.error('❌ Failed to check stopExam flag:', err);
       }
-    }, 1000); 
-  
-    return () => clearInterval(intervalId);
-  }, [warningCount, autoSubmittable, user?._id]);
+    }, 5000); // Check every 5 seconds
 
-  
+    // Cleanup function
+    return () => {
+      console.log("🧹 Cleaning up stopExam polling interval");
+      clearInterval(intervalId);
+      if (orgStopTimerRef.current) {
+        clearInterval(orgStopTimerRef.current);
+        orgStopTimerRef.current = null;
+      }
+    };
+  }, [warningCount, autoSubmittable, user?._id]); // Dependencies ensure effect runs when these change
+
+  console.log("sd", isAutoSubmittable);
+
   const dismissManualReviewMessage = () => {
     setShowManualReviewMessage(false);
   };
@@ -424,7 +477,53 @@ const TestHeader = ({isAutoSubmittable}) => {
   }
 
   return (
-    <div className={`flex flex-col `}>
+    <div className={`flex flex-col`}>
+      {/* CSS Animations */}
+      <style jsx>{`
+        @keyframes slide-in-right {
+          from {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+        
+        .animate-slide-in-right {
+          animation: slide-in-right 0.3s ease-out;
+        }
+        
+        @keyframes fade-in {
+          from {
+            opacity: 0;
+            transform: scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        
+        .animate-fade-in {
+          animation: fade-in 0.3s ease-out;
+        }
+        
+        @keyframes pulse {
+          0%, 100% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.05);
+          }
+        }
+        
+        .animate-pulse-scale {
+          animation: pulse 1s ease-in-out infinite;
+        }
+      `}</style>
+
       {!eventDetails ? (
         <div className={`flex justify-center items-center h-full text-lg font-medium ${
           theme === 'light' ? 'text-gray-700' : 'text-gray-800'
@@ -448,7 +547,53 @@ const TestHeader = ({isAutoSubmittable}) => {
               </div>
             )}
 
-            {/* FIXED: Use autoSubmittable variable consistently */}
+            {/* Organization Stop Toast Notification */}
+            {showOrgStopToast && (
+              <div className="fixed top-4 right-4 z-50 animate-slide-in-right">
+                <div className={`p-6 rounded-2xl shadow-2xl w-96 border-l-4 border-red-500 ${
+                  theme === 'light' 
+                    ? 'bg-white text-gray-800' 
+                    : 'bg-gray-800 text-gray-100'
+                }`}>
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0">
+                      <span className="text-2xl">🛑</span>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg text-red-600 mb-2">
+                        Examination Terminated
+                      </h3>
+                      <p className={`text-sm leading-relaxed mb-4 ${
+                        theme === 'light' ? 'text-gray-600' : 'text-gray-300'
+                      }`}>
+                        Your examination has been terminated by the organization due to repeated 
+                        monitoring anomalies detected during the assessment period.
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <span className={`text-sm font-medium ${
+                          theme === 'light' ? 'text-gray-700' : 'text-gray-300'
+                        }`}>
+                          Auto-submitting in:
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center animate-pulse-scale">
+                            <span className="text-white font-bold text-sm">
+                              {orgStopCountdown}
+                            </span>
+                          </div>
+                          <span className={`text-sm ${
+                            theme === 'light' ? 'text-gray-500' : 'text-gray-400'
+                          }`}>
+                            seconds
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Auto-Submit Final Popup */}
             {showFinalPopup && autoSubmittable && (
               <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center px-4">
@@ -542,7 +687,6 @@ const TestHeader = ({isAutoSubmittable}) => {
                       Warnings: <span className={`font-bold ${
                         theme === 'light' ? 'text-red-800' : 'text-red-200'
                       }`}>{warningCount}</span>/5
-                      {/* FIXED: Use autoSubmittable variable */}
                       {!autoSubmittable && (
                         <span className={`ml-2 text-xs px-2 py-1 rounded ${
                           theme === 'light' ? 'bg-blue-100 text-blue-700' : 'bg-blue-900/30 text-blue-300'
@@ -554,7 +698,6 @@ const TestHeader = ({isAutoSubmittable}) => {
                   </div>
                 )
               }
-              
             </div>
           </div>
         </>

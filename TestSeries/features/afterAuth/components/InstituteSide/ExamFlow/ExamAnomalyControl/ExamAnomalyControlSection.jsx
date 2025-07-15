@@ -389,125 +389,144 @@ const handleStopExam = useCallback(
   
             {/* Tab Content */}
             <div className="p-6">
-              {activeTab === 'anomalies' && goLive ? (
+            {activeTab === 'anomalies' && goLive ? (
+                // ✅ If Live Mode is ON
                 <div>
-                  <div className="flex items-center justify-between mb-4">
+                    {/* Header */}
+                    <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-semibold text-gray-900">Critical Anomalies</h2>
                     <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4 text-gray-400" />
                         <span className="text-sm text-gray-500">
-                          {loading ? 'Updating...' : 'Auto-refresh every 5s'}
+                            {loading ? 'Updating...' : 'Auto-refresh every 5s'}
                         </span>
-                      </div>
-                      <button 
+                        </div>
+                        <button 
                         onClick={() => setGoLive(prev => !prev)} 
-                        className='bg-red-400 text-gray-100 py-2 px-3 rounded-2xl hover:bg-red-500 transition-colors'
-                      >
-                        Stop live
-                      </button>
+                        className="bg-red-400 text-gray-100 py-2 px-3 rounded-2xl hover:bg-red-500 transition-colors"
+                        >
+                        Stop Live
+                        </button>
                     </div>
-                  </div>
-                  
-                  {Object.keys(groupedAnomalies).length === 0 ? (
+                    </div>
+
+                    {/* No anomalies */}
+                    {Object.keys(groupedAnomalies).length === 0 ? (
                     <div className="text-center py-12">
-                      <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
-                      <p className="text-gray-500">No anomalies flagged for review.</p>
+                        <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
+                        <p className="text-gray-500">No anomalies flagged for review.</p>
                     </div>
-                  ) : (
+                    ) : (
+                    // Anomalies grouped by student
                     <div className="space-y-4">
-                      {Object.entries(groupedAnomalies).map(([studentId, studentAnomalies]) => (
+                        {Object.entries(groupedAnomalies).map(([studentId, studentAnomalies]) => (
                         <div key={studentId} className="bg-white p-4 rounded-xl border border-gray-200">
-                          <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-3">
-                              <button
+                                <button
                                 onClick={() => toggleStudentExpansion(studentId)}
                                 className="p-1 hover:bg-gray-100 rounded"
-                              >
-                                {expandedStudents.has(studentId) ? 
-                                  <ChevronUp className="h-4 w-4" /> : 
-                                  <ChevronDown className="h-4 w-4" />
-                                }
-                              </button>
-                              <Users className="h-5 w-5 text-gray-600" />
-                              <h3 className="text-lg font-semibold text-gray-900">Student: {studentId}</h3>
-                              <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                >
+                                {expandedStudents.has(studentId) ? (
+                                    <ChevronUp className="h-4 w-4" />
+                                ) : (
+                                    <ChevronDown className="h-4 w-4" />
+                                )}
+                                </button>
+                                <Users className="h-5 w-5 text-gray-600" />
+                                <h3 className="text-lg font-semibold text-gray-900">Student: {studentId}</h3>
+                                <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                 {studentAnomalies.length} anomalies
-                              </span>
+                                </span>
                             </div>
                             <div className="flex items-center gap-2">
-                              {stoppedStudents.has(studentId) ? (
+                                {stoppedStudents.has(studentId) ? (
                                 <span className="px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                  EXAMS STOPPED
+                                    EXAMS STOPPED
                                 </span>
-                              ) : (
+                                ) : (
                                 <button
-                                  onClick={() => handleStopExam(studentId)}
-                                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2 text-sm font-medium"
+                                    onClick={() => handleStopExam(studentId)}
+                                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2 text-sm font-medium"
                                 >
-                                  <StopCircle className="h-4 w-4" />
-                                  Stop Exam
+                                    <StopCircle className="h-4 w-4" />
+                                    Stop Exam
                                 </button>
-                              )}
+                                )}
                             </div>
-                          </div>
-                          
-                          {expandedStudents.has(studentId) && (
+                            </div>
+
+                            {expandedStudents.has(studentId) && (
                             <div className="space-y-3">
-                              {studentAnomalies.map((event, index) => (
+                                {studentAnomalies.map((event, index) => (
                                 <div
-                                  key={event._id || index}
-                                  className={`p-4 rounded-lg border ${
+                                    key={event._id || index}
+                                    className={`p-4 rounded-lg border ${
                                     event.flaggedForReview
-                                      ? 'bg-red-50 border-red-200'
-                                      : 'bg-orange-50 border-orange-200'
-                                  }`}
+                                        ? 'bg-red-50 border-red-200'
+                                        : 'bg-orange-50 border-orange-200'
+                                    }`}
                                 >
-                                  <div className="flex items-center justify-between mb-2">
+                                    <div className="flex items-center justify-between mb-2">
                                     <div className="flex items-center gap-3">
-                                      <AlertTriangle className={`h-4 w-4 ${event.flaggedForReview ? 'text-red-500' : 'text-orange-500'}`} />
-                                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                        event.flaggedForReview
-                                          ? 'bg-red-100 text-red-800'
-                                          : 'bg-orange-100 text-orange-800'
-                                      }`}>
+                                        <AlertTriangle
+                                        className={`h-4 w-4 ${
+                                            event.flaggedForReview ? 'text-red-500' : 'text-orange-500'
+                                        }`}
+                                        />
+                                        <span
+                                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                            event.flaggedForReview
+                                            ? 'bg-red-100 text-red-800'
+                                            : 'bg-orange-100 text-orange-800'
+                                        }`}
+                                        >
                                         {event.flaggedForReview ? 'FLAGGED' : 'DETECTED'}
-                                      </span>
+                                        </span>
                                     </div>
-                                    <span className="text-xs text-gray-500">{formatTimestamp(event.timestamp)}</span>
-                                  </div>
-                                  
-                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <span className="text-xs text-gray-500">
+                                        {formatTimestamp(event.timestamp)}
+                                    </span>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                     <div>
-                                      <p className="text-xs text-gray-600 mb-1">Exam ID</p>
-                                      <p className="text-sm font-medium text-gray-900">{event.examId}</p>
+                                        <p className="text-xs text-gray-600 mb-1">Exam ID</p>
+                                        <p className="text-sm font-medium text-gray-900">{event.examId}</p>
                                     </div>
                                     <div className="md:col-span-2">
-                                      <p className="text-xs text-gray-600 mb-1">Anomaly Details</p>
-                                      <p className="text-sm font-medium text-gray-900">{event.details}</p>
+                                        <p className="text-xs text-gray-600 mb-1">Anomaly Details</p>
+                                        <p className="text-sm font-medium text-gray-900">{event.details}</p>
                                     </div>
-                                  </div>
+                                    </div>
                                 </div>
-                              ))}
+                                ))}
                             </div>
-                          )}
+                            )}
                         </div>
-                      ))}
+                        ))}
                     </div>
-                  )}
+                    )}
                 </div>
-              ) : (
-                <div>
-                    <p>YOU NEED TO GO LIVE FOR LIVE TRAILS</p>
-                    <button 
-                      onClick={() => setGoLive(prev => !prev)} 
-                      className='bg-red-400 text-gray-100 py-2 px-3 rounded-2xl hover:bg-red-500 transition-colors'
+                ) : activeTab === 'anomalies' ? (
+                // ✅ If Live Mode is OFF
+                <div className="bg-white shadow-md border border-gray-200 rounded-2xl p-6 w-full max-w-md mx-auto text-center">
+                    <h2 className="text-xl font-semibold text-gray-800 mb-2">
+                    Live Mode Required
+                    </h2>
+                    <p className="text-gray-600 mb-4">
+                    To initiate real-time monitoring and enable live proctoring, please activate Live Mode.
+                    </p>
+                    <button
+                    onClick={() => setGoLive(prev => !prev)}
+                    className="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-2.5 rounded-xl shadow-md hover:from-red-600 hover:to-red-700 transition-all font-medium"
                     >
-                      Go live
+                    Activate Live Mode
                     </button>
                 </div>
-              )}
-  
+                ) : null}
+
               {activeTab === 'logs' && (
                 <div>
                   <div className="flex items-center justify-between mb-6">

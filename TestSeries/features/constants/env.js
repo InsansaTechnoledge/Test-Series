@@ -27,6 +27,7 @@ export const VITE_PLAN_FEATURE_MAP= `{
   "/institute/create-contest/:contestId": ["coding_feature"],
   "/institute/contest-list": ["coding_feature"],
   "/institute/code-create": ["coding_feature"],
+  "/institute/exam-anomaly": ["proctore_feature"],
   "/student/upcoming-exams": ["exam_feature"],
   "/student/completed-exams": ["exam_feature"],
   "/student/result/:examId": ["exam_feature"],
