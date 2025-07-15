@@ -3,7 +3,10 @@ import { ChevronLeft, ChevronRight, Play, Code, Clock, Star, Users, TestTube, Se
 import { useTheme } from '../../../../hooks/useTheme';
 import { UploadCloud, Save } from "lucide-react";
 import { TerminalSquare } from "lucide-react";
+import CountdownTimer from '../../TestTimer/CountdownTimer';
 const HeaderComponent = ({
+  contest_id,
+  duration,
   problems,
   language,
   setCurrentProblem,
@@ -79,8 +82,17 @@ const HeaderComponent = ({
         ? 'bg-gradient-to-r from-blue-50 via-white to-blue-50 border-gray-200'
         : 'bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 border-gray-700'
       }`}>
+
       {/* Main Header */}
+       <CountdownTimer 
+              initialTime={duration} 
+              handleSubmitTest={submitContest} 
+              // submitted={submitted} 
+              submitted={false} // Assuming you have a way to track if the contest is submitted
+              examId={contest_id}
+            />  
       <div className="p-4 flex justify-between items-center">
+
         {/* Left Section - Navigation */}
         <div className="flex items-center space-x-6">
           <div className="flex items-center space-x-2">
