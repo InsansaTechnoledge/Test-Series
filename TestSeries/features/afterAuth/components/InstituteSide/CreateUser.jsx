@@ -1,24 +1,35 @@
 import { useEffect, useState, useMemo } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useLocation } from "react-router-dom";
+import {
+  AlertTriangle,
+  Eye,
+  EyeOff,
+  RefreshCcw,
+} from "lucide-react";
+
 import profileDefault from "../../../../assests/Institute/profile.png";
+import Banner from "../../../../assests/Institute/add user.svg";
+
 import HeadingUtil from "../../utility/HeadingUtil";
-import { AlertTriangle, Eye, EyeOff, RefreshCcw } from "lucide-react";
 import { generatePassword } from "../../utility/GenerateRandomPassword";
 import { createUser } from "../../../../utils/services/userService";
+
 import { useCachedBatches } from "../../../../hooks/useCachedBatches";
 import { useCachedRoleGroup } from "../../../../hooks/useCachedRoleGroup";
-import { useQueryClient } from "@tanstack/react-query";
+import { useCachedOrganization } from "../../../../hooks/useCachedOrganization";
 import { useUser } from "../../../../contexts/currentUserContext";
-import Banner from "../../../../assests/Institute/add user.svg";
 import { usePageAccess } from "../../../../contexts/PageAccessContext";
 import useLimitAccess from "../../../../hooks/useLimitAccess";
-import { useLocation } from "react-router-dom";
-import { useCachedOrganization } from "../../../../hooks/useCachedOrganization";
 import { useTheme } from "../../../../hooks/useTheme";
 import { useToast, ToastContainer } from "../../../../utils/Toaster";
 
 const CreateUser = () => {
-  const { batches, isLoading, isError } = useCachedBatches();
-  const { roleGroups, rolesLoading } = useCachedRoleGroup();
+  const { batches } = useCachedBatches();
+  const { roleGroups } = useCachedRoleGroup();
+  const { theme } = useTheme();
+  const { toasts, showToast, removeToast } = useToast();
+
   const [batchesVisible, setBatchesVisible] = useState(false);
   const [formData, setFormData] = useState({});
   const [selectedBatches, setSelectedBatches] = useState([]);
@@ -27,48 +38,12 @@ const CreateUser = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showBatches, setShowBatches] = useState([]);
   const [error, setError] = useState({});
-  const { theme } = useTheme();
-  const { toasts, showToast, removeToast } = useToast();
-import { useTheme } from "../../../../hooks/useTheme"
-
-const CreateUser = () => {
-    const { batches, isLoading, isError } = useCachedBatches();
-    const { roleGroups, rolesLoading } = useCachedRoleGroup();
-    const [batchesVisible, setBatchesVisible] = useState(false);
-    const [formData, setFormData] = useState({});
-    const [selectedBatches, setSelectedBatches] = useState([]);
-    const [profile, setProfile] = useState(null);
-    const [showPassword, setShowPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [showBatches, setShowBatches] = useState([]);
-    const [error, setError] = useState({});
-    const { theme } = useTheme()
-
-    // Add state for dynamic user count tracking
-    const [createdUsersCount, setCreatedUsersCount] = useState(0);
-
-    const queryClient = useQueryClient();
-
-    const { user, getFeatureKeyFromLocation } = useUser();
-    const location = useLocation();
-
-  // Add state for dynamic user count tracking
   const [createdUsersCount, setCreatedUsersCount] = useState(0);
 
   const queryClient = useQueryClient();
-
   const { user, getFeatureKeyFromLocation } = useUser();
   const location = useLocation();
-    // Get current total users from the actual source (user or organization metadata)
-    const currentTotalUsers = user?.role === 'organization'
-        ? user.metaData?.totalUsers || 0
-        : organization?.metaData?.totalUsers || 0;
-
-  const canAddMoreUsers = useLimitAccess(
-    getFeatureKeyFromLocation(location.pathname),
-    "totalUsers"
-  );
-  const Creation_limit = user?.planFeatures?.user_feature.value;
+  const canAccessPage = usePageAccess();
 
   const organization =
     user.role !== "organization"
@@ -78,44 +53,38 @@ const CreateUser = () => {
         })?.organization
       : null;
 
-  // Get current total users from the actual source (user or organization metadata)
   const currentTotalUsers =
     user?.role === "organization"
       ? user.metaData?.totalUsers || 0
       : organization?.metaData?.totalUsers || 0;
 
-  // Dynamic calculation that includes newly created users in current session
+  const Creation_limit = user?.planFeatures?.user_feature.value || 0;
   const Available_limit = Math.max(
     0,
     Creation_limit - (currentTotalUsers + createdUsersCount)
   );
 
-  // Check if limit is exceeded dynamically
   const isLimitExceeded =
     currentTotalUsers + createdUsersCount >= Creation_limit;
 
-  const canAccessPage = usePageAccess();
+  const canAddMoreUsers = useLimitAccess(
+    getFeatureKeyFromLocation(location.pathname),
+    "totalUsers"
+  );
 
-  // Memoize batches to prevent unnecessary re-renders
   const memoizedBatches = useMemo(() => {
     return Array.isArray(batches) ? batches : [];
   }, [batches]);
 
-  // Fix the infinite loop by using memoized batches and proper dependency
   useEffect(() => {
     if (memoizedBatches.length > 0) {
       setShowBatches(memoizedBatches);
     }
   }, [memoizedBatches]);
 
-  const validateField = (name, value, currentErrors) => {
-    const newErrors = { ...currentErrors };
-
+  const validateField = (name, value) => {
     switch (name) {
       case "firstName":
-        return value.length >= 3 && value.length <= 32
-          ? ""
-          : "Name must be between 3-32 characters";
       case "lastName":
         return value.length >= 3 && value.length <= 32
           ? ""
@@ -142,70 +111,27 @@ const CreateUser = () => {
         ) {
           return "Password must be at least 8 characters with uppercase, lowercase, number, and special character";
         }
-        // Clear confirm password error if passwords now match
-        if (formData?.confirm_password && formData.confirm_password === value) {
-          return "";
-    }, [memoizedBatches]);
 
-    const validateField = (name, value, currentErrors) => {
-        const newErrors = { ...currentErrors };
-
-        switch (name) {
-            case "firstName":
-                return value.length >= 3 && value.length <= 32
-                    ? ""
-                    : "Name must be between 3-32 characters";
-            case "lastName":
-                return value.length >= 3 && value.length <= 32
-                    ? ""
-                    : "Name must be between 3-32 characters";
-            case "email":
-                return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value) &&
-                    value.length >= 10 &&
-                    value.length <= 60
-                    ? ""
-                    : "Please enter a valid email address";
-            case "password":
-                const hasUpperCase = /[A-Z]/.test(value);
-                const hasLowerCase = /[a-z]/.test(value);
-                const hasNumbers = /\d/.test(value);
-                const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value);
-                const isLongEnough = value.length >= 8;
-
-                if (
-                    !isLongEnough ||
-                    !hasUpperCase ||
-                    !hasLowerCase ||
-                    !hasNumbers ||
-                    !hasSpecialChar
-                ) {
-                    return "Password must be at least 8 characters with uppercase, lowercase, number, and special character";
-                }
-                // Clear confirm password error if passwords now match
-                if (formData?.confirm_password && formData.confirm_password === value) {
-                    return "";
-                }
-                return "";
-            case "confirm_password":
-                return value === formData?.password ? "" : "Passwords do not match";
-            case "userId":
-                return value === "" ? "userId of institute is required" : "";
-            case "gender":
-                return value ? "" : "Please select the gender";
-            default:
-                return "";
+        if (
+          formData?.confirm_password &&
+          formData.confirm_password !== value
+        ) {
+          return "Passwords do not match";
         }
+
         return "";
+
       case "confirm_password":
         return value === formData?.password ? "" : "Passwords do not match";
       case "userId":
-        return value === "" ? "userId of institute is required" : "";
+        return value ? "" : "userId of institute is required";
       case "gender":
         return value ? "" : "Please select the gender";
       default:
         return "";
     }
   };
+
 
   const onChangeHandler = (e) => {
     const { name, value } = e.target;

@@ -1,20 +1,3 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { languages } from './Data/Language';
-import { useResizable } from './hooks/useResizable';
-import { useVerticalResizable } from './hooks/useVerticleResizable';
-import ProblemDescription from './components/ProblemDescription';
-import VerticalDragHandle from './components/VerticleDragHandle';
-import CodeEditor from './components/CodeEditor';
-import HorizontalDragHandle from './components/HorizontalDragHandle';
-import OutputPanel from './components/OutPutPanel';
-import HeaderComponent from './components/HeaderComponent';
-import { getContestQuestions, runContestCode, runContestTestCases } from '../../../utils/services/contestQuestionService';
-import { useParams } from 'react-router-dom';
-import CryptoJS from 'crypto-js';
-import { VITE_SECRET_KEY_FOR_CONTEST } from '../../constants/env';
-import { useTheme } from '../../../hooks/useTheme';
-import { submitContestService } from '../../../utils/services/contestService';
-import ContestResultComponent from '../../afterAuth/components/StudentSide/Coding-Contests/contestResult/contestResultComponent';
 import React, { useEffect, useMemo, useState } from "react";
 import { languages } from "./Data/Language";
 import { useResizable } from "./hooks/useResizable";
@@ -34,9 +17,10 @@ import { useParams } from "react-router-dom";
 import CryptoJS from "crypto-js";
 import { VITE_SECRET_KEY_FOR_CONTEST } from "../../constants/env";
 import { useTheme } from "../../../hooks/useTheme";
-import { Save } from "lucide-react";
 import { submitContestService } from "../../../utils/services/contestService";
 import ContestResultComponent from "../../afterAuth/components/StudentSide/Coding-Contests/contestResult/contestResultComponent";
+
+import { Save } from "lucide-react";
 import { useToast, ToastContainer } from "../../../utils/Toaster";
 
 const CodingPlatform = () => {
@@ -127,8 +111,8 @@ const CodingPlatform = () => {
   }, [theme]);
 
   const runCode = async () => {
-    if (code.trim() === '') {
-      setErrors(['Code cannot be empty!']);
+    if (code.trim() === "") {
+      setErrors(["Code cannot be empty!"]);
       return;
     }
     //  setTestInput([]);
@@ -177,25 +161,27 @@ const CodingPlatform = () => {
     } catch (error) {
       setErrors(["Network error: " + error.message]);
     } finally {
-
       const currentLang = languages.find((l) => l.value === language);
       if (!currentLang) {
-        setErrors(['Unsupported language selected!']);
+        setErrors(["Unsupported language selected!"]);
         setIsRunning(false);
         return;
       }
-      localStorage.setItem(`contest_${contest_id}_problem_${problem.question_id}_language_${language}_code_`, code);
+      localStorage.setItem(
+        `contest_${contest_id}_problem_${problem.question_id}_language_${language}_code_`,
+        code
+      );
       setIsRunning(false);
     }
   };
 
   const runTests = async () => {
     setTestInput([]);
-    if(code.trim() === '') {
-      setErrors(['Code cannot be empty!']);
+    if (code.trim() === "") {
+      setErrors(["Code cannot be empty!"]);
       return;
     }
-    setTestInput([])
+    setTestInput([]);
     setIsRunning(true);
     let results = [];
     setErrors([]);
@@ -226,23 +212,27 @@ const CodingPlatform = () => {
         setTestInput(response.data.testInput || []);
         setOutput(results.fullOutput || "");
         setTestResults(results);
-        setOutput(results.fullOutput || '');
+        setOutput(results.fullOutput || "");
         setErrors(response.data.errors || []);
       }
     } catch (error) {
-      console.error('runTests error:', error);
-      setErrors(['Test execution failed: ' + error.response?.data?.message || error.message]);
-      setOutput('');
+      console.error("runTests error:", error);
+      setErrors([
+        "Test execution failed: " + error.response?.data?.message ||
+          error.message,
+      ]);
+      setOutput("");
       setTestResults([]);
       console.error("runTests error:", error);
       setErrors(["Test execution failed: " + error.message]);
+    } finally {
+      const marksForEachTestCase = problem.marks / problem.test_cases.length;
+
+      localStorage.setItem(
+        `contest_${contest_id}_problem_${problem.question_id}_testResults`,
+        testResults.passedCount * marksForEachTestCase || 0
+      );
     }
-finally{
-
-        const marksForEachTestCase = (problem.marks / problem.test_cases.length);
-
-          localStorage.setItem(`contest_${contest_id}_problem_${problem.question_id}_testResults`, (testResults.passedCount * marksForEachTestCase) || 0);
-}
     setIsRunning(false);
     setOutputTab("testcase");
   };
@@ -281,15 +271,11 @@ finally{
     } finally {
       setIsRunning(false);
     }
+    setOutputTab("testcase");
   };
   console.log("Contest ID:", contest_id);
   console.log("Problems:", problems);
 
-    setOutputTab('testcase');
-
-
-  };
-  
   const submitContest = async () => {
     const studentResult = {
       results: problems.map((problem) => ({
@@ -350,7 +336,7 @@ finally{
           studentResult={resultPageData.studentResult}
         />
       )}
-
+      {/* 
       {!showResultPage && !resultPageData && (
         <div
           className={` flex flex-col m-6 ${
@@ -511,7 +497,107 @@ finally{
             </div>
           </div>
         </div>
+      )} */}
+      {!showResultPage && !resultPageData && (
+        <div
+          className={`flex flex-col m-6 ${
+            theme === "light" ? "" : "bg-gray-700"
+          }`}
+        >
+          <HeaderComponent
+            problems={problems}
+            language={language}
+            setCurrentProblem={setCurrentProblem}
+            setLanguage={setLanguage}
+            currentProblem={currentProblem}
+            languages={languages}
+            runCode={runCode}
+            isRunning={isRunning}
+            runTests={runTests}
+            editorTheme={editorTheme}
+            setEditorTheme={setEditorTheme}
+            saveCode={SaveCode}
+            submitContest={submitContest}
+          />
+
+          <div className="flex-1 flex overflow-hidden">
+            <div
+              ref={leftPanel.containerRef}
+              className={`border-r flex flex-col ${
+                theme === "light"
+                  ? "bg-white border-gray-200"
+                  : "bg-gray-800 border-gray-700"
+              }`}
+              style={{ width: `${leftPanel.width}%` }}
+            >
+              <div
+                className={`flex border-b flex-shrink-0 ${
+                  theme === "light" ? "border-gray-200" : "border-gray-700"
+                }`}
+              >
+                <button
+                  onClick={() => setActiveTab("description")}
+                  className={`px-4 py-2 border-b-2 transition-all duration-300 ${
+                    activeTab === "description"
+                      ? theme === "light"
+                        ? "border-blue-500 text-blue-600 bg-gray-50"
+                        : "border-blue-400 text-blue-300 bg-gray-700"
+                      : theme === "light"
+                      ? "border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                      : "border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-700"
+                  }`}
+                >
+                  Description
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-hidden flex flex-col">
+                {activeTab === "description" && (
+                  <ProblemDescription problem={problem} />
+                )}
+              </div>
+            </div>
+
+            <VerticalDragHandle
+              onMouseDown={leftPanel.startResize}
+              isResizing={leftPanel.isResizing}
+            />
+
+            <div className="flex-1 flex flex-col overflow-hidden">
+              <div
+                style={{ height: `calc(100% - ${outputPanel.height}px)` }}
+                className="overflow-hidden"
+              >
+                <CodeEditor
+                  code={code}
+                  onChange={setCode}
+                  language={language}
+                  theme={editorTheme}
+                  contest_id={contest_id}
+                  question_id={problem?.question_id || ""}
+                />
+              </div>
+              <HorizontalDragHandle
+                onMouseDown={outputPanel.startResize}
+                isResizing={outputPanel.isResizing}
+              />
+              <div style={{ height: `${outputPanel.height}px` }}>
+                <OutputPanel
+                  activeTab={outputTab}
+                  setActiveTab={setOutputTab}
+                  testResults={testResults}
+                  isRunning={isRunning}
+                  output={output}
+                  errors={errors}
+                  height={outputPanel.height}
+                  testInput={testinput}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       )}
+
       <ToastContainer toasts={toasts} onRemove={removeToast} />
     </>
   );

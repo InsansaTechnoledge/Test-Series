@@ -78,12 +78,21 @@ const UpcomingExam = () => {
     const upcoming = exams.filter(
       (exam) => exam.go_live === false || exam.go_live === "FALSE"
     );
+    // const live = exams.filter(
+
+    //   (exam) =>
+    //     (exam.go_live === true || exam.go_live === "TRUE") &&
+    //     exam.hasAttempted !== true
+    //   exam => (exam.go_live === true || exam.go_live === "TRUE") && exam.hasAttempted !== true || exam.reapplicable === true
+    // );
+
     const live = exams.filter(
       (exam) =>
-        (exam.go_live === true || exam.go_live === "TRUE") &&
-        exam.hasAttempted !== true
-      exam => (exam.go_live === true || exam.go_live === "TRUE") && exam.hasAttempted !== true || exam.reapplicable === true
+        ((exam.go_live === true || exam.go_live === "TRUE") &&
+          exam.hasAttempted !== true) ||
+        exam.reapplicable === true
     );
+
     const attempted = exams.filter((exam) => exam.hasAttempted === true);
 
     setUpcomingExams(upcoming);
