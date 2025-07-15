@@ -1,46 +1,54 @@
-import React, { useEffect, useState } from 'react';
-
+import React, { useEffect, useState } from "react";
+import { useToast, ToastContainer } from "../../../../../utils/Toaster";
 const ProctorSplash = () => {
   const [isReady, setIsReady] = useState(false);
   const [examData, setExamData] = useState(null);
   const [isStarting, setIsStarting] = useState(false);
   const [logs, setLogs] = useState([]);
   const [isElectronEnv, setIsElectronEnv] = useState(false);
+  const { toasts, showToast, removeToast } = useToast();
 
   useEffect(() => {
     // Check if we're in Electron environment
-    const electronAvailable = typeof window !== 'undefined' && window.electronAPI;
+    const electronAvailable =
+      typeof window !== "undefined" && window.electronAPI;
     setIsElectronEnv(electronAvailable);
-    
+
     if (!electronAvailable) {
-      console.warn('Not in Electron environment - electronAPI not available');
+      console.warn("Not in Electron environment - electronAPI not available");
     }
 
     // Get exam data from URL parameters
     const urlParams = new URLSearchParams(window.location.search);
-    const userId = urlParams.get('userId');
-    const examId = urlParams.get('examId');
-    const eventId = urlParams.get('eventId') || 'default';
-    
-    console.log('ProctorSplash - URL params:', { userId, examId, eventId });
-    
+    const userId = urlParams.get("userId");
+    const examId = urlParams.get("examId");
+    const eventId = urlParams.get("eventId") || "default";
+
+    console.log("ProctorSplash - URL params:", { userId, examId, eventId });
+
     if (userId && examId) {
       setExamData({ userId, examId, eventId });
       setIsReady(true);
     } else {
-      console.error('Missing required parameters:', { userId, examId });
+      console.error("Missing required parameters:", { userId, examId });
     }
 
     // Listen for proctor engine logs from main process
     if (electronAvailable) {
       const handleProctorLog = (message) => {
-        console.log('Proctor Log:', message);
-        setLogs(prev => [...prev.slice(-9), { type: 'log', message, timestamp: new Date() }]);
+        console.log("Proctor Log:", message);
+        setLogs((prev) => [
+          ...prev.slice(-9),
+          { type: "log", message, timestamp: new Date() },
+        ]);
       };
 
       const handleProctorWarning = (warning) => {
-        console.warn('Proctor Warning:', warning);
-        setLogs(prev => [...prev.slice(-9), { type: 'warning', message: warning, timestamp: new Date() }]);
+        console.warn("Proctor Warning:", warning);
+        setLogs((prev) => [
+          ...prev.slice(-9),
+          { type: "warning", message: warning, timestamp: new Date() },
+        ]);
       };
 
       window.electronAPI.onProctorLog(handleProctorLog);
@@ -49,8 +57,8 @@ const ProctorSplash = () => {
       // Cleanup
       return () => {
         if (window.electronAPI.removeAllListeners) {
-          window.electronAPI.removeAllListeners('proctor-log');
-          window.electronAPI.removeAllListeners('proctor-warning');
+          window.electronAPI.removeAllListeners("proctor-log");
+          window.electronAPI.removeAllListeners("proctor-warning");
         }
       };
     }
@@ -58,29 +66,29 @@ const ProctorSplash = () => {
 
   const handleStartExam = async () => {
     if (!examData || !window.electronAPI) {
-      console.error('Cannot start exam - missing data or API');
+      console.error("Cannot start exam - missing data or API");
       return;
     }
-    
+
     setIsStarting(true);
-    
+
     try {
-      console.log('Starting exam with data:', examData);
-      
+      console.log("Starting exam with data:", examData);
+
       // Start the exam and proctor engine
       const result = await window.electronAPI.startExam(examData);
-      
+
       if (result.success) {
-        console.log('Exam started successfully');
+        console.log("Exam started successfully");
         // The main process will navigate to the test page automatically
       } else {
-        console.error('Failed to start exam:', result.message);
-        alert('Failed to start exam: ' + result.message);
+        console.error("Failed to start exam:", result.message);
+        showToast(`Failed to start exam: " + ${result.message}`, "error");
         setIsStarting(false);
       }
     } catch (error) {
-      console.error('Error starting exam:', error);
-      alert('Error starting exam: ' + error.message);
+      console.error("Error starting exam:", error);
+      showToast(`Error starting exam:  + ${error.message}`, "error");
       setIsStarting(false);
     }
   };
@@ -136,11 +144,11 @@ const ProctorSplash = () => {
             disabled={!isReady || isStarting || !isElectronEnv}
             className={`w-full py-3 px-6 rounded-lg font-semibold transition-all duration-200 ${
               isReady && !isStarting && isElectronEnv
-                ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600'
-                : 'bg-gray-500 text-gray-300 cursor-not-allowed'
+                ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600"
+                : "bg-gray-500 text-gray-300 cursor-not-allowed"
             }`}
           >
-            {isStarting ? '🚀 Starting Exam...' : '▶️ Start Exam'}
+            {isStarting ? "🚀 Starting Exam..." : "▶️ Start Exam"}
           </button>
 
           <button
@@ -152,10 +160,10 @@ const ProctorSplash = () => {
         </div>
 
         {/* Debug Info */}
-        {process.env.NODE_ENV === 'development' && (
+        {process.env.NODE_ENV === "development" && (
           <div className="text-xs text-blue-300 space-y-1">
-            <div>Environment: {isElectronEnv ? 'Electron' : 'Browser'}</div>
-            <div>Ready: {isReady ? 'Yes' : 'No'}</div>
+            <div>Environment: {isElectronEnv ? "Electron" : "Browser"}</div>
+            <div>Ready: {isReady ? "Yes" : "No"}</div>
             <div>URL: {window.location.href}</div>
           </div>
         )}
@@ -163,17 +171,23 @@ const ProctorSplash = () => {
         {/* Logs */}
         {logs.length > 0 && (
           <div className="mt-6 max-h-32 overflow-y-auto bg-black/30 p-3 rounded-lg">
-            <h4 className="text-white text-sm font-semibold mb-2">Proctor Logs:</h4>
+            <h4 className="text-white text-sm font-semibold mb-2">
+              Proctor Logs:
+            </h4>
             {logs.map((log, index) => (
-              <div key={index} className={`text-xs mb-1 ${
-                log.type === 'warning' ? 'text-yellow-300' : 'text-green-300'
-              }`}>
+              <div
+                key={index}
+                className={`text-xs mb-1 ${
+                  log.type === "warning" ? "text-yellow-300" : "text-green-300"
+                }`}
+              >
                 {log.message}
               </div>
             ))}
           </div>
         )}
       </div>
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
     </div>
   );
 };

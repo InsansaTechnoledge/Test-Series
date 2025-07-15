@@ -1,98 +1,93 @@
-import React, { useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { useUser } from '../../../../../../contexts/currentUserContext';
-import { useEffect } from 'react';
-import CodeCreatorForm from '../../../../../Test/CodeEditor/codeCreator/codeCreatorForm';
-import { useTheme } from '../../../../../../hooks/useTheme';
+import React, { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
+import { useUser } from "../../../../../../contexts/currentUserContext";
+import { useEffect } from "react";
+import CodeCreatorForm from "../../../../../Test/CodeEditor/codeCreator/codeCreatorForm";
+import { useTheme } from "../../../../../../hooks/useTheme";
+import { useToast, ToastContainer } from "../../../../../../utils/Toaster";
 
 const ManualQuestionForm = ({ setQuestions, organizationId }) => {
-  const {user}=useUser();
-  console.log("sdgv",user)
+  const { user } = useUser();
+  console.log("sdgv", user);
+  const { toasts, showToast, removeToast } = useToast();
 
   const [codeData, setCodeData] = useState({
-    title: '',
-    difficulty: 'easy',
-    prompt: '',
-    input_format: '',
-    output_format: '',
-    sample_input: '',
-    sample_output: '',
-    test_cases: [
-      { input: '', expected_output: '', explanation: '' }
-    ],
-    description: '',
-    examples: [
-      { input: '', output: '', explanation: '' }
-    ],
-    constraints: [''],
+    title: "",
+    difficulty: "easy",
+    prompt: "",
+    input_format: "",
+    output_format: "",
+    sample_input: "",
+    sample_output: "",
+    test_cases: [{ input: "", expected_output: "", explanation: "" }],
+    description: "",
+    examples: [{ input: "", output: "", explanation: "" }],
+    constraints: [""],
     starter_code: {
-      javascript: '',
-      python: '',
-      java: '',
-      cpp: ''
-    }
+      javascript: "",
+      python: "",
+      java: "",
+      cpp: "",
+    },
   });
   // Add code-specific properties if needed
   // newQuestion.test_cases = [];
 
-
   const initialFormState = {
-    type: 'mcq',
-    question_text: '',
-    options: ['', '', '', ''],
+    type: "mcq",
+    question_text: "",
+    options: ["", "", "", ""],
     correct_option: 0,
     correct_options: [],
-    correct_answer: '',
-    left_items: ['', '', '', ''],
-    right_items: ['', '', '', ''],
-    correct_pairs_input: '',
+    correct_answer: "",
+    left_items: ["", "", "", ""],
+    right_items: ["", "", "", ""],
+    correct_pairs_input: "",
     is_true: true,
-    explanation: '',
-    difficulty: 'easy',
-    positive_marks: '',
-    negative_marks: '0',
-    subject: '',
-    chapter: '',
+    explanation: "",
+    difficulty: "easy",
+    positive_marks: "",
+    negative_marks: "0",
+    subject: "",
+    chapter: "",
 
-    passage: '',
+    passage: "",
     sub_question_ids: [],
     sub_form: {
-      type: 'mcq',
-      question_text: '',
-      options: ['', '', '', ''],
+      type: "mcq",
+      question_text: "",
+      options: ["", "", "", ""],
       correct_option: 0,
       correct_options: [],
-      correct_answer: '',
+      correct_answer: "",
       is_true: true,
-      explanation: '',
-      difficulty: 'easy',
-      positive_marks: '',
-      negative_marks: '0',
-      subject: '',
-      chapter: ''
-    }
-
+      explanation: "",
+      difficulty: "easy",
+      positive_marks: "",
+      negative_marks: "0",
+      subject: "",
+      chapter: "",
+    },
   };
 
-  const {theme} = useTheme()
+  const { theme } = useTheme();
   const [form, setForm] = useState(initialFormState);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleOptionsChange = (index, value) => {
     const updatedOptions = [...form.options];
     updatedOptions[index] = value;
-    setForm(prev => ({ ...prev, options: updatedOptions }));
+    setForm((prev) => ({ ...prev, options: updatedOptions }));
   };
-
 
   const handleAdd = () => {
     // Basic validation
     if (!form.question_text.trim()) {
-      alert("Please enter a question text");
+      showToast("Please enter a question text","warning");
       return;
     }
 
@@ -108,62 +103,57 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
       chapter: form.chapter,
       question_type: form.type,
       organization_id: organizationId,
-
     };
 
-    if (form.type === 'mcq') {
+    if (form.type === "mcq") {
       newQuestion.options = form.options;
       newQuestion.correct_option = parseInt(form.correct_option) || 0;
     }
 
-    if (form.type === 'msq') {
+    if (form.type === "msq") {
       newQuestion.options = form.options;
       newQuestion.correct_options = form.correct_options;
     }
 
-    if (form.type === 'fill' || form.type === 'numerical') {
+    if (form.type === "fill" || form.type === "numerical") {
       newQuestion.correct_answer = form.correct_answer;
     }
 
-    if (form.type === 'tf') {
-      newQuestion.is_true = form.is_true === 'true' || form.is_true === true;
+    if (form.type === "tf") {
+      newQuestion.is_true = form.is_true === "true" || form.is_true === true;
     }
 
-    if (form.type === 'match') {
+    if (form.type === "match") {
       newQuestion.left_items = form.left_items;
       newQuestion.right_items = form.right_items;
 
-      if (form.correct_pairs_input.trim() === '') {
-        alert("Please enter matching pairs in JSON format.");
+      if (form.correct_pairs_input.trim() === "") {
+        showToast("Please enter matching pairs in JSON format.","warning");
         return;
       }
 
       try {
         newQuestion.correct_pairs = JSON.parse(form.correct_pairs_input);
       } catch (err) {
-        alert("Correct Pairs must be a valid JSON object (e.g., {\"1\": \"A\"})");
+        showToast('Correct Pairs must be a valid JSON object (e.g., {"1": "A"})',"warning");
         return;
       }
     }
 
-
-
-    if (form.type === 'comprehension') {
+    if (form.type === "comprehension") {
       newQuestion.passage = form.passage;
       newQuestion.sub_question_ids = form.sub_question_ids;
 
       // ✅ Calculate total marks from sub-questions
-      const totalSubMarks = form.sub_question_ids.reduce((acc, sub) => acc + (Number(sub.positive_marks) || 0), 0);
+      const totalSubMarks = form.sub_question_ids.reduce(
+        (acc, sub) => acc + (Number(sub.positive_marks) || 0),
+        0
+      );
       newQuestion.positive_marks = totalSubMarks;
       newQuestion.negative_marks = 0; // or compute if needed
-
     }
 
-
-
-    if (form.type === 'code') {
-
-
+    if (form.type === "code") {
       newQuestion.title = codeData.title;
       newQuestion.prompt = codeData.prompt;
 
@@ -177,51 +167,49 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
       newQuestion.constraints = codeData.constraints;
       newQuestion.starter_code = codeData.starter_code;
       newQuestion.difficulty = codeData.difficulty;
-
     }
 
-    setQuestions(prev => [...prev, newQuestion]);
+    setQuestions((prev) => [...prev, newQuestion]);
 
     // Reset form after adding
     setForm(initialFormState);
     setCodeData({
-      title: '',
-      difficulty: 'easy',
-      prompt: '',
-      input_format: '',
-      output_format: '',
-      sample_input: '',
-      sample_output: '',
-      test_cases: [
-        { input: '', expected_output: '', explanation: '' }
-      ],
-      description: '',
-      examples: [
-        { input: '', output: '', explanation: '' }
-      ],
-      constraints: [''],
+      title: "",
+      difficulty: "easy",
+      prompt: "",
+      input_format: "",
+      output_format: "",
+      sample_input: "",
+      sample_output: "",
+      test_cases: [{ input: "", expected_output: "", explanation: "" }],
+      description: "",
+      examples: [{ input: "", output: "", explanation: "" }],
+      constraints: [""],
       starter_code: {
-        javascript: '',
-        python: '',
-        java: '',
-        cpp: ''
-      }
+        javascript: "",
+        python: "",
+        java: "",
+        cpp: "",
+      },
     });
-
   };
-  useEffect(()=>{
-    console.log("check"  ,user?.planFeatures?.coding_feature?.isActive)
-  },[user])
+  useEffect(() => {
+    console.log("check", user?.planFeatures?.coding_feature?.isActive);
+  }, [user]);
   const inputCommon = `p-4 rounded-2xl transition-all duration-300 text-lg w-full pr-14 ${
-    theme === 'light'
-      ? 'bg-white text-gray-900 border-2 border-gray-200 focus:ring-indigo-200 focus:border-indigo-400 placeholder-gray-400'
-      : 'bg-gray-800 text-indigo-100 border-2 border-gray-600 focus:ring-indigo-500 focus:border-indigo-300 placeholder-indigo-300'
+    theme === "light"
+      ? "bg-white text-gray-900 border-2 border-gray-200 focus:ring-indigo-200 focus:border-indigo-400 placeholder-gray-400"
+      : "bg-gray-800 text-indigo-100 border-2 border-gray-600 focus:ring-indigo-500 focus:border-indigo-300 placeholder-indigo-300"
   }`;
-const LabelCommon =`text-lg font-bold ${
-  theme === 'light' ? 'text-gray-700' : 'text-indigo-200'
-}`
+  const LabelCommon = `text-lg font-bold ${
+    theme === "light" ? "text-gray-700" : "text-indigo-200"
+  }`;
   return (
-    <div className={` backdrop-blur-md shadow-md rounded-2xl p-6 space-y-6  ${theme == 'light' ?"border border-gray-200 bg-white/70" : "bg-gray-800"}`}>
+    <div
+      className={` backdrop-blur-md shadow-md rounded-2xl p-6 space-y-6  ${
+        theme == "light" ? "border border-gray-200 bg-white/70" : "bg-gray-800"
+      }`}
+    >
       {/* Question Type Dropdown */}
       <div>
         <label className={LabelCommon}>Question Type</label>
@@ -239,12 +227,12 @@ const LabelCommon =`text-lg font-bold ${
           <option value="match">Match the Following</option>
           <option value="comprehension">Comprehension</option>
           {user?.planFeatures?.coding_feature?.isActive === true ||
-            user?.planFeatures?.coding_feature?.isActive === "true" ? (
-              <option value="code">Code</option>
-            ) : null}
+          user?.planFeatures?.coding_feature?.isActive === "true" ? (
+            <option value="code">Code</option>
+          ) : null}
         </select>
       </div>
-   
+
       {/* Question Text */}
       <div>
         <label className={LabelCommon}>Question Text</label>
@@ -259,7 +247,7 @@ const LabelCommon =`text-lg font-bold ${
       </div>
 
       {/* MCQ / MSQ Options */}
-      {(form.type === 'mcq' || form.type === 'msq') && (
+      {(form.type === "mcq" || form.type === "msq") && (
         <div className="space-y-2">
           <label className={LabelCommon}>Options</label>
           {form.options.map((opt, i) => (
@@ -275,7 +263,7 @@ const LabelCommon =`text-lg font-bold ${
       )}
 
       {/* Correct Option(s) */}
-      {form.type === 'mcq' && (
+      {form.type === "mcq" && (
         <input
           className={inputCommon}
           type="number"
@@ -288,19 +276,22 @@ const LabelCommon =`text-lg font-bold ${
         />
       )}
 
-      {form.type === 'msq' && (
+      {form.type === "msq" && (
         <input
           className={inputCommon}
           placeholder="Correct Option Indexes (comma-separated)"
           onChange={(e) => {
-            const values = e.target.value.split(',').map(v => parseInt(v.trim())).filter(v => !isNaN(v));
-            setForm(prev => ({ ...prev, correct_options: values }));
+            const values = e.target.value
+              .split(",")
+              .map((v) => parseInt(v.trim()))
+              .filter((v) => !isNaN(v));
+            setForm((prev) => ({ ...prev, correct_options: values }));
           }}
         />
       )}
 
       {/* Fill / Numerical Answer */}
-      {(form.type === 'fill' || form.type === 'numerical') && (
+      {(form.type === "fill" || form.type === "numerical") && (
         <input
           className={inputCommon}
           name="correct_answer"
@@ -311,7 +302,7 @@ const LabelCommon =`text-lg font-bold ${
       )}
 
       {/* True / False */}
-      {form.type === 'tf' && (
+      {form.type === "tf" && (
         <select
           className={inputCommon}
           name="is_true"
@@ -324,10 +315,11 @@ const LabelCommon =`text-lg font-bold ${
       )}
 
       {/* Match the Following */}
-      {form.type === 'match' && (
+      {form.type === "match" && (
         <div className="space-y-3">
           <p className="text-sm text-gray-600">
-            Enter <strong>Left</strong> and <strong>Right</strong> items at the same index for pairing.
+            Enter <strong>Left</strong> and <strong>Right</strong> items at the
+            same index for pairing.
           </p>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -341,7 +333,7 @@ const LabelCommon =`text-lg font-bold ${
                   onChange={(e) => {
                     const updated = [...form.left_items];
                     updated[i] = e.target.value;
-                    setForm(prev => ({ ...prev, left_items: updated }));
+                    setForm((prev) => ({ ...prev, left_items: updated }));
                   }}
                 />
               ))}
@@ -357,7 +349,7 @@ const LabelCommon =`text-lg font-bold ${
                   onChange={(e) => {
                     const updated = [...form.right_items];
                     updated[i] = e.target.value;
-                    setForm(prev => ({ ...prev, right_items: updated }));
+                    setForm((prev) => ({ ...prev, right_items: updated }));
                   }}
                 />
               ))}
@@ -367,7 +359,12 @@ const LabelCommon =`text-lg font-bold ${
             className={inputCommon}
             placeholder='Correct Pairs (e.g., {"India":"New Delhi"})'
             value={form.correct_pairs_input}
-            onChange={(e) => setForm(prev => ({ ...prev, correct_pairs_input: e.target.value }))}
+            onChange={(e) =>
+              setForm((prev) => ({
+                ...prev,
+                correct_pairs_input: e.target.value,
+              }))
+            }
           />
           <button
             type="button"
@@ -377,9 +374,9 @@ const LabelCommon =`text-lg font-bold ${
                 const right = form.right_items[i];
                 if (left && right) pairs[left] = right;
               });
-              setForm(prev => ({
+              setForm((prev) => ({
                 ...prev,
-                correct_pairs_input: JSON.stringify(pairs, null, 2)
+                correct_pairs_input: JSON.stringify(pairs, null, 2),
               }));
             }}
             className="inline-block bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg shadow-sm transition"
@@ -389,30 +386,34 @@ const LabelCommon =`text-lg font-bold ${
         </div>
       )}
 
-          {form.type === 'code' && (
-        <div className={` border rounded p-4 space-y-3  ${theme == 'light' ?"bg-white" : "bg-gray-700"} `}>
-
-     
-          <h3 className={`text-lg font-medium mb-2  ${theme == 'light' ?"text-black" : "text-gray-100"}`}>Code Question Builder</h3>
-          <CodeCreatorForm
-            setFormData={setCodeData}
-            formData={codeData}
-
-          />
+      {form.type === "code" && (
+        <div
+          className={` border rounded p-4 space-y-3  ${
+            theme == "light" ? "bg-white" : "bg-gray-700"
+          } `}
+        >
+          <h3
+            className={`text-lg font-medium mb-2  ${
+              theme == "light" ? "text-black" : "text-gray-100"
+            }`}
+          >
+            Code Question Builder
+          </h3>
+          <CodeCreatorForm setFormData={setCodeData} formData={codeData} />
         </div>
-
       )}
 
-      {form.type === 'comprehension' && (
+      {form.type === "comprehension" && (
         <>
           {/* Comprehension Passage */}
           <textarea
-            className={inputCommon
-            }
+            className={inputCommon}
             rows={4}
             placeholder="Enter comprehension passage"
             value={form.passage}
-            onChange={(e) => setForm(prev => ({ ...prev, passage: e.target.value }))}
+            onChange={(e) =>
+              setForm((prev) => ({ ...prev, passage: e.target.value }))
+            }
           />
 
           <input
@@ -421,12 +422,12 @@ const LabelCommon =`text-lg font-bold ${
             type="number"
             value={form.sub_form.positive_marks}
             onChange={(e) =>
-              setForm(prev => ({
+              setForm((prev) => ({
                 ...prev,
                 sub_form: {
                   ...prev.sub_form,
-                  positive_marks: parseInt(e.target.value)
-                }
+                  positive_marks: parseInt(e.target.value),
+                },
               }))
             }
           />
@@ -437,40 +438,39 @@ const LabelCommon =`text-lg font-bold ${
             type="number"
             value={form.sub_form.negative_marks}
             onChange={(e) =>
-              setForm(prev => ({
+              setForm((prev) => ({
                 ...prev,
                 sub_form: {
                   ...prev.sub_form,
-                  negative_marks: parseInt(e.target.value)
-                }
+                  negative_marks: parseInt(e.target.value),
+                },
               }))
             }
           />
 
-
           {/* Sub-question builder */}
-          <div className={` border rounded p-4 space-y-3 ${
-            theme === 'light' 
-              ? 'bg-gray-100' 
-              : 'bg-gray-800 border border-gray-700'
-          }`}>
-      
-       
-            <h4 className={` font-semibold ${
-            theme === 'light' 
-              ? 'text-black' 
-              : 'text-gray-300'
-          }`}>Add Sub-questions</h4>
-          
-
+          <div
+            className={` border rounded p-4 space-y-3 ${
+              theme === "light"
+                ? "bg-gray-100"
+                : "bg-gray-800 border border-gray-700"
+            }`}
+          >
+            <h4
+              className={` font-semibold ${
+                theme === "light" ? "text-black" : "text-gray-300"
+              }`}
+            >
+              Add Sub-questions
+            </h4>
 
             <select
               className={inputCommon}
               value={form.sub_form.type}
               onChange={(e) =>
-                setForm(prev => ({
+                setForm((prev) => ({
                   ...prev,
-                  sub_form: { ...prev.sub_form, type: e.target.value }
+                  sub_form: { ...prev.sub_form, type: e.target.value },
                 }))
               }
             >
@@ -486,15 +486,15 @@ const LabelCommon =`text-lg font-bold ${
               placeholder="Sub-question text"
               value={form.sub_form.question_text}
               onChange={(e) =>
-                setForm(prev => ({
+                setForm((prev) => ({
                   ...prev,
-                  sub_form: { ...prev.sub_form, question_text: e.target.value }
+                  sub_form: { ...prev.sub_form, question_text: e.target.value },
                 }))
               }
             />
 
             {/* Options */}
-            {(form.sub_form.type === 'mcq' || form.sub_form.type === 'msq') && (
+            {(form.sub_form.type === "mcq" || form.sub_form.type === "msq") && (
               <>
                 {form.sub_form.options.map((opt, i) => (
                   <input
@@ -505,9 +505,9 @@ const LabelCommon =`text-lg font-bold ${
                     onChange={(e) => {
                       const updated = [...form.sub_form.options];
                       updated[i] = e.target.value;
-                      setForm(prev => ({
+                      setForm((prev) => ({
                         ...prev,
-                        sub_form: { ...prev.sub_form, options: updated }
+                        sub_form: { ...prev.sub_form, options: updated },
                       }));
                     }}
                   />
@@ -516,70 +516,74 @@ const LabelCommon =`text-lg font-bold ${
             )}
 
             {/* MCQ correct index */}
-            {form.sub_form.type === 'mcq' && (
+            {form.sub_form.type === "mcq" && (
               <input
                 type="number"
                 className={inputCommon}
                 placeholder="Correct option index (0-based)"
                 value={form.sub_form.correct_option}
                 onChange={(e) =>
-                  setForm(prev => ({
+                  setForm((prev) => ({
                     ...prev,
                     sub_form: {
                       ...prev.sub_form,
-                      correct_option: parseInt(e.target.value)
-                    }
+                      correct_option: parseInt(e.target.value),
+                    },
                   }))
                 }
               />
             )}
 
             {/* MSQ correct options */}
-            {form.sub_form.type === 'msq' && (
+            {form.sub_form.type === "msq" && (
               <input
                 className={inputCommon}
                 placeholder="Correct options (comma-separated)"
                 onChange={(e) =>
-                  setForm(prev => ({
+                  setForm((prev) => ({
                     ...prev,
                     sub_form: {
                       ...prev.sub_form,
                       correct_options: e.target.value
-                        .split(',')
-                        .map(val => parseInt(val.trim()))
-                    }
+                        .split(",")
+                        .map((val) => parseInt(val.trim())),
+                    },
                   }))
                 }
               />
             )}
 
             {/* Fill / Numerical */}
-            {(form.sub_form.type === 'fill' || form.sub_form.type === 'numerical') && (
+            {(form.sub_form.type === "fill" ||
+              form.sub_form.type === "numerical") && (
               <input
                 className={inputCommon}
                 placeholder="Correct answer"
                 value={form.sub_form.correct_answer}
                 onChange={(e) =>
-                  setForm(prev => ({
+                  setForm((prev) => ({
                     ...prev,
-                    sub_form: { ...prev.sub_form, correct_answer: e.target.value }
+                    sub_form: {
+                      ...prev.sub_form,
+                      correct_answer: e.target.value,
+                    },
                   }))
                 }
               />
             )}
 
             {/* True/False */}
-            {form.sub_form.type === 'tf' && (
+            {form.sub_form.type === "tf" && (
               <select
                 className={inputCommon}
                 value={form.sub_form.is_true}
                 onChange={(e) =>
-                  setForm(prev => ({
+                  setForm((prev) => ({
                     ...prev,
                     sub_form: {
                       ...prev.sub_form,
-                      is_true: e.target.value === 'true'
-                    }
+                      is_true: e.target.value === "true",
+                    },
                   }))
                 }
               >
@@ -592,34 +596,38 @@ const LabelCommon =`text-lg font-bold ${
               type="button"
               className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
               onClick={() => {
-                setForm(prev => ({
+                setForm((prev) => ({
                   ...prev,
-                  sub_question_ids: [...prev.sub_question_ids, { ...prev.sub_form, id: uuidv4() }],
+                  sub_question_ids: [
+                    ...prev.sub_question_ids,
+                    { ...prev.sub_form, id: uuidv4() },
+                  ],
                   sub_form: {
-                    type: 'mcq',
-                    question_text: '',
-                    options: ['', '', '', ''],
+                    type: "mcq",
+                    question_text: "",
+                    options: ["", "", "", ""],
                     correct_option: 0,
                     correct_options: [],
-                    correct_answer: '',
+                    correct_answer: "",
                     is_true: true,
-                    explanation: '',
-                    difficulty: 'easy',
-                    positive_marks: '',
-                    negative_marks: '0',
-                    subject: '',
-                    chapter: ''
-                  }
+                    explanation: "",
+                    difficulty: "easy",
+                    positive_marks: "",
+                    negative_marks: "0",
+                    subject: "",
+                    chapter: "",
+                  },
                 }));
               }}
             >
-             Add Sub-question
+              Add Sub-question
             </button>
 
             {/* Preview sub-questions */}
             {form.sub_question_ids.length > 0 && (
               <div className="mt-2 text-sm text-gray-700">
-                <strong>Sub-questions added:</strong> {form.sub_question_ids.length}
+                <strong>Sub-questions added:</strong>{" "}
+                {form.sub_question_ids.length}
               </div>
             )}
           </div>
@@ -694,10 +702,10 @@ const LabelCommon =`text-lg font-bold ${
       >
         Add Question
       </button>
-    </div>
 
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
+    </div>
   );
 };
-
 
 export default ManualQuestionForm;
