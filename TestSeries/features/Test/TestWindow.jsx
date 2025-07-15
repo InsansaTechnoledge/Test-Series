@@ -397,74 +397,33 @@ useEffect(() => {
   if (isExamLoading || isQuestionLoading) {
     return <div>Loading...🥲</div>;
   }
+
   const handleBioBreak = async (durationInMs) => {
-    const eventId = 'bio-break';
+    const eventId = 'default';
     
     try {
-      console.log("🔍 Starting bio break process...");
-      
-      // First, check if the proctor engine is actually running
-      let proctorStatus = null;
-      if (window?.electronAPI?.getProctorStatus) {
-        proctorStatus = await window.electronAPI.getProctorStatus();
-        console.log("📊 Current proctor status:", proctorStatus);
-      }
-      
       // Add toast notification for bio break start
       addToast(
-        'Bio break initiated',
+        'Bio break started',
         'info',
-        `Attempting to pause proctor for ${durationInMs / 60000} minutes`,
-        3000
+        `Proctor monitoring paused for ${durationInMs / 60000} minutes`,
+        durationInMs
       );
   
-      // Try to stop the proctor engine with detailed logging
+      // Stop the proctor engine with proper error handling
       if (window?.electronAPI?.stopProctorEngine) {
-        console.log("⏸️ Calling stopProctorEngine...");
+        console.log("⏸️ Stopping Proctor Engine...");
         
-        // Call the function and wait for response
-        const stopResult = await window.electronAPI.stopProctorEngine();
-        console.log("📋 Stop result:", stopResult);
-        
-        // Verify the proctor actually stopped
-        if (window?.electronAPI?.getProctorStatus) {
-          const newStatus = await window.electronAPI.getProctorStatus();
-          console.log("📊 Status after stop:", newStatus);
-          
-          if (newStatus?.isRunning === false || newStatus?.status === 'stopped') {
-            console.log("✅ Proctor engine successfully stopped");
-            addToast(
-              'Bio break active',
-              'success',
-              `Proctor monitoring paused for ${durationInMs / 60000} minutes`,
-              durationInMs
-            );
-          } else {
-            console.error("❌ Proctor engine did not stop properly");
-            addToast(
-              'Warning',
-              'warning',
-              'Proctor engine may still be running during bio break',
-              5000
-            );
-          }
-        } else {
-          // If we can't check status, assume it worked but warn user
-          console.log("⚠️ Cannot verify proctor stop status");
-          addToast(
-            'Bio break started',
-            'info',
-            `Proctor stop requested for ${durationInMs / 60000} minutes`,
-            3000
-          );
-        }
+        // Use await if the function returns a promise
+        const result = await window.electronAPI.stopProctorEngine();
+        console.log("Proctor engine stopped:", result);
       } else {
-        console.error("❌ stopProctorEngine function not available");
+        console.error("stopProctorEngine not available");
         addToast(
           'Error',
           'error',
-          'Proctor control not available - bio break may not work',
-          5000
+          'Unable to stop proctor engine - function not available',
+          3000
         );
         return;
       }
@@ -472,79 +431,53 @@ useEffect(() => {
       // Set a timeout to restart the proctor engine
       const restartTimeout = setTimeout(async () => {
         try {
-          console.log("🔄 Bio break time ended, restarting proctor...");
-          
           if (window?.electronAPI?.startProctorEngine) {
-            console.log("▶️ Calling startProctorEngine...");
+            console.log("▶️ Restarting Proctor Engine...");
             
-            const startResult = await window.electronAPI.startProctorEngine(examId, eventId);
-            console.log("📋 Start result:", startResult);
+            // Use await if the function returns a promise
+            const result = await window.electronAPI.startProctorEngine(examId, eventId);
+            console.log("Proctor engine restarted:", result);
             
-            // Verify the proctor actually started
-            if (window?.electronAPI?.getProctorStatus) {
-              const newStatus = await window.electronAPI.getProctorStatus();
-              console.log("📊 Status after start:", newStatus);
-              
-              if (newStatus?.isRunning === true || newStatus?.status === 'running') {
-                console.log("✅ Proctor engine successfully restarted");
-                addToast(
-                  'Bio break ended',
-                  'success',
-                  'Proctor monitoring resumed',
-                  3000
-                );
-              } else {
-                console.error("❌ Proctor engine did not restart properly");
-                addToast(
-                  'Error',
-                  'error',
-                  'Failed to restart proctor monitoring',
-                  5000
-                );
-              }
-            } else {
-              console.log("⚠️ Cannot verify proctor start status");
-              addToast(
-                'Bio break ended',
-                'info',
-                'Proctor restart requested',
-                3000
-              );
-            }
+            addToast(
+              'Bio break ended',
+              'info',
+              'Proctor monitoring resumed',
+              3000
+            );
           } else {
-            console.error("❌ startProctorEngine function not available");
+            console.error("startProctorEngine not available");
             addToast(
               'Error',
               'error',
-              'Cannot restart proctor engine',
+              'Unable to restart proctor engine - function not available',
               5000
             );
           }
         } catch (error) {
-          console.error("❌ Error restarting proctor engine:", error);
+          console.error("Error restarting proctor engine:", error);
           addToast(
             'Error',
             'error',
-            `Failed to restart proctor: ${error.message}`,
+            'Failed to restart proctor engine after bio break',
             5000
           );
         }
       }, durationInMs);
   
-      // Store the timeout ID for cleanup
+      // Store the timeout ID so it can be cleared if needed
+      // You might want to store this in component state if you need to cancel it
       window.bioBreakTimeout = restartTimeout;
   
     } catch (error) {
-      console.error("❌ Error during bio break:", error);
+      console.error("Error during bio break:", error);
       addToast(
         'Error',
         'error',
-        `Bio break failed: ${error.message}`,
-        5000
+        'Failed to initiate bio break',
+        3000
       );
     }
   };
-  
   
   
   
