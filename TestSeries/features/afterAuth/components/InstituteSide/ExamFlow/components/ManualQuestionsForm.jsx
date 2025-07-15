@@ -38,9 +38,9 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
     question_text: "",
     options: ["", "", "", ""],
     correct_option: 0,
-    type: 'mcq',
-    question_text: '',
-    options: ['', '', '', ''],
+    type: "mcq",
+    question_text: "",
+    options: ["", "", "", ""],
     correct_option: null,
     correct_options: [],
     correct_answer: "",
@@ -62,9 +62,9 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
       question_text: "",
       options: ["", "", "", ""],
       correct_option: 0,
-      type: 'mcq',
-      question_text: '',
-      options: ['', '', '', ''],
+      type: "mcq",
+      question_text: "",
+      options: ["", "", "", ""],
       correct_option: null,
       correct_options: [],
       correct_answer: "",
@@ -95,7 +95,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
   const handleAdd = () => {
     // Basic validation
     if (!form.question_text.trim()) {
-      showToast("Please enter a question text","warning");
+      showToast("Please enter a question text", "warning");
       return;
     }
 
@@ -136,14 +136,17 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
       newQuestion.right_items = form.right_items;
 
       if (form.correct_pairs_input.trim() === "") {
-        showToast("Please enter matching pairs in JSON format.","warning");
+        showToast("Please enter matching pairs in JSON format.", "warning");
         return;
       }
 
       try {
         newQuestion.correct_pairs = JSON.parse(form.correct_pairs_input);
       } catch (err) {
-        showToast('Correct Pairs must be a valid JSON object (e.g., {"1": "A"})',"warning");
+        showToast(
+          'Correct Pairs must be a valid JSON object (e.g., {"1": "A"})',
+          "warning"
+        );
         return;
       }
     }
@@ -256,8 +259,6 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
 
       {/* MCQ / MSQ Options */}
       {(form.type === "mcq" || form.type === "msq") && (
-     
-      {(form.type === 'mcq' || form.type === 'msq') && (
         <div className="space-y-2">
           <label className={LabelCommon}>Options</label>
           <div>
@@ -265,22 +266,23 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
           </div>
           {form.options.map((opt, i) => {
             const isChecked =
-              form.type === 'mcq'
+              form.type === "mcq"
                 ? form.correct_option === i
                 : form.correct_options.includes(i);
 
             return (
               <div
                 key={i}
-                className={`flex items-center gap-3 p-2 rounded-xl transition-all cursor-pointer ${isChecked ? 'bg-green-100 border border-green-600' : ''
-                  }`}
+                className={`flex items-center gap-3 p-2 rounded-xl transition-all cursor-pointer ${
+                  isChecked ? "bg-green-100 border border-green-600" : ""
+                }`}
                 onClick={() => {
-                  if (form.type === 'mcq') {
+                  if (form.type === "mcq") {
                     setForm((prev) => ({
                       ...prev,
                       correct_option: i,
                     }));
-                  } else if (form.type === 'msq') {
+                  } else if (form.type === "msq") {
                     const newSelections = isChecked
                       ? form.correct_options.filter((index) => index !== i)
                       : [...form.correct_options, i];
@@ -292,11 +294,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
                   }
                 }}
               >
-                <input
-                  type="checkbox"
-                  checked={isChecked}
-                  readOnly
-                />
+                <input type="checkbox" checked={isChecked} readOnly />
                 <input
                   className={inputCommon}
                   placeholder={`Option ${i + 1}`}
@@ -337,8 +335,6 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
           }}
         />
       )}
-
-
 
       {/* Fill / Numerical Answer */}
       {(form.type === "fill" || form.type === "numerical") && (
