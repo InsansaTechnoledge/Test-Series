@@ -104,6 +104,12 @@ export const controlData = [
         activeIcon: ExamListActive
     },
     {
+      name: "Exam anomaly center",
+      path: "exam-anomaly",
+      icon: '',
+      activeIcon: ''
+    },
+    {
         name: "Upload videos",
         path: "video",
         icon: UploadVideo, 
@@ -161,7 +167,8 @@ export const categoryData = [
     icon: exam,
     features: [
       'Create Exams',
-      'Exam List Page'
+      'Exam List Page',
+      'Exam anomaly center'
     ]
   },
   {

@@ -724,6 +724,13 @@ const CreateBatch = () => {
                       name="subjects"
                       className={inputCommon}
                       placeholder="Enter subject name"
+                       onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault(); // Prevents form submission if inside a form
+                          addSubject();       // Calls your existing function
+                        }
+                      }}
+
                     />
                     <button
                       onClick={addSubject}

@@ -13,7 +13,7 @@ import SubmitModal from "./utils/SubmitResultComponent";
 const QuestionSection = ({
   setSelectedQuestion,
   selectedQuestion,
-  // selectedSubject,
+  selectedSubject,
   subjectSpecificQuestions,
   setSubjectSpecificQuestions,
   handleSubmitTest,

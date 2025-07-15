@@ -28,6 +28,18 @@ const ExamForm = ({
   },
 }) => {
   const { theme } = useTheme();
+
+const ExamForm = ({ canCreateMoreExams, onSubmit, initialData = {
+  name: '',
+  date: '',
+  total_marks: '',
+  duration: '',
+  batch_id: '',
+  auto_submittable: true,
+  ai_proctored: false,
+} }) => {
+
+  const {theme} = useTheme()
   const { user } = useUser();
   const { batches = [], batchMap } = useCachedBatches();
   const { toasts, showToast, removeToast } = useToast();

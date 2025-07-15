@@ -9,10 +9,11 @@ import { submitResult } from '../../utils/services/resultService';
 import { VITE_SECRET_KEY_FOR_TESTWINDOW } from '../constants/env';
 import LoadingTest from './LoadingTest';
 import { calculateResult } from './utils/resultCalculator';
+import { checkToStopExamForStudent } from '../../utils/services/proctorService';
 
-const TestHeader = ({}) => {
+const TestHeader = ({isAutoSubmittable}) => {
   const [eventDetails, setEventDetails] = useState();
- const [selectedQuestion, setSelectedQuestion] = useState();
+  const [selectedQuestion, setSelectedQuestion] = useState();
   const [subjectSpecificQuestions, setSubjectSpecificQuestions] = useState();
   const [selectedSubject, setSelectedSubject] = useState();
   const [submitted, setSubmitted] = useState(false);
@@ -22,6 +23,7 @@ const TestHeader = ({}) => {
   const [countdown, setCountdown] = useState(null);
   const [allWarnings, setAllWarnings] = useState([]);
   const [showFinalPopup, setShowFinalPopup] = useState(false);
+  const [showManualReviewMessage, setShowManualReviewMessage] = useState(false);
   
   // New proctor-specific states
   const [proctorStatus, setProctorStatus] = useState('Not Started');
@@ -32,6 +34,7 @@ const TestHeader = ({}) => {
   const warningProcessedRef = useRef(new Set());
   const countdownTimerRef = useRef(null);
   const warningTimeoutRef = useRef(null);
+  const autoSubmitTriggeredRef = useRef(false);
   
   const { user } = useUser();
   const secretKey = import.meta.env.VITE_SECRET_KEY_FOR_TESTWINDOW || VITE_SECRET_KEY_FOR_TESTWINDOW;
@@ -41,6 +44,9 @@ const TestHeader = ({}) => {
   const examId = searchParams.get('examId');
   const { questions, isError: isExamError, isLoading: isQuestionLoading } = useCachedQuestions(examId);
   const { exam, isLoading: isExamLoading } = useCachedExam(examId);
+
+  // FIXED: Get auto_submittable from exam data if prop is not provided
+  const autoSubmittable = isAutoSubmittable ?? exam?.auto_submittable ?? false;
 
   // Check if we're in Electron environment
   useEffect(() => {
@@ -144,6 +150,13 @@ const TestHeader = ({}) => {
     setWarningCount(prev => {
       const newCount = prev + 1;
       console.log('📊 Warning count updated:', newCount);
+      
+      // Check warning threshold immediately
+      const MAX_WARNINGS_ALLOWED = 5;
+      if (newCount >= MAX_WARNINGS_ALLOWED) {
+        handleWarningThresholdReached();
+      }
+      
       return newCount;
     });
     
@@ -184,21 +197,27 @@ const TestHeader = ({}) => {
         countdownTimerRef.current = null;
       }
     }, 5000);
+  };
+
+  const handleWarningThresholdReached = () => {
+    // Prevent multiple triggers
+    if (autoSubmitTriggeredRef.current) {
+      console.log('⚠️ Warning threshold already processed');
+      return;
+    }
     
-    // Check if we should show final popup (5 warnings threshold)
-    // Use setTimeout to ensure state is updated before checking
-
-    const MAX_WARNINGS_ALLOWED = 5;
-
-setTimeout(() => {
-      setWarningCount(currentCount => {
-        if (currentCount >= MAX_WARNINGS_ALLOWED) {
-          setShowFinalPopup(true);
-        }
-        return currentCount;
-      });
-    }, 0);
-
+    autoSubmitTriggeredRef.current = true;
+    
+    // FIXED: Use the computed autoSubmittable value
+    console.log('🚨 Warning threshold reached. Auto-submittable:', autoSubmittable);
+    
+    if (autoSubmittable === true) {
+      console.log('🔄 Triggering auto-submit');
+      setShowFinalPopup(true);
+    } else {
+      console.log('📝 Showing manual review message');
+      setShowManualReviewMessage(true);
+    }
   };
 
   const handleProctorEvent = (data) => {
@@ -329,8 +348,6 @@ setTimeout(() => {
       localStorage.removeItem('testQuestions');
       localStorage.removeItem('encryptedTimeLeft');
 
-      // handleSubmitTest();
-      // navigate('/student/completed-exams');
       const answers = Object.entries(subjectSpecificQuestions).reduce((acc, [, value]) => {
         const objs = value.map((val) => ({
           question_id: val.id,
@@ -366,6 +383,29 @@ setTimeout(() => {
 
     if (window?.electronAPI?.stopProctorEngine) window.electronAPI.stopProctorEngine();
     if (window?.electronAPI?.closeWindow) window.electronAPI.closeWindow();
+  };
+
+  useEffect(() => {
+    if (autoSubmittable || warningCount < 5 || !user?._id) return;
+  
+    const intervalId = setInterval(async () => {
+      try {
+        const result = await checkToStopExamForStudent(user._id);
+        if (result?.stopExam === true) {
+          console.log("⛔ Exam manually stopped by proctor");
+          setShowManualReviewMessage(true); 
+        }
+      } catch (err) {
+        console.error('Failed to check stopExam flag:', err);
+      }
+    }, 1000); 
+  
+    return () => clearInterval(intervalId);
+  }, [warningCount, autoSubmittable, user?._id]);
+
+  
+  const dismissManualReviewMessage = () => {
+    setShowManualReviewMessage(false);
   };
 
   if (!eventDetails) return <LoadingTest/>;
@@ -408,8 +448,9 @@ setTimeout(() => {
               </div>
             )}
 
-            {/* Final Popup */}
-            {showFinalPopup && (
+            {/* FIXED: Use autoSubmittable variable consistently */}
+            {/* Auto-Submit Final Popup */}
+            {showFinalPopup && autoSubmittable && (
               <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center px-4">
                 <div className={`p-6 rounded-2xl shadow-2xl w-full max-w-2xl animate-fade-in ${
                   theme === 'light' 
@@ -447,6 +488,45 @@ setTimeout(() => {
               </div>
             )}
 
+            {/* Manual Review Message Popup */}
+            {showManualReviewMessage && !autoSubmittable && (
+              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center px-4">
+                <div className={`p-6 rounded-2xl shadow-2xl w-full max-w-2xl animate-fade-in ${
+                  theme === 'light' 
+                    ? 'bg-white text-gray-800' 
+                    : 'bg-gray-800 text-gray-100'
+                }`}>
+                  <div className="text-center">
+                    <h2 className="text-2xl sm:text-3xl font-bold text-amber-500 flex items-center justify-center gap-2">
+                      <span>⚠️</span> Warning Threshold Reached
+                    </h2>
+                    <p className={`mt-2 text-sm sm:text-base ${
+                      theme === 'light' ? 'text-gray-600' : 'text-gray-300'
+                    }`}>
+                      Multiple anomalies have been detected during your test. The examiner is reviewing the outcome.
+                    </p>
+                  </div>
+                  <ul className={`mt-4 max-h-48 overflow-y-auto text-sm sm:text-base border rounded-lg px-4 py-3 space-y-1 list-disc list-inside shadow-inner ${
+                    theme === 'light'
+                      ? 'bg-amber-50 border-amber-200 text-amber-700'
+                      : 'bg-amber-900/20 border-amber-800 text-amber-300'
+                  }`}>
+                    {allWarnings.map((item, idx) => (
+                      <li key={idx}>{item}</li>
+                    ))}
+                  </ul>
+                  <div className="mt-6 text-center">
+                    <button
+                      onClick={dismissManualReviewMessage}
+                      className="inline-flex items-center justify-center px-6 py-2.5 text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 rounded-lg text-base font-semibold transition duration-200 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    >
+                      Continue Test
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Header */}
             <div className="flex flex-col py-6 px-6 sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6 rounded-xl">
               {/* warning and timer */}
@@ -462,6 +542,14 @@ setTimeout(() => {
                       Warnings: <span className={`font-bold ${
                         theme === 'light' ? 'text-red-800' : 'text-red-200'
                       }`}>{warningCount}</span>/5
+                      {/* FIXED: Use autoSubmittable variable */}
+                      {!autoSubmittable && (
+                        <span className={`ml-2 text-xs px-2 py-1 rounded ${
+                          theme === 'light' ? 'bg-blue-100 text-blue-700' : 'bg-blue-900/30 text-blue-300'
+                        }`}>
+                          Manual Review
+                        </span>
+                      )}
                     </div>
                   </div>
                 )

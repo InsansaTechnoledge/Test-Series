@@ -82,6 +82,7 @@ const UpcomingExam = () => {
       (exam) =>
         (exam.go_live === true || exam.go_live === "TRUE") &&
         exam.hasAttempted !== true
+      exam => (exam.go_live === true || exam.go_live === "TRUE") && exam.hasAttempted !== true || exam.reapplicable === true
     );
     const attempted = exams.filter((exam) => exam.hasAttempted === true);
 
@@ -260,7 +261,8 @@ const UpcomingExam = () => {
 
     if (isProctored && !isElectronEnv) {
       return {
-        text: "Requires Desktop App",
+        text: "Desktop App Required",
+        tooltip: "This exam requires the Evalvo Proctor desktop app.",
         disabled: true,
         style: {
           backgroundColor: "#6c757d",
@@ -272,8 +274,9 @@ const UpcomingExam = () => {
 
     if (isProctored && isElectronEnv) {
       return {
-        text: "Start AI-Proctored Exam",
-        disabled: false,
+        text: "Launch Proctored Exam",
+        tooltip: "AI-based proctoring is active for this exam.",
+        disabled: !canStart,
         style: {
           backgroundColor: "#dc3545",
           color: "white",

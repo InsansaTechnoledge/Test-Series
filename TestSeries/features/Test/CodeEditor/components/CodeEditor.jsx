@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-const CodeEditor = ({ code, onChange, language, theme  }) => {
+const CodeEditor = ({ code, onChange, language, theme,question_id,contest_id  }) => {
   const containerRef = useRef(null);
   const editorRef = useRef(null);
   const [isEditorReady, setIsEditorReady] = useState(false);
@@ -121,18 +121,7 @@ const CodeEditor = ({ code, onChange, language, theme  }) => {
       javascript: 'javascript',
       typescript: 'typescript',
       c: 'c',
-      csharp: 'csharp',
-      php: 'php',
-      swift: 'swift',
-      kotlin: 'kotlin',
-      dart: 'dart',
-      golang: 'go',
-      ruby: 'ruby',
-      rust: 'rust',
-      scala: 'scala',
-      racket: 'racket',
-      elixir: 'elixir',
-      erlang: 'erlang'
+
     };
     return map[lang] || 'plaintext';
   };
@@ -148,7 +137,7 @@ const CodeEditor = ({ code, onChange, language, theme  }) => {
   // Update code if changed externally
   useEffect(() => {
     if (editorRef.current && isEditorReady && editorRef.current.getValue() !== code) {
-      editorRef.current.setValue(code);
+      editorRef.current.setValue(localStorage.getItem(`contest_${contest_id}_problem_${question_id}_language_${language}_code_`) || code);
     }
   }, [code, isEditorReady]);
 

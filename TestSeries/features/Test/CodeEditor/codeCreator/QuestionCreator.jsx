@@ -1,33 +1,32 @@
-import React, { useState } from "react";
 import {
-  Plus,
-  Trash2,
-  Save,
-  Code,
+  BookOpen,
+  CheckCircle,
   ChevronLeft,
   ChevronRight,
-  BookOpen,
+  Code,
+  Plus,
   Trophy,
-  CheckCircle,
   XCircle,
 } from "lucide-react";
+import { useState } from "react";
 import { saveContestQuestion } from "../../../../utils/services/contestQuestionService";
-import CodeCreatorForm from "./codeCreatorForm";
 // import { useSearchParams } from 'react-router-dom';
-import { useTheme } from "../../../../hooks/useTheme";
 import { useEffect } from "react";
-import { useToast, ToastContainer } from "../../../../utils/Toaster";
-
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useTheme } from "../../../../hooks/useTheme";
 import {
   fetchCodingQuestion,
   fetchCodingQuestions,
 } from "../../../../utils/services/contestService";
-import { useSearchParams } from "react-router-dom";
+import { ToastContainer, useToast } from "../../../../utils/Toaster";
 
 export default function QuestionCreator() {
   const { theme } = useTheme();
   const [searchParams] = useSearchParams();
   const contestId = searchParams.get("contestId");
+  // const contestId = "demo-contest-id";
+
+  const navigate = useNavigate();
   // const contestId = "demo-contest-id";
 
   const [difficulty, setDifficulty] = useState("Easy");
@@ -105,6 +104,7 @@ export default function QuestionCreator() {
       showToast("Contest created successfully!");
       setSelectedQuestions([]);
       setFullDetails(null);
+      navigate(`/institute/contest-list`);
     } else {
       showToast("Failed to create contest. Please try again.", "error");
     }
