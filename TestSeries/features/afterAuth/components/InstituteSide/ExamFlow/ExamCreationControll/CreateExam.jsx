@@ -258,7 +258,6 @@ const CreateExam = () => {
                     theme === "light" ? "bg-gray-200" : "bg-gray-700"
                   }`}
                 >
-<<<<<<< HEAD
                   <h3
                     className={`text-lg font-medium mb-2  ${
                       theme == "light" ? "text-black" : "text-gray-100"
@@ -279,32 +278,6 @@ const CreateExam = () => {
                     organizationId={examDetails.organization_id} // ✅ pass this down!
                     examDetails={examDetails}
                   />
-=======
-                  {tabs.map((tab) => (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveTab(tab.id)}
-                      className={`
-            flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md font-medium transition-all duration-200
-            ${
-              activeTab === tab.id
-                ? theme === "light"
-                  ? "bg-white text-blue-600 shadow-sm"
-                  : "bg-gray-800 text-blue-400 shadow-sm"
-                : theme === "light"
-                ? "text-gray-600 hover:text-gray-800 hover:bg-gray-100"
-                : "text-gray-400 hover:text-gray-200 hover:bg-gray-600"
-            }
-          `}
-                    >
-                      {/* <span className="text-lg">{tab.icon}</span> */}
-                      <span className="text-lg">
-                        <tab.icon size={16} />
-                      </span>
-                      <span>{tab.label}</span>
-                    </button>
-                  ))}
->>>>>>> b17866806b583c8779b5f1780e56ea36ea6366c4
                 </div>
 
                 {/* Tab Description */}
