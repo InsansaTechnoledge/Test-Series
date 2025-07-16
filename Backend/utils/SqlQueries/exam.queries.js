@@ -43,7 +43,8 @@ export const fetchSelective = async (conditions) => {
       ),
       reapplicable,
       auto_submittable,
-      ai_proctored
+      ai_proctored,
+      subjects
 
     `);
 

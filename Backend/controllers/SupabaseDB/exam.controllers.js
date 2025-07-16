@@ -72,7 +72,11 @@ export const fetchExamBasedOnCondition = async (req, res) => {
       };
     }
 
+    console.log("called")
+
     const exams = await fetchSelective(baseQuery);
+
+    console.log("fv", exams)
 
     // If user is a student, mark attempted exams
     if (req.user.role === 'student') {

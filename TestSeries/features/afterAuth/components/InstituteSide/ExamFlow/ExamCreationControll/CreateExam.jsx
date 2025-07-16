@@ -85,6 +85,7 @@ const CreateExam = () => {
           const res = await fetchExamById(examId);
 
           const matchedExam = res.data.find((e) => e.id === examId);
+          console.log("SD", matchedExam)
 
           if (!matchedExam) {
             console.warn("⚠️ No matching exam found!");
@@ -164,28 +165,11 @@ const CreateExam = () => {
               total_marks: "",
               duration: "",
               batch_id: "",
+              subjects: []
             }
           } // for edit form
         />
       ) : (
-        // <div className="bg-blue-50 p-6 rounded-3xl mb-6 shadow-lg ">
-        //   <div className="flex justify-between items-center ">
-        //     <div className=''>
-        //       <h2 className="text-xl font-semibold">{examDetails.name}</h2>
-        //       <p className="text-gray-600">
-        //         Date: {examDetails.date} |
-        //         Duration: {examDetails.duration} mins |
-        //         Total Marks: {examDetails.total_marks}
-        //       </p>
-        //     </div>
-        //     <button
-        //       onClick={() => setEditingExam(true)}
-        //       className="text-blue-600 hover:text-blue-800"
-        //     >
-        //       Edit
-        //     </button>
-        //   </div>
-        // </div>
         <div
           className={`p-6 rounded-3xl mb-6 shadow-lg ${
             theme === "light" ? "bg-blue-50" : "bg-gray-800"
@@ -208,6 +192,31 @@ const CreateExam = () => {
                 Date: {examDetails.date} | Duration: {examDetails.duration} mins
                 | Total Marks: {examDetails.total_marks}
               </p>
+
+              <p className={`${theme === "light" ? "text-gray-600" : "text-gray-300"}`}>
+                Date: {examDetails.date} | Duration: {examDetails.duration} mins | Total Marks: {examDetails.total_marks}
+              </p>
+
+              {Array.isArray(examDetails.subjects) && examDetails.subjects.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <p
+                    className={`font-semibold ${
+                      theme === "light" ? "text-gray-700" : "text-gray-200"
+                    }`}
+                  >
+                    Subjects:
+                  </p>
+                  {examDetails.subjects.map((subj, idx) => (
+                    <span
+                      key={idx}
+                      className="bg-indigo-100 text-indigo-800 text-sm font-medium px-3 py-1 rounded-full"
+                    >
+                      {subj} 
+                    </span>
+                  ))}
+                </div>
+              )}
+
             </div>
             {canEditExams && (
               <button
@@ -249,6 +258,28 @@ const CreateExam = () => {
                     theme === "light" ? "bg-gray-200" : "bg-gray-700"
                   }`}
                 >
+<<<<<<< HEAD
+                  <h3
+                    className={`text-lg font-medium mb-2  ${
+                      theme == "light" ? "text-black" : "text-gray-100"
+                    }`}
+                  >
+                    Option 1: Manual Entry
+                  </h3>
+                  <p
+                    className={`mb-4 ${
+                      theme == "light" ? "text-gray-500" : "text-gray-500"
+                    }`}
+                  >
+                    Create questions one by one with full control over each
+                    question's details.
+                  </p>
+                  <ManualQuestionForm
+                    setQuestions={setQuestions}
+                    organizationId={examDetails.organization_id} // ✅ pass this down!
+                    examDetails={examDetails}
+                  />
+=======
                   {tabs.map((tab) => (
                     <button
                       key={tab.id}
@@ -273,6 +304,7 @@ const CreateExam = () => {
                       <span>{tab.label}</span>
                     </button>
                   ))}
+>>>>>>> b17866806b583c8779b5f1780e56ea36ea6366c4
                 </div>
 
                 {/* Tab Description */}
