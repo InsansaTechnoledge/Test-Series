@@ -261,9 +261,26 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
       {(form.type === "mcq" || form.type === "msq") && (
         <div className="space-y-2">
           <label className={LabelCommon}>Options</label>
-          <div>
-            <span className="text-sm text-white">Select Correct Option</span>
+          <div className="mb-3">
+            <p
+              className={`text-sm ${
+                theme === "light" ? "text-gray-600" : "text-gray-300"
+              }`}
+            >
+              Enter your options below, then click to select the correct
+              answer(s)
+            </p>
           </div>
+          <div>
+            <span
+              className={`text-sm font-semibold ${
+                theme === "light" ? "text-gray-600" : "text-gray-300"
+              }`}
+            >
+              Select Correct Option
+            </span>
+          </div>
+
           {form.options.map((opt, i) => {
             const isChecked =
               form.type === "mcq"
@@ -273,8 +290,14 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
             return (
               <div
                 key={i}
-                className={`flex items-center gap-3 p-2 rounded-xl transition-all cursor-pointer ${
-                  isChecked ? "bg-green-100 border border-green-600" : ""
+                className={`flex items-center gap-3 p-3 rounded-lg border transition-colors cursor-pointer ${
+                  isChecked
+                    ? theme === "light"
+                      ? "bg-blue-50 border-blue-200"
+                      : "bg-blue-900/20 border-blue-700"
+                    : theme === "light"
+                    ? "bg-white border-gray-200 hover:border-gray-300"
+                    : "bg-gray-800 border-gray-700 hover:border-gray-600"
                 }`}
                 onClick={() => {
                   if (form.type === "mcq") {
@@ -294,12 +317,59 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
                   }
                 }}
               >
-                <input type="checkbox" checked={isChecked} readOnly />
+                <div
+                  className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors ${
+                    isChecked
+                      ? "bg-blue-500 border-blue-500"
+                      : theme === "light"
+                      ? "border-gray-300"
+                      : "border-gray-600"
+                  }`}
+                >
+                  {isChecked && (
+                    <svg
+                      className="w-2.5 h-2.5 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={3}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  )}
+                </div>
+
+                <span
+                  className={`text-sm font-medium min-w-[20px] ${
+                    isChecked
+                      ? theme === "light"
+                        ? "text-blue-600"
+                        : "text-blue-400"
+                      : theme === "light"
+                      ? "text-gray-500"
+                      : "text-gray-400"
+                  }`}
+                >
+                  {String.fromCharCode(97 + i).toUpperCase()}.
+                </span>
+
                 <input
-                  className={inputCommon}
+                  className={`${inputCommon} flex-1 py-1.5 px-2 rounded border transition-colors ${
+                    isChecked
+                      ? theme === "light"
+                        ? "bg-blue-50/50 border-blue-200"
+                        : "bg-blue-900/10 border-blue-700"
+                      : theme === "light"
+                      ? "bg-gray-50 border-gray-200 focus:border-blue-400"
+                      : "bg-gray-700 border-gray-600 focus:border-blue-500"
+                  }`}
                   placeholder={`Option ${i + 1}`}
                   value={opt}
-                  onClick={(e) => e.stopPropagation()} // stop outer div click
+                  onClick={(e) => e.stopPropagation()}
                   onChange={(e) => handleOptionsChange(i, e.target.value)}
                 />
               </div>
@@ -309,7 +379,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
       )}
 
       {/* Correct Option(s) */}
-      {form.type === "mcq" && (
+      {/* {form.type === "mcq" && (
         <input
           className={inputCommon}
           type="number"
@@ -320,9 +390,9 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
           min={0}
           max={form.options.length - 1}
         />
-      )}
+      )} */}
 
-      {form.type === "msq" && (
+      {/* {form.type === "msq" && (
         <input
           className={inputCommon}
           placeholder="Correct Option Indexes (comma-separated)"
@@ -334,7 +404,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
             setForm((prev) => ({ ...prev, correct_options: values }));
           }}
         />
-      )}
+      )} */}
 
       {/* Fill / Numerical Answer */}
       {(form.type === "fill" || form.type === "numerical") && (
@@ -562,7 +632,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
             )}
 
             {/* MCQ correct index */}
-            {form.sub_form.type === "mcq" && (
+            {/* {form.sub_form.type === "mcq" && (
               <input
                 type="number"
                 className={inputCommon}
@@ -578,10 +648,10 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
                   }))
                 }
               />
-            )}
+            )} */}
 
             {/* MSQ correct options */}
-            {form.sub_form.type === "msq" && (
+            {/* {form.sub_form.type === "msq" && (
               <input
                 className={inputCommon}
                 placeholder="Correct options (comma-separated)"
@@ -597,7 +667,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
                   }))
                 }
               />
-            )}
+            )} */}
 
             {/* Fill / Numerical */}
             {(form.sub_form.type === "fill" ||

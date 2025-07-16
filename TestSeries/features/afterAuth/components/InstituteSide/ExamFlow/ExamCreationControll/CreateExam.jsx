@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Banner from "../../../../../../assests/Institute/create exam.svg";
+import { Edit3, Upload } from "lucide-react";
 import { useUser } from "../../../../../../contexts/currentUserContext";
 import { useCachedOrganization } from "../../../../../../hooks/useCachedOrganization";
 import useLimitAccess from "../../../../../../hooks/useLimitAccess";
@@ -27,6 +28,8 @@ const CreateExam = () => {
   const location = useLocation();
   const { theme } = useTheme();
   const { toasts, showToast, removeToast } = useToast();
+  const [activeTab, setActiveTab] = useState("manual");
+
   const canCreateMoreExams = useLimitAccess(
     getFeatureKeyFromLocation(location.pathname),
     "totalExams"
@@ -39,7 +42,20 @@ const CreateExam = () => {
     keyFromPageOrAction: "actions.deleteExam",
     location: location.pathname,
   });
-
+  const tabs = [
+    {
+      id: "manual",
+      label: "Manual Entry",
+      icon: Edit3,
+      description: "Create questions one by one with full control",
+    },
+    {
+      id: "bulk",
+      label: "Bulk Upload",
+      icon: Upload,
+      description: "Upload multiple questions using Excel spreadsheet",
+    },
+  ];
   const organization =
     user.role !== "organization"
       ? useCachedOrganization({
@@ -222,67 +238,187 @@ const CreateExam = () => {
             </h2>
 
             <div
-              className={` p-6 rounded-lg mb-6 ${
-                theme == "light" ? "bg-gray-50" : "bg-gray-800"
+              className={`p-6 rounded-lg mb-6 ${
+                theme === "light" ? "bg-gray-50" : "bg-gray-800"
               }`}
             >
-              <div
-                className={`flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4  ${
-                  theme == "light" ? "bg-gray-50" : "bg-gray-800"
-                }`}
-              >
+              {/* Tab Navigation */}
+              <div className="mb-6">
                 <div
-                  className={`flex-1  rounded-xl p-6 shadow-2xl transition ${
-                    theme == "light" ? "bg-gray-50" : "bg-gray-800"
+                  className={`flex space-x-1 p-1 rounded-lg ${
+                    theme === "light" ? "bg-gray-200" : "bg-gray-700"
                   }`}
                 >
-                  <h3
-                    className={`text-lg font-medium mb-2  ${
-                      theme == "light" ? "text-black" : "text-gray-100"
-                    }`}
-                  >
-                    Option 1: Manual Entry
-                  </h3>
-                  <p
-                    className={`mb-4 ${
-                      theme == "light" ? "text-gray-500" : "text-gray-500"
-                    }`}
-                  >
-                    Create questions one by one with full control over each
-                    question's details.
-                  </p>
-                  <ManualQuestionForm
-                    setQuestions={setQuestions}
-                    organizationId={examDetails.organization_id} // ✅ pass this down!
-                  />
+                  {tabs.map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`
+            flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md font-medium transition-all duration-200
+            ${
+              activeTab === tab.id
+                ? theme === "light"
+                  ? "bg-white text-blue-600 shadow-sm"
+                  : "bg-gray-800 text-blue-400 shadow-sm"
+                : theme === "light"
+                ? "text-gray-600 hover:text-gray-800 hover:bg-gray-100"
+                : "text-gray-400 hover:text-gray-200 hover:bg-gray-600"
+            }
+          `}
+                    >
+                      {/* <span className="text-lg">{tab.icon}</span> */}
+                      <span className="text-lg">
+                        <tab.icon size={16} />
+                      </span>
+                      <span>{tab.label}</span>
+                    </button>
+                  ))}
                 </div>
 
+                {/* Tab Description */}
+                <div className="mt-4 text-center">
+                  <p
+                    className={`text-sm ${
+                      theme === "light" ? "text-gray-600" : "text-gray-400"
+                    }`}
+                  >
+                    {tabs.find((tab) => tab.id === activeTab)?.description}
+                  </p>
+                </div>
+              </div>
+
+              {/* Tab Content */}
+              <div className="relative">
+                {/* Manual Entry Tab */}
                 <div
-                  className={`flex-1 shadow-2xl  rounded-lg p-6 transition    ${
-                    theme == "light"
-                      ? "bg-gray-50"
-                      : "bg-gray-800 border-gray-800 border"
+                  className={`transition-all duration-300 ${
+                    activeTab === "manual"
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 translate-y-4 absolute inset-0 pointer-events-none"
                   }`}
                 >
-                  <h3
-                    className={`text-lg font-medium mb-2  ${
-                      theme == "light" ? "text-black" : "text-gray-100"
+                  <div
+                    className={`rounded-xl p-6 shadow-2xl transition-all duration-200 hover:shadow-3xl ${
+                      theme === "light"
+                        ? "bg-white border border-gray-100"
+                        : "bg-gray-900 border border-gray-700"
                     }`}
                   >
-                    Option 2: Bulk Upload
-                  </h3>
-                  <p
-                    className={`mb-4 ${
-                      theme == "light" ? "text-gray-500" : "text-gray-500"
+                    <div className="flex items-center gap-3 mb-4">
+                      <div
+                        className={`p-2 rounded-lg ${
+                          theme === "light"
+                            ? "bg-blue-50 text-blue-600"
+                            : "bg-blue-900/30 text-blue-400"
+                        }`}
+                      >
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                          />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3
+                          className={`text-lg font-semibold ${
+                            theme === "light"
+                              ? "text-gray-900"
+                              : "text-gray-100"
+                          }`}
+                        >
+                          Manual Entry
+                        </h3>
+                        <p
+                          className={`text-sm ${
+                            theme === "light"
+                              ? "text-gray-500"
+                              : "text-gray-400"
+                          }`}
+                        >
+                          Craft each question with precision and control
+                        </p>
+                      </div>
+                    </div>
+
+                    <ManualQuestionForm
+                      setQuestions={setQuestions}
+                      organizationId={examDetails.organization_id}
+                    />
+                  </div>
+                </div>
+
+                {/* Bulk Upload Tab */}
+                <div
+                  className={`transition-all duration-300 ${
+                    activeTab === "bulk"
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 translate-y-4 absolute inset-0 pointer-events-none"
+                  }`}
+                >
+                  <div
+                    className={`rounded-xl p-6 shadow-2xl transition-all duration-200 hover:shadow-3xl ${
+                      theme === "light"
+                        ? "bg-white border border-gray-100"
+                        : "bg-gray-900 border border-gray-700"
                     }`}
                   >
-                    Upload multiple questions at once using an Excel
-                    spreadsheet.
-                  </p>
-                  <BulkUpload
-                    setQuestions={setQuestions}
-                    organizationId={examDetails.organization_id}
-                  />
+                    <div className="flex items-center gap-3 mb-4">
+                      <div
+                        className={`p-2 rounded-lg ${
+                          theme === "light"
+                            ? "bg-green-50 text-green-600"
+                            : "bg-green-900/30 text-green-400"
+                        }`}
+                      >
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                          />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3
+                          className={`text-lg font-semibold ${
+                            theme === "light"
+                              ? "text-gray-900"
+                              : "text-gray-100"
+                          }`}
+                        >
+                          Bulk Upload
+                        </h3>
+                        <p
+                          className={`text-sm ${
+                            theme === "light"
+                              ? "text-gray-500"
+                              : "text-gray-400"
+                          }`}
+                        >
+                          Import multiple questions efficiently from Excel
+                        </p>
+                      </div>
+                    </div>
+
+                    <BulkUpload
+                      setQuestions={setQuestions}
+                      organizationId={examDetails.organization_id}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
