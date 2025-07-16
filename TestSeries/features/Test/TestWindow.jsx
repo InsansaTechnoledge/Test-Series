@@ -18,6 +18,7 @@ import LoadingTest from "./LoadingTest";
 import WarningHeaderForExams from "./utils/WarningHeaderForExams";
 import { useCallback } from "react";
 import { useExamManagement } from "../../hooks/UseExam";
+import BioBreakTimerUI from "./TestTimer/BioBreakTimerUI";
 
 const TestWindow = () => {
   const [eventDetails, setEventDetails] = useState();
@@ -31,6 +32,9 @@ const TestWindow = () => {
   const [isInitialSetupComplete, setIsInitialSetupComplete] = useState(false);
   const [isSecurityHookInitialized, setIsSecurityHookInitialized] =
     useState(false);
+
+  const [bioBreakTimeLeft, setBioBreakTimeLeft] = useState(0);
+  const bioBreakIntervalRef = useRef(null);
 
   const examContainerRef = useRef(null);
   const { user } = useUser();
@@ -386,6 +390,13 @@ const TestWindow = () => {
     isInitialSetupComplete,
     isSecurityHookInitialized,
   ]);
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60)
+      .toString()
+      .padStart(2, "0");
+    const s = (seconds % 60).toString().padStart(2, "0");
+    return `${m}:${s}`;
+  };
 
   const handleSubmitTest = useCallback(async () => {
     try {
@@ -504,8 +515,8 @@ const TestWindow = () => {
     const eventId = "default";
 
     try {
-      // Add toast notification for bio break start
       setIsPaused(true);
+      setBioBreakTimeLeft(durationInMs / 1000); // in seconds
 
       addToast(
         "Bio break started",
@@ -514,66 +525,30 @@ const TestWindow = () => {
         durationInMs
       );
 
-      // Stop the proctor engine with proper error handling
       if (window?.electronAPI?.stopProctorEngine) {
-        console.log("⏸️ Stopping Proctor Engine...");
-
-        // Use await if the function returns a promise
-        const result = await window.electronAPI.stopProctorEngine();
-        console.log("Proctor engine stopped:", result);
-      } else {
-        console.error("stopProctorEngine not available");
-        addToast(
-          "Error",
-          "error",
-          "Unable to stop proctor engine - function not available",
-          3000
-        );
-        return;
+        await window.electronAPI.stopProctorEngine();
       }
 
-      // Set a timeout to restart the proctor engine
-      const restartTimeout = setTimeout(async () => {
-        try {
-          if (window?.electronAPI?.startProctorEngine) {
-            console.log("▶️ Restarting Proctor Engine...");
-
-            // Use await if the function returns a promise
-            const result = await window.electronAPI.startProctorEngine(
-              examId,
-              eventId
-            );
-            console.log("Proctor engine restarted:", result);
-            setIsPaused(false);
-            addToast(
-              "Bio break ended",
-              "info",
-              "Proctor monitoring resumed",
-              3000
-            );
-          } else {
-            console.error("startProctorEngine not available");
-            addToast(
-              "Error",
-              "error",
-              "Unable to restart proctor engine - function not available",
-              5000
-            );
+      // Start countdown timer
+      if (bioBreakIntervalRef.current)
+        clearInterval(bioBreakIntervalRef.current);
+      bioBreakIntervalRef.current = setInterval(() => {
+        setBioBreakTimeLeft((prev) => {
+          if (prev <= 1) {
+            clearInterval(bioBreakIntervalRef.current);
+            return 0;
           }
-        } catch (error) {
-          console.error("Error restarting proctor engine:", error);
-          addToast(
-            "Error",
-            "error",
-            "Failed to restart proctor engine after bio break",
-            5000
-          );
-        }
-      }, durationInMs);
+          return prev - 1;
+        });
+      }, 1000);
 
-      // Store the timeout ID so it can be cleared if needed
-      // You might want to store this in component state if you need to cancel it
-      window.bioBreakTimeout = restartTimeout;
+      setTimeout(async () => {
+        if (window?.electronAPI?.startProctorEngine) {
+          await window.electronAPI.startProctorEngine(examId, eventId);
+        }
+        setIsPaused(false);
+        addToast("Bio break ended", "info", "Proctor monitoring resumed", 3000);
+      }, durationInMs);
     } catch (error) {
       console.error("Error during bio break:", error);
       addToast("Error", "error", "Failed to initiate bio break", 3000);
@@ -708,13 +683,22 @@ const TestWindow = () => {
             />
           </div>
 
+          {isPaused && bioBreakTimeLeft > 0 && (
+            <BioBreakTimerUI
+              formatTime={formatTime}
+              bioBreakTimeLeft={bioBreakTimeLeft}
+            />
+          )}
+
           <QuestionSection
             selectedQuestion={selectedQuestion}
-            setSelectedQuestion={setSelectedQuestion}
+            setSelectedQuestion={isPaused ? () => {} : setSelectedQuestion}
             subjectSpecificQuestions={subjectSpecificQuestions}
-            setSubjectSpecificQuestions={setSubjectSpecificQuestions}
+            setSubjectSpecificQuestions={
+              isPaused ? () => {} : setSubjectSpecificQuestions
+            }
             selectedSubject={selectedSubject}
-            handleSubmitTest={handleSubmitTest}
+            handleSubmitTest={isPaused ? () => {} : handleSubmitTest}
           />
         </div>
 
@@ -733,11 +717,13 @@ const TestWindow = () => {
           <div className="w-full py-3 px-2">
             <QuestionListSection
               selectedSubject={selectedSubject}
-              setSelectedSubject={setSelectedSubject}
+              setSelectedSubject={isPaused ? () => {} : setSelectedSubject}
               selectedQuestion={selectedQuestion}
-              setSelectedQuestion={setSelectedQuestion}
+              setSelectedQuestion={isPaused ? () => {} : setSelectedQuestion}
               subjectSpecificQuestions={subjectSpecificQuestions}
-              setSubjectSpecificQuestions={setSubjectSpecificQuestions}
+              setSubjectSpecificQuestions={
+                isPaused ? () => {} : setSubjectSpecificQuestions
+              }
               eventDetails={eventDetails}
             />
           </div>
