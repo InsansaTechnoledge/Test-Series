@@ -21,7 +21,8 @@ const getBaseURL = () => {
     window.location.hostname === "localhost" ||
     window.location.hostname === "127.0.0.1"
   ) {
-    return "https://test-series-backup-server1.onrender.com/api";
+    // return "https://test-series-backup-server1.onrender.com/api";
+    return "http://localhost:8000/api";
   }
   // Production URL - use current server from array
   return PRODUCTION_SERVERS[currentServerIndex];
