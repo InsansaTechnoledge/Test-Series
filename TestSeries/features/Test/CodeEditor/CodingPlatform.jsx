@@ -46,16 +46,32 @@ const CodingPlatform = () => {
   const SECRET_KEY_CONTEST =
     import.meta.env.VITE_SECRET_KEY_FOR_CONTEST || VITE_SECRET_KEY_FOR_CONTEST;
 
-  const contest_id = useMemo(() => {
-    try {
-      return CryptoJS.AES.decrypt(decodedId, SECRET_KEY_CONTEST).toString(
-        CryptoJS.enc.Utf8
-      );
-    } catch (error) {
-      console.error("Error decrypting contestId:", error);
-      return null;
-    }
-  }, [decodedId, SECRET_KEY_CONTEST]);
+  const contestData = useMemo(() => {
+  try {
+    const decrypted = CryptoJS.AES.decrypt(
+      decodedId,
+      SECRET_KEY_CONTEST
+    ).toString(CryptoJS.enc.Utf8);
+
+    if (!decrypted) throw new Error("Empty decrypted string");
+
+    return JSON.parse(decrypted);
+  } catch (error) {
+    console.error("Error decrypting contest data:", error);
+    return null;
+  }
+}, [decodedId, SECRET_KEY_CONTEST]);
+
+  const contest_id = contestData?.contest_id;
+  const duration = contestData?.duration;
+
+
+  useEffect(() => {
+  if (!contestData) {
+    showToast("Invalid contest data. Please check your link.", "error");
+  }
+}, [contestData]);
+
 
   useEffect(() => {
     if (!contest_id) {
@@ -237,45 +253,7 @@ const CodingPlatform = () => {
     setOutputTab("testcase");
   };
 
-  const SaveCode = async () => {
-    setIsRunning(true);
-    setErrors([]);
-    try {
-      if (!problem || !problem.code_snippets) {
-        setErrors(["No problem or code snippets defined!"]);
-        setIsRunning(false);
-        return;
-      }
-      const currentLang = languages.find((l) => l.value === language);
-      if (!currentLang) {
-        setErrors(["Unsupported language selected!"]);
-        setIsRunning(false);
-        return;
-      }
-      const marksForEachTestCase = problem.marks / problem.test_cases.length;
-      localStorage.setItem(
-        `contest_${contest_id}_problem_${problem.question_id}_code`,
-        code
-      );
-      localStorage.setItem(
-        `contest_${contest_id}_problem_${problem.question_id}_language`,
-        language
-      );
-      localStorage.setItem(
-        `contest_${contest_id}_problem_${problem.question_id}_testResults`,
-        testResults.passedCount * marksForEachTestCase || 0
-      );
-    } catch (error) {
-      console.error("SaveCode error:", error);
-      setErrors(["Code saving failed: " + error.message]);
-    } finally {
-      setIsRunning(false);
-    }
-    setOutputTab("testcase");
-  };
-  console.log("Contest ID:", contest_id);
-  console.log("Problems:", problems);
-
+  
   const submitContest = async () => {
     const studentResult = {
       results: problems.map((problem) => ({
@@ -336,168 +314,7 @@ const CodingPlatform = () => {
           studentResult={resultPageData.studentResult}
         />
       )}
-      {/* 
-      {!showResultPage && !resultPageData && (
-        <div
-          className={` flex flex-col m-6 ${
-            theme === "light" ? "" : "bg-gray-700"
-          }`}
-        >
-          <HeaderComponent
-            problems={problems}
-            language={language}
-            setCurrentProblem={setCurrentProblem}
-            setLanguage={setLanguage}
-            currentProblem={currentProblem}
-            languages={languages}
-            runCode={runCode}
-            isRunning={isRunning}
-            runTests={runTests}
-            editorTheme={editorTheme}
-            setEditorTheme={setEditorTheme}
-            saveCode={SaveCode}
-            submitContest={submitContest}
-          />
-          <div className="flex-1 flex overflow-hidden">
-            <div
-              ref={leftPanel.containerRef}
-              className={`border-r flex flex-col ${
-                theme === "light"
-                  ? "bg-white border-gray-200"
-                  : "bg-gray-800 border-gray-700"
-      {!showResultPage && !resultPageData && (<div className={` flex flex-col m-6 ${theme === 'light' ? '' : 'bg-gray-700'}`}>
-        <HeaderComponent
-          problems={problems}
-          language={language}
-          setCurrentProblem={setCurrentProblem}
-          setLanguage={setLanguage}
-          currentProblem={currentProblem}
-          languages={languages}
-          runCode={runCode}
-          isRunning={isRunning}
-          runTests={runTests}
-          editorTheme={editorTheme}
-          setEditorTheme={setEditorTheme}
-          submitContest={submitContest}
-        />
-        <div className="flex-1 flex overflow-hidden">
-          <div
-            ref={leftPanel.containerRef}
-            className={`border-r flex flex-col ${theme === 'light'
-              ? 'bg-white border-gray-200'
-              : 'bg-gray-800 border-gray-700'
-              }`}
-              style={{ width: `${leftPanel.width}%` }}
-            >
-              <div
-                className={`flex border-b flex-shrink-0 ${
-                  theme === "light" ? "border-gray-200" : "border-gray-700"
-                }`}
-              >
-                <button
-                  onClick={() => setActiveTab("description")}
-                  className={`px-4 py-2 border-b-2 transition-all duration-300 ${
-                    activeTab === "description"
-                      ? theme === "light"
-                        ? "border-blue-500 text-blue-600 bg-gray-50"
-                        : "border-blue-400 text-blue-300 bg-gray-700"
-                      : theme === "light"
-                      ? "border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                      : "border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-700"
-                  }`}
-              >
-                Description
-              </button>
-
-            </div>
-            <div className="flex-1 overflow-hidden flex flex-col">
-              {activeTab === 'description' && <ProblemDescription problem={problem} />}
-
-            </div>
-          </div>
-          <VerticalDragHandle
-            onMouseDown={leftPanel.startResize}
-            isResizing={leftPanel.isResizing}
-          />
-          <div className="flex-1 flex flex-col overflow-hidden">
-            <div
-              style={{ height: `calc(100% - ${outputPanel.height}px)` }}
-              className="overflow-hidden"
-            >
-              <CodeEditor
-                code={code}
-                onChange={setCode}
-                language={language}
-                theme={editorTheme}
-                contest_id={contest_id}
-                question_id={problem?.question_id || ''}
-              />
-            </div>
-            <HorizontalDragHandle
-              onMouseDown={outputPanel.startResize}
-              isResizing={outputPanel.isResizing}
-            />
-            <div style={{ height: `${outputPanel.height}px` }}>
-              <OutputPanel
-                activeTab={outputTab}
-                setActiveTab={setOutputTab}
-                testResults={testResults}
-                isRunning={isRunning}
-                output={output}
-                errors={errors}
-                height={outputPanel.height}
-                testInput={testinput}
-              />
-            </div>
-          </div>
-        </div>
-      </div>)}
-                >
-                  Description
-                </button>
-              </div>
-              <div className="flex-1 overflow-hidden flex flex-col">
-                {activeTab === "description" && (
-                  <ProblemDescription problem={problem} />
-                )}
-              </div>
-            </div>
-            <VerticalDragHandle
-              onMouseDown={leftPanel.startResize}
-              isResizing={leftPanel.isResizing}
-            />
-            <div className="flex-1 flex flex-col overflow-hidden">
-              <div
-                style={{ height: `calc(100% - ${outputPanel.height}px)` }}
-                className="overflow-hidden"
-              >
-                <CodeEditor
-                  code={code}
-                  onChange={setCode}
-                  language={language}
-                  theme={editorTheme}
-                />
-              </div>
-              <HorizontalDragHandle
-                onMouseDown={outputPanel.startResize}
-                isResizing={outputPanel.isResizing}
-              />
-              <div style={{ height: `${outputPanel.height}px` }}>
-                <OutputPanel
-                  activeTab={outputTab}
-                  setActiveTab={setOutputTab}
-                  testResults={testResults}
-                  isRunning={isRunning}
-                  output={output}
-                  errors={errors}
-                  height={outputPanel.height}
-                  testInput={testinput}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      )} */}
+     
       {!showResultPage && !resultPageData && (
         <div
           className={`flex flex-col m-6 ${
@@ -505,6 +322,8 @@ const CodingPlatform = () => {
           }`}
         >
           <HeaderComponent
+          contest_id={contest_id}
+          duration={duration}
             problems={problems}
             language={language}
             setCurrentProblem={setCurrentProblem}
@@ -516,7 +335,6 @@ const CodingPlatform = () => {
             runTests={runTests}
             editorTheme={editorTheme}
             setEditorTheme={setEditorTheme}
-            saveCode={SaveCode}
             submitContest={submitContest}
           />
 
