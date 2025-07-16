@@ -42,6 +42,7 @@ const ContestInstructionWindow = () => {
     const contestData = contestMap?.[contestId];
 
     if (contestData) {
+      console.log("Contest data found:", contestData);
       setContest(contestData);
     }
 
@@ -58,11 +59,18 @@ const ContestInstructionWindow = () => {
       showToast("Please accept the contest guidelines to proceed.", "error");
       return;
     }
-    const encryptedId = CryptoJS.AES.encrypt(
-      contestId,
+    console.log(contest)
+    const payload=JSON.stringify({
+      contest_id: contestId,
+      duration:contest.duration ||0,
+    })
+    console.log("Payload to encrypt:", payload);
+    console.log("Secret key used for encryption:", SECRET_KEY_CONTEST);
+    const encryptedPayload = CryptoJS.AES.encrypt(
+      payload,
       SECRET_KEY_CONTEST
     ).toString();
-    const safeId = encodeURIComponent(encryptedId);
+    const safeId = encodeURIComponent(encryptedPayload);
     navigate(`/student/code/${safeId}`);
   };
   const { theme } = useTheme();

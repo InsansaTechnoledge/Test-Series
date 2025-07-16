@@ -79,6 +79,30 @@ const QuestionSection = ({
       return () => clearTimeout(timeout);
     }
   }, [submitted, navigate]);
+  //Sanjana
+    useEffect(() => {
+    if (!selectedQuestion || !subjectSpecificQuestions) return;
+
+    const currentQuestion = selectedQuestion;
+    const originalSubject = currentQuestion.originalSubject || currentQuestion.subject;
+
+    setSubjectSpecificQuestions((prev) => ({
+        ...prev,
+        [originalSubject]: prev[originalSubject].map((q) =>
+            q.id === currentQuestion.id
+                ? {
+                    ...q,
+                    response: option,
+                    ...(isAnswered
+                        ? q.status === 'markedForReview'
+                            ? { status: 'markedForReview' }
+                            : { status: 'answered' }
+                        : { status: 'unanswered' }),
+                }
+                : q
+        ),
+    }));
+}, [option]);
 
   // Early return if dependencies are not ready
   if (!selectedQuestion || !subjectSpecificQuestions) {
@@ -173,14 +197,14 @@ const QuestionSection = ({
       [originalSubject]: prev[originalSubject].map((q) =>
         q.id === selectedQuestion.id
           ? {
-              ...q,
-              response: option,
-              ...(isAnswered
-                ? q.status === "markedForReview"
-                  ? null
-                  : { status: "answered" }
-                : { status: "unanswered" }),
-            }
+            ...q,
+            response: option,
+            ...(isAnswered
+              ? q.status === "markedForReview"
+                ? null
+                : { status: "answered" }
+              : { status: "unanswered" }),
+          }
           : q
       ),
     }));
@@ -199,10 +223,10 @@ const QuestionSection = ({
       [originalSubject]: prev[originalSubject].map((q) =>
         q.id === selectedQuestion.id
           ? {
-              ...q,
-              response: isAnswered ? option : null,
-              status: "markedForReview",
-            }
+            ...q,
+            response: isAnswered ? option : null,
+            status: "markedForReview",
+          }
           : q
       ),
     }));
@@ -221,11 +245,11 @@ const QuestionSection = ({
       [originalSubject]: prev[originalSubject].map((q) =>
         q.id === selectedQuestion.id
           ? {
-              ...q,
-              ...(isAnswered
-                ? { status: "answered" }
-                : { status: "unanswered" }),
-            }
+            ...q,
+            ...(isAnswered
+              ? { status: "answered" }
+              : { status: "unanswered" }),
+          }
           : q
       ),
     }));
@@ -268,35 +292,31 @@ const QuestionSection = ({
 
   return (
     <div
-      className={`relative w-full flex flex-col justify-between gap-6 ${
-        theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-gray-900"
-      }`}
+      className={`relative w-full flex flex-col justify-between gap-6 ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-gray-900"
+        }`}
     >
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 px-4 py-1">
         <div className="flex items-center gap-4">
           <div
-            className={`px-5 py-1 rounded-full text-sm font-medium m-1 ${
-              theme === "dark"
+            className={`px-5 py-1 rounded-full text-sm font-medium m-1 ${theme === "dark"
                 ? "bg-blue-900 text-blue-200 border border-blue-700"
                 : "bg-blue-100 text-blue-800 border border-blue-300"
-            }`}
+              }`}
           >
             {questionSubject}
           </div>
         </div>
         <div
-          className={`text-sm ${
-            theme === "dark" ? "text-gray-300" : "text-gray-600"
-          }`}
+          className={`text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-600"
+            }`}
         >
           {questionNumber} of {allQuestions.length}
         </div>
       </div>
 
       <div
-        className={`flex-1 ${
-          theme === "dark" ? "bg-gray-800" : "bg-gray-50"
-        } rounded-lg`}
+        className={`flex-1 ${theme === "dark" ? "bg-gray-800" : "bg-gray-50"
+          } rounded-lg`}
       >
         {(() => {
           switch (selectedQuestion.question_type) {
@@ -376,15 +396,14 @@ const QuestionSection = ({
             onClick={handlePrevious}
             disabled={currentQuestionIndex <= 0}
             className={`px-4 py-2 rounded-md font-semibold border transition-all duration-200
-                            ${
-                              theme === "light"
-                                ? currentQuestionIndex <= 0
-                                  ? "bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed"
-                                  : "bg-gray-100 text-gray-800 border-gray-300 hover:bg-gray-200"
-                                : currentQuestionIndex <= 0
-                                ? "bg-gray-700 text-gray-400 border-gray-600 cursor-not-allowed"
-                                : "bg-gray-800 text-white border-gray-600 hover:bg-gray-700"
-                            }
+                            ${theme === "light"
+                ? currentQuestionIndex <= 0
+                  ? "bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed"
+                  : "bg-gray-100 text-gray-800 border-gray-300 hover:bg-gray-200"
+                : currentQuestionIndex <= 0
+                  ? "bg-gray-700 text-gray-400 border-gray-600 cursor-not-allowed"
+                  : "bg-gray-800 text-white border-gray-600 hover:bg-gray-700"
+              }
                         `}
           >
             Previous
@@ -393,11 +412,10 @@ const QuestionSection = ({
           <button
             onClick={() => setOption(handleClearResponse(selectedQuestion))}
             className={`px-4 py-2 rounded-md font-semibold border transition-all duration-200
-                            ${
-                              theme === "light"
-                                ? "bg-blue-100 text-blue-700 border-blue-300 hover:bg-blue-200"
-                                : "bg-blue-950 text-blue-200 border-blue-800 hover:bg-blue-900"
-                            }
+                            ${theme === "light"
+                ? "bg-blue-100 text-blue-700 border-blue-300 hover:bg-blue-200"
+                : "bg-blue-950 text-blue-200 border-blue-800 hover:bg-blue-900"
+              }
                         `}
           >
             Clear Response
@@ -407,11 +425,10 @@ const QuestionSection = ({
             <button
               onClick={handleUnMarkForReview}
               className={`px-4 py-2 rounded-md font-semibold transition-all duration-200
-                                ${
-                                  theme === "light"
-                                    ? "bg-yellow-200 text-yellow-800 hover:bg-yellow-300"
-                                    : "bg-yellow-600 text-white hover:bg-yellow-700"
-                                }
+                                ${theme === "light"
+                  ? "bg-yellow-200 text-yellow-800 hover:bg-yellow-300"
+                  : "bg-yellow-600 text-white hover:bg-yellow-700"
+                }
                             `}
             >
               Unmark for Review & Next
@@ -420,11 +437,10 @@ const QuestionSection = ({
             <button
               onClick={handleMarkForReview}
               className={`px-4 py-2 rounded-md font-semibold transition-all duration-200
-                                ${
-                                  theme === "light"
-                                    ? "bg-yellow-200 text-yellow-800 hover:bg-yellow-300"
-                                    : "bg-yellow-600 text-white hover:bg-yellow-700"
-                                }
+                                ${theme === "light"
+                  ? "bg-yellow-200 text-yellow-800 hover:bg-yellow-300"
+                  : "bg-yellow-600 text-white hover:bg-yellow-700"
+                }
                             `}
             >
               Mark for Review & Next
@@ -435,17 +451,16 @@ const QuestionSection = ({
             onClick={handleNext}
             disabled={currentQuestionIndex >= allQuestions.length - 1}
             className={`px-4 py-2 rounded-md font-semibold border transition-all duration-200
-                            ${
-                              theme === "light"
-                                ? currentQuestionIndex >=
-                                  allQuestions.length - 1
-                                  ? "bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed"
-                                  : "bg-gray-100 text-gray-800 border-gray-300 hover:bg-gray-200"
-                                : currentQuestionIndex >=
-                                  allQuestions.length - 1
-                                ? "bg-gray-700 text-gray-400 border-gray-600 cursor-not-allowed"
-                                : "bg-gray-800 text-white border-gray-600 hover:bg-gray-700"
-                            }
+                            ${theme === "light"
+                ? currentQuestionIndex >=
+                  allQuestions.length - 1
+                  ? "bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed"
+                  : "bg-gray-100 text-gray-800 border-gray-300 hover:bg-gray-200"
+                : currentQuestionIndex >=
+                  allQuestions.length - 1
+                  ? "bg-gray-700 text-gray-400 border-gray-600 cursor-not-allowed"
+                  : "bg-gray-800 text-white border-gray-600 hover:bg-gray-700"
+              }
                         `}
           >
             Next
@@ -456,11 +471,10 @@ const QuestionSection = ({
           <button
             onClick={() => setShowSubmitModal(true)}
             className={`px-6 py-2 rounded-md text-lg font-semibold shadow transition-all duration-200
-                          ${
-                            theme === "light"
-                              ? "bg-blue-900 text-white hover:bg-blue-800"
-                              : "bg-blue-700 text-white hover:bg-blue-600"
-                          }
+                          ${theme === "light"
+                ? "bg-blue-900 text-white hover:bg-blue-800"
+                : "bg-blue-700 text-white hover:bg-blue-600"
+              }
                         `}
           >
             Submit Test
