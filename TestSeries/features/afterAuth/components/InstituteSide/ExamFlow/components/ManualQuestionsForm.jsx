@@ -6,7 +6,8 @@ import CodeCreatorForm from "../../../../../Test/CodeEditor/codeCreator/codeCrea
 import { useTheme } from "../../../../../../hooks/useTheme";
 import { useToast, ToastContainer } from "../../../../../../utils/Toaster";
 
-const ManualQuestionForm = ({ setQuestions, organizationId }) => {
+const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
+  console.log('sdvsz',examDetails.subjects)
   const { user } = useUser();
   console.log("sdgv", user);
   const { toasts, showToast, removeToast } = useToast();
@@ -682,13 +683,21 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
 
       {/* Subject, Chapter, Explanation */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <input
-          className={inputCommon}
-          name="subject"
-          value={form.subject}
-          onChange={handleChange}
-          placeholder="Subject"
-        />
+      <select
+        className={inputCommon}
+        name="subject"
+        value={form.subject}
+        onChange={handleChange}
+      >
+        <option value="">-- Select Subject --</option>
+        {Array.isArray(examDetails.subjects) &&
+          examDetails.subjects.map((subj, idx) => (
+            <option key={idx} value={subj}>
+              {subj}
+            </option>
+          ))}
+      </select>
+
         <input
           className={inputCommon}
           name="chapter"

@@ -398,86 +398,86 @@ useEffect(() => {
     return <div>Loading...🥲</div>;
   }
 
-  const handleBioBreak = async (durationInMs) => {
-    const eventId = 'default';
+  // const handleBioBreak = async (durationInMs) => {
+  //   const eventId = 'default';
     
-    try {
-      // Add toast notification for bio break start
-      addToast(
-        'Bio break started',
-        'info',
-        `Proctor monitoring paused for ${durationInMs / 60000} minutes`,
-        durationInMs
-      );
+  //   try {
+  //     // Add toast notification for bio break start
+  //     addToast(
+  //       'Bio break started',
+  //       'info',
+  //       `Proctor monitoring paused for ${durationInMs / 60000} minutes`,
+  //       durationInMs
+  //     );
   
-      // Stop the proctor engine with proper error handling
-      if (window?.electronAPI?.stopProctorEngine) {
-        console.log("⏸️ Stopping Proctor Engine...");
+  //     // Stop the proctor engine with proper error handling
+  //     if (window?.electronAPI?.stopProctorEngine) {
+  //       console.log("⏸️ Stopping Proctor Engine...");
         
-        // Use await if the function returns a promise
-        const result = await window.electronAPI.stopProctorEngine();
-        console.log("Proctor engine stopped:", result);
-      } else {
-        console.error("stopProctorEngine not available");
-        addToast(
-          'Error',
-          'error',
-          'Unable to stop proctor engine - function not available',
-          3000
-        );
-        return;
-      }
+  //       // Use await if the function returns a promise
+  //       const result = await window.electronAPI.stopProctorEngine();
+  //       console.log("Proctor engine stopped:", result);
+  //     } else {
+  //       console.error("stopProctorEngine not available");
+  //       addToast(
+  //         'Error',
+  //         'error',
+  //         'Unable to stop proctor engine - function not available',
+  //         3000
+  //       );
+  //       return;
+  //     }
   
-      // Set a timeout to restart the proctor engine
-      const restartTimeout = setTimeout(async () => {
-        try {
-          if (window?.electronAPI?.startProctorEngine) {
-            console.log("▶️ Restarting Proctor Engine...");
+  //     // Set a timeout to restart the proctor engine
+  //     const restartTimeout = setTimeout(async () => {
+  //       try {
+  //         if (window?.electronAPI?.startProctorEngine) {
+  //           console.log("▶️ Restarting Proctor Engine...");
             
-            // Use await if the function returns a promise
-            const result = await window.electronAPI.startProctorEngine(examId, eventId);
-            console.log("Proctor engine restarted:", result);
+  //           // Use await if the function returns a promise
+  //           const result = await window.electronAPI.startProctorEngine(examId, eventId);
+  //           console.log("Proctor engine restarted:", result);
             
-            addToast(
-              'Bio break ended',
-              'info',
-              'Proctor monitoring resumed',
-              3000
-            );
-          } else {
-            console.error("startProctorEngine not available");
-            addToast(
-              'Error',
-              'error',
-              'Unable to restart proctor engine - function not available',
-              5000
-            );
-          }
-        } catch (error) {
-          console.error("Error restarting proctor engine:", error);
-          addToast(
-            'Error',
-            'error',
-            'Failed to restart proctor engine after bio break',
-            5000
-          );
-        }
-      }, durationInMs);
+  //           addToast(
+  //             'Bio break ended',
+  //             'info',
+  //             'Proctor monitoring resumed',
+  //             3000
+  //           );
+  //         } else {
+  //           console.error("startProctorEngine not available");
+  //           addToast(
+  //             'Error',
+  //             'error',
+  //             'Unable to restart proctor engine - function not available',
+  //             5000
+  //           );
+  //         }
+  //       } catch (error) {
+  //         console.error("Error restarting proctor engine:", error);
+  //         addToast(
+  //           'Error',
+  //           'error',
+  //           'Failed to restart proctor engine after bio break',
+  //           5000
+  //         );
+  //       }
+  //     }, durationInMs);
   
-      // Store the timeout ID so it can be cleared if needed
-      // You might want to store this in component state if you need to cancel it
-      window.bioBreakTimeout = restartTimeout;
+  //     // Store the timeout ID so it can be cleared if needed
+  //     // You might want to store this in component state if you need to cancel it
+  //     window.bioBreakTimeout = restartTimeout;
   
-    } catch (error) {
-      console.error("Error during bio break:", error);
-      addToast(
-        'Error',
-        'error',
-        'Failed to initiate bio break',
-        3000
-      );
-    }
-  };
+  //   } catch (error) {
+  //     console.error("Error during bio break:", error);
+  //     addToast(
+  //       'Error',
+  //       'error',
+  //       'Failed to initiate bio break',
+  //       3000
+  //     );
+  //   }
+  // };
   
   
   
@@ -516,7 +516,7 @@ useEffect(() => {
 
                 {/** BIO Break */}
 
-                {
+                {/* {
                   window?.electronAPI && (
                     <div className="flex items-center justify-center">
                       <div className={`rounded-xl shadow-sm px-4 py-2 w-full max-w-xs transition-all ${
@@ -548,7 +548,7 @@ useEffect(() => {
                       </div>
                     </div>
                   )
-                }
+                } */}
 
 
                 {/* Security Status Indicator */}
@@ -589,7 +589,7 @@ useEffect(() => {
 
         <div className='w-full lg:w-[25%] lg:block'>
           <div className="hidden lg:block">
-                       <TestHeader />
+            <TestHeader />
             <CountdownTimer 
               initialTime={eventDetails.duration} 
               handleSubmitTest={handleSubmitTest} 

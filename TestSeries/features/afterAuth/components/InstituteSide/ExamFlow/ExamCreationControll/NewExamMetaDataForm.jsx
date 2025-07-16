@@ -2,7 +2,8 @@ import React from 'react'
 import { Settings } from 'lucide-react';
 import ExamControllSettings from '../ExamControll/ExamControllSettings'
 
-const NewExamMetaDataForm = ({handleSubmit , theme , form , handleChange , batches , isExamControllOpen , setIsExamControllOpen , canAccessPage , canCreateMoreExams}) => {
+const NewExamMetaDataForm = ({handleSubmit , theme , form, setForm , handleChange , batches , isExamControllOpen , setIsExamControllOpen , canAccessPage , canCreateMoreExams}) => {
+    console.log("f", batches)
   return (
     <div>
        <div className="borderoverflow-hidden mb-8  rounded-3xl p-6 transform hover:scale-105 transition-all duration-300 ">
@@ -133,6 +134,52 @@ const NewExamMetaDataForm = ({handleSubmit , theme , form , handleChange , batch
                 ))}
             </select>
             </div>
+
+            {/* <p>{form.batch_id}</p> */}
+
+            {/* Select Subject */}
+
+            <div>
+            <label
+                className={`font-bold mb-3 flex items-center space-x-2 text-sm ${
+                theme === 'light' ? 'text-gray-800' : 'text-gray-100'
+                }`}
+            >
+                <span>Select Subjects to include in exam</span>
+            </label>
+
+            <select
+                multiple
+                name="subjects"
+                id="subjects"
+                className="w-full px-3 py-2 rounded-md border border-gray-300 h-40"
+                value={form.subjects}
+                onChange={(e) => {
+                    const selectedOptions = Array.from(e.target.selectedOptions).map(option => option.value);
+                    setForm(prev => ({ ...prev, subjects: selectedOptions }));
+                }}
+                >
+                <option disabled value="">Select Subjects</option>
+                {batches.find(batch => batch.id === form.batch_id)?.subjects?.map((subject, idx) => (
+                    <option key={idx} value={subject}>
+                    {subject}
+                    </option>
+                ))}
+            </select>
+            {form?.subjects?.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-2">
+                {form.subjects.map((subj, index) => (
+                <span
+                    key={index}
+                    className="bg-blue-100 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full"
+                >
+                    {subj}
+                </span>
+                ))}
+            </div>
+            )}
+            </div>
+
         </div>
 
         {/*Exam controll section */}

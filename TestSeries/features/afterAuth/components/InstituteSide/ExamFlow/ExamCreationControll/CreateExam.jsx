@@ -69,6 +69,7 @@ const CreateExam = () => {
           const res = await fetchExamById(examId);
 
           const matchedExam = res.data.find((e) => e.id === examId);
+          console.log("SD", matchedExam)
 
           if (!matchedExam) {
             console.warn("⚠️ No matching exam found!");
@@ -148,28 +149,11 @@ const CreateExam = () => {
               total_marks: "",
               duration: "",
               batch_id: "",
+              subjects: []
             }
           } // for edit form
         />
       ) : (
-        // <div className="bg-blue-50 p-6 rounded-3xl mb-6 shadow-lg ">
-        //   <div className="flex justify-between items-center ">
-        //     <div className=''>
-        //       <h2 className="text-xl font-semibold">{examDetails.name}</h2>
-        //       <p className="text-gray-600">
-        //         Date: {examDetails.date} |
-        //         Duration: {examDetails.duration} mins |
-        //         Total Marks: {examDetails.total_marks}
-        //       </p>
-        //     </div>
-        //     <button
-        //       onClick={() => setEditingExam(true)}
-        //       className="text-blue-600 hover:text-blue-800"
-        //     >
-        //       Edit
-        //     </button>
-        //   </div>
-        // </div>
         <div
           className={`p-6 rounded-3xl mb-6 shadow-lg ${
             theme === "light" ? "bg-blue-50" : "bg-gray-800"
@@ -192,6 +176,31 @@ const CreateExam = () => {
                 Date: {examDetails.date} | Duration: {examDetails.duration} mins
                 | Total Marks: {examDetails.total_marks}
               </p>
+
+              <p className={`${theme === "light" ? "text-gray-600" : "text-gray-300"}`}>
+                Date: {examDetails.date} | Duration: {examDetails.duration} mins | Total Marks: {examDetails.total_marks}
+              </p>
+
+              {Array.isArray(examDetails.subjects) && examDetails.subjects.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <p
+                    className={`font-semibold ${
+                      theme === "light" ? "text-gray-700" : "text-gray-200"
+                    }`}
+                  >
+                    Subjects:
+                  </p>
+                  {examDetails.subjects.map((subj, idx) => (
+                    <span
+                      key={idx}
+                      className="bg-indigo-100 text-indigo-800 text-sm font-medium px-3 py-1 rounded-full"
+                    >
+                      {subj} 
+                    </span>
+                  ))}
+                </div>
+              )}
+
             </div>
             {canEditExams && (
               <button
@@ -254,6 +263,7 @@ const CreateExam = () => {
                   <ManualQuestionForm
                     setQuestions={setQuestions}
                     organizationId={examDetails.organization_id} // ✅ pass this down!
+                    examDetails={examDetails}
                   />
                 </div>
 
