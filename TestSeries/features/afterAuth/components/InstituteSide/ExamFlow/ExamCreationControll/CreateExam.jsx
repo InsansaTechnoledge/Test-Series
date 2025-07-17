@@ -365,6 +365,7 @@ const CreateExam = () => {
                     <ManualQuestionForm
                       setQuestions={setQuestions}
                       organizationId={examDetails.organization_id}
+                       examDetails={examDetails}
                     />
                   </div>
                 </div>
