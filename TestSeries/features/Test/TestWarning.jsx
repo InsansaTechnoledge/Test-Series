@@ -24,6 +24,8 @@ const TestHeader = ({isAutoSubmittable}) => {
   const [allWarnings, setAllWarnings] = useState([]);
   const [showFinalPopup, setShowFinalPopup] = useState(false);
   const [showManualReviewMessage, setShowManualReviewMessage] = useState(false);
+
+  console.log("dfv",eventDetails?.subjects)
   
   // Organization stop toast states
   const [showOrgStopToast, setShowOrgStopToast] = useState(false);
@@ -310,10 +312,18 @@ const TestHeader = ({isAutoSubmittable}) => {
   }, [eventDetails]);
 
   useEffect(() => {
-    if (selectedSubject && subjectSpecificQuestions) {
+    if (
+      selectedSubject &&
+      subjectSpecificQuestions &&
+      Array.isArray(subjectSpecificQuestions[selectedSubject]) &&
+      subjectSpecificQuestions[selectedSubject].length > 0
+    ) {
       setSelectedQuestion(subjectSpecificQuestions[selectedSubject][0]);
+    } else {
+      setSelectedQuestion(null); // optional fallback
     }
-  }, [selectedSubject]);
+  }, [selectedSubject, subjectSpecificQuestions]);
+  
 
   useEffect(() => {
     if (submitted) {

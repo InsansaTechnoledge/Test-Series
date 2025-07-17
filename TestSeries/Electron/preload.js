@@ -334,3 +334,4 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Notify main process that renderer is ready
   rendererReady: () => ipcRenderer.send('renderer-ready')
 });
+

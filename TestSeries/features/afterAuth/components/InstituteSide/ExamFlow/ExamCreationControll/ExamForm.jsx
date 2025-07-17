@@ -23,6 +23,7 @@ const ExamForm = ({
     total_marks: "",
     duration: "",
     batch_id: "",
+    subjects: [], 
     auto_submittable: true,
     ai_proctored: false,
   },
@@ -101,6 +102,7 @@ const ExamForm = ({
           handleSubmit={handleSubmit}
           theme={theme}
           form={form}
+          setForm={setForm}
           handleChange={handleChange}
           batches={batches}
           isExamControllOpen={isExamControllOpen}
