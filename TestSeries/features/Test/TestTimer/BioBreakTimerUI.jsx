@@ -1,6 +1,11 @@
 import React from "react";
 
-const BioBreakTimerUI = ({ formatTime, bioBreakTimeLeft }) => {
+const BioBreakTimerUI = ({ formatTime, bioBreakTimeLeft , setBioBreakTimeLeft ,   setIsPaused}) => {
+
+  const handleContinueTest = () => {
+    setBioBreakTimeLeft(0);
+    setIsPaused(false);
+  }
   return (
     <>
       <div className="fixed inset-0 z-[1000] bg-black bg-opacity-80 backdrop-blur-sm flex items-center justify-center">
@@ -14,6 +19,9 @@ const BioBreakTimerUI = ({ formatTime, bioBreakTimeLeft }) => {
           <p className="text-white text-base md:text-lg opacity-75">
             Please wait... You cannot interact with the test during this time.
           </p>
+          <button className="bg-green-600 text-gray-100 px-3 py-2 rounded-2xl text-3xl cursor-pointer" onClick={() => handleContinueTest()}>
+            continue test
+          </button>
         </div>
       </div>
     </>

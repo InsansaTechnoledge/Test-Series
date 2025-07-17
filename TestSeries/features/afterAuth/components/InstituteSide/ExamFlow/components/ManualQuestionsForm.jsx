@@ -7,7 +7,7 @@ import { useTheme } from "../../../../../../hooks/useTheme";
 import { useToast, ToastContainer } from "../../../../../../utils/Toaster";
 
 const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
-  console.log('sdvsz',examDetails.subjects)
+  console.log('sdvsz',examDetails?.subjects)
   const { user } = useUser();
   console.log("sdgv", user);
   const { toasts, showToast, removeToast } = useToast();
@@ -760,8 +760,8 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
         onChange={handleChange}
       >
         <option value="">-- Select Subject --</option>
-        {Array.isArray(examDetails.subjects) &&
-          examDetails.subjects.map((subj, idx) => (
+        {Array.isArray(examDetails?.subjects) &&
+          examDetails?.subjects.map((subj, idx) => (
             <option key={idx} value={subj}>
               {subj}
             </option>

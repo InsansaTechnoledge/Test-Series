@@ -687,6 +687,8 @@ const TestWindow = () => {
             <BioBreakTimerUI
               formatTime={formatTime}
               bioBreakTimeLeft={bioBreakTimeLeft}
+              setBioBreakTimeLeft={setBioBreakTimeLeft}
+              setIsPaused={setIsPaused}
             />
           )}
 
