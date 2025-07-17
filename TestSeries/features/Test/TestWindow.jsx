@@ -490,6 +490,7 @@ useEffect(() => {
       <WarningHeaderForExams examViolations={examViolations} theme={theme} warningCount={warningCount}/>
 
       {/* Main Exam Interface */}
+     
       <div className={`py-16 flex min-h-screen flex-col lg:flex-row gap-2 mt-8`}>
         <div className='w-full lg:w-[80%] p-2 lg:p-4 gap-2 flex flex-col'>
           <div className={`p-4 rounded-md shadow-sm w-full border ${

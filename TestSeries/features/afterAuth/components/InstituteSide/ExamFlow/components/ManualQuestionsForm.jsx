@@ -215,6 +215,8 @@ const ManualQuestionForm = ({ setQuestions, organizationId }) => {
   const LabelCommon = `text-lg font-bold ${
     theme === "light" ? "text-gray-700" : "text-indigo-200"
   }`;
+
+  
   return (
     <div
       className={` backdrop-blur-md shadow-md rounded-2xl p-6 space-y-6  ${
