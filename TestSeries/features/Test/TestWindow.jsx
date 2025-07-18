@@ -41,6 +41,7 @@ const TestWindow = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const examId = searchParams.get("examId");
+  const isProctorRunning = searchParams.get("isProctorRunning") === "true";
   const { exams } = useExamManagement();
 
   const currentExam = exams.find((exam) => exam.id === examId);
@@ -672,7 +673,7 @@ const TestWindow = () => {
           </div>
 
           <div className="lg:hidden">
-            <TestHeader isAutoSubmittable={isAutoSubmittable} />
+            <TestHeader isAutoSubmittable={isAutoSubmittable} isProctorRunning={isProctorRunning} />
 
             <CountdownTimer
               initialTime={eventDetails.duration}

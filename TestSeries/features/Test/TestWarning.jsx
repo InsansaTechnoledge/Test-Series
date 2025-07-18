@@ -11,7 +11,7 @@ import LoadingTest from './LoadingTest';
 import { calculateResult } from './utils/resultCalculator';
 import { checkToStopExamForStudent } from '../../utils/services/proctorService';
 
-const TestHeader = ({isAutoSubmittable}) => {
+const TestHeader = ({ isAutoSubmittable,isProctorRunning }) => {
   const [eventDetails, setEventDetails] = useState();
   const [selectedQuestion, setSelectedQuestion] = useState();
   const [subjectSpecificQuestions, setSubjectSpecificQuestions] = useState();
@@ -25,24 +25,22 @@ const TestHeader = ({isAutoSubmittable}) => {
   const [showFinalPopup, setShowFinalPopup] = useState(false);
   const [showManualReviewMessage, setShowManualReviewMessage] = useState(false);
 
-  console.log("dfv",eventDetails?.subjects)
-  
   // Organization stop toast states
   const [showOrgStopToast, setShowOrgStopToast] = useState(false);
   const [orgStopCountdown, setOrgStopCountdown] = useState(5);
-  
+
   // New proctor-specific states
   const [proctorStatus, setProctorStatus] = useState('Not Started');
   const [proctorEvents, setProctorEvents] = useState([]);
   const [isElectronEnv, setIsElectronEnv] = useState(false);
-  
+
   // Add refs to prevent duplicate processing
   const warningProcessedRef = useRef(new Set());
   const countdownTimerRef = useRef(null);
   const warningTimeoutRef = useRef(null);
   const autoSubmitTriggeredRef = useRef(false);
   const orgStopTimerRef = useRef(null);
-  
+
   const { user } = useUser();
   const secretKey = import.meta.env.VITE_SECRET_KEY_FOR_TESTWINDOW || VITE_SECRET_KEY_FOR_TESTWINDOW;
   const location = useLocation();
@@ -62,7 +60,7 @@ const TestHeader = ({isAutoSubmittable}) => {
       setIsElectronEnv(isElectron);
       console.log('🔍 Electron environment detected:', isElectron);
     };
-    
+
     checkElectronEnv();
   }, []);
 
@@ -96,12 +94,10 @@ const TestHeader = ({isAutoSubmittable}) => {
       });
 
       window.electronAPI.onProctorEvent((event, data) => {
-        console.log('📥 Proctor event received:', data);
         handleProctorEvent(data);
       });
 
       window.electronAPI.onProctorLog((event, data) => {
-        console.log('📝 Proctor log:', data);
         setProctorStatus(data);
       });
 
@@ -111,7 +107,6 @@ const TestHeader = ({isAutoSubmittable}) => {
         eventId: examId
       };
 
-      console.log('🔧 Sending proctor params:', proctorParams);
 
       const result = await window.electronAPI.startProctorEngineAsync(proctorParams);
 
@@ -120,6 +115,8 @@ const TestHeader = ({isAutoSubmittable}) => {
         setProctorStatus('Running');
         console.log('✅ Proctor engine started successfully');
       } else {
+        setProctorRunning(isProctorRunning);
+         isProctorRunning ? setProctorStatus('Running') : setProctorStatus('Stopped');
         setProctorStatus(`Error: ${result.message}`);
         console.error('❌ Failed to start proctor engine:', result.message);
       }
@@ -132,49 +129,48 @@ const TestHeader = ({isAutoSubmittable}) => {
   const handleProctorWarning = (data) => {
     // Create a unique identifier for this warning
     const warningId = `${data.timestamp || Date.now()}-${data.eventType || 'unknown'}`;
-    
+
     // Prevent duplicate processing
     if (warningProcessedRef.current.has(warningId)) {
       console.log('⚠️ Duplicate warning ignored:', warningId);
       return;
     }
-    
+
     warningProcessedRef.current.add(warningId);
-    
+
     // Clean up old processed warnings (keep last 20)
     if (warningProcessedRef.current.size > 20) {
       const oldWarnings = Array.from(warningProcessedRef.current).slice(0, -20);
       oldWarnings.forEach(id => warningProcessedRef.current.delete(id));
     }
-    
+
     const warningMessage = data.details || data.eventType || 'Unknown warning';
     const timestamp = new Date(data.timestamp || Date.now()).toLocaleTimeString();
     const formattedWarning = `${timestamp}: ${warningMessage}`;
-    
-    console.log('🔔 Processing warning:', formattedWarning);
-    
+
+
     setWarning(warningMessage);
     setWarningCount(prev => {
       const newCount = prev + 1;
       console.log('📊 Warning count updated:', newCount);
-      
+
       // Check warning threshold immediately
       const MAX_WARNINGS_ALLOWED = 5;
       if (newCount >= MAX_WARNINGS_ALLOWED) {
         handleWarningThresholdReached();
       }
-      
+
       return newCount;
     });
-    
+
     setAllWarnings(prev => [...prev, formattedWarning]);
-    
+
     // Clear any existing countdown timer
     if (countdownTimerRef.current) {
       clearInterval(countdownTimerRef.current);
       countdownTimerRef.current = null;
     }
-    
+
     // Handle specific warning types
     if (warningMessage.includes('No face detected')) {
       setCountdown(10);
@@ -189,12 +185,12 @@ const TestHeader = ({isAutoSubmittable}) => {
         });
       }, 1000);
     }
-    
+
     // Clear any existing warning timeout
     if (warningTimeoutRef.current) {
       clearTimeout(warningTimeoutRef.current);
     }
-    
+
     // Auto-clear warning after 5 seconds
     warningTimeoutRef.current = setTimeout(() => {
       setWarning(null);
@@ -212,12 +208,12 @@ const TestHeader = ({isAutoSubmittable}) => {
       console.log('⚠️ Warning threshold already processed');
       return;
     }
-    
+
     autoSubmitTriggeredRef.current = true;
-    
+
     // FIXED: Use the computed autoSubmittable value
     console.log('🚨 Warning threshold reached. Auto-submittable:', autoSubmittable);
-    
+
     if (autoSubmittable === true) {
       console.log('🔄 Triggering auto-submit');
       setShowFinalPopup(true);
@@ -232,25 +228,25 @@ const TestHeader = ({isAutoSubmittable}) => {
   };
 
   const { theme } = useTheme();
-  
+
   const cleanupProctor = () => {
     // Clean up timers
     if (countdownTimerRef.current) {
       clearInterval(countdownTimerRef.current);
       countdownTimerRef.current = null;
     }
-    
+
     if (warningTimeoutRef.current) {
       clearTimeout(warningTimeoutRef.current);
       warningTimeoutRef.current = null;
     }
-    
+
     // Add cleanup for organization stop timer
     if (orgStopTimerRef.current) {
       clearInterval(orgStopTimerRef.current);
       orgStopTimerRef.current = null;
     }
-    
+
     if (window?.electronAPI) {
       window.electronAPI.cleanupProctorListeners();
       if (proctorRunning) {
@@ -323,7 +319,7 @@ const TestHeader = ({isAutoSubmittable}) => {
       setSelectedQuestion(null); // optional fallback
     }
   }, [selectedSubject, subjectSpecificQuestions]);
-  
+
 
   useEffect(() => {
     if (submitted) {
@@ -361,7 +357,12 @@ const TestHeader = ({isAutoSubmittable}) => {
     try {
       // Stop proctor engine before submitting
       if (isElectronEnv && proctorRunning) {
-        await window.electronAPI?.stopProctorEngineAsync();
+        // await window.electronAPI?.stopProctorEngineAsync();
+        if (window?.electronAPI?.stopProctorEngine)
+          await window.electronAPI.stopProctorEngine();
+        if (window?.electronAPI?.closeWindow)
+          await window.electronAPI.closeWindow();
+        console.log('✅ Proctor engine stopped successfully');
         setProctorRunning(false);
         setProctorStatus('Stopped');
       }
@@ -398,12 +399,10 @@ const TestHeader = ({isAutoSubmittable}) => {
         navigate('/student/completed-exams');
       }
 
-    } catch (err) { 
+    } catch (err) {
       console.error('Error submitting test:', err);
     }
 
-    if (window?.electronAPI?.stopProctorEngine) window.electronAPI.stopProctorEngine();
-    if (window?.electronAPI?.closeWindow) window.electronAPI.closeWindow();
   };
 
   // Enhanced useEffect with toast notification for organization stop
@@ -418,20 +417,20 @@ const TestHeader = ({isAutoSubmittable}) => {
     const intervalId = setInterval(async () => {
       try {
         const result = await checkToStopExamForStudent(user._id);
-        
+
         const stopExamValue = result?.stopExam || result?.data?.stopExam || result?.response?.stopExam;
         console.log("📊 stopExamValue:", stopExamValue, "type:", typeof stopExamValue);
-        
+
         if (stopExamValue === true || stopExamValue === "true" || stopExamValue === 1 || stopExamValue === "1") {
           console.log("⛔ Exam manually stopped by proctor - showing toast notification");
-          
-          
+
+
           clearInterval(intervalId);
-          
-         
+
+
           setShowOrgStopToast(true);
           setOrgStopCountdown(15);
-          
+
           // Start countdown timer
           orgStopTimerRef.current = setInterval(() => {
             setOrgStopCountdown(prev => {
@@ -440,7 +439,7 @@ const TestHeader = ({isAutoSubmittable}) => {
                 clearInterval(orgStopTimerRef.current);
                 orgStopTimerRef.current = null;
                 setShowOrgStopToast(false);
-                
+
                 console.log("🚀 Countdown finished - submitting test");
                 handleSubmitTest();
                 return 0;
@@ -471,7 +470,7 @@ const TestHeader = ({isAutoSubmittable}) => {
     setShowManualReviewMessage(false);
   };
 
-  if (!eventDetails) return <LoadingTest/>;
+  if (!eventDetails) return <LoadingTest />;
 
   if (isExamError) {
     return <div className='font-bold flex flex-col gap-8 mt-20 text-center'>
@@ -535,21 +534,19 @@ const TestHeader = ({isAutoSubmittable}) => {
       `}</style>
 
       {!eventDetails ? (
-        <div className={`flex justify-center items-center h-full text-lg font-medium ${
-          theme === 'light' ? 'text-gray-700' : 'text-gray-800'
-        }`}>
-          <LoadingTest/>
+        <div className={`flex justify-center items-center h-full text-lg font-medium ${theme === 'light' ? 'text-gray-700' : 'text-gray-800'
+          }`}>
+          <LoadingTest />
         </div>
       ) : (
         <>
           <div className="relative flex flex-col w-full sm:px-6">
             {/* Warning Banner */}
             {warning && (
-              <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-xl shadow-lg text-center w-[90%] sm:w-[500px] font-medium backdrop-blur-md ${
-                theme === 'light'
+              <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-xl shadow-lg text-center w-[90%] sm:w-[500px] font-medium backdrop-blur-md ${theme === 'light'
                   ? 'bg-amber-50/95 border border-amber-200 text-amber-900'
                   : 'bg-amber-900/95 border border-amber-700 text-amber-100'
-              }`}>
+                }`}>
                 <span className="text-xl mr-2">⚠️</span>
                 {warning === "No face detected" && countdown !== null
                   ? `You have ${countdown} sec to come back to the screen`
@@ -560,11 +557,10 @@ const TestHeader = ({isAutoSubmittable}) => {
             {/* Organization Stop Toast Notification */}
             {showOrgStopToast && (
               <div className="fixed top-4 right-4 z-50 animate-slide-in-right">
-                <div className={`p-6 rounded-2xl shadow-2xl w-96 border-l-4 border-red-500 ${
-                  theme === 'light' 
-                    ? 'bg-white text-gray-800' 
+                <div className={`p-6 rounded-2xl shadow-2xl w-96 border-l-4 border-red-500 ${theme === 'light'
+                    ? 'bg-white text-gray-800'
                     : 'bg-gray-800 text-gray-100'
-                }`}>
+                  }`}>
                   <div className="flex items-start gap-3">
                     <div className="flex-shrink-0">
                       <span className="text-2xl">🛑</span>
@@ -573,16 +569,14 @@ const TestHeader = ({isAutoSubmittable}) => {
                       <h3 className="font-semibold text-lg text-red-600 mb-2">
                         Examination Terminated
                       </h3>
-                      <p className={`text-sm leading-relaxed mb-4 ${
-                        theme === 'light' ? 'text-gray-600' : 'text-gray-300'
-                      }`}>
-                        Your examination has been terminated by the organization due to repeated 
+                      <p className={`text-sm leading-relaxed mb-4 ${theme === 'light' ? 'text-gray-600' : 'text-gray-300'
+                        }`}>
+                        Your examination has been terminated by the organization due to repeated
                         monitoring anomalies detected during the assessment period.
                       </p>
                       <div className="flex items-center justify-between">
-                        <span className={`text-sm font-medium ${
-                          theme === 'light' ? 'text-gray-700' : 'text-gray-300'
-                        }`}>
+                        <span className={`text-sm font-medium ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'
+                          }`}>
                           Auto-submitting in:
                         </span>
                         <div className="flex items-center gap-2">
@@ -591,9 +585,8 @@ const TestHeader = ({isAutoSubmittable}) => {
                               {orgStopCountdown}
                             </span>
                           </div>
-                          <span className={`text-sm ${
-                            theme === 'light' ? 'text-gray-500' : 'text-gray-400'
-                          }`}>
+                          <span className={`text-sm ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'
+                            }`}>
                             seconds
                           </span>
                         </div>
@@ -607,26 +600,23 @@ const TestHeader = ({isAutoSubmittable}) => {
             {/* Auto-Submit Final Popup */}
             {showFinalPopup && autoSubmittable && (
               <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center px-4">
-                <div className={`p-6 rounded-2xl shadow-2xl w-full max-w-2xl animate-fade-in ${
-                  theme === 'light' 
-                    ? 'bg-white text-gray-800' 
+                <div className={`p-6 rounded-2xl shadow-2xl w-full max-w-2xl animate-fade-in ${theme === 'light'
+                    ? 'bg-white text-gray-800'
                     : 'bg-gray-800 text-gray-100'
-                }`}>
+                  }`}>
                   <div className="text-center">
                     <h2 className="text-2xl sm:text-3xl font-bold text-red-500 flex items-center justify-center gap-2">
                       <span>🚨</span> Multiple Anomalies Detected
                     </h2>
-                    <p className={`mt-2 text-sm sm:text-base ${
-                      theme === 'light' ? 'text-gray-600' : 'text-gray-300'
-                    }`}>
+                    <p className={`mt-2 text-sm sm:text-base ${theme === 'light' ? 'text-gray-600' : 'text-gray-300'
+                      }`}>
                       Your test is being auto-submitted due to repeated violations. Please review the detected incidents below:
                     </p>
                   </div>
-                  <ul className={`mt-4 max-h-48 overflow-y-auto text-sm sm:text-base border rounded-lg px-4 py-3 space-y-1 list-disc list-inside shadow-inner ${
-                    theme === 'light'
+                  <ul className={`mt-4 max-h-48 overflow-y-auto text-sm sm:text-base border rounded-lg px-4 py-3 space-y-1 list-disc list-inside shadow-inner ${theme === 'light'
                       ? 'bg-red-50 border-red-200 text-red-700'
                       : 'bg-red-900/20 border-red-800 text-red-300'
-                  }`}>
+                    }`}>
                     {allWarnings.map((item, idx) => (
                       <li key={idx}>{item}</li>
                     ))}
@@ -646,26 +636,23 @@ const TestHeader = ({isAutoSubmittable}) => {
             {/* Manual Review Message Popup */}
             {showManualReviewMessage && !autoSubmittable && (
               <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center px-4">
-                <div className={`p-6 rounded-2xl shadow-2xl w-full max-w-2xl animate-fade-in ${
-                  theme === 'light' 
-                    ? 'bg-white text-gray-800' 
+                <div className={`p-6 rounded-2xl shadow-2xl w-full max-w-2xl animate-fade-in ${theme === 'light'
+                    ? 'bg-white text-gray-800'
                     : 'bg-gray-800 text-gray-100'
-                }`}>
+                  }`}>
                   <div className="text-center">
                     <h2 className="text-2xl sm:text-3xl font-bold text-amber-500 flex items-center justify-center gap-2">
                       <span>⚠️</span> Warning Threshold Reached
                     </h2>
-                    <p className={`mt-2 text-sm sm:text-base ${
-                      theme === 'light' ? 'text-gray-600' : 'text-gray-300'
-                    }`}>
+                    <p className={`mt-2 text-sm sm:text-base ${theme === 'light' ? 'text-gray-600' : 'text-gray-300'
+                      }`}>
                       Multiple anomalies have been detected during your test. The examiner is reviewing the outcome.
                     </p>
                   </div>
-                  <ul className={`mt-4 max-h-48 overflow-y-auto text-sm sm:text-base border rounded-lg px-4 py-3 space-y-1 list-disc list-inside shadow-inner ${
-                    theme === 'light'
+                  <ul className={`mt-4 max-h-48 overflow-y-auto text-sm sm:text-base border rounded-lg px-4 py-3 space-y-1 list-disc list-inside shadow-inner ${theme === 'light'
                       ? 'bg-amber-50 border-amber-200 text-amber-700'
                       : 'bg-amber-900/20 border-amber-800 text-amber-300'
-                  }`}>
+                    }`}>
                     {allWarnings.map((item, idx) => (
                       <li key={idx}>{item}</li>
                     ))}
@@ -688,19 +675,16 @@ const TestHeader = ({isAutoSubmittable}) => {
               {
                 isElectronEnv && (
                   <div className='flex flex-col gap-3 w-full'>
-                    <div className={`flex items-center gap-2 font-semibold px-4 py-2 rounded-xl shadow-sm w-full justify-center ${
-                      theme === 'light'
+                    <div className={`flex items-center gap-2 font-semibold px-4 py-2 rounded-xl shadow-sm w-full justify-center ${theme === 'light'
                         ? 'text-red-700 bg-red-50 border border-red-200'
                         : 'text-red-300 bg-red-900/20 border border-red-800'
-                    }`}>
+                      }`}>
                       <span className="text-lg">🚨</span>
-                      Warnings: <span className={`font-bold ${
-                        theme === 'light' ? 'text-red-800' : 'text-red-200'
-                      }`}>{warningCount}</span>/5
+                      Warnings: <span className={`font-bold ${theme === 'light' ? 'text-red-800' : 'text-red-200'
+                        }`}>{warningCount}</span>/5
                       {!autoSubmittable && (
-                        <span className={`ml-2 text-xs px-2 py-1 rounded ${
-                          theme === 'light' ? 'bg-blue-100 text-blue-700' : 'bg-blue-900/30 text-blue-300'
-                        }`}>
+                        <span className={`ml-2 text-xs px-2 py-1 rounded ${theme === 'light' ? 'bg-blue-100 text-blue-700' : 'bg-blue-900/30 text-blue-300'
+                          }`}>
                           Manual Review
                         </span>
                       )}
