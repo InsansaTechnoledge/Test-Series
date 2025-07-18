@@ -776,6 +776,7 @@ ipcMain.handle('submit-exam', (event, examResults) => {
 });
  
 ipcMain.on('start-proctor-engine', (_event, params) => {
+  console.log('🔧 Received request to start proctor engine with params:', params);
   if (proctorProcess) {
     safeSend('proctor-log', '⚠️ Proctor Engine already running.');
     return;
@@ -786,6 +787,7 @@ ipcMain.on('start-proctor-engine', (_event, params) => {
 });
  
 ipcMain.handle('start-proctor-engine-async', async (_event, params) => {
+  console.log('🔧 Received async request to start proctor engine with params:', params);
   if (proctorProcess) {
     return { success: false, message: 'Proctor Engine already running.' };
   }

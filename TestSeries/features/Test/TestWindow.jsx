@@ -544,8 +544,13 @@ const TestWindow = () => {
       }, 1000);
 
       setTimeout(async () => {
-        if (window?.electronAPI?.startProctorEngine) {
-          await window.electronAPI.startProctorEngine(examId, eventId);
+        if (window?.electronAPI?.startProctorEngineAsync) {
+          const params={
+            userId: user._id,
+            examId,
+            examId,
+          }
+          await window.electronAPI.startProctorEngineAsync(params);
         }
         setIsPaused(false);
         addToast("Bio break ended", "info", "Proctor monitoring resumed", 3000);
