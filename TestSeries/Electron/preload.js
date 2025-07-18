@@ -281,7 +281,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   
   stopProctorEngine: () => {
     console.log('🛑 Preload: stopProctorEngine called');
-    ipcRenderer.send('stop-proctor-engine');
+    ipcRenderer.invoke('stop-proctor-engine');
   },
 
   // ✅ FIXED: Event listeners for proctor events
