@@ -11,7 +11,7 @@ import LoadingTest from './LoadingTest';
 import { calculateResult } from './utils/resultCalculator';
 import { checkToStopExamForStudent } from '../../utils/services/proctorService';
 
-const TestHeader = ({ isAutoSubmittable,isProctorRunning }) => {
+const TestHeader = ({ isAutoSubmittable,isProctorRunning,handleSubmit}) => {
   const [eventDetails, setEventDetails] = useState();
   const [selectedQuestion, setSelectedQuestion] = useState();
   const [subjectSpecificQuestions, setSubjectSpecificQuestions] = useState();
@@ -348,62 +348,63 @@ const TestHeader = ({ isAutoSubmittable,isProctorRunning }) => {
   }
 
   const handleSubmitTest = async () => {
-    try {
-      // Stop proctor engine before submitting
+    // try {
+    //   // Stop proctor engine before submitting
     
 
-      localStorage.removeItem("testQuestions");
-      localStorage.removeItem(`encryptedTimeLeft_${examId}`);
-      localStorage.removeItem(`selectedSubject_${examId}`);
-      localStorage.removeItem(`selectedQuestion_${examId}`);
-      localStorage.removeItem(`examViolations_${examId}`);
-      localStorage.removeItem(`warningCount_${examId}`);
+    //   localStorage.removeItem("testQuestions");
+    //   localStorage.removeItem(`encryptedTimeLeft_${examId}`);
+    //   localStorage.removeItem(`selectedSubject_${examId}`);
+    //   localStorage.removeItem(`selectedQuestion_${examId}`);
+    //   localStorage.removeItem(`examViolations_${examId}`);
+    //   localStorage.removeItem(`warningCount_${examId}`);
 
 
-      const answers = Object.entries(subjectSpecificQuestions).reduce((acc, [, value]) => {
-        const objs = value.map((val) => ({
-          question_id: val.id,
-          user_response: val.response,
-          correct_response: getCorrectResponse(val),
-          question_type: val.question_type,
-          positive_marks: val.positive_marks,
-          negative_marks: val.negative_marks
-        }));
+    //   const answers = Object.entries(subjectSpecificQuestions).reduce((acc, [, value]) => {
+    //     const objs = value.map((val) => ({
+    //       question_id: val.id,
+    //       user_response: val.response,
+    //       correct_response: getCorrectResponse(val),
+    //       question_type: val.question_type,
+    //       positive_marks: val.positive_marks,
+    //       negative_marks: val.negative_marks
+    //     }));
 
-        return [...acc, ...objs];
-      }, []);
+    //     return [...acc, ...objs];
+    //   }, []);
 
-      const result = calculateResult(answers);
+    //   const result = calculateResult(answers);
 
-      const payload = {
-        studentId: user._id,
-        examId: examId,
-        status: "attempted",
-        wrongAnswers: result.wrongAnswers,
-        unattempted: result.unattempted,
-        marks: result.totalMarks,
-      }
+    //   const payload = {
+    //     studentId: user._id,
+    //     examId: examId,
+    //     status: "attempted",
+    //     wrongAnswers: result.wrongAnswers,
+    //     unattempted: result.unattempted,
+    //     marks: result.totalMarks,
+    //   }
 
-      const response = await submitResult(payload);
-      if (response.status == 200) {
-        setSubmitted(true);
-        navigate('/student/completed-exams');
-      }
+    //   const response = await submitResult(payload);
+    //   if (response.status == 200) {
+    //     setSubmitted(true);
+    //     navigate('/student/completed-exams');
+    //   }
 
-    } catch (err) {
-      console.error('Error submitting test:', err);
-    }
-     if (isElectronEnv && proctorRunning) {
-        // await window.electronAPI?.stopProctorEngineAsync();
-        if (window?.electronAPI?.stopProctorEngine)
-          await window.electronAPI.stopProctorEngine();
-        console.log('✅ Proctor engine stopped successfully');
-        setProctorRunning(false);
-        setProctorStatus('Stopped');
-      }
-      if (window?.electronAPI?.closeWindow)
-         { window.electronAPI.closeWindow();}
+    // } catch (err) {
+    //   console.error('Error submitting test:', err);
+    // }
+    //  if (isElectronEnv && proctorRunning) {
+    //     // await window.electronAPI?.stopProctorEngineAsync();
+    //     if (window?.electronAPI?.stopProctorEngine)
+    //       await window.electronAPI.stopProctorEngine();
+    //     console.log('✅ Proctor engine stopped successfully');
+    //     setProctorRunning(false);
+    //     setProctorStatus('Stopped');
+    //   }
+    //   if (window?.electronAPI?.closeWindow)
+    //      { window.electronAPI.closeWindow();}
     
+    handleSubmit();
 
   };
 

@@ -668,7 +668,7 @@ const TestWindow = () => {
           </div>
 
           <div className="lg:hidden">
-            <TestHeader isAutoSubmittable={isAutoSubmittable} isProctorRunning={isProctorRunning} />
+            <TestHeader isAutoSubmittable={isAutoSubmittable} isProctorRunning={isProctorRunning} handleSubmit={handleSubmitTest}/>
 
             <CountdownTimer
               initialTime={eventDetails.duration}
