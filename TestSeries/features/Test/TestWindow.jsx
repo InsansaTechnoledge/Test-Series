@@ -412,7 +412,7 @@ const TestWindow = () => {
       console.log("Subject Specific Questions:", subjectSpecificQuestions);
 
       localStorage.removeItem("testQuestions");
-      localStorage.removeItem("encryptedTimeLeft");
+      localStorage.removeItem(`encryptedTimeLeft_${examId}`);
       localStorage.removeItem(`selectedSubject_${examId}`);
       localStorage.removeItem(`selectedQuestion_${examId}`);
       localStorage.removeItem(`examViolations_${examId}`);

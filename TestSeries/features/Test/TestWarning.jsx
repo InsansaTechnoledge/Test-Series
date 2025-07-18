@@ -321,12 +321,6 @@ const TestHeader = ({ isAutoSubmittable,isProctorRunning }) => {
   }, [selectedSubject, subjectSpecificQuestions]);
 
 
-  useEffect(() => {
-    if (submitted) {
-      handleSubmitTest();
-    }
-  }, [submitted]);
-
   const getCorrectResponse = (question) => {
     switch (question.question_type) {
       case "mcq":
@@ -356,19 +350,15 @@ const TestHeader = ({ isAutoSubmittable,isProctorRunning }) => {
   const handleSubmitTest = async () => {
     try {
       // Stop proctor engine before submitting
-      if (isElectronEnv && proctorRunning) {
-        // await window.electronAPI?.stopProctorEngineAsync();
-        if (window?.electronAPI?.stopProctorEngine)
-          await window.electronAPI.stopProctorEngine();
-        if (window?.electronAPI?.closeWindow)
-          await window.electronAPI.closeWindow();
-        console.log('✅ Proctor engine stopped successfully');
-        setProctorRunning(false);
-        setProctorStatus('Stopped');
-      }
+    
 
-      localStorage.removeItem('testQuestions');
-      localStorage.removeItem('encryptedTimeLeft');
+      localStorage.removeItem("testQuestions");
+      localStorage.removeItem(`encryptedTimeLeft_${examId}`);
+      localStorage.removeItem(`selectedSubject_${examId}`);
+      localStorage.removeItem(`selectedQuestion_${examId}`);
+      localStorage.removeItem(`examViolations_${examId}`);
+      localStorage.removeItem(`warningCount_${examId}`);
+
 
       const answers = Object.entries(subjectSpecificQuestions).reduce((acc, [, value]) => {
         const objs = value.map((val) => ({
@@ -396,12 +386,24 @@ const TestHeader = ({ isAutoSubmittable,isProctorRunning }) => {
 
       const response = await submitResult(payload);
       if (response.status == 200) {
+        setSubmitted(true);
         navigate('/student/completed-exams');
       }
 
     } catch (err) {
       console.error('Error submitting test:', err);
     }
+     if (isElectronEnv && proctorRunning) {
+        // await window.electronAPI?.stopProctorEngineAsync();
+        if (window?.electronAPI?.stopProctorEngine)
+          await window.electronAPI.stopProctorEngine();
+        console.log('✅ Proctor engine stopped successfully');
+        setProctorRunning(false);
+        setProctorStatus('Stopped');
+      }
+      if (window?.electronAPI?.closeWindow)
+         { window.electronAPI.closeWindow();}
+    
 
   };
 

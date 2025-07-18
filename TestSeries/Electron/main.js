@@ -708,6 +708,21 @@ ipcMain.handle('get-protocol-params', () => {
   }
   return null;
 });
+
+let deeplinkURL = null;
+
+ipcMain.handle('get-url-params', () => {
+  if (!deeplinkURL) return null;
+
+  try {
+    const parsedUrl = new URL(deeplinkURL);
+    const params = Object.fromEntries(parsedUrl.searchParams.entries());
+    return params;
+  } catch (err) {
+    return null;
+  }
+});
+
  
 ipcMain.handle('window-minimize', () => {
   if (mainWindow) mainWindow.minimize();
@@ -832,6 +847,7 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
+  app.quit();
 });
  
 app.on('activate', () => {
