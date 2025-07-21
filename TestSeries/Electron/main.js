@@ -4,6 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const readline = require('readline');
 const url = require('url');
+const { kill } = require('process');
 const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
  
 let mainWindow;
@@ -53,7 +54,19 @@ function getIconPath() {
  
   return null; // Return null if no icon found
 }
- 
+
+function killProctorProcessWindows() {
+  if (proctorProcess && proctorProcess.pid) {
+    exec(`taskkill /PID ${proctorProcess.pid} /T /F`, (err, stdout, stderr) => {
+      if (err) {
+        console.error('❌ Error killing process:', err);
+      } else {
+        console.log('✅ Proctor process killed:', stdout);
+        proctorProcess = null;
+      }
+    });
+  }
+}
 // Register the custom protocol
 if (process.defaultApp) {
   if (process.argv.length >= 2) {
@@ -70,9 +83,10 @@ function safeSend(channel, data) {
   }
 }
  
+  const isWin = process.platform === 'win32';
 // // Function to get proctor engine binary path
 function getBinaryPath() {
-  const isWin = process.platform === 'win32';
+
   const is64Bit = process.arch === 'x64';
   const binaryName = isWin ? 'proctor_engine.exe' : 'proctor_engine';
   console.log("Platform:", process.platform);
@@ -577,6 +591,10 @@ function createWindow() {
  
   mainWindow.on('closed', () => {
     if (proctorProcess) {
+      if(isWin){
+        killProctorProcessWindows();
+      }
+      else
       proctorProcess.kill('SIGTERM');
       proctorProcess = null;
     }
@@ -690,6 +708,21 @@ ipcMain.handle('get-protocol-params', () => {
   }
   return null;
 });
+
+let deeplinkURL = null;
+
+ipcMain.handle('get-url-params', () => {
+  if (!deeplinkURL) return null;
+
+  try {
+    const parsedUrl = new URL(deeplinkURL);
+    const params = Object.fromEntries(parsedUrl.searchParams.entries());
+    return params;
+  } catch (err) {
+    return null;
+  }
+});
+
  
 ipcMain.handle('window-minimize', () => {
   if (mainWindow) mainWindow.minimize();
@@ -743,6 +776,7 @@ ipcMain.handle('submit-exam', (event, examResults) => {
 });
  
 ipcMain.on('start-proctor-engine', (_event, params) => {
+  console.log('🔧 Received request to start proctor engine with params:', params);
   if (proctorProcess) {
     safeSend('proctor-log', '⚠️ Proctor Engine already running.');
     return;
@@ -753,6 +787,7 @@ ipcMain.on('start-proctor-engine', (_event, params) => {
 });
  
 ipcMain.handle('start-proctor-engine-async', async (_event, params) => {
+  console.log('🔧 Received async request to start proctor engine with params:', params);
   if (proctorProcess) {
     return { success: false, message: 'Proctor Engine already running.' };
   }
@@ -768,7 +803,25 @@ ipcMain.handle('start-proctor-engine-async', async (_event, params) => {
  
 ipcMain.handle('stop-proctor-engine-async', async () => {
   if (proctorProcess) {
-    proctorProcess.kill('SIGINT');
+    if (isWin) {
+      killProctorProcessWindows();
+    }
+    else
+    proctorProcess.kill('SIGTERM');
+    proctorProcess = null;
+    return { success: true, message: 'Proctor Engine stopped.' };
+  }
+  return { success: false, message: 'Proctor Engine was not running.' };
+});
+
+ipcMain.handle('stop-proctor-engine', () => {
+
+  if (proctorProcess) {
+    if (isWin) {
+      killProctorProcessWindows();
+    } else {
+      proctorProcess.kill('SIGTERM');
+    }
     proctorProcess = null;
     return { success: true, message: 'Proctor Engine stopped.' };
   }
@@ -785,6 +838,10 @@ ipcMain.on('renderer-ready', () => {
  
 app.on('window-all-closed', () => {
   if (proctorProcess) {
+    if(isWin){
+      killProctorProcessWindows();
+    }
+    else
     proctorProcess.kill('SIGTERM');
     proctorProcess = null;
   }
@@ -792,6 +849,7 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
+  app.quit();
 });
  
 app.on('activate', () => {

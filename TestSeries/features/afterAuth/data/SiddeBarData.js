@@ -37,102 +37,104 @@ import CrerateContestActive from '../../../assests/Navigator/code contest/code c
 import CreateContestList from '../../../assests/Navigator/contest list/contest list - nor.svg'
 import CreateContestListActive from '../../../assests/Navigator/contest list/contest list - act.svg'
 
+import AnomalyIcon from '../../../assests/Navigator/exam/anomaly/alert - act.svg';
+import AnomalyIconActive from '../../../assests/Navigator/exam/anomaly/alert - nor.svg';
 
 
 import AllBatch from "../../../assests/Navigator/batch/batch - normal.svg"
 import user from "../../../assests/Navigator/User/user - nor.svg"
-import  student from "../../../assests/Navigator/students/sttudent - nor.svg"
-import  exam from "../../../assests/Navigator/exam/exam - nor.svg"
+import student from "../../../assests/Navigator/students/sttudent - nor.svg"
+import exam from "../../../assests/Navigator/exam/exam - nor.svg"
 import video from "../../../assests/Navigator/videos/video - nor.svg"
-import  contest from "../../../assests/Navigator/code contest/code contest - nor.svg"
+import contest from "../../../assests/Navigator/code contest/code contest - nor.svg"
 import { User } from 'lucide-react';
 
 export const controlData = [
+  {
+    name: "Create Batch",
+    path: "create-batch",
+    icon: CreateBatch,
+    activeIcon: CreateBatchActive
+  },
+  {
+    name: "All Batches",
+    path: 'batch-list',
+    icon: BatchLogo,
+    activeIcon: ActiveBatch
+  },
+  {
+    name: "Add User",
+    path: "create-user",
+    icon: AddUser,
+    activeIcon: AddUserActive
+  },
+  {
+    name: "User Details",
+    path: "user-list",
+    icon: UserList,
+    activeIcon: UserListActive
+  },
+
+  {
+    name: "Create Role Group",
+    path: "create-role-group",
+    icon: RoloGroup,
+    activeIcon: RoloGroupActive
+  },
+  {
+    name: "Add Student",
+    path: "add-student",
+    icon: AddStudent,
+    activeIcon: AddStudentActive
+  },
+  {
+    name: "Student List",
+    path: "student-list",
+    icon: StudentList,
+    activeIcon: StudentListActive
+  },
+  {
+    name: "Create Exams",
+    path: "create-exam",
+    icon: CreateExam,
+    activeIcon: CreateExamActive
+  },
+  {
+    name: "Exam List Page",
+    path: "exam-list",
+    icon: ExamList,
+    activeIcon: ExamListActive
+  },
+  {
+    name: "Exam Anomaly Center",
+    path: "exam-anomaly",
+    icon: AnomalyIconActive,
+    activeIcon: AnomalyIcon
+  },
     {
-        name: "Create Batch",
-        path: "create-batch",
-        icon: CreateBatch, 
-        activeIcon: CreateBatchActive
-    },
-    {
-        name: "All Batches",
-        path: 'batch-list',
-        icon: BatchLogo, 
-        activeIcon: ActiveBatch
-    },
-    {
-        name: "Add User",
-        path: "create-user",
-        icon: AddUser, 
-        activeIcon: AddUserActive
-    },
-    {
-        name: "User Details",
-        path: "user-list",
-        icon: UserList, 
-        activeIcon: UserListActive
-    },
-    
-    {
-        name: "Create Role Group",
-        path: "create-role-group",
-        icon: RoloGroup, 
-        activeIcon: RoloGroupActive
-    },
-    {
-        name: "Add Student",
-        path: "add-student",
-        icon: AddStudent, 
-        activeIcon: AddStudentActive
-    },
-    {
-        name: "Student List",
-        path: "student-list",
-        icon: StudentList, 
-        activeIcon: StudentListActive
-    },
-    {
-        name: "Create Exams",
-        path: "create-exam",
-        icon: CreateExam, 
-        activeIcon: CreateExamActive
-    },
-    {
-        name: "Exam List Page",
-        path: "exam-list",
-        icon: ExamList, 
-        activeIcon: ExamListActive
-    },
-    {
-      name: "Exam anomaly center",
-      path: "exam-anomaly",
-      icon: '',
-      activeIcon: ''
-    },
-    {
-        name: "Upload videos",
-        path: "video",
-        icon: UploadVideo, 
-        activeIcon: UploadVideoActive
-    },
-    {
-        name: "Uploaded Videos",
-        path: "video-list",
-        icon: VideoList, 
-        activeIcon: VideoListActive
-    },
-    {
-        name: "Create Contest",
-        path: "create-contest",
-        icon: CrerateContest, 
-        activeIcon: CrerateContestActive
-    },
-    {
-        name: "Contest list",
-        path: "contest-list",
-        icon: CreateContestList, 
-        activeIcon: CreateContestListActive
-    }
+    name: "Upload videos",
+    path: "video",
+    icon: UploadVideo,
+    activeIcon: UploadVideoActive
+  },
+  {
+    name: "Uploaded Videos",
+    path: "video-list",
+    icon: VideoList,
+    activeIcon: VideoListActive
+  },
+  {
+    name: "Create Contest",
+    path: "create-contest",
+    icon: CrerateContest,
+    activeIcon: CrerateContestActive
+  },
+  {
+    name: "Contest list",
+    path: "contest-list",
+    icon: CreateContestList,
+    activeIcon: CreateContestListActive
+  }
 ];
 
 
@@ -168,7 +170,8 @@ export const categoryData = [
     features: [
       'Create Exams',
       'Exam List Page',
-      'Exam anomaly center'
+      'Exam anomaly center',
+
     ]
   },
   {
@@ -214,7 +217,7 @@ export const studentControlData = [
   {
     name: "Batch Notes",
     path: "",
-    icon: '' , activeIcon: ''
+    icon: '', activeIcon: ''
   },
   {
     name: "New Contests",
@@ -234,7 +237,7 @@ export const studentControlData = [
   {
     name: "Enter LeaderBoards",
     path: "leader-board",
-    icon: '' , activeIcon: ''
+    icon: '', activeIcon: ''
   },
   {
     name: "Analysis",
@@ -256,7 +259,7 @@ export const studentCategoryData = [
   {
     name: "Contests",
     icon: contest,
-    features: ["New Contests", "Registered Contests", "Live Contests" , "Enter LeaderBoards"]
+    features: ["New Contests", "Registered Contests", "Live Contests", "Enter LeaderBoards"]
   },
   {
     name: "Academics",
@@ -266,6 +269,6 @@ export const studentCategoryData = [
   {
     name: "Classroom",
     icon: exam,
-    features: ["Batch Videos" , "Batch Notes" ]
+    features: ["Batch Videos", "Batch Notes"]
   }
 ];

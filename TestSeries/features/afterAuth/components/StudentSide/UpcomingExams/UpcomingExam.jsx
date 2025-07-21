@@ -352,7 +352,7 @@ const UpcomingExam = () => {
           
           // Wait a moment for proctor to initialize, then navigate to exam
           setTimeout(() => {
-            navigate(`/student/test?userId=${userId}&examId=${examId}&eventId=${eventId}&proctored=true`);
+            navigate(`/student/test?userId=${userId}&examId=${examId}&eventId=${eventId}&proctored=true&isProctorRunning=true`);
           }, 2000);
         } else {
           // If proctor failed to start, ask user if they want to continue without proctoring

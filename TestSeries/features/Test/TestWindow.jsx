@@ -41,6 +41,7 @@ const TestWindow = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const examId = searchParams.get("examId");
+  const isProctorRunning = searchParams.get("isProctorRunning") === "true";
   const { exams } = useExamManagement();
 
   const currentExam = exams.find((exam) => exam.id === examId);
@@ -411,7 +412,7 @@ const TestWindow = () => {
       console.log("Subject Specific Questions:", subjectSpecificQuestions);
 
       localStorage.removeItem("testQuestions");
-      localStorage.removeItem("encryptedTimeLeft");
+      localStorage.removeItem(`encryptedTimeLeft_${examId}`);
       localStorage.removeItem(`selectedSubject_${examId}`);
       localStorage.removeItem(`selectedQuestion_${examId}`);
       localStorage.removeItem(`examViolations_${examId}`);
@@ -543,8 +544,13 @@ const TestWindow = () => {
       }, 1000);
 
       setTimeout(async () => {
-        if (window?.electronAPI?.startProctorEngine) {
-          await window.electronAPI.startProctorEngine(examId, eventId);
+        if (window?.electronAPI?.startProctorEngineAsync) {
+          const params={
+            userId: user._id,
+            examId,
+            examId,
+          }
+          await window.electronAPI.startProctorEngineAsync(params);
         }
         setIsPaused(false);
         addToast("Bio break ended", "info", "Proctor monitoring resumed", 3000);
@@ -568,17 +574,12 @@ const TestWindow = () => {
       />
 
       {/* Main Exam Interface */}
-      <div
-        className={`py-16 flex min-h-screen flex-col lg:flex-row gap-2 mt-8`}
-      >
-        <div className="w-full lg:w-[80%] p-2 lg:p-4 gap-2 flex flex-col">
-          <div
-            className={`p-4 rounded-md shadow-sm w-full border ${
-              theme === "light"
-                ? "bg-white border-gray-200"
-                : "bg-gray-800 border-gray-700"
-            }`}
-          >
+     
+      <div className={`py-16 flex min-h-screen flex-col lg:flex-row gap-2 mt-8`}>
+        <div className='w-full lg:w-[80%] p-2 lg:p-4 gap-2 flex flex-col'>
+          <div className={`p-4 rounded-md shadow-sm w-full border ${
+            theme === 'light' ? 'bg-white border-gray-200' : 'bg-gray-800 border-gray-700'
+          }`}>
             <div className="flex justify-between items-center">
               <h2
                 className={`text-xl xl:text-2xl font-bold leading-snug flex flex-col ${
@@ -672,7 +673,7 @@ const TestWindow = () => {
           </div>
 
           <div className="lg:hidden">
-            <TestHeader isAutoSubmittable={isAutoSubmittable} />
+            <TestHeader isAutoSubmittable={isAutoSubmittable} isProctorRunning={isProctorRunning} handleSubmit={handleSubmitTest}/>
 
             <CountdownTimer
               initialTime={eventDetails.duration}

@@ -38,10 +38,6 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
     type: "mcq",
     question_text: "",
     options: ["", "", "", ""],
-    correct_option: 0,
-    type: "mcq",
-    question_text: "",
-    options: ["", "", "", ""],
     correct_option: null,
     correct_options: [],
     correct_answer: "",
@@ -59,10 +55,6 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
     passage: "",
     sub_question_ids: [],
     sub_form: {
-      type: "mcq",
-      question_text: "",
-      options: ["", "", "", ""],
-      correct_option: 0,
       type: "mcq",
       question_text: "",
       options: ["", "", "", ""],
@@ -216,6 +208,8 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
   const LabelCommon = `text-lg font-bold ${
     theme === "light" ? "text-gray-700" : "text-indigo-200"
   }`;
+
+  
   return (
     <div
       className={` backdrop-blur-md shadow-md rounded-2xl p-6 space-y-6  ${
