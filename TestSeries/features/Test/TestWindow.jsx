@@ -548,7 +548,7 @@ const TestWindow = () => {
           const params={
             userId: user._id,
             examId,
-            examId,
+            eventId,
           }
           await window.electronAPI.startProctorEngineAsync(params);
         }

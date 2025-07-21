@@ -1,22 +1,18 @@
 import CryptoJS from 'crypto-js';
 import React, { useEffect, useRef, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation} from 'react-router-dom';
 import { useUser } from '../../contexts/currentUserContext';
 import { useCachedExam } from '../../hooks/useCachedExam';
 import { useCachedQuestions } from '../../hooks/useCachedQuestions';
 import { useTheme } from '../../hooks/useTheme';
-import { submitResult } from '../../utils/services/resultService';
 import { VITE_SECRET_KEY_FOR_TESTWINDOW } from '../constants/env';
 import LoadingTest from './LoadingTest';
-import { calculateResult } from './utils/resultCalculator';
 import { checkToStopExamForStudent } from '../../utils/services/proctorService';
 
 const TestHeader = ({ isAutoSubmittable,isProctorRunning,handleSubmit}) => {
   const [eventDetails, setEventDetails] = useState();
-  const [selectedQuestion, setSelectedQuestion] = useState();
   const [subjectSpecificQuestions, setSubjectSpecificQuestions] = useState();
   const [selectedSubject, setSelectedSubject] = useState();
-  const [submitted, setSubmitted] = useState(false);
   const [warning, setWarning] = useState(null);
   const [warningCount, setWarningCount] = useState(0);
   const [proctorRunning, setProctorRunning] = useState(false);
@@ -28,10 +24,6 @@ const TestHeader = ({ isAutoSubmittable,isProctorRunning,handleSubmit}) => {
   // Organization stop toast states
   const [showOrgStopToast, setShowOrgStopToast] = useState(false);
   const [orgStopCountdown, setOrgStopCountdown] = useState(5);
-
-  // New proctor-specific states
-  const [proctorStatus, setProctorStatus] = useState('Not Started');
-  const [proctorEvents, setProctorEvents] = useState([]);
   const [isElectronEnv, setIsElectronEnv] = useState(false);
 
   // Add refs to prevent duplicate processing
@@ -45,7 +37,6 @@ const TestHeader = ({ isAutoSubmittable,isProctorRunning,handleSubmit}) => {
   const secretKey = import.meta.env.VITE_SECRET_KEY_FOR_TESTWINDOW || VITE_SECRET_KEY_FOR_TESTWINDOW;
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const navigate = useNavigate();
   const examId = searchParams.get('examId');
   const { questions, isError: isExamError, isLoading: isQuestionLoading } = useCachedQuestions(examId);
   const { exam, isLoading: isExamLoading } = useCachedExam(examId);
@@ -320,94 +311,6 @@ const TestHeader = ({ isAutoSubmittable,isProctorRunning,handleSubmit}) => {
     }
   }, [selectedSubject, subjectSpecificQuestions]);
 
-
-  const getCorrectResponse = (question) => {
-    switch (question.question_type) {
-      case "mcq":
-        return question.correct_option;
-      case "msq":
-        return question.correct_options;
-      case "fill":
-      case "numerical":
-        return question.correct_answer;
-      case "tf":
-        return question.is_true;
-      case "match":
-        return question.correct_pairs;
-      case "comprehension":
-        return question.sub_questions.reduce((acc, sub_q) => {
-          const response = getCorrectResponse(sub_q);
-          return {
-            ...acc,
-            [sub_q.id]: [response, sub_q.positive_marks, sub_q.negative_marks, sub_q.question_type]
-          };
-        }, {})
-      default:
-        return question.correct_response;
-    }
-  }
-
-  const handleSubmitTest = async () => {
-    // try {
-    //   // Stop proctor engine before submitting
-    
-
-    //   localStorage.removeItem("testQuestions");
-    //   localStorage.removeItem(`encryptedTimeLeft_${examId}`);
-    //   localStorage.removeItem(`selectedSubject_${examId}`);
-    //   localStorage.removeItem(`selectedQuestion_${examId}`);
-    //   localStorage.removeItem(`examViolations_${examId}`);
-    //   localStorage.removeItem(`warningCount_${examId}`);
-
-
-    //   const answers = Object.entries(subjectSpecificQuestions).reduce((acc, [, value]) => {
-    //     const objs = value.map((val) => ({
-    //       question_id: val.id,
-    //       user_response: val.response,
-    //       correct_response: getCorrectResponse(val),
-    //       question_type: val.question_type,
-    //       positive_marks: val.positive_marks,
-    //       negative_marks: val.negative_marks
-    //     }));
-
-    //     return [...acc, ...objs];
-    //   }, []);
-
-    //   const result = calculateResult(answers);
-
-    //   const payload = {
-    //     studentId: user._id,
-    //     examId: examId,
-    //     status: "attempted",
-    //     wrongAnswers: result.wrongAnswers,
-    //     unattempted: result.unattempted,
-    //     marks: result.totalMarks,
-    //   }
-
-    //   const response = await submitResult(payload);
-    //   if (response.status == 200) {
-    //     setSubmitted(true);
-    //     navigate('/student/completed-exams');
-    //   }
-
-    // } catch (err) {
-    //   console.error('Error submitting test:', err);
-    // }
-    //  if (isElectronEnv && proctorRunning) {
-    //     // await window.electronAPI?.stopProctorEngineAsync();
-    //     if (window?.electronAPI?.stopProctorEngine)
-    //       await window.electronAPI.stopProctorEngine();
-    //     console.log('✅ Proctor engine stopped successfully');
-    //     setProctorRunning(false);
-    //     setProctorStatus('Stopped');
-    //   }
-    //   if (window?.electronAPI?.closeWindow)
-    //      { window.electronAPI.closeWindow();}
-    
-    handleSubmit();
-
-  };
-
   // Enhanced useEffect with toast notification for organization stop
   useEffect(() => {
     // Only start polling if autoSubmittable is false AND warning count >= 5
@@ -444,7 +347,7 @@ const TestHeader = ({ isAutoSubmittable,isProctorRunning,handleSubmit}) => {
                 setShowOrgStopToast(false);
 
                 console.log("🚀 Countdown finished - submitting test");
-                handleSubmitTest();
+                handleSubmit();
                 return 0;
               }
               return prev - 1;
@@ -626,7 +529,7 @@ const TestHeader = ({ isAutoSubmittable,isProctorRunning,handleSubmit}) => {
                   </ul>
                   <div className="mt-6 text-center">
                     <button
-                      onClick={handleSubmitTest}
+                      onClick={()=>{handleSubmit()}}
                       className="inline-flex items-center justify-center px-6 py-2.5 text-white bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 rounded-lg text-base font-semibold transition duration-200 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
                     >
                       Okay, Close Test
