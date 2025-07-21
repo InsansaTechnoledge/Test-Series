@@ -108,8 +108,8 @@ export const controlData = [
   {
     name: "Exam Anomaly Center",
     path: "exam-anomaly",
-    icon: AnomalyIcon,
-    activeIcon: AnomalyIconActive
+    icon: AnomalyIconActive,
+    activeIcon: AnomalyIcon
   },
     {
     name: "Upload videos",
