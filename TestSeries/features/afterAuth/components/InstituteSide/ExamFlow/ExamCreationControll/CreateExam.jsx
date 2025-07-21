@@ -78,6 +78,8 @@ const CreateExam = () => {
     navigate(`/institute/create-exam/${newExam.id}`, { replace: true });
   };
 
+  console.log("DF",examDetails?.subjects)
+
   useEffect(() => {
     const loadExamIfNeeded = async () => {
       if (examId) {
@@ -85,7 +87,7 @@ const CreateExam = () => {
           const res = await fetchExamById(examId);
 
           const matchedExam = res.data.find((e) => e.id === examId);
-          console.log("SD", matchedExam)
+          console.log("SD", matchedExam);
 
           if (!matchedExam) {
             console.warn("⚠️ No matching exam found!");
@@ -165,58 +167,55 @@ const CreateExam = () => {
               total_marks: "",
               duration: "",
               batch_id: "",
-              subjects: []
+              subjects: [],
             }
           } // for edit form
         />
       ) : (
         <div
-          className={`p-6 rounded-3xl mb-6 shadow-lg ${
+          className={`p-6 rounded-3xl mb-6 px-12 shadow-lg ${
             theme === "light" ? "bg-blue-50" : "bg-gray-800"
           }`}
         >
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center ">
             <div className="">
               <h2
                 className={`text-xl font-semibold ${
-                  theme === "light" ? "text-gray-800" : "text-white"
+                  theme === "light" ? "text-green-600" : "text-green-400"
                 }`}
               >
-                {examDetails.name}
+                <span className={`${theme === 'light' ? 'text-gray-700' : 'text-white'}`}>Exam Name :</span> {examDetails.name}
               </h2>
+            
               <p
                 className={`${
                   theme === "light" ? "text-gray-600" : "text-gray-300"
-                }`}
+                } mt-2`}
               >
                 Date: {examDetails.date} | Duration: {examDetails.duration} mins
                 | Total Marks: {examDetails.total_marks}
               </p>
 
-              <p className={`${theme === "light" ? "text-gray-600" : "text-gray-300"}`}>
-                Date: {examDetails.date} | Duration: {examDetails.duration} mins | Total Marks: {examDetails.total_marks}
-              </p>
-
-              {Array.isArray(examDetails.subjects) && examDetails.subjects.length > 0 && (
-                <div className="mt-2 flex flex-wrap gap-2">
-                  <p
-                    className={`font-semibold ${
-                      theme === "light" ? "text-gray-700" : "text-gray-200"
-                    }`}
-                  >
-                    Subjects:
-                  </p>
-                  {examDetails.subjects.map((subj, idx) => (
-                    <span
-                      key={idx}
-                      className="bg-indigo-100 text-indigo-800 text-sm font-medium px-3 py-1 rounded-full"
+              {Array.isArray(examDetails?.subjects) &&
+                examDetails?.subjects.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <p
+                      className={`font-semibold ${
+                        theme === "light" ? "text-gray-700" : "text-gray-200"
+                      }`}
                     >
-                      {subj} 
-                    </span>
-                  ))}
-                </div>
-              )}
-
+                      Subjects:
+                    </p>
+                    {examDetails?.subjects.map((subj, idx) => (
+                      <span
+                        key={idx}
+                        className="bg-indigo-100 text-indigo-800 text-sm font-medium px-3 py-1 rounded-full"
+                      >
+                        {subj}
+                      </span>
+                    ))}
+                  </div>
+                )}
             </div>
             {canEditExams && (
               <button
@@ -258,26 +257,30 @@ const CreateExam = () => {
                     theme === "light" ? "bg-gray-200" : "bg-gray-700"
                   }`}
                 >
-                  <h3
-                    className={`text-lg font-medium mb-2  ${
-                      theme == "light" ? "text-black" : "text-gray-100"
-                    }`}
-                  >
-                    Option 1: Manual Entry
-                  </h3>
-                  <p
-                    className={`mb-4 ${
-                      theme == "light" ? "text-gray-500" : "text-gray-500"
-                    }`}
-                  >
-                    Create questions one by one with full control over each
-                    question's details.
-                  </p>
-                  <ManualQuestionForm
-                    setQuestions={setQuestions}
-                    organizationId={examDetails.organization_id} // ✅ pass this down!
-                    examDetails={examDetails}
-                  />
+                  {tabs.map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`
+            flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md font-medium transition-all duration-200
+            ${
+              activeTab === tab.id
+                ? theme === "light"
+                  ? "bg-white text-blue-600 shadow-sm"
+                  : "bg-gray-800 text-blue-400 shadow-sm"
+                : theme === "light"
+                ? "text-gray-600 hover:text-gray-800 hover:bg-gray-100"
+                : "text-gray-400 hover:text-gray-200 hover:bg-gray-600"
+            }
+          `}
+                    >
+                      {/* <span className="text-lg">{tab.icon}</span> */}
+                      <span className="text-lg">
+                        <tab.icon size={16} />
+                      </span>
+                      <span>{tab.label}</span>
+                    </button>
+                  ))}
                 </div>
 
                 {/* Tab Description */}
@@ -356,6 +359,7 @@ const CreateExam = () => {
                     <ManualQuestionForm
                       setQuestions={setQuestions}
                       organizationId={examDetails.organization_id}
+                      examDetails={examDetails}
                     />
                   </div>
                 </div>
@@ -434,57 +438,55 @@ const CreateExam = () => {
             setQuestions={setQuestions}
             examDetails={examDetails}
           />
-          <div className="flex justify-center flex-col gap-2 max-w-2l items-center">
-            <button
-              onClick={handleSubmitExam}
-              disabled={isSubmitting}
-              className={`mt-6 font-semibold ${
-                isSubmitting
-                  ? "bg-gray-300 cursor-not-allowed"
-                  : "bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 hover:scale-105 hover:shadow-2x p-2"
-              } text-white px-6 py-3 rounded transition w-full md:w-auto flex items-center justify-center`}
-            >
-              {isSubmitting ? (
-                <>
-                  <svg
-                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  Submitting...
-                </>
-              ) : (
-                "Submit Exam"
-              )}
-            </button>
-
-            {canDeleteExams && (
-              <button
-                disabled={!canDeleteExams}
-                onClick={() => {
-                  setShowDeleteModal(true);
-                }}
-                className="text-red-600 border-red-600 border px-4 py-2 mt-4 rounded hover:bg-red-700 transition hover:text-white font-semibold"
-              >
-                Delete exam
-              </button>
+          <div className="flex flex-col md:flex-row items-center justify-center gap-4 max-w-2xl mx-auto mt-6">
+          <button
+            onClick={handleSubmitExam}
+            disabled={isSubmitting}
+            className={`w-full md:w-auto px-6 py-3 rounded font-semibold text-white transition duration-200 ease-in-out flex items-center justify-center ${
+              isSubmitting
+                ? "bg-gray-300 cursor-not-allowed"
+                : "bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 hover:scale-105 hover:shadow-xl"
+            }`}
+          >
+            {isSubmitting ? (
+              <>
+                <svg
+                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Submitting...
+              </>
+            ) : (
+              "Submit Exam"
             )}
-          </div>
+          </button>
+
+          {canDeleteExams && (
+            <button
+              onClick={() => setShowDeleteModal(true)}
+              className="w-full md:w-auto px-6 py-3 rounded border border-red-600 text-red-600 font-semibold transition duration-200 ease-in-out hover:bg-red-600 hover:text-white"
+            >
+              Delete Exam
+            </button>
+          )}
+        </div>
+
         </>
       )}
       {showDeleteModal && (
