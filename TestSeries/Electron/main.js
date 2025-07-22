@@ -322,6 +322,7 @@ function createWindow() {
     height: 900,
     minWidth: 800,
     minHeight: 600,
+    // fullscreen: true,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -361,7 +362,7 @@ function createWindow() {
     });
    
     // Open dev tools in development
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
   } else {
     // Production mode - load from build folder or create fallback
     const indexPath = path.join(__dirname, 'build', 'index.html');

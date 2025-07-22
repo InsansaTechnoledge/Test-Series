@@ -9,7 +9,7 @@ import { validateWithBloom } from "../../../../../../utils/validateWithBloom";
 import { Toast } from "primereact/toast";
 
 const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
-  console.log('sdvsz', examDetails.subjects)
+  console.log('sdvsz',examDetails?.subjects)
   const { user } = useUser();
   console.log("sdgv", user);
   const { toasts, showToast, removeToast } = useToast();
@@ -780,22 +780,22 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
           </>
         )}
 
-        {/* Subject, Chapter, Explanation */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <select
-            className={inputCommon}
-            name="subject"
-            value={form.subject}
-            onChange={handleChange}
-          >
-            <option value="">-- Select Subject --</option>
-            {Array.isArray(examDetails.subjects) &&
-              examDetails.subjects.map((subj, idx) => (
-                <option key={idx} value={subj}>
-                  {subj}
-                </option>
-              ))}
-          </select>
+      {/* Subject, Chapter, Explanation */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <select
+        className={inputCommon}
+        name="subject"
+        value={form.subject}
+        onChange={handleChange}
+      >
+        <option value="">-- Select Subject --</option>
+        {Array.isArray(examDetails?.subjects) &&
+          examDetails?.subjects.map((subj, idx) => (
+            <option key={idx} value={subj}>
+              {subj}
+            </option>
+          ))}
+      </select>
 
           <input
             className={inputCommon}

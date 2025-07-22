@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Search, Filter, Trash2, MoreHorizontal, Eye, Edit, UserX, Check, X, ChevronUp, ChevronDown, Users, GraduationCap, Sparkles, Target, PlusSquare } from 'lucide-react'
+import { Search, Filter, Trash2, MoreHorizontal, Eye, Edit, UserX, Check, X, ChevronUp, ChevronDown, Users, GraduationCap, Sparkles, Target, PlusSquare, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useCachedStudents } from '../../../../hooks/useCachedStudents';
 import { deleteStudentById } from '../../../../utils/services/studentService';
 import { useCachedBatches } from '../../../../hooks/useCachedBatches';
@@ -44,6 +44,9 @@ const StudentListPage = () => {
   const { theme } = useTheme();
   const location = useLocation();
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [studentsPerPage] = useState(6);
+
   const canAddStudent= hasRoleAccess({
     keyFromPageOrAction: 'actions.addStudent',
     location: location.pathname
@@ -63,6 +66,7 @@ const StudentListPage = () => {
   });
 
 
+  console.log("sdf",students)
 
   useEffect(() => {
     if (students.length > 0) {
@@ -93,6 +97,50 @@ const StudentListPage = () => {
     return 0
   })
 
+  // Calculate pagination based on filtered results
+  const totalPages = Math.ceil(sortedStudents.length / studentsPerPage);
+  const indexOfLastStudent = currentPage * studentsPerPage;
+  const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
+  const currentStudents = sortedStudents.slice(indexOfFirstStudent, indexOfLastStudent);
+
+  // Reset to first page when search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedBatch]);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  // Generate page numbers for pagination
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const maxVisiblePages = 5;
+    
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i);
+      }
+    } else {
+      const startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+      const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+      
+      if (startPage > 1) {
+        pageNumbers.push(1);
+        if (startPage > 2) pageNumbers.push('...');
+      }
+      
+      for (let i = startPage; i <= endPage; i++) {
+        pageNumbers.push(i);
+      }
+      
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) pageNumbers.push('...');
+        pageNumbers.push(totalPages);
+      }
+    }
+    
+    return pageNumbers;
+  };
+
   // Handle sort
   const requestSort = (key) => {
     let direction = 'asc'
@@ -120,14 +168,28 @@ const StudentListPage = () => {
     }
   }
 
-  // Handle select all
-  useEffect(() => {
+  // Handle select all for current page
+  const toggleSelectAllCurrentPage = () => {
     if (selectAll) {
-      setSelectedStudents(sortedStudents.map(student => student._id))
+      // Deselect all students from current page
+      const currentPageStudentIds = currentStudents.map(student => student._id);
+      setSelectedStudents(prev => prev.filter(id => !currentPageStudentIds.includes(id)));
+      setSelectAll(false);
     } else {
-      setSelectedStudents([])
+      // Select all students from current page
+      const currentPageStudentIds = currentStudents.map(student => student._id);
+      setSelectedStudents(prev => [...new Set([...prev, ...currentPageStudentIds])]);
+      setSelectAll(true);
     }
-  }, [selectAll])
+  };
+
+  // Update selectAll state based on current page selection
+  useEffect(() => {
+    const currentPageStudentIds = currentStudents.map(student => student._id);
+    const allCurrentPageSelected = currentPageStudentIds.length > 0 && 
+      currentPageStudentIds.every(id => selectedStudents.includes(id));
+    setSelectAll(allCurrentPageSelected);
+  }, [selectedStudents, currentStudents]);
 
   // Confirm delete selected students
   const confirmDeleteSelected = () => {
@@ -151,6 +213,7 @@ const StudentListPage = () => {
     setSelectAll(false)
     setShowConfirmDelete(false)
   }
+
 
   return (
     <div className={`min-h-screen`}>
@@ -226,77 +289,7 @@ const StudentListPage = () => {
           </div>
         </div>
 
-        {/* Control Panel */}
-        <div className={`${theme === 'light' ? 'bg-white border border-gray-100' : 'bg-gray-800 border border-gray-700'} rounded-3xl shadow-xl p-6 mb-8`}>
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 ${theme === 'light' ? 'text-gray-400' : 'text-gray-300'} w-5 h-5`} />
-                <input
-                  className={`${theme === 'light' ? 'bg-gray-50 border-2 border-gray-200 text-gray-900 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400' : 'bg-gray-700 border-2 border-gray-600 text-gray-100 focus:ring-4 focus:ring-indigo-400 focus:border-indigo-400'} rounded-2xl pl-12 pr-6 py-3 transition-all duration-300 w-80`}
-                  placeholder="Search by name, email or phone..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className={`${theme === 'light' ? 'bg-gray-50 border-2 border-gray-200 text-gray-900 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400' : 'bg-gray-700 border-2 border-gray-600 text-gray-100 focus:ring-4 focus:ring-indigo-400 focus:border-indigo-400'} rounded-2xl px-6 py-3 transition-all duration-300 font-medium flex items-center space-x-2`}
-              >
-                <Filter className="w-5 h-5" />
-                <span>Filters</span>
-                {selectedBatch && (
-                  <span className="inline-flex items-center justify-center bg-indigo-100 text-indigo-800 text-xs font-medium h-5 w-5 rounded-full">
-                    1
-                  </span>
-                )}
-              </button>
-            </div>
-
-            <div className="flex items-center space-x-3">
-              {(selectedStudents.length > 0 && canDeleteStudent) && (
-                <button
-                  disabled={!canDeleteStudent}
-                  onClick={confirmDeleteSelected}
-                  className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-2xl font-bold transition-all duration-300 hover:shadow-2xl hover:scale-105 flex items-center space-x-2"
-                >
-                  <Trash2 className="w-5 h-5" />
-                  <span>Delete Selected ({selectedStudents.length})</span>
-                </button>
-              )}
-
-             {canAddStudent && ( <button
-                disabled={!canAddStudent}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-2xl font-bold transition-all duration-300 hover:shadow-2xl hover:scale-105 flex items-center space-x-3 transform"
-                onClick={() => navigate('/institute/add-student')}
-              >
-                <PlusSquare className="w-5 h-5" />
-                <span>Add New Student</span>
-              </button>)}
-            </div>
-          </div>
-
-          {/* Expanded Filters */}
-          {showFilters && (
-            <div className="mt-6 pt-6 border-t border-gray-200">
-              <div className="max-w-xs">
-                <label className={`block text-sm font-medium ${theme === 'light' ? 'text-gray-700' : 'text-gray-200'} mb-2`}>Batch Filter</label>
-                <select
-                  value={selectedBatch}
-                  onChange={(e) => setSelectedBatch(e.target.value)}
-                  className={`${theme === 'light' ? 'bg-gray-50 border-2 border-gray-200 text-gray-900 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400' : 'bg-gray-700 border-2 border-gray-600 text-gray-100 focus:ring-4 focus:ring-indigo-400 focus:border-indigo-400'} rounded-2xl px-4 py-3 transition-all duration-300 w-full font-medium`}
-                >
-                  <option value="">All Batches</option>
-                  {batches.map((batch) => (
-                    <option key={batch.id} value={batch.id}>{batch.name}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          )}
-        </div>
-
+       
         {/* Sort Controls */}
         <div className={`${theme === 'light' ? 'bg-white border border-gray-100' : 'bg-gray-800 border border-gray-700'} rounded-3xl shadow-xl p-6 mb-8`}>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -344,9 +337,83 @@ const StudentListPage = () => {
           </div>
         </div>
 
-        {/* Student Cards Grid */}
+         {/* search bar */}
+        <div className="my-4 flex justify-center">
+        <input
+          type="text"
+          placeholder="Search students..."
+          className="border border-gray-300 px-4 py-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-600"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+
+        {/* Enhanced Pagination */}
+        {totalPages > 1 && (
+          <div className={`${theme === 'light' ? 'bg-white border border-gray-100' : 'bg-gray-800 border border-gray-700'} rounded-3xl shadow-xl p-6 mb-8`}>
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className={`text-sm font-medium ${theme === 'light' ? 'text-gray-700' : 'text-gray-200'}`}>
+                Showing {indexOfFirstStudent + 1} to {Math.min(indexOfLastStudent, sortedStudents.length)} of {sortedStudents.length} students
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                {/* Previous Button */}
+                <button
+                  onClick={() => paginate(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-300 ${
+                    currentPage === 1
+                      ? (theme === 'light' ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-gray-700 text-gray-500 cursor-not-allowed')
+                      : (theme === 'light' ? 'bg-gray-50 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600' : 'bg-gray-700 text-gray-200 hover:bg-indigo-800 hover:text-indigo-300')
+                  }`}
+                >
+                  <ChevronLeft size={16} />
+                  Previous
+                </button>
+
+                {/* Page Numbers */}
+                <div className="flex items-center space-x-1">
+                  {getPageNumbers().map((pageNum, index) => (
+                    <React.Fragment key={index}>
+                      {pageNum === '...' ? (
+                        <span className={`px-3 py-2 ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>...</span>
+                      ) : (
+                        <button
+                          onClick={() => paginate(pageNum)}
+                          className={`px-4 py-2 rounded-xl font-medium transition-all duration-300 ${
+                            currentPage === pageNum
+                              ? (theme === 'light' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-indigo-600 text-white shadow-lg')
+                              : (theme === 'light' ? 'bg-gray-50 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600' : 'bg-gray-700 text-gray-200 hover:bg-indigo-800 hover:text-indigo-300')
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </div>
+
+                {/* Next Button */}
+                <button
+                  onClick={() => paginate(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-300 ${
+                    currentPage === totalPages
+                      ? (theme === 'light' ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-gray-700 text-gray-500 cursor-not-allowed')
+                      : (theme === 'light' ? 'bg-gray-50 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600' : 'bg-gray-700 text-gray-200 hover:bg-indigo-800 hover:text-indigo-300')
+                  }`}
+                >
+                  Next
+                  <ChevronRight size={16} />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+       {/* Student Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12 ">
-          {sortedStudents?.map((student, idx) => (
+          {currentStudents?.map((student, idx) => (
             <div
               key={student._id || idx}
               className={`group relative ${theme === 'light' ? 'bg-white border-gray-100' : 'bg-gray-800 border-gray-700'} rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border overflow-hidden`}
@@ -357,13 +424,13 @@ const StudentListPage = () => {
             >
               {/* Gradient Header */}
         
-<div className={`h-16 ${theme === 'light' ? 'bg-gradient-to-r from-indigo-500 to-indigo-400' : 'bg-gradient-to-r from-indigo-600 to-indigo-700'} rounded-t-2xl relative overflow-hidden shadow-md`}>
+              <div className={`h-16 ${theme === 'light' ? 'bg-gradient-to-r from-indigo-500 to-indigo-400' : 'bg-gradient-to-r from-indigo-600 to-indigo-700'} rounded-t-2xl relative overflow-hidden shadow-md`}>
 
-<div className={`inset-0 ${theme === 'light' ? 'bg-indigo-100' : 'bg-gray-800'} bg-opacity-5 backdrop-blur-sm -z-10 absolute  bg-opacity-10`}></div>
+              <div className={`inset-0 ${theme === 'light' ? 'bg-indigo-100' : 'bg-gray-800'} bg-opacity-5 backdrop-blur-sm -z-10 absolute  bg-opacity-10`}></div>
 
 
-<div className='flex justify-between items-center px-3  py-4 '>
-<div className="flex gap-2 justify-center items-center ">
+              <div className='flex justify-between items-center px-3  py-4 '>
+              <div className="flex gap-2 justify-center items-center ">
                   <input
                     type="checkbox"
                     checked={selectedStudents.includes(student._id)}
@@ -371,26 +438,17 @@ const StudentListPage = () => {
                     className="w-5 h-5 z-10 cursor-pointer rounded-lg text-white bg-white bg-opacity-20 border-2 border-white focus:ring-white"
                   />
                     <h3 className="text-white font-bold text-md leading-snug line-clamp-2">
-  {student.name}
-  </h3>
+                    {student.name}
+                    </h3>
+              </div>
+                 
+
+              <div className="">
+                <div className="bg-white text-indigo-700 text-xs font-bold px-2 py-1 rounded-full shadow backdrop-blur-md border border-white border-opacity-30 flex items-center gap-1">
+                {batchMap[student.batch?.currentBatch]?.name || 'No Batch'}
                 </div>
-<div className="">
-
+              </div>
 </div>
-
-<div className="">
-  <div className="bg-white text-indigo-700 text-xs font-bold px-2 py-1 rounded-full shadow backdrop-blur-md border border-white border-opacity-30 flex items-center gap-1">
-  {batchMap[student.batch?.currentBatch]?.name || 'No Batch'}
-  </div>
-</div>
-
-
-
-
-
-</div>
-
-
 
 </div>
               {/* Card Content */}

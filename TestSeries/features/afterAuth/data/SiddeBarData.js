@@ -170,7 +170,7 @@ export const categoryData = [
     features: [
       'Create Exams',
       'Exam List Page',
-      'Exam anomaly center',
+      'Exam Anomaly Center',
 
     ]
   },

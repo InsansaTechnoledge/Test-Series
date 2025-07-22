@@ -13,8 +13,10 @@ import {
   Sparkles,
   Zap,
   Target,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import  React ,{ useEffect, useState } from "react";
 import HeadingUtil from "../../utility/HeadingUtil";
 import { useCachedBatches } from "../../../../hooks/useCachedBatches";
 import RefreshButton from "../../utility/RefreshButton";
@@ -59,6 +61,10 @@ const BatchList = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [batchId, setBatchId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+
+  const [currentpage, setCurrentPage] = useState(1);
+  const [batchesPerpage] = useState(6);
+
   const canEditBatch = hasRoleAccess({
     keyFromPageOrAction: "actions.editBatch",
     location: null,
@@ -76,10 +82,6 @@ const BatchList = () => {
     location: null,
   });
 
-  console.log("canEditBatch", canEditBatch);
-  console.log("canDeleteBatch", canDeleteBatch);
-  console.log("canViewBatch", canViewBatch);
-  console.log("canCreateBatch", canCreateBatch);
 
   const refreshFunction = async () => {
     await queryClient.invalidateQueries(["batches", user._id]);
@@ -115,9 +117,7 @@ const BatchList = () => {
   // Handle Delete Confirmation
   const confirmDeleteBatch = async () => {
     try {
-      // Add your delete API call here
-      // await deleteBatch(batchId);
-
+     
       // Refresh data after deletion
       await refreshFunction();
 
@@ -148,6 +148,48 @@ const BatchList = () => {
       .includes(searchTerm.toLowerCase());
     return yearMatch && searchMatch;
   });
+
+  const totalPages = Math.ceil(filteredBatches.length / batchesPerpage);
+  const indexOfLastBatch = currentpage * batchesPerpage; 
+  const indexOfFirstBatch = indexOfLastBatch - batchesPerpage; 
+
+// Slice the batches array to get the current page's batches
+const currentBatch = filteredBatches.slice(indexOfFirstBatch, indexOfLastBatch);
+
+// Paginate function to handle page changes
+const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+// Generate page numbers for pagination
+const getPageNumbers = () => {
+  const pageNumbers = [];
+  const maxVisiblePages = 5;
+
+  if (totalPages <= maxVisiblePages) {
+    for (let i = 1; i <= totalPages; i++) {
+      pageNumbers.push(i);
+    }
+  } else {
+    const startPage = Math.max(1, currentpage - Math.floor(maxVisiblePages / 2));
+    const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (startPage > 1) {
+      pageNumbers.push(1);
+      if (startPage > 2) pageNumbers.push('...');
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(i);
+    }
+
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) pageNumbers.push('...');
+      pageNumbers.push(totalPages);
+    }
+  }
+
+  return pageNumbers;
+};
+
 
   const { theme } = useTheme();
 
@@ -337,9 +379,73 @@ const BatchList = () => {
           </div>
         </div>
 
+        {totalPages > 0 && (
+          <div className={`${theme === 'light' ? 'bg-white border border-gray-100' : 'bg-gray-800 border border-gray-700'} rounded-3xl shadow-xl p-6 mb-8`}>
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className={`text-sm font-medium ${theme === 'light' ? 'text-gray-700' : 'text-gray-200'}`}>
+                Showing {indexOfFirstBatch + 1} to {Math.min(indexOfLastBatch, filteredBatches.length)} of {filteredBatches.length} students
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                {/* Previous Button */}
+                <button
+                  onClick={() => paginate(currentpage - 1)}
+                  disabled={currentpage === 1}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-300 ${
+                    currentpage === 1
+                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      : 'bg-gray-50 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600'
+                  }`}
+                >
+                  <ChevronLeft size={16} />
+                  Previous
+                </button>
+
+                {/* Page Numbers */}
+                <div className="flex items-center space-x-1">
+                  {getPageNumbers().map((pageNum, index) => (
+                    <React.Fragment key={index}>
+                      {pageNum === '...' ? (
+                        <span className="px-3 py-2 text-gray-500">...</span>
+                      ) : (
+                        <button
+                          onClick={() => paginate(pageNum)}
+                          className={`px-4 py-2 rounded-xl font-medium transition-all duration-300 ${
+                            currentpage === pageNum
+                              ? 'bg-indigo-600 text-white shadow-lg'
+                              : 'bg-gray-50 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600'
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </div>
+
+                {/* Next Button */}
+                <button
+                  onClick={() => paginate(currentpage + 1)}
+                  disabled={currentpage === totalPages}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-300 ${
+                    currentpage === totalPages
+                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      : 'bg-gray-50 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600'
+                  }`}
+                >
+                  Next
+                  <ChevronRight size={16} />
+                </button>
+
+              </div>
+            </div>
+          </div>
+        )}
+
+
         {/* Batch Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {filteredBatches?.map((batch, idx) => (
+          {currentBatch?.map((batch, idx) => (
             <div
               key={batch.id || idx}
               className={`group relative ${
