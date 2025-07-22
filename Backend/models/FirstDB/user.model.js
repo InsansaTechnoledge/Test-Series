@@ -20,7 +20,8 @@ user:{
   }
 
 },
-{_id: false});
+{_id: false
+});
 
 const userSchema = new Schema({
 
@@ -119,9 +120,7 @@ const userSchema = new Schema({
       enum: ['User', 'Organization'],
     }
   },
-  youtubeInfo:{
-    type:youtubeInfoSchema
-  }
+  youtubeInfo:youtubeInfoSchema
 
 
 }, {

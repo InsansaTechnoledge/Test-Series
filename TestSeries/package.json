@@ -22,6 +22,8 @@
     "motion": "^12.18.1",
     "npm": "^11.4.1",
     "papaparse": "^5.5.3",
+    "primeicons": "^7.0.0",
+    "primereact": "^10.9.6",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.6.0",

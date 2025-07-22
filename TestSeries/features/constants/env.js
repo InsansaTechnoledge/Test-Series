@@ -124,4 +124,4 @@ export const VITE_ROLE_FEATURE_MAP= `{
   "actions.uploadVideo": ["video:upload_video"],
   "actions.viewReport": ["analysis:view_analysis"]
 }`
- 
+ export const REACT_APP_GEMINI_API_KEY="AIzaSyCAd5Amk4Z_G20WeQTA8sGhplKgV7yn1Fg"
