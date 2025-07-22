@@ -8,7 +8,7 @@ export default function BottomNavigator({ setShowLogoutModal }) {
   const location = useLocation();
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [showLayoutOptions, setShowLayoutOptions] = useState(false);
-  const [layoutPosition, setLayoutPosition] = useState('bottom');
+  const [layoutPosition, setLayoutPosition] = useState('collapse');
   const [isMobile, setIsMobile] = useState(false);
   const { controls } = SideBarDataHook();
 
