@@ -9,7 +9,7 @@ import { VITE_SECRET_KEY_FOR_TESTWINDOW } from '../constants/env';
 import LoadingTest from './LoadingTest';
 import { checkToStopExamForStudent } from '../../utils/services/proctorService';
 
-const TestHeader = ({ isAutoSubmittable,isProctorRunning,handleSubmit}) => {
+const TestHeader = ({ isAutoSubmittable, isProctorRunning, handleSubmit , setSelectedQuestion}) => {
   const [eventDetails, setEventDetails] = useState();
   const [subjectSpecificQuestions, setSubjectSpecificQuestions] = useState();
   const [selectedSubject, setSelectedSubject] = useState();
