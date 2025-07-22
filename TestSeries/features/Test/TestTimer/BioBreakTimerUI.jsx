@@ -1,10 +1,28 @@
 import React from "react";
+import { useLocation } from "react-router-dom";
+import { useUser } from "../../../contexts/currentUserContext";
 
 const BioBreakTimerUI = ({ formatTime, bioBreakTimeLeft , setBioBreakTimeLeft ,   setIsPaused}) => {
+  const {user}=useUser();
+  const location=useLocation();
+  const searchParams = new URLSearchParams(location.search);
+    const examId = searchParams.get("examId");
 
-  const handleContinueTest = () => {
+  const handleContinueTest = async () => {
+    try{
     setBioBreakTimeLeft(0);
     setIsPaused(false);
+      if (window?.electronAPI?.startProctorEngineAsync) {
+          const params={
+            userId: user._id,
+            examId,
+            eventId:examId,
+          }
+          await window.electronAPI.startProctorEngineAsync(params);
+        }
+      }catch(error) {
+        console.error("Error resuming test:", error);
+      }
   }
   return (
     <>
