@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Edit, Eye, PlusSquare, Search, Trash, Users, UserCheck, Shield, AlertTriangle } from 'lucide-react'
+import { Edit, Eye, PlusSquare, Search, Trash, Users, UserCheck, Shield, AlertTriangle, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import RefreshButton from '../../utility/RefreshButton'
 import { useCachedUser } from '../../../../hooks/useCachedUser'
@@ -42,6 +42,9 @@ const UserList = () => {
     const navigate = useNavigate();
     const { theme } = useTheme();
 
+    const [currentpage, setCurrentPage] = useState(1);
+    const [userPerPage] = useState(6);
+
       const canCreateUser=hasRoleAccess({
             keyFromPageOrAction: "actions.createUser",
             location: location.pathname
@@ -75,6 +78,46 @@ const UserList = () => {
            
         }
     }, [users])
+
+    const totalPages = Math.ceil(filteredUsers.length / userPerPage);
+    const indexOfLastUser = currentpage * userPerPage; 
+    const indexOfFirstUser = indexOfLastUser - userPerPage; 
+
+    const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+
+    // Paginate function to handle page changes
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+    const getPageNumbers = () => {
+        const pageNumbers = [];
+        const maxVisiblePages = 5;
+      
+        if (totalPages <= maxVisiblePages) {
+          for (let i = 1; i <= totalPages; i++) {
+            pageNumbers.push(i);
+          }
+        } else {
+          const startPage = Math.max(1, currentpage - Math.floor(maxVisiblePages / 2));
+          const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+      
+          if (startPage > 1) {
+            pageNumbers.push(1);
+            if (startPage > 2) pageNumbers.push('...');
+          }
+      
+          for (let i = startPage; i <= endPage; i++) {
+            pageNumbers.push(i);
+          }
+      
+          if (endPage < totalPages) {
+            if (endPage < totalPages - 1) pageNumbers.push('...');
+            pageNumbers.push(totalPages);
+          }
+        }
+      
+        return pageNumbers;
+      };
+    
 
     useEffect(() => {
         let filtered = users || [];
@@ -214,9 +257,72 @@ const UserList = () => {
                     </div>
                 </div>
 
+                {totalPages > 0 && (
+                <div className={`${theme === 'light' ? 'bg-white border border-gray-100' : 'bg-gray-800 border border-gray-700'} rounded-3xl shadow-xl p-6 mb-8`}>
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className={`text-sm font-medium ${theme === 'light' ? 'text-gray-700' : 'text-gray-200'}`}>
+                        Showing {indexOfFirstUser + 1} to {Math.min(indexOfLastUser, filteredUsers.length)} of {filteredUsers.length} students
+                    </div>
+                    
+                    <div className="flex items-center space-x-2">
+                        {/* Previous Button */}
+                        <button
+                        onClick={() => paginate(currentpage - 1)}
+                        disabled={currentpage === 1}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-300 ${
+                            currentpage === 1
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                            : 'bg-gray-50 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600'
+                        }`}
+                        >
+                        <ChevronLeft size={16} />
+                        Previous
+                        </button>
+
+                        {/* Page Numbers */}
+                        <div className="flex items-center space-x-1">
+                        {getPageNumbers().map((pageNum, index) => (
+                            <React.Fragment key={index}>
+                            {pageNum === '...' ? (
+                                <span className="px-3 py-2 text-gray-500">...</span>
+                            ) : (
+                                <button
+                                onClick={() => paginate(pageNum)}
+                                className={`px-4 py-2 rounded-xl font-medium transition-all duration-300 ${
+                                    currentpage === pageNum
+                                    ? 'bg-indigo-600 text-white shadow-lg'
+                                    : 'bg-gray-50 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600'
+                                }`}
+                                >
+                                {pageNum}
+                                </button>
+                            )}
+                            </React.Fragment>
+                        ))}
+                        </div>
+
+                        {/* Next Button */}
+                        <button
+                        onClick={() => paginate(currentpage + 1)}
+                        disabled={currentpage === totalPages}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-300 ${
+                            currentpage === totalPages
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                            : 'bg-gray-50 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600'
+                        }`}
+                        >
+                        Next
+                        <ChevronRight size={16} />
+                        </button>
+
+                    </div>
+                    </div>
+                </div>
+                )}
+
                 {/* User Cards Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-                    {filteredUsers?.map((userItem, idx) => (
+                    {currentUsers?.map((userItem, idx) => (
                         <div 
                             key={userItem._id || idx} 
                             className={`group relative ${theme === 'light' ? 'bg-white border-gray-100' : 'bg-gray-800 border-gray-700'} rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border overflow-hidden`}
