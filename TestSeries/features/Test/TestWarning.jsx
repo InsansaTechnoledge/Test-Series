@@ -20,6 +20,7 @@ const TestHeader = ({ isAutoSubmittable, isProctorRunning, handleSubmit , setSel
   const [allWarnings, setAllWarnings] = useState([]);
   const [showFinalPopup, setShowFinalPopup] = useState(false);
   const [showManualReviewMessage, setShowManualReviewMessage] = useState(false);
+  const [proctorStatus, setProctorStatus] = useState('Initializing...');
 
   // Organization stop toast states
   const [showOrgStopToast, setShowOrgStopToast] = useState(false);

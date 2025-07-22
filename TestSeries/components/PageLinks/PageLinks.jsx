@@ -64,6 +64,7 @@ import RegisteredAndScheduledContestPage from '../../features/afterAuth/componen
 import LiveContestPage from '../../features/afterAuth/components/StudentSide/Coding-Contests/LiveContest/LiveContestPage';
 import LeaderBoard from '../../features/afterAuth/components/StudentSide/Coding-Contests/contestResult/LeaderBoard';
 import ExamAnomalyControlSection from '../../features/afterAuth/components/InstituteSide/ExamFlow/ExamAnomalyControl/ExamAnomalyControlSection';
+import QBMS from '../../features/afterAuth/components/InstituteSide/QuestionBankManagementSystem/QBMS';
 
 // Error Boundary Component
 class ElectronErrorBoundary extends React.Component {
@@ -314,6 +315,7 @@ const PageLinks = () => {
                 <Route path='create-role-group' element={<FeatureBasedRoleGroups />} />
                 <Route path='create-exam/:examId?' element={<CreateExam />} />
                 <Route path='exam-list' element={<ExamListPage />} />
+                <Route path='qbms' element={<QBMS/>}/>
                 <Route path='exam-anomaly' element={<ExamAnomalyControlSection/>}/>
                 <Route path='institute-landing' element={<InstituteLandingPage />} />
                 <Route path='batch-details' element={<BatchViewPage />} />

@@ -52,8 +52,8 @@ export const VITE_PLAN_FEATURE_MAP= `{
   "actions.viewReport": ["analysis_feature"]
 }`
  
-export const VITE_API_BASE_URL="https://test-series-1new.onrender.com/api"
-//  VITE_API_BASE_URL="http://localhost:8000/api"
+// export const VITE_API_BASE_URL="https://test-series-1new.onrender.com/api"
+export const VITE_API_BASE_URL="http://localhost:8000/api"
 
 export const VITE_ROLE_FEATURE_MAP= `{
   "/institute/batch-list": ["batch:view_batch", "batch:create_batch", "batch:edit_batch"],
@@ -71,6 +71,7 @@ export const VITE_ROLE_FEATURE_MAP= `{
   "/institute/create-exam": ["exam:create_exam"],
   "/institute/create-exam/:examId": ["exam:edit_exam"],
   "/institute/exam-list": ["exam:view_exam", "exam:publish_exam", "exam:edit_exam", "exam:delete_exam","exam:create_exam"],
+  "/institue/qbms": ["exam:create_qb"],
  
   "/institute/create-user": ["user:create_user"],
   "/institute/user-list": ["user:view_user", "user:edit_user", "user:delete_user","user:create_user"],
