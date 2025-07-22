@@ -9,7 +9,7 @@ import { VITE_SECRET_KEY_FOR_TESTWINDOW } from '../constants/env';
 import LoadingTest from './LoadingTest';
 import { checkToStopExamForStudent } from '../../utils/services/proctorService';
 
-const TestHeader = ({ isAutoSubmittable,isProctorRunning,handleSubmit}) => {
+const TestHeader = ({ isAutoSubmittable,isProctorRunning,handleSubmit,  setSelectedQuestion = () => {},}) => {
   const [eventDetails, setEventDetails] = useState();
   const [subjectSpecificQuestions, setSubjectSpecificQuestions] = useState();
   const [selectedSubject, setSelectedSubject] = useState();
@@ -20,6 +20,7 @@ const TestHeader = ({ isAutoSubmittable,isProctorRunning,handleSubmit}) => {
   const [allWarnings, setAllWarnings] = useState([]);
   const [showFinalPopup, setShowFinalPopup] = useState(false);
   const [showManualReviewMessage, setShowManualReviewMessage] = useState(false);
+  const [proctorStatus, setProctorStatus] = useState('Initializing...');
 
   // Organization stop toast states
   const [showOrgStopToast, setShowOrgStopToast] = useState(false);
