@@ -199,7 +199,7 @@ function generateRandomPassword() {
     if (exists) {
       return prev.filter((b) => b.id !== key);
     } else {
-      return [...prev, batch];
+      return [...prev, batches];
     }
   });
 };

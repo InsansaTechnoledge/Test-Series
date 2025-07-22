@@ -411,6 +411,7 @@ const Navbar = ({setShowLogoutModal}) => {
                           setShowProfileDropdown(false);
                           setActiveCategory(''); // Close categories dropdown
                         }}
+                        title='you can manage your entire set of questions here'
                         className={`block w-full text-left px-4 py-2 text-sm transition-all duration-200 ease-in-out hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:border-l-4 hover:border-blue-500 hover:shadow-md hover:transform hover:scale-[1.02] rounded-lg ${themeClasses.dropdownItem}`}
                       >
                         <span className="relative z-10 font-medium group-hover:text-blue-700 transition-colors duration-200">
