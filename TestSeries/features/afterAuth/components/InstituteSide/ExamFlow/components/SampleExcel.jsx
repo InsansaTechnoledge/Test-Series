@@ -13,27 +13,32 @@ export const generateSampleExcel = () => {
       difficulty: 'easy',
       positive_marks: 1,
       negative_marks: 0,
+      bloom_level: 'remember',
     },
     {
       type: 'msq',
       question_text: 'Which of the following are fruits?',
       options: JSON.stringify(['Apple', 'Potato', 'Banana', 'Tomato']),
       correct_options: JSON.stringify([0, 2, 3]),
+      bloom_level: 'understand',
     },
     {
       type: 'fill',
       question_text: '______ is the chemical symbol for water.',
       correct_answer: 'H2O',
+      bloom_level: 'remember',
     },
     {
       type: 'numerical',
       question_text: 'What is 5 + 3?',
       correct_answer: '8',
+      bloom_level: 'apply',
     },
     {
       type: 'tf',
       question_text: 'The earth is flat.',
       is_true: false,
+       bloom_level: 'understand',
     },
     {
       type: 'match',
@@ -44,7 +49,9 @@ export const generateSampleExcel = () => {
         'India': 'New Delhi',
         'Germany': 'Berlin',
         'Japan': 'Tokyo',
+        
       }),
+      bloom_level: 'analyze',
     },
   ];
 

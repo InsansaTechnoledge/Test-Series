@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useUser } from "../../../../../../contexts/currentUserContext";
 import { useEffect } from "react";
@@ -6,15 +6,15 @@ import CodeCreatorForm from "../../../../../Test/CodeEditor/codeCreator/codeCrea
 import { useTheme } from "../../../../../../hooks/useTheme";
 import { useToast, ToastContainer } from "../../../../../../utils/Toaster";
 import { validateWithBloom } from "../../../../../../utils/validateWithBloom";
-import { Toast } from "primereact/toast";
+
 
 const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
-  console.log('sdvsz',examDetails?.subjects)
+  console.log('sdvsz', examDetails.subjects)
   const { user } = useUser();
   console.log("sdgv", user);
   const { toasts, showToast, removeToast } = useToast();
   const [bloomLevel, setBloomLevel] = useState("Remember");
-  const toast = useRef(null);
+
   const [codeData, setCodeData] = useState({
     title: "",
     difficulty: "easy",
@@ -36,23 +36,6 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
   });
   // Add code-specific properties if needed
   // newQuestion.test_cases = [];
-  const handleShowSuccess = () => {
-    toast.current.show({
-      severity: "success",
-      summary: "Validated",
-      detail: "Question matches Bloom's level",
-      life: 3000,
-    });
-  };
-
- const handleShowError = (expectedLevel, selectedLevel) => {
-  toast.current.show({
-    severity: "error",
-    summary: "Incorrect Bloom Level",
-    detail: `Expected ${expectedLevel}, but selected ${selectedLevel}`,
-    life: 4000,
-  });
-};
 
   const initialFormState = {
     type: "mcq",
@@ -113,15 +96,15 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
     }
     const { isValid, matchedLevel } = await validateWithBloom(form.question_text, bloomLevel);
 
-  
+    console.log("✅ Bloom Match:", isValid);
+    console.log("✅ Detected Bloom Level:", matchedLevel);
 
     if (!isValid) {
-    handleShowError(matchedLevel, bloomLevel);
-
+      showToast(`❌ Incorrect Bloom level! ${bloomLevel}, correct ${matchedLevel}`, "error");
       return;
     }
 
-    handleShowSuccess(); (`✅ Question matches Bloom level: ${matchedLevel}`, "success");
+    showToast(`✅ Question matches Bloom level: ${matchedLevel}`, "success");
 
     const newQuestion = {
       id: uuidv4(),
@@ -241,179 +224,175 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
 
 
   return (
-    <>
-      <Toast ref={toast} position="top-center" />
-      <ToastContainer toasts={toasts} onRemove={removeToast} />
-
-      <div
-        className={` backdrop-blur-md shadow-md rounded-2xl p-6 space-y-6  ${theme == "light" ? "border border-gray-200 bg-white/70" : "bg-gray-800"
-          }`}
-      >
-        {/* Question Type Dropdown */}
-        <div>
-          <label className={LabelCommon}>Question Type</label>
-          <select
-            className={inputCommon}
-            name="type"
-            value={form.type}
-            onChange={handleChange}
-          >
-            <option value="mcq">MCQ</option>
-            <option value="msq">MSQ</option>
-            <option value="fill">Fill in the Blank</option>
-            <option value="tf">True/False</option>
-            <option value="numerical">Numerical</option>
-            <option value="match">Match the Following</option>
-            <option value="comprehension">Comprehension</option>
-            {user?.planFeatures?.coding_feature?.isActive === true ||
-              user?.planFeatures?.coding_feature?.isActive === "true" ? (
-              <option value="code">Code</option>
-            ) : null}
-          </select>
-        </div>
-
-        {/* Question Text */}
-        <div>
-          <label className={LabelCommon}>Question Text</label>
-          <textarea
-            className={inputCommon}
-            rows={3}
-            name="question_text"
-            value={form.question_text}
-            onChange={handleChange}
-            placeholder="Enter question..."
-          />
-        </div>
-
-        {/* MCQ / MSQ Options */}
-        {(form.type === "mcq" || form.type === "msq") && (
-          <div className="space-y-2">
-            <label className={LabelCommon}>Options</label>
-            <div className="mb-3">
-              <p
-                className={`text-sm ${theme === "light" ? "text-gray-600" : "text-gray-300"
-                  }`}
-              >
-                Enter your options below, then click to select the correct
-                answer(s)
-              </p>
-            </div>
-            <div>
-              <span
-                className={`text-sm font-semibold ${theme === "light" ? "text-gray-600" : "text-gray-300"
-                  }`}
-              >
-                Select Correct Option
-              </span>
-            </div>
-
-            {form.options.map((opt, i) => {
-              const isChecked =
-                form.type === "mcq"
-                  ? form.correct_option === i
-                  : form.correct_options.includes(i);
-
-              return (
-                <div
-                  key={i}
-                  className={`flex items-center gap-3 p-3 rounded-lg border transition-colors cursor-pointer ${isChecked
-                    ? theme === "light"
-                      ? "bg-blue-50 border-blue-200"
-                      : "bg-blue-900/20 border-blue-700"
-                    : theme === "light"
-                      ? "bg-white border-gray-200 hover:border-gray-300"
-                      : "bg-gray-800 border-gray-700 hover:border-gray-600"
-                    }`}
-                  onClick={() => {
-                    if (form.type === "mcq") {
-                      setForm((prev) => ({
-                        ...prev,
-                        correct_option: i,
-                      }));
-                    } else if (form.type === "msq") {
-                      const newSelections = isChecked
-                        ? form.correct_options.filter((index) => index !== i)
-                        : [...form.correct_options, i];
-
-                      setForm((prev) => ({
-                        ...prev,
-                        correct_options: newSelections,
-                      }));
-                    }
-                  }}
-                >
-                  <div
-                    className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors ${isChecked
-                      ? "bg-blue-500 border-blue-500"
-                      : theme === "light"
-                        ? "border-gray-300"
-                        : "border-gray-600"
-                      }`}
-                  >
-                    {isChecked && (
-                      <svg
-                        className="w-2.5 h-2.5 text-white"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={3}
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
-                    )}
-                  </div>
-
-                  <span
-                    className={`text-sm font-medium min-w-[20px] ${isChecked
-                      ? theme === "light"
-                        ? "text-blue-600"
-                        : "text-blue-400"
-                      : theme === "light"
-                        ? "text-gray-500"
-                        : "text-gray-400"
-                      }`}
-                  >
-                    {String.fromCharCode(97 + i).toUpperCase()}.
-                  </span>
-
-                  <input
-                    className={`${inputCommon} flex-1 py-1.5 px-2 rounded border transition-colors ${isChecked
-                      ? theme === "light"
-                        ? "bg-blue-50/50 border-blue-200"
-                        : "bg-blue-900/10 border-blue-700"
-                      : theme === "light"
-                        ? "bg-gray-50 border-gray-200 focus:border-blue-400"
-                        : "bg-gray-700 border-gray-600 focus:border-blue-500"
-                      }`}
-                    placeholder={`Option ${i + 1}`}
-                    value={opt}
-                    onClick={(e) => e.stopPropagation()}
-                    onChange={(e) => handleOptionsChange(i, e.target.value)}
-                  />
-                </div>
-              );
-            })}
-          </div>
-        )}
+    <div
+      className={` backdrop-blur-md shadow-md rounded-2xl p-6 space-y-6  ${theme == "light" ? "border border-gray-200 bg-white/70" : "bg-gray-800"
+        }`}
+    >
+      {/* Question Type Dropdown */}
+      <div>
+        <label className={LabelCommon}>Question Type</label>
         <select
           className={inputCommon}
-          value={bloomLevel}
-          onChange={(e) => setBloomLevel(e.target.value)}
+          name="type"
+          value={form.type}
+          onChange={handleChange}
         >
-          <option value="Remember">Remember</option>
-          <option value="Understand">Understand</option>
-          <option value="Apply">Apply</option>
-          <option value="Analyze">Analyze</option>
-          <option value="Evaluate">Evaluate</option>
-          <option value="Create">Create</option>
+          <option value="mcq">MCQ</option>
+          <option value="msq">MSQ</option>
+          <option value="fill">Fill in the Blank</option>
+          <option value="tf">True/False</option>
+          <option value="numerical">Numerical</option>
+          <option value="match">Match the Following</option>
+          <option value="comprehension">Comprehension</option>
+          {user?.planFeatures?.coding_feature?.isActive === true ||
+            user?.planFeatures?.coding_feature?.isActive === "true" ? (
+            <option value="code">Code</option>
+          ) : null}
         </select>
+      </div>
 
-        {/* Correct Option(s) */}
-        {/* {form.type === "mcq" && (
+      {/* Question Text */}
+      <div>
+        <label className={LabelCommon}>Question Text</label>
+        <textarea
+          className={inputCommon}
+          rows={3}
+          name="question_text"
+          value={form.question_text}
+          onChange={handleChange}
+          placeholder="Enter question..."
+        />
+      </div>
+
+      {/* MCQ / MSQ Options */}
+      {(form.type === "mcq" || form.type === "msq") && (
+        <div className="space-y-2">
+          <label className={LabelCommon}>Options</label>
+          <div className="mb-3">
+            <p
+              className={`text-sm ${theme === "light" ? "text-gray-600" : "text-gray-300"
+                }`}
+            >
+              Enter your options below, then click to select the correct
+              answer(s)
+            </p>
+          </div>
+          <div>
+            <span
+              className={`text-sm font-semibold ${theme === "light" ? "text-gray-600" : "text-gray-300"
+                }`}
+            >
+              Select Correct Option
+            </span>
+          </div>
+
+          {form.options.map((opt, i) => {
+            const isChecked =
+              form.type === "mcq"
+                ? form.correct_option === i
+                : form.correct_options.includes(i);
+
+            return (
+              <div
+                key={i}
+                className={`flex items-center gap-3 p-3 rounded-lg border transition-colors cursor-pointer ${isChecked
+                  ? theme === "light"
+                    ? "bg-blue-50 border-blue-200"
+                    : "bg-blue-900/20 border-blue-700"
+                  : theme === "light"
+                    ? "bg-white border-gray-200 hover:border-gray-300"
+                    : "bg-gray-800 border-gray-700 hover:border-gray-600"
+                  }`}
+                onClick={() => {
+                  if (form.type === "mcq") {
+                    setForm((prev) => ({
+                      ...prev,
+                      correct_option: i,
+                    }));
+                  } else if (form.type === "msq") {
+                    const newSelections = isChecked
+                      ? form.correct_options.filter((index) => index !== i)
+                      : [...form.correct_options, i];
+
+                    setForm((prev) => ({
+                      ...prev,
+                      correct_options: newSelections,
+                    }));
+                  }
+                }}
+              >
+                <div
+                  className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors ${isChecked
+                    ? "bg-blue-500 border-blue-500"
+                    : theme === "light"
+                      ? "border-gray-300"
+                      : "border-gray-600"
+                    }`}
+                >
+                  {isChecked && (
+                    <svg
+                      className="w-2.5 h-2.5 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={3}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  )}
+                </div>
+
+                <span
+                  className={`text-sm font-medium min-w-[20px] ${isChecked
+                    ? theme === "light"
+                      ? "text-blue-600"
+                      : "text-blue-400"
+                    : theme === "light"
+                      ? "text-gray-500"
+                      : "text-gray-400"
+                    }`}
+                >
+                  {String.fromCharCode(97 + i).toUpperCase()}.
+                </span>
+
+                <input
+                  className={`${inputCommon} flex-1 py-1.5 px-2 rounded border transition-colors ${isChecked
+                    ? theme === "light"
+                      ? "bg-blue-50/50 border-blue-200"
+                      : "bg-blue-900/10 border-blue-700"
+                    : theme === "light"
+                      ? "bg-gray-50 border-gray-200 focus:border-blue-400"
+                      : "bg-gray-700 border-gray-600 focus:border-blue-500"
+                    }`}
+                  placeholder={`Option ${i + 1}`}
+                  value={opt}
+                  onClick={(e) => e.stopPropagation()}
+                  onChange={(e) => handleOptionsChange(i, e.target.value)}
+                />
+              </div>
+            );
+          })}
+        </div>
+      )}
+      <select
+        className={inputCommon}
+        value={bloomLevel}
+        onChange={(e) => setBloomLevel(e.target.value)}
+      >
+        <option value="Remember">Remember</option>
+        <option value="Understand">Understand</option>
+        <option value="Apply">Apply</option>
+        <option value="Analyze">Analyze</option>
+        <option value="Evaluate">Evaluate</option>
+        <option value="Create">Create</option>
+      </select>
+
+      {/* Correct Option(s) */}
+      {/* {form.type === "mcq" && (
         <input
           className={inputCommon}
           type="number"
@@ -426,7 +405,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
         />
       )} */}
 
-        {/* {form.type === "msq" && (
+      {/* {form.type === "msq" && (
         <input
           className={inputCommon}
           placeholder="Correct Option Indexes (comma-separated)"
@@ -440,229 +419,229 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
         />
       )} */}
 
-        {/* Fill / Numerical Answer */}
-        {(form.type === "fill" || form.type === "numerical") && (
+      {/* Fill / Numerical Answer */}
+      {(form.type === "fill" || form.type === "numerical") && (
+        <input
+          className={inputCommon}
+          name="correct_answer"
+          value={form.correct_answer}
+          onChange={handleChange}
+          placeholder="Correct Answer"
+        />
+      )}
+
+      {/* True / False */}
+      {form.type === "tf" && (
+        <select
+          className={inputCommon}
+          name="is_true"
+          value={form.is_true}
+          onChange={handleChange}
+        >
+          <option value="true">True</option>
+          <option value="false">False</option>
+        </select>
+      )}
+
+      {/* Match the Following */}
+      {form.type === "match" && (
+        <div className="space-y-3">
+          <p className="text-sm text-gray-600">
+            Enter <strong>Left</strong> and <strong>Right</strong> items at the
+            same index for pairing.
+          </p>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className={LabelCommon}>Left Items</label>
+              {form.left_items.map((item, i) => (
+                <input
+                  key={i}
+                  className={inputCommon}
+                  placeholder={`Left ${i + 1}`}
+                  value={item}
+                  onChange={(e) => {
+                    const updated = [...form.left_items];
+                    updated[i] = e.target.value;
+                    setForm((prev) => ({ ...prev, left_items: updated }));
+                  }}
+                />
+              ))}
+            </div>
+            <div>
+              <label className={LabelCommon}>Right Items</label>
+              {form.right_items.map((item, i) => (
+                <input
+                  key={i}
+                  className={inputCommon}
+                  placeholder={`Right ${i + 1}`}
+                  value={item}
+                  onChange={(e) => {
+                    const updated = [...form.right_items];
+                    updated[i] = e.target.value;
+                    setForm((prev) => ({ ...prev, right_items: updated }));
+                  }}
+                />
+              ))}
+            </div>
+          </div>
           <input
             className={inputCommon}
-            name="correct_answer"
-            value={form.correct_answer}
-            onChange={handleChange}
-            placeholder="Correct Answer"
+            placeholder='Correct Pairs (e.g., {"India":"New Delhi"})'
+            value={form.correct_pairs_input}
+            onChange={(e) =>
+              setForm((prev) => ({
+                ...prev,
+                correct_pairs_input: e.target.value,
+              }))
+            }
           />
-        )}
+          <button
+            type="button"
+            onClick={() => {
+              const pairs = {};
+              form.left_items.forEach((left, i) => {
+                const right = form.right_items[i];
+                if (left && right) pairs[left] = right;
+              });
+              setForm((prev) => ({
+                ...prev,
+                correct_pairs_input: JSON.stringify(pairs, null, 2),
+              }));
+            }}
+            className="inline-block bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg shadow-sm transition"
+          >
+            Auto-generate Correct Pairs
+          </button>
+        </div>
+      )}
 
-        {/* True / False */}
-        {form.type === "tf" && (
-          <select
+      {form.type === "code" && (
+        <div
+          className={` border rounded p-4 space-y-3  ${theme == "light" ? "bg-white" : "bg-gray-700"
+            } `}
+        >
+          <h3
+            className={`text-lg font-medium mb-2  ${theme == "light" ? "text-black" : "text-gray-100"
+              }`}
+          >
+            Code Question Builder
+          </h3>
+          <CodeCreatorForm setFormData={setCodeData} formData={codeData} />
+        </div>
+      )}
+
+      {form.type === "comprehension" && (
+        <>
+          {/* Comprehension Passage */}
+          <textarea
             className={inputCommon}
-            name="is_true"
-            value={form.is_true}
-            onChange={handleChange}
-          >
-            <option value="true">True</option>
-            <option value="false">False</option>
-          </select>
-        )}
+            rows={4}
+            placeholder="Enter comprehension passage"
+            value={form.passage}
+            onChange={(e) =>
+              setForm((prev) => ({ ...prev, passage: e.target.value }))
+            }
+          />
 
-        {/* Match the Following */}
-        {form.type === "match" && (
-          <div className="space-y-3">
-            <p className="text-sm text-gray-600">
-              Enter <strong>Left</strong> and <strong>Right</strong> items at the
-              same index for pairing.
-            </p>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className={LabelCommon}>Left Items</label>
-                {form.left_items.map((item, i) => (
-                  <input
-                    key={i}
-                    className={inputCommon}
-                    placeholder={`Left ${i + 1}`}
-                    value={item}
-                    onChange={(e) => {
-                      const updated = [...form.left_items];
-                      updated[i] = e.target.value;
-                      setForm((prev) => ({ ...prev, left_items: updated }));
-                    }}
-                  />
-                ))}
-              </div>
-              <div>
-                <label className={LabelCommon}>Right Items</label>
-                {form.right_items.map((item, i) => (
-                  <input
-                    key={i}
-                    className={inputCommon}
-                    placeholder={`Right ${i + 1}`}
-                    value={item}
-                    onChange={(e) => {
-                      const updated = [...form.right_items];
-                      updated[i] = e.target.value;
-                      setForm((prev) => ({ ...prev, right_items: updated }));
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
-            <input
-              className={inputCommon}
-              placeholder='Correct Pairs (e.g., {"India":"New Delhi"})'
-              value={form.correct_pairs_input}
-              onChange={(e) =>
-                setForm((prev) => ({
-                  ...prev,
-                  correct_pairs_input: e.target.value,
-                }))
-              }
-            />
-            <button
-              type="button"
-              onClick={() => {
-                const pairs = {};
-                form.left_items.forEach((left, i) => {
-                  const right = form.right_items[i];
-                  if (left && right) pairs[left] = right;
-                });
-                setForm((prev) => ({
-                  ...prev,
-                  correct_pairs_input: JSON.stringify(pairs, null, 2),
-                }));
-              }}
-              className="inline-block bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg shadow-sm transition"
-            >
-              Auto-generate Correct Pairs
-            </button>
-          </div>
-        )}
+          <input
+            className={inputCommon}
+            placeholder="Positive Marks"
+            type="number"
+            value={form.sub_form.positive_marks}
+            onChange={(e) =>
+              setForm((prev) => ({
+                ...prev,
+                sub_form: {
+                  ...prev.sub_form,
+                  positive_marks: parseInt(e.target.value),
+                },
+              }))
+            }
+          />
 
-        {form.type === "code" && (
+          <input
+            className={inputCommon}
+            placeholder="Negative Marks"
+            type="number"
+            value={form.sub_form.negative_marks}
+            onChange={(e) =>
+              setForm((prev) => ({
+                ...prev,
+                sub_form: {
+                  ...prev.sub_form,
+                  negative_marks: parseInt(e.target.value),
+                },
+              }))
+            }
+          />
+
+          {/* Sub-question builder */}
           <div
-            className={` border rounded p-4 space-y-3  ${theme == "light" ? "bg-white" : "bg-gray-700"
-              } `}
+            className={` border rounded p-4 space-y-3 ${theme === "light"
+              ? "bg-gray-100"
+              : "bg-gray-800 border border-gray-700"
+              }`}
           >
-            <h3
-              className={`text-lg font-medium mb-2  ${theme == "light" ? "text-black" : "text-gray-100"
+            <h4
+              className={` font-semibold ${theme === "light" ? "text-black" : "text-gray-300"
                 }`}
             >
-              Code Question Builder
-            </h3>
-            <CodeCreatorForm setFormData={setCodeData} formData={codeData} />
-          </div>
-        )}
+              Add Sub-questions
+            </h4>
 
-        {form.type === "comprehension" && (
-          <>
-            {/* Comprehension Passage */}
-            <textarea
+            <select
               className={inputCommon}
-              rows={4}
-              placeholder="Enter comprehension passage"
-              value={form.passage}
-              onChange={(e) =>
-                setForm((prev) => ({ ...prev, passage: e.target.value }))
-              }
-            />
-
-            <input
-              className={inputCommon}
-              placeholder="Positive Marks"
-              type="number"
-              value={form.sub_form.positive_marks}
+              value={form.sub_form.type}
               onChange={(e) =>
                 setForm((prev) => ({
                   ...prev,
-                  sub_form: {
-                    ...prev.sub_form,
-                    positive_marks: parseInt(e.target.value),
-                  },
+                  sub_form: { ...prev.sub_form, type: e.target.value },
+                }))
+              }
+            >
+              <option value="mcq">MCQ</option>
+              <option value="msq">MSQ</option>
+              <option value="fill">Fill in the Blank</option>
+              <option value="tf">True/False</option>
+              <option value="numerical">Numerical</option>
+            </select>
+
+            <input
+              className={inputCommon}
+              placeholder="Sub-question text"
+              value={form.sub_form.question_text}
+              onChange={(e) =>
+                setForm((prev) => ({
+                  ...prev,
+                  sub_form: { ...prev.sub_form, question_text: e.target.value },
                 }))
               }
             />
 
-            <input
-              className={inputCommon}
-              placeholder="Negative Marks"
-              type="number"
-              value={form.sub_form.negative_marks}
-              onChange={(e) =>
-                setForm((prev) => ({
-                  ...prev,
-                  sub_form: {
-                    ...prev.sub_form,
-                    negative_marks: parseInt(e.target.value),
-                  },
-                }))
-              }
-            />
+            {/* Options */}
+            {(form.sub_form.type === "mcq" || form.sub_form.type === "msq") && (
+              <>
+                {form.sub_form.options.map((opt, i) => (
+                  <input
+                    key={i}
+                    className={inputCommon}
+                    placeholder={`Option ${i + 1}`}
+                    value={opt}
+                    onChange={(e) => {
+                      const updated = [...form.sub_form.options];
+                      updated[i] = e.target.value;
+                      setForm((prev) => ({
+                        ...prev,
+                        sub_form: { ...prev.sub_form, options: updated },
+                      }));
+                    }}
+                  />
+                ))}
+              </>
+            )}
 
-            {/* Sub-question builder */}
-            <div
-              className={` border rounded p-4 space-y-3 ${theme === "light"
-                ? "bg-gray-100"
-                : "bg-gray-800 border border-gray-700"
-                }`}
-            >
-              <h4
-                className={` font-semibold ${theme === "light" ? "text-black" : "text-gray-300"
-                  }`}
-              >
-                Add Sub-questions
-              </h4>
-
-              <select
-                className={inputCommon}
-                value={form.sub_form.type}
-                onChange={(e) =>
-                  setForm((prev) => ({
-                    ...prev,
-                    sub_form: { ...prev.sub_form, type: e.target.value },
-                  }))
-                }
-              >
-                <option value="mcq">MCQ</option>
-                <option value="msq">MSQ</option>
-                <option value="fill">Fill in the Blank</option>
-                <option value="tf">True/False</option>
-                <option value="numerical">Numerical</option>
-              </select>
-
-              <input
-                className={inputCommon}
-                placeholder="Sub-question text"
-                value={form.sub_form.question_text}
-                onChange={(e) =>
-                  setForm((prev) => ({
-                    ...prev,
-                    sub_form: { ...prev.sub_form, question_text: e.target.value },
-                  }))
-                }
-              />
-
-              {/* Options */}
-              {(form.sub_form.type === "mcq" || form.sub_form.type === "msq") && (
-                <>
-                  {form.sub_form.options.map((opt, i) => (
-                    <input
-                      key={i}
-                      className={inputCommon}
-                      placeholder={`Option ${i + 1}`}
-                      value={opt}
-                      onChange={(e) => {
-                        const updated = [...form.sub_form.options];
-                        updated[i] = e.target.value;
-                        setForm((prev) => ({
-                          ...prev,
-                          sub_form: { ...prev.sub_form, options: updated },
-                        }));
-                      }}
-                    />
-                  ))}
-                </>
-              )}
-
-              {/* MCQ correct index */}
-              {/* {form.sub_form.type === "mcq" && (
+            {/* MCQ correct index */}
+            {/* {form.sub_form.type === "mcq" && (
               <input
                 type="number"
                 className={inputCommon}
@@ -680,8 +659,8 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
               />
             )} */}
 
-              {/* MSQ correct options */}
-              {/* {form.sub_form.type === "msq" && (
+            {/* MSQ correct options */}
+            {/* {form.sub_form.type === "msq" && (
               <input
                 className={inputCommon}
                 placeholder="Correct options (comma-separated)"
@@ -699,167 +678,166 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
               />
             )} */}
 
-              {/* Fill / Numerical */}
-              {(form.sub_form.type === "fill" ||
-                form.sub_form.type === "numerical") && (
-                  <input
-                    className={inputCommon}
-                    placeholder="Correct answer"
-                    value={form.sub_form.correct_answer}
-                    onChange={(e) =>
-                      setForm((prev) => ({
-                        ...prev,
-                        sub_form: {
-                          ...prev.sub_form,
-                          correct_answer: e.target.value,
-                        },
-                      }))
-                    }
-                  />
-                )}
-
-              {/* True/False */}
-              {form.sub_form.type === "tf" && (
-                <select
+            {/* Fill / Numerical */}
+            {(form.sub_form.type === "fill" ||
+              form.sub_form.type === "numerical") && (
+                <input
                   className={inputCommon}
-                  value={form.sub_form.is_true}
+                  placeholder="Correct answer"
+                  value={form.sub_form.correct_answer}
                   onChange={(e) =>
                     setForm((prev) => ({
                       ...prev,
                       sub_form: {
                         ...prev.sub_form,
-                        is_true: e.target.value === "true",
+                        correct_answer: e.target.value,
                       },
                     }))
                   }
-                >
-                  <option value="true">True</option>
-                  <option value="false">False</option>
-                </select>
+                />
               )}
 
-              <button
-                type="button"
-                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                onClick={() => {
+            {/* True/False */}
+            {form.sub_form.type === "tf" && (
+              <select
+                className={inputCommon}
+                value={form.sub_form.is_true}
+                onChange={(e) =>
                   setForm((prev) => ({
                     ...prev,
-                    sub_question_ids: [
-                      ...prev.sub_question_ids,
-                      { ...prev.sub_form, id: uuidv4() },
-                    ],
                     sub_form: {
-                      type: "mcq",
-                      question_text: "",
-                      options: ["", "", "", ""],
-                      correct_option: 0,
-                      correct_options: [],
-                      correct_answer: "",
-                      is_true: true,
-                      explanation: "",
-                      difficulty: "easy",
-                      positive_marks: "",
-                      negative_marks: "0",
-                      subject: "",
-                      chapter: "",
+                      ...prev.sub_form,
+                      is_true: e.target.value === "true",
                     },
-                  }));
-                }}
+                  }))
+                }
               >
-                Add Sub-question
-              </button>
+                <option value="true">True</option>
+                <option value="false">False</option>
+              </select>
+            )}
 
-              {/* Preview sub-questions */}
-              {form.sub_question_ids.length > 0 && (
-                <div className="mt-2 text-sm text-gray-700">
-                  <strong>Sub-questions added:</strong>{" "}
-                  {form.sub_question_ids.length}
-                </div>
-              )}
-            </div>
-          </>
-        )}
+            <button
+              type="button"
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+              onClick={() => {
+                setForm((prev) => ({
+                  ...prev,
+                  sub_question_ids: [
+                    ...prev.sub_question_ids,
+                    { ...prev.sub_form, id: uuidv4() },
+                  ],
+                  sub_form: {
+                    type: "mcq",
+                    question_text: "",
+                    options: ["", "", "", ""],
+                    correct_option: 0,
+                    correct_options: [],
+                    correct_answer: "",
+                    is_true: true,
+                    explanation: "",
+                    difficulty: "easy",
+                    positive_marks: "",
+                    negative_marks: "0",
+                    subject: "",
+                    chapter: "",
+                  },
+                }));
+              }}
+            >
+              Add Sub-question
+            </button>
+
+            {/* Preview sub-questions */}
+            {form.sub_question_ids.length > 0 && (
+              <div className="mt-2 text-sm text-gray-700">
+                <strong>Sub-questions added:</strong>{" "}
+                {form.sub_question_ids.length}
+              </div>
+            )}
+          </div>
+        </>
+      )}
 
       {/* Subject, Chapter, Explanation */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <select
-        className={inputCommon}
-        name="subject"
-        value={form.subject}
-        onChange={handleChange}
-      >
-        <option value="">-- Select Subject --</option>
-        {Array.isArray(examDetails?.subjects) &&
-          examDetails?.subjects.map((subj, idx) => (
-            <option key={idx} value={subj}>
-              {subj}
-            </option>
-          ))}
-      </select>
+        <select
+          className={inputCommon}
+          name="subject"
+          value={form.subject}
+          onChange={handleChange}
+        >
+          <option value="">-- Select Subject --</option>
+          {Array.isArray(examDetails.subjects) &&
+            examDetails.subjects.map((subj, idx) => (
+              <option key={idx} value={subj}>
+                {subj}
+              </option>
+            ))}
+        </select>
 
+        <input
+          className={inputCommon}
+          name="chapter"
+          value={form.chapter}
+          onChange={handleChange}
+          placeholder="Chapter"
+        />
+      </div>
+
+      <textarea
+        className={inputCommon}
+        name="explanation"
+        value={form.explanation}
+        onChange={handleChange}
+        rows={2}
+        placeholder="Explanation (optional)"
+      />
+
+      {/* Difficulty & Marks */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <select
+          className={inputCommon}
+          name="difficulty"
+          value={form.difficulty}
+          onChange={handleChange}
+        >
+          <option value="easy">Easy</option>
+          <option value="medium">Medium</option>
+          <option value="hard">Hard</option>
+        </select>
+        <div className="grid grid-cols-2 gap-4">
           <input
+            type="number"
             className={inputCommon}
-            name="chapter"
-            value={form.chapter}
+            name="positive_marks"
+            value={form.positive_marks}
             onChange={handleChange}
-            placeholder="Chapter"
+            placeholder="Positive Marks"
+            min={1}
+          />
+          <input
+            type="number"
+            className={inputCommon}
+            name="negative_marks"
+            value={form.negative_marks}
+            onChange={handleChange}
+            placeholder="Negative Marks"
+            min={0}
           />
         </div>
-
-        <textarea
-          className={inputCommon}
-          name="explanation"
-          value={form.explanation}
-          onChange={handleChange}
-          rows={2}
-          placeholder="Explanation (optional)"
-        />
-
-        {/* Difficulty & Marks */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <select
-            className={inputCommon}
-            name="difficulty"
-            value={form.difficulty}
-            onChange={handleChange}
-          >
-            <option value="easy">Easy</option>
-            <option value="medium">Medium</option>
-            <option value="hard">Hard</option>
-          </select>
-          <div className="grid grid-cols-2 gap-4">
-            <input
-              type="number"
-              className={inputCommon}
-              name="positive_marks"
-              value={form.positive_marks}
-              onChange={handleChange}
-              placeholder="Positive Marks"
-              min={1}
-            />
-            <input
-              type="number"
-              className={inputCommon}
-              name="negative_marks"
-              value={form.negative_marks}
-              onChange={handleChange}
-              placeholder="Negative Marks"
-              min={0}
-            />
-          </div>
-        </div>
-
-        {/* Add Question Button */}
-        <button
-          className="py-2.5 px-6 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-medium rounded-xl shadow-md hover:scale-[1.02] transition-transform duration-200"
-          onClick={handleAdd}
-        >
-          Add Question
-        </button>
-
-        {/* <ToastContainer toasts={toasts} onRemove={removeToast} /> */}
       </div>
-    </>
+
+      {/* Add Question Button */}
+      <button
+        className="py-2.5 px-6 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-medium rounded-xl shadow-md hover:scale-[1.02] transition-transform duration-200"
+        onClick={handleAdd}
+      >
+        Add Question
+      </button>
+
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
+    </div>
   );
 };
 

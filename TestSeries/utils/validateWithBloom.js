@@ -1,5 +1,5 @@
 export const validateWithBloom = async (questionText, bloomLevel) => {
-  const API_KEY = "AIzaSyAbwF_tOUPTX_3_2aTyKFZIACw_BT1ztUA";
+  const API_KEY = "AIzaSyCdc78DcT5WR8NoFb51RyJJjm0PS4-vMeM";
 
   const prompt = `
 Check the Bloom's Taxonomy level of the following question. Respond only with:

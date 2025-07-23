@@ -37,7 +37,7 @@ console.log('Grouped By Batch:', groupedByBatch);
         <Calendar className="w-5 h-5 text-indigo-400" />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Card 1 */}
         <div className={`${isDark ? 'bg-gray-700' : 'bg-white'} rounded-xl p-4 text-center shadow-sm`}>
           <div className={`text-xl font-bold ${isDark ? 'text-indigo-100' : 'text-indigo-600'} `}>{batchMap?.[groupedByBatch?.batch_id]?.name}</div>
@@ -46,7 +46,13 @@ console.log('Grouped By Batch:', groupedByBatch);
           </div>
         </div>
 
-       
+        {/* Card 2 */}
+        <div className={`${isDark ? 'bg-gray-700' : 'bg-white'} rounded-xl p-4 text-center shadow-sm`}>
+          <div className="text-2xl font-bold text-green-600">94%</div>
+          <div className={`text-sm mt-1 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+            Attendance Rate
+          </div>
+        </div>
 
         {/* Card 3 */}
         <div className={`${isDark ? 'bg-gray-700' : 'bg-white'} rounded-xl p-4 text-center shadow-sm`}>
