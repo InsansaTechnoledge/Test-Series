@@ -39,7 +39,8 @@ export const VITE_PLAN_FEATURE_MAP= `{
   "/video": ["videoMaterial_feature"],
   "/video/upload": ["videoMaterial_feature"],
   "/certificate-creation": ["analysis_feature"],
- 
+  "/institute/qbms": ["questionBank_feature"],
+
   "actions.createBatch": ["batch_feature"],
   "actions.addStudent": ["student_feature"],
   "actions.createRole": ["role_feature"],
@@ -71,7 +72,7 @@ export const VITE_ROLE_FEATURE_MAP= `{
   "/institute/create-exam": ["exam:create_exam"],
   "/institute/create-exam/:examId": ["exam:edit_exam"],
   "/institute/exam-list": ["exam:view_exam", "exam:publish_exam", "exam:edit_exam", "exam:delete_exam","exam:create_exam"],
-  "/institue/qbms": ["exam:create_qb"],
+
  
   "/institute/create-user": ["user:create_user"],
   "/institute/user-list": ["user:view_user", "user:edit_user", "user:delete_user","user:create_user"],
@@ -125,3 +126,5 @@ export const VITE_ROLE_FEATURE_MAP= `{
   "actions.viewReport": ["analysis:view_analysis"]
 }`
  export const REACT_APP_GEMINI_API_KEY="AIzaSyCAd5Amk4Z_G20WeQTA8sGhplKgV7yn1Fg"
+
+   // "/institue/qbms": ["exam:create_qb"],
