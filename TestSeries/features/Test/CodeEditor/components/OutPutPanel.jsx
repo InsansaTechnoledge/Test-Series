@@ -11,6 +11,8 @@ const OutputPanel = ({
   errors = [],
   height,
   testInput,
+  showTestResults,
+  toggleTestResults,
 }) => {
   const { theme } = useTheme();
   const passedTests = testResults.passedCount
@@ -86,7 +88,7 @@ const OutputPanel = ({
     : 'text-gray-400';
 
   return (
-    <div className={`${containerClass} flex flex-col`} style={{ height: `${height}px` }}>
+    <div className={`${containerClass} flex flex-col -mt-1`} style={{ height: `${height}px` }}>
       {/* Tabs */}
       <div className={tabContainerClass}>
         <button
@@ -109,11 +111,19 @@ const OutputPanel = ({
             </span>
           )}
         </button>
+        <button
+          onClick={toggleTestResults}
+          className="ml-2 text-sm text-gray-500 hover:text-gray-700 transition-transform"
+        >
+          <span className={`inline-block transform transition-transform duration-200 ${showTestResults ? "rotate-180" : ""}`}>
+            ▼
+          </span>
+        </button>
       </div>
 
       {/* Content - Fixed: Made this scrollable */}
       <div className={contentClass}>
-        {activeTab === 'testcase' && (
+        {activeTab === 'testcase'  && showTestResults && (
           <div>
             <h3 className={headingClass}>Test Results</h3>
 
@@ -136,11 +146,11 @@ const OutputPanel = ({
                   </div>
                 </div>
               )
-            :(
-              <span className={placeholderTextClass}>
-                No test results available.
-              </span>
-            )}
+                : (
+                  <span className={placeholderTextClass}>
+                    No test results available.
+                  </span>
+                )}
 
               {isRunning ? (
                 <div className={runningTextClass}>
@@ -189,7 +199,7 @@ const OutputPanel = ({
 
         {activeTab === 'output' && (
           <div>
-            {console.log("🎀🎀🎀🎀11,",testInput)}
+            {console.log("🎀🎀🎀🎀11,", testInput)}
             <h3 className={headingClass}>Console Output</h3>
             {errors.length > 0 && (
               <div className="mb-4">
@@ -206,61 +216,62 @@ const OutputPanel = ({
             <div className={outputContainerClass}>
               <pre className={outputTextClass}>
                 {output ? (
-<>
-{console.log("🎀🎀🎀🎀22,",output)}
+                  <>
+                    {console.log("🎀🎀🎀🎀22,", output)}
 
-  {testInput.length === output.length
-    ? testInput?.map((input, index) => (
-        <div key={index} className="mb-4">
-          <div className="mb-2">
-            <span className={labelClass}>Input:</span>
-            <div className={inputClass}>
-              {JSON.stringify(input)}
-            </div>
-          </div>
-          <div className="mb-2">
-            <span className={labelClass}>Output:</span> 
-            <div className={outputTextClass}>
-              {typeof output === 'string'? output: JSON.stringify(output[index]) }
-           
-            </div>
-          </div>
-        </div>
-      ))
-    : testInput?.map((input, index) => {
-      let rawValue=input;
-      let cleaned='';
-      if (typeof rawValue === 'object') {
-        cleaned = JSON.stringify(rawValue);
-      } else if (typeof rawValue === 'string') {
-        cleaned = rawValue;
-      } else {
-        cleaned = JSON.parse(rawValue);
-      }
-      return(
-        <div key={index} className="mb-4">
-          <div className="mb-2">
-            <span className={labelClass}>Input:</span>
-            <div className={inputClass}>
-              {cleaned}
-            </div>
-          </div>
-          <div className="mb-2">
-            <span className={labelClass}>Output:</span>
-            <div className={outputTextClass}>
-            {typeof output === 'string'?output: JSON.stringify(output[index]) }
-            </div>
-          </div>
-        </div>
-      )})
-  }
-</>
+                    {testInput.length === output.length
+                      ? testInput?.map((input, index) => (
+                        <div key={index} className="mb-4">
+                          <div className="mb-2">
+                            <span className={labelClass}>Input:</span>
+                            <div className={inputClass}>
+                              {JSON.stringify(input)}
+                            </div>
+                          </div>
+                          <div className="mb-2">
+                            <span className={labelClass}>Output:</span>
+                            <div className={outputTextClass}>
+                              {typeof output === 'string' ? output : JSON.stringify(output[index])}
 
-) : (
-  <span className={placeholderTextClass}>
-    No output yet. Run your code to see results.
-  </span>
-)}
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                      : testInput?.map((input, index) => {
+                        let rawValue = input;
+                        let cleaned = '';
+                        if (typeof rawValue === 'object') {
+                          cleaned = JSON.stringify(rawValue);
+                        } else if (typeof rawValue === 'string') {
+                          cleaned = rawValue;
+                        } else {
+                          cleaned = JSON.parse(rawValue);
+                        }
+                        return (
+                          <div key={index} className="mb-4">
+                            <div className="mb-2">
+                              <span className={labelClass}>Input:</span>
+                              <div className={inputClass}>
+                                {cleaned}
+                              </div>
+                            </div>
+                            <div className="mb-2">
+                              <span className={labelClass}>Output:</span>
+                              <div className={outputTextClass}>
+                                {typeof output === 'string' ? output : JSON.stringify(output[index])}
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      })
+                    }
+                  </>
+
+                ) : (
+                  <span className={placeholderTextClass}>
+                    No output yet. Run your code to see results.
+                  </span>
+                )}
 
               </pre>
             </div>
