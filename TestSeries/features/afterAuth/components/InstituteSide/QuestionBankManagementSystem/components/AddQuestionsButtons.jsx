@@ -1,9 +1,9 @@
 import React from 'react'
-import { Plus, Upload, X } from 'lucide-react';
+import { EyeIcon, Plus, Upload, X } from 'lucide-react';
 
-const AddQuestionPart = ({handleAddingQuestions ,  isManuallyAddingQuestions , isBulkUploadingQuestions}) => {
+const AddQuestionPart = ({handleAddingQuestions ,  isManuallyAddingQuestions , isBulkUploadingQuestions , setShowAnalysis}) => {
     return (
-      <div className="grid grid-cols-2 gap-4 w-full max-w-xl">
+      <div className="grid grid-cols-3 gap-4 w-full max-w-4xl">
         <button 
             onClick={() => handleAddingQuestions('manual')}
             className={`cursor-pointer flex items-center gap-2 text-lg ${isManuallyAddingQuestions ? 'text-red-600' : 'text-blue-600'}  bg-white px-4 py-2 rounded-lg shadow hover:bg-gray-100 transition`}>
@@ -34,6 +34,13 @@ const AddQuestionPart = ({handleAddingQuestions ,  isManuallyAddingQuestions , i
             </span>
             }
           
+        </button>
+        <button
+             onClick={() => setShowAnalysis(true)}
+             className={`cursor-pointer flex items-center gap-2 text-indigo-600 text-lg bg-white px-4 py-2 rounded-lg shadow hover:bg-gray-100 transition`}
+        >
+            <EyeIcon/>
+            Show Analysis
         </button>
       </div>
     );

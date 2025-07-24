@@ -6,7 +6,7 @@ import ManualUploadSection from './UploadingQuestions/ManualUploadSection';
 
 
 
-const AllCategoriesBody = ({ categories , organizationId , setSelectedQuestionType }) => {
+const AllCategoriesBody = ({ categories , organizationId , setSelectedQuestionType , setShowAnalysis }) => {
     const [isManuallyAddingQuestions , setIsManuallyAddingQuestions] = useState(false);
     const [isBulkUploadingQuestions , setIsBulkUploadingQuestions] = useState(false);
 
@@ -39,6 +39,7 @@ const AllCategoriesBody = ({ categories , organizationId , setSelectedQuestionTy
             handleAddingQuestions={handleAddingQuestions}
             isManuallyAddingQuestions={isManuallyAddingQuestions}
             isBulkUploadingQuestions={isBulkUploadingQuestions}
+            setShowAnalysis={setShowAnalysis}
           />
         </div>
 

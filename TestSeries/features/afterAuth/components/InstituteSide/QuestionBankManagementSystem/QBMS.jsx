@@ -6,6 +6,7 @@ import { useTheme } from '../../../../../hooks/useTheme';
 import BodySkeleton from './components/BodySkeleton';
 import DetailedQuestionPage from './components/DetailedPageRender/DetailedQuestionPage.jsx';
 import Navbar from './components/Navbar.jsx';
+import ExamDataDashboard from './components/Analytics/QuestionsAnalysis.jsx';
 
 const QBMS = () => {
   const [questions, setQuestions] = useState({ data: [] });
@@ -14,7 +15,9 @@ const QBMS = () => {
   const [showIntroPage, setShowIntroPage] = useState(true);
   const { id } = useParams();
   const {theme} = useTheme();
+  const [showAlanysis , setShowAnalysis] = useState(false);
 
+  console.log(questions);
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -81,21 +84,27 @@ const QBMS = () => {
         theme={theme}
       />
       {
-        selectedQuestionType === 'none' ? 
-          <BodySkeleton 
-          categories={questionTypes} 
-          QuestionLength={questions?.data.length} 
-          organizationId={id}
-          setSelectedQuestionType={setSelectedQuestionType}
-        />
-        :
-        <DetailedQuestionPage 
-          setSelectedQuestionType={setSelectedQuestionType} 
-          selectedQuestionType={selectedQuestionType} 
-          filteredQuestionsByType={filteredQuestionsByType}
-          categories={questionTypes}
-        />
-      } 
+        showAlanysis === true ? (
+          <ExamDataDashboard questions={questions?.data} setShowAnalysis={setShowAnalysis} />
+        ) : (
+          selectedQuestionType === 'none' ? (
+            <BodySkeleton 
+              categories={questionTypes} 
+              QuestionLength={questions?.data.length} 
+              organizationId={id}
+              setSelectedQuestionType={setSelectedQuestionType}
+              setShowAnalysis={setShowAnalysis}
+            />
+          ) : (
+            <DetailedQuestionPage 
+              setSelectedQuestionType={setSelectedQuestionType} 
+              selectedQuestionType={selectedQuestionType} 
+              filteredQuestionsByType={filteredQuestionsByType}
+              categories={questionTypes}
+            />
+          )
+        )
+      }
     </div> 
   );
 };

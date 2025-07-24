@@ -4,12 +4,12 @@ import React from 'react'
 import QBMSstats from "./QBMSstats";
 import AllCategoriesBody from "./AllCategoriesBody";
 
-const BodySkeleton = ({categories, QuestionLength , organizationId , setSelectedQuestionType}) => {
+const BodySkeleton = ({categories, QuestionLength , organizationId , setSelectedQuestionType , setShowAnalysis}) => {
   return (
     <>
         <div className="min-h-screen">
             <QBMSstats categories={categories} QuestionLength={QuestionLength}/>
-            <AllCategoriesBody categories={categories} organizationId={organizationId} setSelectedQuestionType={setSelectedQuestionType}/>
+            <AllCategoriesBody categories={categories} organizationId={organizationId} setSelectedQuestionType={setSelectedQuestionType} setShowAnalysis={setShowAnalysis}/>
         </div>
     </>
   )
