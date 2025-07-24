@@ -11,7 +11,7 @@ const HorizontalDragHandle = ({ onMouseDown, isResizing }) => (
     onKeyDown={(e) => {
       if ((e.key === 'Enter' || e.key === ' ') && onMouseDown) onMouseDown(e);
     }}
-    className={`h-1 bg-gray-300 hover:bg-blue-500 cursor-row-resize relative group ${isResizing ? 'bg-blue-500' : ''}`}
+    className={`h-1 bg-gray-300  mb-4hover:bg-blue-500 cursor-row-resize relative group ${isResizing ? 'bg-blue-500' : ''}`}
   >
     <div className="absolute inset-x-0 -top-1 -bottom-1 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
       <GripHorizontal className="w-4 h-4 text-gray-600" />

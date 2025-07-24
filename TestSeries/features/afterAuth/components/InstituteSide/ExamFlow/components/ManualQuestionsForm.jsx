@@ -1,20 +1,24 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useUser } from "../../../../../../contexts/currentUserContext";
 import { useEffect } from "react";
 import CodeCreatorForm from "../../../../../Test/CodeEditor/codeCreator/codeCreatorForm";
 import { useTheme } from "../../../../../../hooks/useTheme";
-import { useToast, ToastContainer } from "../../../../../../utils/Toaster";
+// import { useToast, ToastContainer } from "../../../../../../utils/Toaster";
 import { validateWithBloom } from "../../../../../../utils/validateWithBloom";
-import { Toast } from "primereact/toast";
+import { useToast_new } from "../../../../../../utils/Toaster_new";
+ // adjust path if different
+
 
 const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
-  console.log('sdvsz',examDetails?.subjects)
+  console.log('sdvsz', examDetails.subjects)
   const { user } = useUser();
   console.log("sdgv", user);
-  const { toasts, showToast, removeToast } = useToast();
+  //  const { toasts, showToast, removeToast } = useToast();
   const [bloomLevel, setBloomLevel] = useState("Remember");
-  const toast = useRef(null);
+  
+  const { showToast_new } = useToast_new();
+
   const [codeData, setCodeData] = useState({
     title: "",
     difficulty: "easy",
@@ -36,23 +40,6 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
   });
   // Add code-specific properties if needed
   // newQuestion.test_cases = [];
-  const handleShowSuccess = () => {
-    toast.current.show({
-      severity: "success",
-      summary: "Validated",
-      detail: "Question matches Bloom's level",
-      life: 3000,
-    });
-  };
-
- const handleShowError = (expectedLevel, selectedLevel) => {
-  toast.current.show({
-    severity: "error",
-    summary: "Incorrect Bloom Level",
-    detail: `Expected ${expectedLevel}, but selected ${selectedLevel}`,
-    life: 4000,
-  });
-};
 
   const initialFormState = {
     type: "mcq",
@@ -108,20 +95,20 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
   const handleAdd = async () => {
     // Basic validation
     if (!form.question_text.trim()) {
-      showToast("Please enter a question text", "warning");
+      showToast_new("Please enter a question text", "warning");
       return;
     }
     const { isValid, matchedLevel } = await validateWithBloom(form.question_text, bloomLevel);
 
-  
+    console.log("✅ Bloom Match:", isValid);
+    console.log("✅ Detected Bloom Level:", matchedLevel);
 
     if (!isValid) {
-    handleShowError(matchedLevel, bloomLevel);
-
+      showToast_new(`❌ Incorrect Bloom level! ${bloomLevel}, correct ${matchedLevel}`, "error");
       return;
     }
 
-    handleShowSuccess(); (`✅ Question matches Bloom level: ${matchedLevel}`, "success");
+    showToast_new(`✅ Question matches Bloom level: ${matchedLevel}`, "success");
 
     const newQuestion = {
       id: uuidv4(),
@@ -244,9 +231,6 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
 
   return (
     <>
-      <Toast ref={toast} position="top-center" />
-      <ToastContainer toasts={toasts} onRemove={removeToast} />
-
       <div
         className={` backdrop-blur-md shadow-md rounded-2xl p-6 space-y-6  ${theme == "light" ? "border border-gray-200 bg-white/70" : "bg-gray-800"
           }`}
@@ -782,22 +766,22 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
           </>
         )}
 
-      {/* Subject, Chapter, Explanation */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <select
-        className={inputCommon}
-        name="subject"
-        value={form.subject}
-        onChange={handleChange}
-      >
-        <option value="">-- Select Subject --</option>
-        {Array.isArray(examDetails?.subjects) &&
-          examDetails?.subjects.map((subj, idx) => (
-            <option key={idx} value={subj}>
-              {subj}
-            </option>
-          ))}
-      </select>
+        {/* Subject, Chapter, Explanation */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <select
+            className={inputCommon}
+            name="subject"
+            value={form.subject}
+            onChange={handleChange}
+          >
+            <option value="">-- Select Subject --</option>
+            {Array.isArray(examDetails.subjects) &&
+              examDetails.subjects.map((subj, idx) => (
+                <option key={idx} value={subj}>
+                  {subj}
+                </option>
+              ))}
+          </select>
 
           <input
             className={inputCommon}
@@ -859,8 +843,14 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
           Add Question
         </button>
 
-        {/* <ToastContainer toasts={toasts} onRemove={removeToast} /> */}
+
+
       </div>
+      {/* <ToastContainer
+        toasts={toasts}
+        onRemove={removeToast}
+
+      /> */}
     </>
   );
 };

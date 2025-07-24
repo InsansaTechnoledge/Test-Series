@@ -13,6 +13,7 @@ function CountdownTimer({
   submitted,
   examId,
   pause = false,
+  variant = "header"
 }) {
   const { theme } = useTheme();
   // const encrypted = localStorage.getItem(`encryptedTimeLeft_${examId}`);
@@ -128,32 +129,204 @@ function CountdownTimer({
     return Math.min(100, Math.max(0, Math.round(percentage)));
   }, [time, totalInitialTime]);
 
+
+
+  if (variant === "header") {
+    const getContainerStyles = () => {
+      const baseStyles =
+        "w-full max-w-[1700px] -mt-4";
+
+      if (isInFinalMinute) {
+        return `${baseStyles} ${theme === "light"
+          ? "bg-red-50 text-red-900 border-2 border-red-200 shadow-red-200"
+          : "bg-red-900 text-red-100 border-2 border-red-700 shadow-red-800"
+          } animate-pulse`;
+      }
+
+      if (isInCriticalTime) {
+        return `${baseStyles} ${theme === "light"
+          ? "bg-orange-50 text-orange-900 border-2 border-orange-200 shadow-orange-200"
+          : "bg-orange-900 text-orange-100 border-2 border-orange-700 shadow-orange-800"
+          }`;
+      }
+
+      return `${baseStyles} ${theme === "light"
+        ? "bg-white text-gray-900 border border-gray-200"
+        : "bg-gray-700 text-white border border-gray-600"
+        }`;
+    };
+
+    const getTimeBoxStyles = () => {
+      const baseStyles =
+        "w-[45px] h-[34px] p-2 mt-1 ml-1 sm:w-[50px] sm:h-[44px] flex flex-col items-center justify-center text-center rounded-md text-xs sm:text-sm font-semibold transition-all duration-300";
+
+
+      if (isInFinalMinute) {
+        return `${baseStyles} ${theme === "light"
+          ? "bg-red-100 text-red-900 border border-red-300"
+          : "bg-red-800 text-red-100 border border-red-600"
+          }`;
+      }
+
+      if (isInCriticalTime) {
+        return `${baseStyles} ${theme === "light"
+          ? "bg-orange-100 text-orange-900 border border-orange-300"
+          : "bg-orange-800 text-orange-100 border border-orange-600"
+          }`;
+      }
+
+      return `${baseStyles} ${theme === "light"
+        ? "bg-gray-100 text-gray-900 border border-gray-300"
+        : "bg-gray-600 text-white border border-gray-500"
+        }`;
+    };
+
+    const getTitleStyles = () => {
+      const baseStyles =
+        "text-xs sm:text-sm md:text-base lg:text-lg font-medium mb-2 sm:mb-3 md:mb-4 tracking-wide transition-all duration-300";
+
+      if (isInFinalMinute) {
+        return `${baseStyles} text-red-600 font-bold animate-pulse`;
+      }
+
+      if (isInCriticalTime) {
+        return `${baseStyles} text-orange-600 font-semibold`;
+      }
+
+      return baseStyles;
+    };
+
+    const getNumberStyles = () => {
+      const baseStyles =
+        "text-sm sm:text-base md:text-lg pt-1 lg:text-xl xl:text-2xl font-semibold"
+
+
+
+      if (isInFinalMinute) {
+        return `${baseStyles} font-black`;
+      }
+
+      if (isInCriticalTime) {
+        return `${baseStyles} font-extrabold`;
+      }
+
+      return baseStyles;
+    };
+
+    const getSeparatorStyles = () => {
+      const baseStyles =
+        "text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-semibold opacity-50 px-1 transition-all duration-300";
+
+      if (isInCriticalTime) {
+        return `${baseStyles} opacity-70`;
+      }
+
+      return baseStyles;
+    };
+
+    const getLabelStyles = () => {
+      const baseStyles =
+        "text-[8px] sm:text-[9px] md:text-[10px] opacity-60  pb-2 transition-all duration-300"
+
+
+
+      if (isInCriticalTime) {
+        return `${baseStyles} opacity-90 font-medium`;
+      }
+
+      return baseStyles;
+    };
+
+    return (
+      <div className={getContainerStyles()}>
+
+        {/* Wrapper to place time and progress side by side */}
+        <div className="flex justify-between items-start flex-wrap gap-[80px]">
+
+          {/* Left side: Timer */}
+          <div className="flex justify-center items-center gap-1 sm:gap-2 md:gap-3 lg:gap-4">
+            {/* Hours */}
+            <div className={getTimeBoxStyles()}>
+              <div className={getNumberStyles()}>{hours}</div>
+              <div className={getLabelStyles()}>Hours</div>
+            </div>
+
+            <span className={getSeparatorStyles()}>:</span>
+
+            {/* Minutes */}
+            <div className={getTimeBoxStyles()}>
+              <div className={getNumberStyles()}>{minutes}</div>
+              <div className={getLabelStyles()}>Minutes</div>
+            </div>
+
+            <span className={getSeparatorStyles()}>:</span>
+
+            {/* Seconds */}
+            <div className={getTimeBoxStyles()}>
+              <div className={getNumberStyles()}>{seconds}</div>
+              <div className={getLabelStyles()}>Seconds</div>
+            </div>
+          </div>
+          <h2 className={getTitleStyles()}>
+            {isInFinalMinute
+              ? "⚠️ FINAL MINUTE!"
+              : isInCriticalTime
+                ? "⏰ Time Running Out!"
+                : "Time Left"}
+          </h2>
+
+          {/* Right side: Progress Bar */}
+          <div className="w-[300px] sm:w-[450px] md:w-[500px]">
+            <div className="mt-3 sm:mt-4 md:mt-5">
+              <div
+                className={`w-full h-1 sm:h-2 rounded-full overflow-hidden ${theme === "light" ? "bg-gray-200" : "bg-gray-600"}`}
+              >
+                <div
+                  className={`h-full transition-all duration-1000 ease-linear ${isInFinalMinute
+                    ? "bg-red-500 animate-pulse"
+                    : isInCriticalTime
+                      ? "bg-orange-500"
+                      : "bg-green-500"
+                    }`}
+                  style={{ width: `${percentageRemaining}%` }}
+                />
+              </div>
+              <div
+                className={`mt-1 sm:mt-2 text-[10px] sm:text-xs opacity-60 ${isInCriticalTime ? "font-medium" : ""}`}
+              >
+                {percentageRemaining}% remaining
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+
+
+  }
   // Dynamic styles based on time remaining
   const getContainerStyles = () => {
     const baseStyles =
       "w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto p-3 sm:p-4 md:p-6 rounded-lg sm:rounded-xl text-center shadow-2xl transition-all duration-300";
 
     if (isInFinalMinute) {
-      return `${baseStyles} ${
-        theme === "light"
-          ? "bg-red-50 text-red-900 border-2 border-red-200 shadow-red-200"
-          : "bg-red-900 text-red-100 border-2 border-red-700 shadow-red-800"
-      } animate-pulse`;
+      return `${baseStyles} ${theme === "light"
+        ? "bg-red-50 text-red-900 border-2 border-red-200 shadow-red-200"
+        : "bg-red-900 text-red-100 border-2 border-red-700 shadow-red-800"
+        } animate-pulse`;
     }
 
     if (isInCriticalTime) {
-      return `${baseStyles} ${
-        theme === "light"
-          ? "bg-orange-50 text-orange-900 border-2 border-orange-200 shadow-orange-200"
-          : "bg-orange-900 text-orange-100 border-2 border-orange-700 shadow-orange-800"
-      }`;
+      return `${baseStyles} ${theme === "light"
+        ? "bg-orange-50 text-orange-900 border-2 border-orange-200 shadow-orange-200"
+        : "bg-orange-900 text-orange-100 border-2 border-orange-700 shadow-orange-800"
+        }`;
     }
 
-    return `${baseStyles} ${
-      theme === "light"
-        ? "bg-white text-gray-900 border border-gray-200"
-        : "bg-gray-700 text-white border border-gray-600"
-    }`;
+    return `${baseStyles} ${theme === "light"
+      ? "bg-white text-gray-900 border border-gray-200"
+      : "bg-gray-700 text-white border border-gray-600"
+      }`;
   };
 
   const getTimeBoxStyles = () => {
@@ -161,26 +334,23 @@ function CountdownTimer({
       "flex-1 max-w-[60px] xs:max-w-[70px] sm:max-w-[80px] md:max-w-[90px] lg:max-w-[100px] xl:max-w-[110px] text-center p-2 sm:p-3 md:p-4 rounded-md sm:rounded-lg md:rounded-xl transition-all duration-300";
 
     if (isInFinalMinute) {
-      return `${baseStyles} ${
-        theme === "light"
-          ? "bg-red-100 text-red-900 border border-red-300"
-          : "bg-red-800 text-red-100 border border-red-600"
-      }`;
+      return `${baseStyles} ${theme === "light"
+        ? "bg-red-100 text-red-900 border border-red-300"
+        : "bg-red-800 text-red-100 border border-red-600"
+        }`;
     }
 
     if (isInCriticalTime) {
-      return `${baseStyles} ${
-        theme === "light"
-          ? "bg-orange-100 text-orange-900 border border-orange-300"
-          : "bg-orange-800 text-orange-100 border border-orange-600"
-      }`;
+      return `${baseStyles} ${theme === "light"
+        ? "bg-orange-100 text-orange-900 border border-orange-300"
+        : "bg-orange-800 text-orange-100 border border-orange-600"
+        }`;
     }
 
-    return `${baseStyles} ${
-      theme === "light"
-        ? "bg-gray-100 text-gray-900 border border-gray-300"
-        : "bg-gray-600 text-white border border-gray-500"
-    }`;
+    return `${baseStyles} ${theme === "light"
+      ? "bg-gray-100 text-gray-900 border border-gray-300"
+      : "bg-gray-600 text-white border border-gray-500"
+      }`;
   };
 
   const getTitleStyles = () => {
@@ -241,8 +411,8 @@ function CountdownTimer({
         {isInFinalMinute
           ? "⚠️ FINAL MINUTE!"
           : isInCriticalTime
-          ? "⏰ Time Running Out!"
-          : "Time Left"}
+            ? "⏰ Time Running Out!"
+            : "Time Left"}
       </h2>
 
       <div className="flex justify-center items-center gap-1 sm:gap-2 md:gap-3 lg:gap-4">
@@ -272,25 +442,22 @@ function CountdownTimer({
       {/* Progress bar for visual indication */}
       <div className="mt-3 sm:mt-4 md:mt-5">
         <div
-          className={`w-full h-1 sm:h-2 rounded-full overflow-hidden ${
-            theme === "light" ? "bg-gray-200" : "bg-gray-600"
-          }`}
+          className={`w-full h-1 sm:h-2 rounded-full overflow-hidden ${theme === "light" ? "bg-gray-200" : "bg-gray-600"
+            }`}
         >
           <div
-            className={`h-full transition-all duration-1000 ease-linear ${
-              isInFinalMinute
-                ? "bg-red-500 animate-pulse"
-                : isInCriticalTime
+            className={`h-full transition-all duration-1000 ease-linear ${isInFinalMinute
+              ? "bg-red-500 animate-pulse"
+              : isInCriticalTime
                 ? "bg-orange-500"
                 : "bg-green-500"
-            }`}
+              }`}
             style={{ width: `${percentageRemaining}%` }}
           />
         </div>
         <div
-          className={`mt-1 sm:mt-2 text-[10px] sm:text-xs opacity-60 ${
-            isInCriticalTime ? "font-medium" : ""
-          }`}
+          className={`mt-1 sm:mt-2 text-[10px] sm:text-xs opacity-60 ${isInCriticalTime ? "font-medium" : ""
+            }`}
         >
           {percentageRemaining}% remaining
         </div>

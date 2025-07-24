@@ -54,43 +54,44 @@ const HeaderComponent = ({
 
   // Common input styles
   const selectStyles = `border rounded-lg px-4 py-2 focus:ring-2 focus:border-transparent outline-none transition-all duration-300 ${theme === 'light'
-      ? 'border-blue-200 bg-white text-gray-900 focus:ring-blue-500 hover:border-blue-300'
-      : 'border-gray-600 bg-gray-800 text-gray-100 focus:ring-blue-400 hover:border-gray-500'
+    ? 'border-blue-200 bg-white text-gray-900 focus:ring-blue-500 hover:border-blue-300'
+    : 'border-gray-600 bg-gray-800 text-gray-100 focus:ring-blue-400 hover:border-gray-500'
     }`;
 
   // Button styles
   const navButtonStyles = `p-2 rounded-lg transition-colors duration-300 ${theme === 'light'
-      ? 'hover:bg-blue-100 disabled:opacity-50 disabled:hover:bg-transparent'
-      : 'hover:bg-gray-700 disabled:opacity-50 disabled:hover:bg-transparent'
+    ? 'hover:bg-blue-100 disabled:opacity-50 disabled:hover:bg-transparent'
+    : 'hover:bg-gray-700 disabled:opacity-50 disabled:hover:bg-transparent'
     }`;
   const runButtonStyles = `w-10 h-10 rounded-lg flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 border shadow-sm ${theme === 'light'
-      ? 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
-      : 'bg-gray-800 text-gray-300 border-gray-600 hover:bg-gray-700'
+    ? 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+    : 'bg-gray-800 text-gray-300 border-gray-600 hover:bg-gray-700'
     }`;
 
   const submitButtonStyles = `px-6 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 transition-all duration-200 shadow-md hover:shadow-lg font-medium ${theme === 'light'
-      ? 'bg-green-600 text-white hover:bg-green-700'
-      : 'bg-green-500 text-white hover:bg-green-600'
+    ? 'bg-green-600 text-white hover:bg-green-700'
+    : 'bg-green-500 text-white hover:bg-green-600'
     }`;
   const secondaryButtonStyles = `px-6 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 transition-all duration-200 shadow-sm hover:shadow-md font-medium border ${theme === 'light'
-      ? 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
-      : 'bg-gray-800 text-gray-100 border-gray-600 hover:bg-gray-700'
+    ? 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+    : 'bg-gray-800 text-gray-100 border-gray-600 hover:bg-gray-700'
     }`;
 
   return (
     <div className={`border-b shadow-sm ${theme === 'light'
-        ? 'bg-gradient-to-r from-blue-50 via-white to-blue-50 border-gray-200'
-        : 'bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 border-gray-700'
+      ? 'bg-gradient-to-r from-blue-50 via-white to-blue-50 border-gray-200'
+      : 'bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 border-gray-700'
       }`}>
 
       {/* Main Header */}
-       <CountdownTimer 
-              initialTime={duration} 
-              handleSubmitTest={submitContest} 
-              // submitted={submitted} 
-              submitted={false} // Assuming you have a way to track if the contest is submitted
-              examId={contest_id}
-            />  
+      <CountdownTimer
+        initialTime={duration}
+        handleSubmitTest={submitContest}
+        // submitted={submitted} 
+        submitted={false} // Assuming you have a way to track if the contest is submitted
+        examId={contest_id}
+        variant="header"
+      />
       <div className="p-4 flex justify-between items-center">
 
         {/* Left Section - Navigation */}
@@ -131,6 +132,7 @@ const HeaderComponent = ({
         {/* Right Section - Controls */}
         <div className="flex items-center space-x-4">
           {/* Language Selector */}
+         
           <div className="flex items-center space-x-2">
             {/* <Code className={`w-4 h-4 ${
               theme === 'light' ? 'text-blue-600' : 'text-blue-400'

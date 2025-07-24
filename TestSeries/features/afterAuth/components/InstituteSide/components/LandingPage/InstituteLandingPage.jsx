@@ -43,7 +43,7 @@ if(user.role !== 'organization') {
 else
   return (
     <div className="min-h-screen p-4 md:p-6">
-      <div className=" mx-auto space-y-6">
+      <div className="max-w-7xl mx-auto space-y-6">
         <Header user={user} theme={theme} />
         <QuickSteps theme={theme} />
         <Analytics examBatchAnalytics={examBatchAnalytics}  theme={theme} batches={batches} />

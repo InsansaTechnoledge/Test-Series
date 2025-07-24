@@ -19,6 +19,7 @@ import { VITE_SECRET_KEY_FOR_CONTEST } from "../../constants/env";
 import { useTheme } from "../../../hooks/useTheme";
 import { submitContestService } from "../../../utils/services/contestService";
 import ContestResultComponent from "../../afterAuth/components/StudentSide/Coding-Contests/contestResult/contestResultComponent";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 import { Save } from "lucide-react";
 import { useToast, ToastContainer } from "../../../utils/Toaster";
@@ -40,6 +41,8 @@ const CodingPlatform = () => {
   const [showResultPage, setShowResultPage] = useState(false);
   const [resultPageData, setResultPageData] = useState(null);
   const { toasts, showToast, removeToast } = useToast();
+  const [isOutputVisible, setIsOutputVisible] = useState(true);
+  const [showTestResults, setShowTestResults] = useState(true);
 
   const [editorTheme, setEditorTheme] = useState("vs-dark");
 
@@ -47,30 +50,30 @@ const CodingPlatform = () => {
     import.meta.env.VITE_SECRET_KEY_FOR_CONTEST || VITE_SECRET_KEY_FOR_CONTEST;
 
   const contestData = useMemo(() => {
-  try {
-    const decrypted = CryptoJS.AES.decrypt(
-      decodedId,
-      SECRET_KEY_CONTEST
-    ).toString(CryptoJS.enc.Utf8);
+    try {
+      const decrypted = CryptoJS.AES.decrypt(
+        decodedId,
+        SECRET_KEY_CONTEST
+      ).toString(CryptoJS.enc.Utf8);
 
-    if (!decrypted) throw new Error("Empty decrypted string");
+      if (!decrypted) throw new Error("Empty decrypted string");
 
-    return JSON.parse(decrypted);
-  } catch (error) {
-    console.error("Error decrypting contest data:", error);
-    return null;
-  }
-}, [decodedId, SECRET_KEY_CONTEST]);
+      return JSON.parse(decrypted);
+    } catch (error) {
+      console.error("Error decrypting contest data:", error);
+      return null;
+    }
+  }, [decodedId, SECRET_KEY_CONTEST]);
 
   const contest_id = contestData?.contest_id;
   const duration = contestData?.duration;
 
 
   useEffect(() => {
-  if (!contestData) {
-    showToast("Invalid contest data. Please check your link.", "error");
-  }
-}, [contestData]);
+    if (!contestData) {
+      showToast("Invalid contest data. Please check your link.", "error");
+    }
+  }, [contestData]);
 
 
   useEffect(() => {
@@ -99,6 +102,7 @@ const CodingPlatform = () => {
   }, [contest_id]);
 
   const leftPanel = useResizable(50, 20, 80);
+  const rightPanel = useVerticalResizable(200, 100, 500);
   const outputPanel = useVerticalResizable(200, 100, 500);
   const problem = problems[currentProblem];
 
@@ -160,16 +164,16 @@ const CodingPlatform = () => {
         setOutput(
           typeof result.run.stdout === "string"
             ? (() => {
+              try {
+                return JSON.parse(result.run.stdout);
+              } catch {
                 try {
-                  return JSON.parse(result.run.stdout);
+                  return eval(result.run.stdout);
                 } catch {
-                  try {
-                    return eval(result.run.stdout);
-                  } catch {
-                    return result.run.stdout;
-                  }
+                  return result.run.stdout;
                 }
-              })()
+              }
+            })()
             : result.run.stdout
         );
       }
@@ -235,7 +239,7 @@ const CodingPlatform = () => {
       console.error("runTests error:", error);
       setErrors([
         "Test execution failed: " + error.response?.data?.message ||
-          error.message,
+        error.message,
       ]);
       setOutput("");
       setTestResults([]);
@@ -253,7 +257,7 @@ const CodingPlatform = () => {
     setOutputTab("testcase");
   };
 
-  
+
   const submitContest = async () => {
     const studentResult = {
       results: problems.map((problem) => ({
@@ -283,6 +287,11 @@ const CodingPlatform = () => {
       setResultPageData({ problems, studentResult });
       showToast("Contest submitted successfully!");
       setShowResultPage(true);
+      localStorage.removeItem(`contest_${contest_id}_problem_${problem.question_id}_language_${language}_code_`);
+      localStorage.removeItem(`contest_${contest_id}_problem_${problem.question_id}_testResults`);
+      localStorage.removeItem(`encryptedTimeLeft_${contest_id}`);
+      localStorage.removeItem("totalInitialTime")
+
     } else {
       showToast(`Failed to submit contest:   ${response.statusText}`, "error");
     }
@@ -291,14 +300,12 @@ const CodingPlatform = () => {
   if (loading) {
     return (
       <div
-        className={`flex items-center justify-center h-screen ${
-          theme === "light" ? "bg-gray-100" : "bg-gray-900"
-        }`}
+        className={`flex items-center justify-center h-screen ${theme === "light" ? "bg-gray-100" : "bg-gray-900"
+          }`}
       >
         <div
-          className={`text-lg ${
-            theme === "light" ? "text-gray-700" : "text-gray-300"
-          }`}
+          className={`text-lg ${theme === "light" ? "text-gray-700" : "text-gray-300"
+            }`}
         >
           Loading...
         </div>
@@ -314,16 +321,15 @@ const CodingPlatform = () => {
           studentResult={resultPageData.studentResult}
         />
       )}
-     
+
       {!showResultPage && !resultPageData && (
         <div
-          className={`flex flex-col m-6 ${
-            theme === "light" ? "" : "bg-gray-700"
-          }`}
+          className={`flex flex-col m-6 ${theme === "light" ? "" : "bg-gray-700"
+            }`}
         >
           <HeaderComponent
-          contest_id={contest_id}
-          duration={duration}
+            contest_id={contest_id}
+            duration={duration}
             problems={problems}
             language={language}
             setCurrentProblem={setCurrentProblem}
@@ -341,29 +347,26 @@ const CodingPlatform = () => {
           <div className="flex-1 flex overflow-hidden">
             <div
               ref={leftPanel.containerRef}
-              className={`border-r flex flex-col ${
-                theme === "light"
-                  ? "bg-white border-gray-200"
-                  : "bg-gray-800 border-gray-700"
-              }`}
-              style={{ width: `${leftPanel.width}%` }}
+              className={`border-r flex flex-col ${theme === "light"
+                ? "bg-white border-gray-200"
+                : "bg-gray-800 border-gray-700"
+                }`}
+              style={{ width: `${leftPanel.width}%`, height: "5%" }}
             >
               <div
-                className={`flex border-b flex-shrink-0 ${
-                  theme === "light" ? "border-gray-200" : "border-gray-700"
-                }`}
+                className={`flex border-b flex-shrink-0 ${theme === "light" ? "border-gray-200" : "border-gray-700"
+                  }`}
               >
                 <button
                   onClick={() => setActiveTab("description")}
-                  className={`px-4 py-2 border-b-2 transition-all duration-300 ${
-                    activeTab === "description"
-                      ? theme === "light"
-                        ? "border-blue-500 text-blue-600 bg-gray-50"
-                        : "border-blue-400 text-blue-300 bg-gray-700"
-                      : theme === "light"
+                  className={`px-4 py-2 border-b-2 transition-all duration-300 ${activeTab === "description"
+                    ? theme === "light"
+                      ? "border-blue-500 text-blue-600 bg-gray-50"
+                      : "border-blue-400 text-blue-300 bg-gray-700"
+                    : theme === "light"
                       ? "border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                       : "border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-700"
-                  }`}
+                    }`}
                 >
                   Description
                 </button>
@@ -381,9 +384,15 @@ const CodingPlatform = () => {
               isResizing={leftPanel.isResizing}
             />
 
-            <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="flex-1 flex flex-col overflow-hidden relative">
+              {/* Code Editor */}
               <div
-                style={{ height: `calc(100% - ${outputPanel.height}px)` }}
+                style={{
+                  height: showTestResults
+                    ? `calc(100% - ${outputPanel.height + 40}px)` // 40px = tab bar height
+                    : '100%',
+                  transition: 'height 0.3s ease',
+                }}
                 className="overflow-hidden"
               >
                 <CodeEditor
@@ -395,23 +404,74 @@ const CodingPlatform = () => {
                   question_id={problem?.question_id || ""}
                 />
               </div>
-              <HorizontalDragHandle
-                onMouseDown={outputPanel.startResize}
-                isResizing={outputPanel.isResizing}
-              />
-              <div style={{ height: `${outputPanel.height}px` }}>
-                <OutputPanel
-                  activeTab={outputTab}
-                  setActiveTab={setOutputTab}
-                  testResults={testResults}
-                  isRunning={isRunning}
-                  output={output}
-                  errors={errors}
-                  height={outputPanel.height}
-                  testInput={testinput}
-                />
+
+              {/* Tab Bar (absolute at bottom or above panel) */}
+              <div
+                className="absolute left-0 right-0 flex items-center justify-between px-4 bg-gray-100 dark:bg-gray-800 border-t border-gray-300 dark:border-gray-600"
+                style={{
+                  height: '40px',
+                  bottom: showTestResults ? `${outputPanel.height}px` : '10%',
+                  transition: 'bottom 0.3s ease',
+                  zIndex: 30,
+                }}
+              >
+                {/* Tab Buttons */}
+                <div className="flex gap-4">
+                  <button
+                    onClick={() => setOutputTab("testResults")}
+                    className={`text-sm font-medium ${outputTab === "testResults" ? "text-blue-600" : ""}`}
+                  >
+                    Test Results
+                  </button>
+                  <button
+                    onClick={() => setOutputTab("output")}
+                    className={`text-sm font-medium ${outputTab === "output" ? "text-blue-600" : ""}`}
+                  >
+                    Output
+                  </button>
+                </div>
+
+                {/* Toggle Button */}
+                <button
+                  onClick={() => setShowTestResults((prev) => !prev)}
+                  className="text-sm flex items-center gap-1"
+                >
+                  {showTestResults ? "Hide ▼" : "Show ▲"}
+                </button>
               </div>
+
+              {/* Resize Handle (only when open) */}
+              {showTestResults && (
+                <HorizontalDragHandle
+                  onMouseDown={outputPanel.startResize}
+                  isResizing={outputPanel.isResizing}
+                />
+              )}
+
+              {/* Output Panel */}
+              {showTestResults && (
+                <div
+                  style={{
+                    height: `${outputPanel.height}px`,
+                    transition: 'height 0.3s ease',
+                  }}
+                >
+                  <OutputPanel
+                    activeTab={outputTab}
+                    setActiveTab={setOutputTab}
+                    testResults={testResults}
+                    isRunning={isRunning}
+                    output={output}
+                    errors={errors}
+                    height={outputPanel.height}
+                    testInput={testinput}
+                    showTestResults={showTestResults}
+                    toggleTestResults={() => setShowTestResults((prev) => !prev)}
+                  />
+                </div>
+              )}
             </div>
+
           </div>
         </div>
       )}
