@@ -229,6 +229,8 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
       },
     });
   };
+
+  
   useEffect(() => {
     console.log("check", user?.planFeatures?.coding_feature?.isActive);
   }, [user]);

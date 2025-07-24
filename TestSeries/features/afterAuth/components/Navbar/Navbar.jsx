@@ -34,6 +34,8 @@ const Navbar = ({setShowLogoutModal}) => {
   const { controls, categories } = SideBarDataHook();
  
 
+  console.log("check", user)
+
   // Search functionality (unchanged)
   const performSearch = (query) => {
     if (!query.trim()) {
@@ -407,24 +409,27 @@ const Navbar = ({setShowLogoutModal}) => {
                     <div className="relative group w-full">
                       <button
                         onClick={() => {
-                          navigate('qbms');
+                          navigate(`/qbms/${user._id}`);
                           setShowProfileDropdown(false);
-                          setActiveCategory(''); // Close categories dropdown
+                          setActiveCategory('');
                         }}
-                        title='you can manage your entire set of questions here'
+                        title="you can manage your entire set of questions here"
                         className={`block w-full text-left px-4 py-2 text-sm transition-all duration-200 ease-in-out hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:border-l-4 hover:border-blue-500 hover:shadow-md hover:transform hover:scale-[1.02] rounded-lg ${themeClasses.dropdownItem}`}
                       >
-                        <span className="relative z-10 font-medium group-hover:text-blue-700 transition-colors duration-200">
+                        <span className="relative z-10 font-medium group-hover:text-blue-700 transition-colors duration-200 flex items-center gap-2">
                           QBMS
+                          <span className="bg-green-100 text-green-800 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-green-300 shadow-sm">
+                            NEW
+                          </span>
                         </span>
                       </button>
-                      
+
                       <div className="absolute right-full top-1/2 -translate-y-1/2 mr-3 bg-gradient-to-r from-gray-900 to-black text-white text-xs rounded-lg px-3 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-out whitespace-nowrap z-20 shadow-lg border border-gray-700 backdrop-blur-sm">
                         <div className="flex items-center space-x-2">
                           <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse"></div>
                           <span className="font-medium">Question Bank Management System</span>
                         </div>
-                        
+
                         <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1 w-2 h-2 bg-gradient-to-tl from-gray-900 to-black border-r border-t border-gray-700 transform rotate-45"></div>
                       </div>
                     </div>

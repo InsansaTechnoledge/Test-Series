@@ -2,6 +2,10 @@ import { Info, Settings, Monitor, Smartphone, Tablet, ArrowDownWideNarrow, Arrow
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import SideBarDataHook from '../../data/sideBarDataHook';
+import dockLight from '../../../../assests/Institute/dockLight.svg'
+import dockDark from '../../../../assests/Institute/dockDark.svg'
+
+import { useTheme } from '../../../../hooks/useTheme';
 
 export default function BottomNavigator({ setShowLogoutModal }) {
   const navigate = useNavigate();
@@ -11,6 +15,8 @@ export default function BottomNavigator({ setShowLogoutModal }) {
   const [layoutPosition, setLayoutPosition] = useState('collapse');
   const [isMobile, setIsMobile] = useState(false);
   const { controls } = SideBarDataHook();
+  const {theme} = useTheme();
+
 
   // Check if device is mobile
   useEffect(() => {
@@ -177,17 +183,18 @@ export default function BottomNavigator({ setShowLogoutModal }) {
       <div className="fixed bottom-0 left-0 right-0 z-[9999] flex justify-center items-center py-6">
         <button
           onClick={() => setLayoutPosition('bottom')}
-          className="bg-indigo-600 text-white rounded-full px-8 py-4 flex items-center space-x-4 transform transition-all duration-500 ease-in-out hover:scale-110 shadow-2xl hover:bg-indigo-700 active:bg-indigo-800 hover:shadow-3xl relative overflow-hidden"
+          className="bg-indigo-200/20 text-white rounded-full px-8 py-4 flex items-center space-x-4 transform transition-all duration-500 ease-in-out hover:scale-110 shadow-2xl hover:shadow-3xl relative overflow-hidden"
         >
-          {/* Animated Pulse Effect */}
-          <span className="absolute inset-0 bg-indigo-700 opacity-30 rounded-full animate-ping"></span>
+         
+          {/* <span className="absolute inset-0 bg-indigo-700 opacity-30 rounded-full animate-ping"></span>
   
-          {/* Icon with smooth transition */}
-          <ArrowUp className="w-6 h-6 transform transition-all duration-500 ease-in-out group-hover:rotate-180" />
+          
+          <ArrowUp className="w-6 h-6 transform transition-all duration-500 ease-in-out group-hover:rotate-180" /> */}
   
-          {/* Animated Text with typing effect */}
-          <span className="font-semibold text-lg tracking-wider transition-all duration-500 transform group-hover:translate-x-3">
-            Expand bar
+         
+          <img src={theme === 'light' ? dockLight : dockDark} className= {`w-11 h-11 cursor-pointer hover:translate-[-0.5px] `} alt='dock-img' />
+          <span className={`font-semibold ${theme === 'light' ? 'text-gray-600' : 'text-gray-100'}  text-lg tracking-wider transition-all duration-500 transform group-hover:translate-x-3`}>
+            Show Menu
           </span>
         </button>
       </div>
