@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useTheme } from '../../../../../../hooks/useTheme';
 
-
-const QuestionPreview = ({ questions, setQuestions, examDetails }) => {
+const QuestionPreview = ({ questions , setQuestions, examDetails = null }) => {
   const [expandedQuestion, setExpandedQuestion] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');

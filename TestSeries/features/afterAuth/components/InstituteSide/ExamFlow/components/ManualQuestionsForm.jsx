@@ -12,7 +12,7 @@ import { useToast_new } from "../../../../../../utils/Toaster_new";
 
 
 const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
-  console.log('sdvsz', examDetails.subjects)
+  console.log('sdvsz', examDetails?.subjects)
   const { user } = useUser();
   console.log("sdgv", user);
   //  const { toasts, showToast, removeToast } = useToast();
@@ -218,6 +218,8 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
       },
     });
   };
+
+  
   useEffect(() => {
     console.log("check", user?.planFeatures?.coding_feature?.isActive);
   }, [user]);
@@ -775,7 +777,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
             onChange={handleChange}
           >
             <option value="">-- Select Subject --</option>
-            {Array.isArray(examDetails.subjects) &&
+            {Array.isArray(examDetails?.subjects) &&
               examDetails.subjects.map((subj, idx) => (
                 <option key={idx} value={subj}>
                   {subj}

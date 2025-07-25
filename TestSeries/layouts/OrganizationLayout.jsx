@@ -6,10 +6,12 @@ import LogoutModal from '../components/Logout/LogoutModal';
 import BottomNavigator from '../features/afterAuth/components/Navigator/BottomNavigator';
 import { useTheme } from '../hooks/useTheme';
 import PageFallback from '../features/afterAuth/components/ErrorBoundry/PageFallback';
+
 export default function OrganizationLayout() {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const location = useLocation();
   const {theme} = useTheme();
+
   useEffect(() => {
 
   }, [location.pathname]);
