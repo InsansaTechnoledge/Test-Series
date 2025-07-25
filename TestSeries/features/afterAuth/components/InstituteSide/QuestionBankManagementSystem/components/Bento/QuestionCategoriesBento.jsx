@@ -43,7 +43,10 @@ const QuestionCategoriesBento = ({ categories , setSelectedQuestionType}) => {
                   <h3 className="text-xl md:text-2xl font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors duration-300">
                     {category?.type?.toUpperCase()}
                   </h3>
-                  <button className='text-red-400 cursor-pointer hover:text-red-500'><Trash2 /></button>
+                  {
+                    isHovered && 
+                    <button className='text-red-400 cursor-pointer hover:text-red-500'><Trash2 /></button>
+                  }
                 </div>
 
                                   

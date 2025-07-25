@@ -109,15 +109,12 @@ const ExamDataDashboard = ({ questions = [], setShowAnalysis }) => {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className=" mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-6 gap-4">
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-indigo-600 mb-1">
+              <h1 className="text-3xl font-semibold mb-2">
                 Exam Questions Data Dashboard
               </h1>
-              <p className="text-gray-600 text-sm md:text-base">
-                Comprehensive analysis of your exam question database
-              </p>
             </div>
             <button 
               onClick={() => setShowAnalysis?.(false)}

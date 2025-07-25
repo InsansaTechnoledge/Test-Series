@@ -75,7 +75,7 @@ const QBMS = () => {
   return (
     <div className='max-h-screen'>
       {
-        !showIntroPage && 
+        !showIntroPage && !showAlanysis && 
           <Navbar/>
       }
       {/* Overlay Introductory Page */}
