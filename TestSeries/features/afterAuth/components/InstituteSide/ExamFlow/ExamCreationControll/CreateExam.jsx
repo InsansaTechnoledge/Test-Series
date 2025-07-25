@@ -139,6 +139,9 @@ const CreateExam = () => {
       setIsSubmitting(false);
     }
   };
+    useEffect(()=>{
+    console.log(questions,"question..........")
+  })
 
   return (
     <div className="p-6  mx-auto ">
