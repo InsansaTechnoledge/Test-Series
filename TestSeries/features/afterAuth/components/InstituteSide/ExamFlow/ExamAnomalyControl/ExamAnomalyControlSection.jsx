@@ -23,6 +23,9 @@ const ExamAnomalyControlSection = () => {
   const [expandedStudents, setExpandedStudents] = useState(new Set());
   const [severityFilter, setSeverityFilter] = useState('all');
 
+  console.log("fds",anomalies);
+  
+
   // Memoized unique students and exams for performance
   const uniqueStudents = useMemo(() => {
     return [...new Set(allLogs.map(log => log.studentId))];
@@ -49,6 +52,7 @@ const ExamAnomalyControlSection = () => {
     }
   }, []);
 
+
   useEffect(() => {
     if (!goLive) return;
 
@@ -57,6 +61,10 @@ const ExamAnomalyControlSection = () => {
 
     return () => clearInterval(interval);
   }, [goLive, fetchData]);
+
+  const displayImage = (base64Image) => {
+    return base64Image ? <img src={base64Image} alt="Anomaly Image" className="max-w-full h-auto" /> : null;
+  };
 
 
   const handleStopExam = useCallback(
@@ -554,6 +562,9 @@ const ExamAnomalyControlSection = () => {
                                   <div className="md:col-span-2">
                                     <p className="text-xs text-gray-600 mb-1">Anomaly Details</p>
                                     <p className="text-sm font-medium text-gray-900">{event.details}</p>
+                                  </div>
+                                  <div className="md:col-span-2">
+                                   <img src={event.imageBase} alt="" />
                                   </div>
                                 </div>
                               </div>
