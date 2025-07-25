@@ -4,8 +4,9 @@ const path = require('path');
 const fs = require('fs');
 const readline = require('readline');
 const url = require('url');
-const { kill } = require('process');
 const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
+const QueueManager = require('./queueManager');
+const queue= new QueueManager();
  
 let mainWindow;
 let protocolUrl = null;
@@ -159,7 +160,7 @@ function launchProctorEngine(params) {
       '--event-id', eventId
     ], {
       stdio: ['ignore', 'pipe', 'pipe'],
-      windowsHide: true,
+      // windowsHide: true,
     });
  
     const rl = readline.createInterface({ input: proctorProcess.stdout });
@@ -172,6 +173,16 @@ function launchProctorEngine(params) {
         console.log('📊 Parsed proctor data:', parsed);
        
         if (parsed?.eventType === 'anomaly') {
+          
+          if(parsed?.image && fs.existsSync(parsed.image)){
+            const imageBuffer = fs.readFileSync(parsed.image);
+            parsed.imageBase = `data:image/jpg;base64,${imageBuffer.toString('base64')}`;
+            delete parsed.image;
+          } 
+          console.log('📸 Anomaly detected:', parsed);
+
+        queue.addEvent(parsed);
+
           safeSend('proctor-warning', parsed);
         } else {
           safeSend('proctor-event', parsed);

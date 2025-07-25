@@ -6,20 +6,14 @@ export const receiveProctorEvent = async (req , res) => {
     try{
         console.log("🟢 Received payload from C++ Engine:", req.body); 
 
-        const { studentId, examId, eventType, timestamp, details } = req.body;
+        const { events } = req.body;
 
-        if (!studentId || !examId || !eventType || !timestamp || !details) {
-            return res.status(400).json({ message: 'Missing required fields' });
-        }
+        // if (!studentId || !examId || !eventType || !timestamp || !details) {
+        //     return res.status(400).json({ message: 'Missing required fields' });
+        // }
 
-         const savedEvent = await ProctorEvent.create({
-            studentId,
-            examId,
-            eventType,
-            timestamp,
-            details,
-        });
-  
+         const savedEvent = await ProctorEvent.insertMany(events);
+
         console.log("✅ Event saved:", savedEvent);
 
         return new APIResponse(201 , savedEvent, 'Event saved Sucessfully').send(res);

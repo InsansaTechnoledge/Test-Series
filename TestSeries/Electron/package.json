@@ -16,7 +16,6 @@
     "clean": "rm -rf dist node_modules && npm install"
   },
   "build": {
-    
     "appId": "com.evalvo.proctor",
     "productName": "Evalvo Proctor",
     "directories": {
@@ -101,9 +100,11 @@
   },
   "devDependencies": {
     "electron": "^35.5.1",
-    "electron-builder": "^26.0.12"
+    "electron-builder": "^26.0.12",
+    "electron-rebuild": "^3.2.9"
   },
   "dependencies": {
+    "better-sqlite3": "^12.2.0",
     "electron-updater": "^6.6.2"
   },
   "author": "Evalvo Team",

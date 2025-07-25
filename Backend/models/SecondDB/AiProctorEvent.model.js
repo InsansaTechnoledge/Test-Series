@@ -31,6 +31,10 @@ const proctorEventSchema = new Schema({
   stopExam: {
     type: Boolean,
     default: false
+  },
+  imageBase: {
+    type: String,
+    required: false
   }
 
 }, { timestamps: true });
