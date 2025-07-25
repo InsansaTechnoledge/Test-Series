@@ -29,7 +29,16 @@
       "bin/**/*",
       "build/**/*"
     ],
-    "extraFiles": [],
+   "extraFiles": [
+      {
+        "from": "./bin/mac/proctor_engine", 
+        "to": "bin/mac/proctor_engine"
+      },
+      {
+        "from": "./bin/win/proctor_engine.exe", 
+        "to": "bin/win/proctor_engine.exe"
+      }
+    ],
     "mac": {
       "target": [
         {

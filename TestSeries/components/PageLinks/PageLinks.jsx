@@ -315,7 +315,7 @@ const PageLinks = () => {
                 <Route path='create-role-group' element={<FeatureBasedRoleGroups />} />
                 <Route path='create-exam/:examId?' element={<CreateExam />} />
                 <Route path='exam-list' element={<ExamListPage />} />
-                <Route path='qbms' element={<QBMS/>}/>
+               
                 <Route path='exam-anomaly' element={<ExamAnomalyControlSection/>}/>
                 <Route path='institute-landing' element={<InstituteLandingPage />} />
                 <Route path='batch-details' element={<BatchViewPage />} />
@@ -359,6 +359,7 @@ const PageLinks = () => {
         <Route path='session-expired' element={<SessionExpireError />} />
         <Route path='certificate-creation' element={<CertificateCreation />} />
         <Route path='syllabus/:syllabusId' element={<SyllabusViewPage />} />
+        <Route path='qbms/:id' element={<QBMS/>}/>
 
         {user?.role === "organization" && (
           <Route path='institute-subscription' element={<YourPlanPage />} />

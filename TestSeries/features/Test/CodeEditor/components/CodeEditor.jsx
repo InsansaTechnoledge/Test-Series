@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-const CodeEditor = ({ code, onChange, language, theme,question_id,contest_id  }) => {
+const CodeEditor = ({ code, onChange, language, theme, question_id, contest_id }) => {
   const containerRef = useRef(null);
   const editorRef = useRef(null);
   const [isEditorReady, setIsEditorReady] = useState(false);
@@ -48,7 +48,7 @@ const CodeEditor = ({ code, onChange, language, theme,question_id,contest_id  })
       const monacoEditor = window.monaco.editor.create(containerRef.current, {
         value: code || '',
         language: mapLanguage(language),
-        theme, 
+        theme,
         automaticLayout: true,
         minimap: { enabled: false },
         fontSize: 14,
@@ -141,7 +141,11 @@ const CodeEditor = ({ code, onChange, language, theme,question_id,contest_id  })
     }
   }, [code, isEditorReady]);
 
-  return <div ref={containerRef} className="h-full border rounded" />;
+  return <div
+    ref={containerRef}
+    className="border rounded"
+    style={{ width: "100%", height: "99%" }}
+  />;
 };
 
 export default CodeEditor;

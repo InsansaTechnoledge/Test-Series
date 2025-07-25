@@ -45,7 +45,7 @@ const StudentListPage = () => {
   const location = useLocation();
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [studentsPerPage] = useState(6);
+  const [studentsPerPage] = useState(12);
 
   const canAddStudent= hasRoleAccess({
     keyFromPageOrAction: 'actions.addStudent',

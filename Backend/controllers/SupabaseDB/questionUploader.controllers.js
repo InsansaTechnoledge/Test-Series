@@ -6,6 +6,7 @@ import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
 import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
 import { Organization } from "../../models/FirstDB/organization.model.js";
 
+
 //uploading the questions foe all types
 const uploadedQuestions = async (questionTypeData) => {
 
@@ -339,7 +340,7 @@ export const uploadFromJSON = async (req, res) => {
       if (q.type === 'comprehension') {
         comprehensionQueue.push(q); // Defer handling
       } else {
-        const { type, subject, chapter, difficulty, explanation, positive_marks, negative_marks } = q;
+        const { type, subject, chapter, difficulty, explanation, positive_marks, negative_marks,bloom_level } = q;
         baseQuestions.push({
           exam_id,
           organization_id,
@@ -349,7 +350,8 @@ export const uploadFromJSON = async (req, res) => {
           difficulty,
           explanation,
           positive_marks: Number(positive_marks) || 1,
-          negative_marks: Number(negative_marks) || 0
+          negative_marks: Number(negative_marks) || 0,
+          bloom_level
         });
       }
     }
@@ -385,7 +387,8 @@ export const uploadFromJSON = async (req, res) => {
           difficulty: sub.difficulty,
           explanation: sub.explanation,
           positive_marks: Number(sub.positive_marks) || 1,
-          negative_marks: Number(sub.negative_marks) || 0
+          negative_marks: Number(sub.negative_marks) || 0,
+          bloom_level:sub.bloom_level
         };
 
         const insertedBase = await insertBaseQuestion([base]);
@@ -417,7 +420,8 @@ export const uploadFromJSON = async (req, res) => {
         difficulty: compQ.difficulty,
         explanation: compQ.explanation,
         positive_marks: subIds.length,
-        negative_marks: 0
+        negative_marks: 0,
+        bloom_level:compQ.bloom_level
       };
 
       const compInsert = await insertBaseQuestion([baseComp]);

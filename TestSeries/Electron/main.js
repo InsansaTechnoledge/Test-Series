@@ -86,59 +86,90 @@ function safeSend(channel, data) {
  
   const isWin = process.platform === 'win32';
 // // Function to get proctor engine binary path
-function getBinaryPath() {
+// function getBinaryPath() {
 
-  const is64Bit = process.arch === 'x64';
-  const binaryName = isWin ? 'proctor_engine.exe' : 'proctor_engine';
-  console.log("Platform:", process.platform);
-console.log("Architecture:", process.arch);
-  let fullPath;
+//   const is64Bit = process.arch === 'x64';
+//   const binaryName = isWin ? 'proctor_engine.exe' : 'proctor_engine';
+//   console.log("Platform:", process.platform);
+// console.log("Architecture:", process.arch);
+//   let fullPath;
  
-  if (isDev) {
-    fullPath = path.join(__dirname, binaryName);
-  } else {
-    const platformDir = isWin ? 'win' : 'mac';
-    const basePath = path.join(process.resourcesPath, 'bin', platformDir);
-    fullPath = path.join(basePath, binaryName);
-  }
+//   if (isDev) {
+//     fullPath = path.join(__dirname, binaryName);
+//   } else {
+//     const platformDir = isWin ? 'win' : 'mac';
+//     const basePath = path.join(process.resourcesPath, 'bin', platformDir);
+//     fullPath = path.join(basePath, binaryName);
+//   }
  
-  console.log("🛠️ Resolved binary path:", fullPath);
-  console.log("🛠️ Current directory (__dirname):", __dirname);
-  console.log("🛠️ isDev:", isDev);
+//   console.log("🛠️ Resolved binary path:", fullPath);
+//   console.log("🛠️ Current directory (__dirname):", __dirname);
+//   console.log("🛠️ isDev:", isDev);
  
-  if (!fs.existsSync(fullPath)) {
-    console.log("📁 Listing files in current directory:");
-    try {
-      const files = fs.readdirSync(__dirname);
-      files.forEach(file => {
-        const filePath = path.join(__dirname, file);
-        const stats = fs.statSync(filePath);
-        console.log(`  ${file} ${stats.isDirectory() ? '(dir)' : `(file, ${stats.size} bytes)`}`);
-      });
-    } catch (err) {
-      console.error("❌ Error reading directory:", err);
-    }
+//   if (!fs.existsSync(fullPath)) {
+//     console.log("📁 Listing files in current directory:");
+//     try {
+//       const files = fs.readdirSync(__dirname);
+//       files.forEach(file => {
+//         const filePath = path.join(__dirname, file);
+//         const stats = fs.statSync(filePath);
+//         console.log(`  ${file} ${stats.isDirectory() ? '(dir)' : `(file, ${stats.size} bytes)`}`);
+//       });
+//     } catch (err) {
+//       console.error("❌ Error reading directory:", err);
+//     }
    
-    throw new Error(`❌ Proctor Engine binary not found at: ${fullPath}`);
-  }
+//     throw new Error(`❌ Proctor Engine binary not found at: ${fullPath}`);
+//   }
  
-  if (!isWin) {
-    try {
-      fs.accessSync(fullPath, fs.constants.F_OK | fs.constants.X_OK);
-    } catch (err) {
-      console.log("⚠️ Binary exists but may not be executable. Attempting to make it executable...");
-      try {
-        fs.chmodSync(fullPath, '755');
-        console.log("✅ Made binary executable");
-      } catch (chmodErr) {
-        console.error("❌ Failed to make binary executable:", chmodErr);
-        throw new Error(`❌ Proctor Engine binary is not executable: ${fullPath}`);
-      }
-    }
-  }
+//   if (!isWin) {
+//     try {
+//       fs.accessSync(fullPath, fs.constants.F_OK | fs.constants.X_OK);
+//     } catch (err) {
+//       console.log("⚠️ Binary exists but may not be executable. Attempting to make it executable...");
+//       try {
+//         fs.chmodSync(fullPath, '755');
+//         console.log("✅ Made binary executable");
+//       } catch (chmodErr) {
+//         console.error("❌ Failed to make binary executable:", chmodErr);
+//         throw new Error(`❌ Proctor Engine binary is not executable: ${fullPath}`);
+//       }
+//     }
+//   }
  
-  return fullPath;
+//   return fullPath;
+// }
+
+function getBinaryPath() {
+  const is64Bit = process.arch === 'x64';
+  const binaryName = isWin ? 'proctor_engine.exe' : 'proctor_engine'; // Set binary name based on platform
+  let binaryPath;
+
+  if (isDev) {
+    // In development, use the local path
+    binaryPath = path.join(__dirname, 'bin', isWin ? 'win' : 'mac', binaryName);
+  } else {
+    // In production, resolve the path based on resources
+    binaryPath = path.join(process.resourcesPath, 'bin', isWin ? 'win' : 'mac', binaryName);
+  }
+
+  console.log("🛠️ Resolved binary path:", binaryPath);
+
+  // Check if binary exists
+  if (!fs.existsSync(binaryPath)) {
+    console.log("📁 Listing files in current directory:");
+    const files = fs.readdirSync(__dirname);
+    files.forEach(file => {
+      const filePath = path.join(__dirname, file);
+      const stats = fs.statSync(filePath);
+      console.log(`  ${file} ${stats.isDirectory() ? '(dir)' : `(file, ${stats.size} bytes)`}`);
+    });
+    throw new Error(`❌ Proctor Engine binary not found at: ${binaryPath}`);
+  }
+
+  return binaryPath;
 }
+
  
 function launchProctorEngine(params) {
   try {

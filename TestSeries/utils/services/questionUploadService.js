@@ -13,3 +13,11 @@ export const addExamAPI = async (data) => {
     });
     return res.data;
   };    
+
+  export const fetchQuestionBankForOrganization = async ({organization_id}) => {
+    const res = await api.get('/v1/question', {
+      params: { organization_id }
+    })
+
+    return res.data;
+  }

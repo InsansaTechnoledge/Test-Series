@@ -7,11 +7,12 @@ import { useTheme } from "../../../../../../hooks/useTheme";
 // import { useToast, ToastContainer } from "../../../../../../utils/Toaster";
 import { validateWithBloom } from "../../../../../../utils/validateWithBloom";
 import { useToast_new } from "../../../../../../utils/Toaster_new";
+
  // adjust path if different
 
 
 const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
-  console.log('sdvsz', examDetails.subjects)
+  console.log('sdvsz', examDetails?.subjects)
   const { user } = useUser();
   console.log("sdgv", user);
   //  const { toasts, showToast, removeToast } = useToast();
@@ -100,9 +101,9 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
     }
     const { isValid, matchedLevel } = await validateWithBloom(form.question_text, bloomLevel);
 
-    console.log("✅ Bloom Match:", isValid);
+    console.log("✅ Bloom Match:", bloomLevel);
     console.log("✅ Detected Bloom Level:", matchedLevel);
-
+    console.log("bloom level/////",bloomLevel);
     if (!isValid) {
       showToast_new(`❌ Incorrect Bloom level! ${bloomLevel}, correct ${matchedLevel}`, "error");
       return;
@@ -124,7 +125,8 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
       question_type: form.type,
       organization_id: organizationId,
     };
-
+  
+   
     if (form.type === "mcq") {
       newQuestion.options = form.options;
       newQuestion.correct_option = parseInt(form.correct_option) || 0;
@@ -216,6 +218,8 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
       },
     });
   };
+
+  
   useEffect(() => {
     console.log("check", user?.planFeatures?.coding_feature?.isActive);
   }, [user]);
@@ -773,7 +777,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
             onChange={handleChange}
           >
             <option value="">-- Select Subject --</option>
-            {Array.isArray(examDetails.subjects) &&
+            {Array.isArray(examDetails?.subjects) &&
               examDetails.subjects.map((subj, idx) => (
                 <option key={idx} value={subj}>
                   {subj}
