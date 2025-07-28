@@ -13,7 +13,7 @@ const LoadingDisplay = () => (
   </div>
 );
 
-const ExamDataDashboard = ({ questions = [], setShowAnalysis }) => {
+const ExamDataDashboard = ({ questions = [], setShowAnalysis , theme }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

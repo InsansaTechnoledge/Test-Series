@@ -73,7 +73,7 @@ const QBMS = () => {
     : questions?.data?.filter((q) => q.question_type === selectedQuestionType) || [];
 
   return (
-    <div className='max-h-screen'>
+    <div className={`${theme === 'light' ? 'bg-white' : 'bg-gray-950'} min-h-screen`}>
       {
         !showIntroPage && !showAlanysis && 
           <Navbar/>
@@ -85,7 +85,7 @@ const QBMS = () => {
       />
       {
         showAlanysis === true ? (
-          <ExamDataDashboard questions={questions?.data} setShowAnalysis={setShowAnalysis} />
+          <ExamDataDashboard questions={questions?.data} setShowAnalysis={setShowAnalysis} theme={theme} />
         ) : (
           selectedQuestionType === 'none' ? (
             <BodySkeleton 
@@ -94,6 +94,7 @@ const QBMS = () => {
               organizationId={id}
               setSelectedQuestionType={setSelectedQuestionType}
               setShowAnalysis={setShowAnalysis}
+              theme={theme}
             />
           ) : (
             <DetailedQuestionPage 

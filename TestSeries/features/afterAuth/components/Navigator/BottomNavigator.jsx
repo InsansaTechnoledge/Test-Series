@@ -6,8 +6,13 @@ import dockLight from '../../../../assests/Institute/dockLight.svg'
 import dockDark from '../../../../assests/Institute/dockDark.svg'
 
 import { useTheme } from '../../../../hooks/useTheme';
+import { useDock } from '../Navbar/context/DockContext';
 
 export default function BottomNavigator({ setShowLogoutModal }) {
+  const {isDockToggled} = useDock();
+
+  if (!isDockToggled) return null;
+
   const navigate = useNavigate();
   const location = useLocation();
   const [hoveredIndex, setHoveredIndex] = useState(null);
@@ -17,6 +22,7 @@ export default function BottomNavigator({ setShowLogoutModal }) {
   const { controls } = SideBarDataHook();
   const {theme} = useTheme();
 
+  
 
   // Check if device is mobile
   useEffect(() => {
@@ -180,22 +186,15 @@ export default function BottomNavigator({ setShowLogoutModal }) {
  
   if (layoutPosition === 'collapse') {
     return (
-      <div className="fixed bottom-0 left-0 right-0 z-[9999] flex justify-center items-center py-6">
+      <div className="fixed bottom-0 left-0 right-0 z-[9999] flex py-6">
         <button
           onClick={() => setLayoutPosition('bottom')}
-          className="bg-indigo-200/20 text-white rounded-full px-8 py-4 flex items-center space-x-4 transform transition-all duration-500 ease-in-out hover:scale-110 shadow-2xl hover:shadow-3xl relative overflow-hidden"
-        >
-         
-          {/* <span className="absolute inset-0 bg-indigo-700 opacity-30 rounded-full animate-ping"></span>
-  
-          
-          <ArrowUp className="w-6 h-6 transform transition-all duration-500 ease-in-out group-hover:rotate-180" /> */}
-  
-         
-          <img src={theme === 'light' ? dockLight : dockDark} className= {`w-11 h-11 cursor-pointer hover:translate-[-0.5px] `} alt='dock-img' />
-          <span className={`font-semibold ${theme === 'light' ? 'text-gray-600' : 'text-gray-100'}  text-lg tracking-wider transition-all duration-500 transform group-hover:translate-x-3`}>
+          className=" text-white rounded-full px-8 py-4 flex items-center space-x-4 transform transition-all duration-500 ease-in-out hover:scale-110 hover:shadow-3xl relative overflow-hidden"
+        >   
+          <img src={theme === 'light' ? dockLight : dockDark} className= {`w-15 h-15 cursor-pointer hover:translate-[-0.5px] `} alt='dock-img' />
+          {/* <span className={`font-semibold ${theme === 'light' ? 'text-gray-600' : 'text-gray-100'}  text-lg tracking-wider transition-all duration-500 transform group-hover:translate-x-3`}>
             Show Menu
-          </span>
+          </span> */}
         </button>
       </div>
     );
@@ -204,6 +203,7 @@ export default function BottomNavigator({ setShowLogoutModal }) {
   // Desktop Navigation Component
   const isVertical = layoutPosition === 'left' || layoutPosition === 'right';
   return (
+    
     <div>
       <div 
         className={`fixed z-[9999] ${
@@ -214,7 +214,7 @@ export default function BottomNavigator({ setShowLogoutModal }) {
             : 'right-4 top-1/2 transform -translate-y-1/2'
         }`}
       >
-        <div className="bg-gray-300 border-3 border-gray-500/50 rounded-2xl shadow-2xl px-4 py-3">
+        <div className="bg-gray-200 border-3 border-gray-500/50 rounded-2xl shadow-2xl px-4 py-3">
           <div className={`flex ${isVertical ? 'flex-col space-y-2' : 'space-x-2'} items-center`}>
             {/* Main Navigation Items */}
             {controls.map((control, idx) => {

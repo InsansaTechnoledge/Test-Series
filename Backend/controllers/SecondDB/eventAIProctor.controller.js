@@ -28,7 +28,7 @@ export const fetchEventsBasedOnAnomalies = async (req, res) => {
       const data = await ProctorEvent.find({   
         eventType: 'anomaly',
         // flaggedForReview: true,
-        stopExam: false
+        // stopExam: false
       });
   
       if (!data || data.length === 0) {

@@ -38,13 +38,13 @@ const Navbar = () => {
         <div className="relative">
           <button
             onClick={toggleDropdown}
-            className="text-white bg-indigo-400 flex items-center space-x-3 px-5 py-2.5  rounded-2xl transition-all duration-300 backdrop-blur-sm border border-white/20 hover:border-white/30"
+            className="text-white  flex items-center space-x-3 px-5 py-2.5  rounded-2xl transition-all duration-300 backdrop-blur-sm border border-white/20 hover:border-white/30"
           >
-            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+            <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center">
               <User className="w-4 h-4" />
             </div>
-            <span className="font-medium">{user?.name || 'undefined'}</span>
-            <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+            <span className=" text-indigo-400 font-medium">{user?.name || 'undefined'}</span>
+            <ChevronDown className={`w-4 h-4 text-gray-800 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
           </button>
 
           {isDropdownOpen && (
@@ -77,7 +77,7 @@ const Navbar = () => {
 
         <button
           onClick={handleExitToEvalvo}
-          className=" flex gap-2 bg-white text-indigo-600 px-6 py-2.5 rounded-xl font-semibold hover:bg-gray-50 shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 border border-white/20"
+          className=" flex gap-2 bg-indigo-400/20 text-indigo-600 px-6 py-2.5 rounded-xl font-semibold  shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 border border-white/20"
         >
           <LogOutIcon/>
           Exit to Evalvo
