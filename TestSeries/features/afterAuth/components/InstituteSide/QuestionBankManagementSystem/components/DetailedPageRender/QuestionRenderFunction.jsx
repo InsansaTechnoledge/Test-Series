@@ -313,9 +313,9 @@ export const QuestionList = ({
         <div className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden">
           {/* Table Header */}
           <div className="bg-gradient-to-r from-gray-50 via-white to-gray-50 border-b border-gray-200">
-            <div className="grid grid-cols-12 gap-0">
+            <div className="grid grid-cols-13 gap-0">
               <div className="col-span-1 px-4 py-4 text-center">
-                <span className="text-sm font-bold text-gray-600 uppercase tracking-wider">#</span>
+                <span className="text-sm font-bold text-gray-600 uppercase tracking-wider">Sr No.</span>
               </div>
               <div className="col-span-4 px-6 py-4 border-l border-gray-200">
                 <span className="text-sm font-bold text-gray-600 uppercase tracking-wider">Question</span>
@@ -329,7 +329,7 @@ export const QuestionList = ({
               <div className="col-span-2 px-4 py-4 text-center border-l border-gray-200">
                 <span className="text-sm font-bold text-gray-600 uppercase tracking-wider">Bloom's Level</span>
               </div>
-              <div className="col-span-1 px-4 py-4 text-center border-l border-gray-200">
+              <div className="col-span-2 px-4 py-4 text-center border-l border-gray-200">
                 <span className="text-sm font-bold text-gray-600 uppercase tracking-wider">Subject</span>
               </div>
               <div className="col-span-2 px-4 py-4 text-center border-l border-gray-200">
@@ -350,20 +350,20 @@ export const QuestionList = ({
                   className="group hover:bg-gray-50 transition-all duration-300 animate-slide-up"
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
-                  <div className="grid grid-cols-12 gap-0 items-start">
+                  <div className="grid grid-cols-13 gap-0 items-start">
                     {/* Question Number */}
                     <div className="col-span-1 px-4 py-6 text-center">
                       <div className="flex flex-col items-center gap-2">
-                        <div className="transform group-hover:scale-110 transition-transform duration-300">
+                        {/* <div className="transform group-hover:scale-110 transition-transform duration-300">
                           {getQuestionIcon(selectedQuestionType)}
-                        </div>
+                        </div> */}
                         <div className="flex items-center gap-1">
                           <Hash className="w-3 h-3 text-gray-400" />
                           <span className="text-sm font-bold text-gray-700">{originalIndex + 1}</span>
                         </div>
-                        <span className={`text-xs px-2 py-1 rounded-full font-medium border ${getTypeColor(selectedQuestionType)}`}>
+                        {/* <span className={`text-xs px-2 py-1 rounded-full font-medium border ${getTypeColor(selectedQuestionType)}`}>
                           {selectedQuestionType.toUpperCase()}
-                        </span>
+                        </span> */}
                       </div>
                     </div>
 
@@ -431,7 +431,7 @@ export const QuestionList = ({
                     </div>
 
                     {/* Subject */}
-                    <div className="col-span-1 px-4 py-6 text-center border-l border-gray-100">
+                    <div className="col-span-2 px-4 py-6 text-center border-l border-gray-100">
                       <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1.5 rounded-full font-medium border border-gray-200">
                         {q?.subject || 'Unknown'}
                       </span>
@@ -442,21 +442,21 @@ export const QuestionList = ({
                       <div className="flex flex-col gap-2">
                         <button
                           onClick={() => handleEdit(q, originalIndex)}
-                          className="w-full flex items-center justify-center gap-2 px-3 py-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-all duration-300 font-medium text-sm border border-blue-200 hover:border-blue-300 hover:shadow-sm transform hover:scale-105"
+                          className="w-full flex items-center justify-center gap-2 px-3 py-2 text-blue-600  rounded-lg transition-all duration-300 font-medium text-sm  transform hover:scale-105"
                         >
                           <Edit className="w-3 h-3" />
                           Edit
                         </button>
                         <button
                           onClick={() => handleMove(q, originalIndex)}
-                          className="w-full flex items-center justify-center gap-2 px-3 py-2 text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-lg transition-all duration-300 font-medium text-sm border border-amber-200 hover:border-amber-300 hover:shadow-sm transform hover:scale-105"
+                          className="w-full flex items-center justify-center gap-2 px-3 py-2 text-amber-600  rounded-lg transition-all duration-300 font-medium text-sm   transform hover:scale-105"
                         >
                           <Move className="w-3 h-3" />
                           Move
                         </button>
                         <button
                           onClick={() => handleDelete(q, originalIndex)}
-                          className="w-full flex items-center justify-center gap-2 px-3 py-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-all duration-300 font-medium text-sm border border-red-200 hover:border-red-300 hover:shadow-sm transform hover:scale-105"
+                          className="w-full flex items-center justify-center gap-2 px-3 py-2 text-red-600  rounded-lg transition-all duration-300 font-medium text-sm transform hover:scale-105"
                         >
                           <Trash2 className="w-3 h-3" />
                           Delete
@@ -510,7 +510,7 @@ export const QuestionList = ({
       {/* End of Results Indicator */}
       {!isLoading && currentIndex >= filteredQuestionsByType.length && displayedQuestions.length > 0 && (
         <div className="flex items-center justify-center py-12">
-          <div className="text-center bg-white rounded-2xl p-8 shadow-lg border border-gray-200">
+          <div className="text-center rounded-2xl p-8 ">
             <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-green-100 to-blue-100 rounded-full flex items-center justify-center">
               <CheckSquare className="w-8 h-8 text-green-600" />
             </div>

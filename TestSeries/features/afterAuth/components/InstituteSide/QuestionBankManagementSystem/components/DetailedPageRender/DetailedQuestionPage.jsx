@@ -45,45 +45,19 @@ const DetailedQuestionPage = ({
                 </button>
                 <div className="h-8 w-px bg-slate-200"></div>       
                 <div>
-                  <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
+                  {/* <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
                     Questions Library
+                  </h1> */}
+                  <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
+                    Viewing <span className="font-semibold capitalize text-indigo-600">{selectedQuestionType}</span> type questions
                   </h1>
-                  <p className="text-slate-600 mt-1 text-sm">
-                    Viewing <span className="font-semibold capitalize text-slate-800">{selectedQuestionType}</span> questions
-                  </p>
                 </div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                {/* View Toggle */}
-                <div className="flex bg-slate-100 rounded-lg p-1">
-                  <button
-                    onClick={() => setViewMode('grid')}
-                    className={`p-2 rounded-md transition-all duration-200 ${
-                      viewMode === 'grid' 
-                        ? 'bg-white shadow-sm text-slate-800' 
-                        : 'text-slate-500 hover:text-slate-700'
-                    }`}
-                  >
-                    <Grid className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => setViewMode('list')}
-                    className={`p-2 rounded-md transition-all duration-200 ${
-                      viewMode === 'list' 
-                        ? 'bg-white shadow-sm text-slate-800' 
-                        : 'text-slate-500 hover:text-slate-700'
-                    }`}
-                  >
-                    <List className="w-4 h-4" />
-                  </button>
-                </div>
-
                 {/* Results Count */}
                 <div className="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg font-medium text-sm border border-blue-100">
                   {filteredQuestionsByType.length} questions
                 </div>
               </div>
+
             </div>
 
             {/* Enhanced Action Bar */}

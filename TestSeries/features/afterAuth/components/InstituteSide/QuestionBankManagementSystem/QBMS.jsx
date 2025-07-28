@@ -7,6 +7,7 @@ import BodySkeleton from "./components/BodySkeleton";
 import DetailedQuestionPage from "./components/DetailedPageRender/DetailedQuestionPage.jsx";
 import Navbar from "./components/Navbar.jsx";
 import ExamDataDashboard from "./components/Analytics/QuestionsAnalysis.jsx";
+import AutoGeneratePaper from "./components/AutoPaperGenerator/AutoGeneratePaper.jsx";
 
 const QBMS = () => {
   const [questions, setQuestions] = useState({ data: [] });
@@ -17,7 +18,7 @@ const QBMS = () => {
   const { theme } = useTheme();
   const [showAlanysis, setShowAnalysis] = useState(false);
 
-  console.log("question" + questions);
+  console.log("question" , questions?.data);
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -124,6 +125,8 @@ const QBMS = () => {
           categories={questionTypes}
         />
       )}
+      <AutoGeneratePaper questions={questions}/>
+      
     </div>
   );
 };
