@@ -50,6 +50,19 @@ const QBMS = () => {
     }
   }, [questions]);
 
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      const message = 'reloading on this section would redirect you to start page '
+      event.returnValue = message
+      return message
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    }
+  },[])
+
 
   useEffect(() => {
     // Check if user has visited today
