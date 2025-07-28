@@ -184,14 +184,16 @@ function launchProctorEngine(params) {
     }
    
     console.log('🚀 Launching proctor engine with params:', { userId, examId, eventId });
-   
+  
+
     proctorProcess = spawn(binaryPath, [
       '--user-id', userId,
       '--exam-id', examId,
       '--event-id', eventId
     ], {
+      // cwd: path.dirname(binaryPath),
       stdio: ['ignore', 'pipe', 'pipe'],
-      // windowsHide: true,
+      windowsHide: true,
     });
  
     const rl = readline.createInterface({ input: proctorProcess.stdout });
