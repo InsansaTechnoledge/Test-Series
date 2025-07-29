@@ -1196,39 +1196,98 @@ if (!gotTheLock) {
 }
 
 // Fixed function to find React build files
+// Fixed function to find React build files - works with asar
 function findReactBuildPath() {
-  const possiblePaths = [
-    // Standard React build locations
-    // path.join(__dirname, 'build', 'index.html'),
-    // path.join(__dirname, 'dist', 'index.html'),
-    // path.join(__dirname, '..', 'build', 'index.html'),
-    // path.join(__dirname, '..', 'dist', 'index.html'),
-    // If build is in resources
-    // path.join(process.resourcesPath, 'build', 'index.html'),
-    // path.join(process.resourcesPath, 'dist', 'index.html'),
-    // If build is in app.asar
-    // path.join(__dirname, '..', '..', 'build', 'index.html'),
-    // path.join(__dirname, '..', '..', 'dist', 'index.html')
+  let buildPath = null;
+  let debugInfo = {
+    platform: process.platform,
+    isDev: isDev,
+    isPackaged: app.isPackaged,
+    __dirname: __dirname,
+    resourcesPath: process.resourcesPath,
+    possiblePaths: [],
+    existsChecks: []
+  };
 
-    path.join(__dirname, 'dist', 'dist', 'index.html'),  
-    path.join(__dirname, 'dist', 'index.html'),  
-
-    // If build is inside app.asar
-    path.join(process.resourcesPath, 'dist', 'dist', 'index.html')
-  ];
-
-  console.log('🔍 Searching for React build files...');
+  const possiblePaths = [];
   
-  for (const buildPath of possiblePaths) {
-    console.log(`  Checking: ${buildPath}`);
-    if (fs.existsSync(buildPath)) {
-      console.log(`✅ Found React build at: ${buildPath}`);
-      return buildPath;
+  if (isDev) {
+    // Development paths
+    possiblePaths.push(
+      path.join(__dirname, 'dist', 'index.html'),
+      path.join(__dirname, '..', 'dist', 'index.html'),
+      path.join(process.cwd(), 'dist', 'index.html')
+    );
+  } else {
+    // Production paths - works with asar
+    if (process.platform === 'darwin') {
+      // macOS paths
+      possiblePaths.push(
+        path.join(__dirname, 'dist', 'index.html'),              // Standard asar path
+        path.join(__dirname, '..', 'dist', 'index.html'),        // Alternative asar path
+        path.join(process.resourcesPath, 'app.asar.unpacked', 'dist', 'index.html'), // If unpacked
+        path.join(process.resourcesPath, 'dist', 'index.html'),  // External resource
+        path.join(process.resourcesPath, 'frontend', 'index.html') // Custom external
+      );
+    } else {
+      // Windows/Linux paths
+      possiblePaths.push(
+        path.join(__dirname, 'dist', 'index.html'),
+        path.join(__dirname, 'dist', 'dist', 'index.html'),
+        path.join(process.resourcesPath, 'app.asar.unpacked', 'dist', 'index.html'),
+        path.join(process.resourcesPath, 'dist', 'index.html')
+      );
     }
   }
+
+  debugInfo.possiblePaths = possiblePaths;
+
+  console.log('🔍 Searching for React build files...');
+  console.log('🖥️ Platform:', process.platform);
+  console.log('📦 App packaged:', app.isPackaged);
+  console.log('🛠️ Development mode:', isDev);
+  console.log('📁 __dirname:', __dirname);
+  console.log('📁 process.resourcesPath:', process.resourcesPath);
   
-  console.warn('⚠️ React build files not found in any of the expected locations');
-  return null;
+  for (const testPath of possiblePaths) {
+    console.log(`  Checking: ${testPath}`);
+    
+    try {
+      // For asar files, we can't reliably use fs.existsSync
+      // Instead, we'll try to access the file through Electron's built-in asar support
+      if (!isDev && testPath.includes(__dirname)) {
+        // This is likely in asar, trust it exists and try to load
+        console.log(`  📦 Assuming asar path exists: ${testPath}`);
+        debugInfo.existsChecks.push({ path: testPath, exists: 'assumed (asar)', chosen: true });
+        buildPath = testPath;
+        break;
+      } else {
+        // For non-asar paths, we can check existence
+        const exists = fs.existsSync(testPath);
+        debugInfo.existsChecks.push({ path: testPath, exists: exists, chosen: exists });
+        console.log(`  ${exists ? '✅' : '❌'} ${testPath} - ${exists ? 'EXISTS' : 'NOT FOUND'}`);
+        
+        if (exists) {
+          buildPath = testPath;
+          break;
+        }
+      }
+    } catch (error) {
+      debugInfo.existsChecks.push({ path: testPath, exists: false, error: error.message, chosen: false });
+      console.log(`  ❌ Error checking ${testPath}:`, error.message);
+    }
+  }
+
+  // Store debug info globally for fallback page
+  global.buildDebugInfo = debugInfo;
+  
+  if (buildPath) {
+    console.log(`✅ Selected React build path: ${buildPath}`);
+  } else {
+    console.warn('⚠️ React build files not found in any of the expected locations');
+  }
+  
+  return buildPath;
 }
 
 function createWindow() {
@@ -1318,44 +1377,49 @@ function createWindow() {
       
       mainWindow.loadURL(startUrl).catch((error) => {
         console.error('❌ Failed to load build file:', error);
-        createAndLoadFallbackHTML(buildPath);
+        console.log('🔄 Trying direct file load...');
+        
+        // Try loadFile method which works better with asar
+        mainWindow.loadFile(buildPath).catch((fileError) => {
+          console.error('❌ Failed to load with loadFile:', fileError);
+          createAndLoadFallbackHTML(buildPath, error, fileError);
+        });
       });
     } else {
       console.warn('⚠️ Build files not found, creating fallback HTML');
-      createAndLoadFallbackHTML(buildPath);
+      createAndLoadFallbackHTML(null);
     }
   }
 
-  // Function to create and load fallback HTML
-  function createAndLoadFallbackHTML(buildPath) {
+  // Function to create and load fallback HTML with enhanced debugging
+  function createAndLoadFallbackHTML(attemptedBuildPath, loadUrlError, loadFileError) {
+    const debugInfo = global.buildDebugInfo || {};
+    
     const fallbackHTML = `
     <!DOCTYPE html>
     <html lang="en">
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Evalvo Proctor</title>
+      <title>Evalvo Proctor - Debug Mode</title>
       <style>
         body {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           color: white;
           margin: 0;
-          padding: 0;
-          display: flex;
-          justify-content: center;
-          align-items: center;
+          padding: 20px;
           min-height: 100vh;
         }
         .container {
-          text-align: center;
+          max-width: 1000px;
+          margin: 0 auto;
           background: rgba(255, 255, 255, 0.1);
           backdrop-filter: blur(10px);
           border-radius: 20px;
-          padding: 40px;
+          padding: 30px;
           box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
           border: 1px solid rgba(255, 255, 255, 0.2);
-          max-width: 600px;
         }
         h1 {
           font-size: 2.5em;
@@ -1364,34 +1428,39 @@ function createWindow() {
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
+          text-align: center;
         }
-        .status {
-          font-size: 1.2em;
+        .debug-section {
           margin: 20px 0;
-          padding: 15px;
-          background: rgba(255, 255, 255, 0.1);
+          padding: 20px;
+          background: rgba(0, 0, 0, 0.2);
           border-radius: 10px;
-          border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .info {
-          margin: 15px 0;
-          padding: 10px;
-          background: rgba(0, 255, 150, 0.1);
-          border-radius: 8px;
           border-left: 4px solid #00ff96;
         }
-        .error {
-          margin: 15px 0;
-          padding: 10px;
+        .error-section {
+          margin: 20px 0;
+          padding: 20px;
           background: rgba(255, 100, 100, 0.1);
-          border-radius: 8px;
+          border-radius: 10px;
           border-left: 4px solid #ff6464;
         }
-        .protocol-test {
-          margin-top: 30px;
-          padding: 20px;
+        .path-item {
+          margin: 10px 0;
+          padding: 10px;
           background: rgba(255, 255, 255, 0.05);
-          border-radius: 10px;
+          border-radius: 5px;
+          font-family: monospace;
+          font-size: 12px;
+        }
+        .exists-true { border-left: 3px solid #00ff96; }
+        .exists-false { border-left: 3px solid #ff6464; }
+        .exists-assumed { border-left: 3px solid #ffaa00; }
+        code {
+          background: rgba(0, 0, 0, 0.3);
+          padding: 2px 6px;
+          border-radius: 4px;
+          font-family: 'Courier New', monospace;
+          font-size: 11px;
         }
         button {
           background: linear-gradient(45deg, #00ff96, #00cc7a);
@@ -1402,125 +1471,159 @@ function createWindow() {
           border-radius: 8px;
           cursor: pointer;
           transition: all 0.3s ease;
-          margin: 10px;
+          margin: 10px 5px;
         }
         button:hover {
           transform: translateY(-2px);
           box-shadow: 0 5px 15px rgba(0, 255, 150, 0.3);
         }
-        .dev-tools {
-          margin-top: 20px;
+        pre {
+          background: rgba(0, 0, 0, 0.4);
+          padding: 15px;
+          border-radius: 8px;
+          overflow-x: auto;
+          font-size: 11px;
+          white-space: pre-wrap;
         }
-        code {
-          background: rgba(0, 0, 0, 0.3);
-          padding: 2px 6px;
-          border-radius: 4px;
-          font-family: 'Courier New', monospace;
+        .info-grid {
+          display: grid;
+          grid-template-columns: auto 1fr;
+          gap: 10px;
+          margin: 15px 0;
+        }
+        .info-label {
+          font-weight: bold;
+          color: #00ff96;
         }
       </style>
     </head>
     <body>
       <div class="container">
-        <h1>🛡️ Evalvo Proctor</h1>
+        <h1>🛡️ Evalvo Proctor - Debug Mode</h1>
         
-        ${!isDev ? `
-        <div class="error">
-          ⚠️ React build files not found. Please ensure your React app is built and placed in the correct directory.
+        <div class="error-section">
+          <h3>⚠️ Frontend Build Not Loaded</h3>
+          <p>The React application could not be loaded. This page shows debugging information to help resolve the issue.</p>
+        </div>
+
+        <div class="debug-section">
+          <h3>📊 System Information</h3>
+          <div class="info-grid">
+            <span class="info-label">Platform:</span> <span>${debugInfo.platform || process.platform}</span>
+            <span class="info-label">Development:</span> <span>${debugInfo.isDev ? 'Yes' : 'No'}</span>
+            <span class="info-label">App Packaged:</span> <span>${debugInfo.isPackaged ? 'Yes' : 'No'}</span>
+            <span class="info-label">Electron Version:</span> <span>${process.versions.electron}</span>
+            <span class="info-label">Node Version:</span> <span>${process.versions.node}</span>
+            <span class="info-label">__dirname:</span> <code>${debugInfo.__dirname || __dirname}</code>
+            <span class="info-label">Resources Path:</span> <code>${debugInfo.resourcesPath || process.resourcesPath}</code>
+            <span class="info-label">Attempted Build Path:</span> <code>${attemptedBuildPath || 'None'}</code>
+          </div>
+        </div>
+
+        ${loadUrlError || loadFileError ? `
+        <div class="error-section">
+          <h3>❌ Load Errors</h3>
+          ${loadUrlError ? `<p><strong>loadURL Error:</strong> ${loadUrlError.message}</p>` : ''}
+          ${loadFileError ? `<p><strong>loadFile Error:</strong> ${loadFileError.message}</p>` : ''}
         </div>
         ` : ''}
-        
-        <div class="status">
-          ✅ Application is running successfully
-        </div>
-        
-        <div class="info">
-          <strong>Path:</strong> ${buildPath || 'N/A'}<br>
-          <strong>Platform:</strong> ${process.platform}<br>
-          <strong>Environment:</strong> ${isDev ? 'Development' : 'Production'}<br>
-          <strong>Version:</strong> Electron ${process.versions.electron}<br>
-          <strong>App Packaged:</strong> ${app.isPackaged ? 'Yes' : 'No'}
+
+        <div class="debug-section">
+          <h3>🔍 Path Detection Results</h3>
+          <p>Paths checked for React build files:</p>
+          ${debugInfo.existsChecks && debugInfo.existsChecks.length > 0 ? 
+            debugInfo.existsChecks.map((check, index) => `
+              <div class="path-item exists-${check.exists === true ? 'true' : check.exists === 'assumed (asar)' ? 'assumed' : 'false'}">
+                <strong>${index + 1}.</strong> <code>${check.path}</code><br>
+                <small>Status: ${check.exists === true ? '✅ EXISTS' : check.exists === 'assumed (asar)' ? '🔶 ASSUMED (ASAR)' : '❌ NOT FOUND'}</small>
+                ${check.chosen ? '<small style="color: #00ff96;"> ← SELECTED</small>' : ''}
+                ${check.error ? `<br><small style="color: #ff6464;">Error: ${check.error}</small>` : ''}
+              </div>
+            `).join('')
+            : '<p>No path checks recorded</p>'
+          }
         </div>
 
-        <div class="protocol-test">
-          <h3>Protocol Test</h3>
-          <p>Test the examproc:// protocol:</p>
-          <code>examproc://splash?userId=test&examId=exam123&eventId=event456</code>
-          <br><br>
-          <button onclick="testProtocol()">Test Protocol</button>
-          <button onclick="openExternal()">Open External Link</button>
-        </div>
-
-        ${isDev ? `
-        <div class="dev-tools">
-          <h3>Development Tools</h3>
-          <button onclick="openDevTools()">Open DevTools</button>
+        <div class="debug-section">
+          <h3>🔧 Actions</h3>
           <button onclick="reloadApp()">Reload App</button>
+          <button onclick="openDevTools()">Open DevTools</button>
+          <button onclick="testProtocol()">Test Protocol</button>
+          <button onclick="checkAsar()">Check ASAR Contents</button>
         </div>
-        ` : ''}
+
+        <div class="debug-section">
+          <h3>💡 Troubleshooting Tips</h3>
+          <ul>
+            <li><strong>Build Missing:</strong> Run <code>vite build</code> before <code>electron-builder</code></li>
+            <li><strong>macOS ASAR:</strong> Files may be in app.asar - check console for asar-related messages</li>
+            <li><strong>Path Issues:</strong> Verify electron-builder includes <code>dist/**/*</code> in files array</li>
+            <li><strong>Development:</strong> Ensure React dev server is running on port 5173</li>
+          </ul>
+        </div>
 
         <div id="protocol-status"></div>
+        <div id="debug-output"></div>
       </div>
 
       <script>
-        // Protocol URL handling
-        if (window.electronAPI) {
-          window.electronAPI.onProtocolUrlReceived((event, params) => {
-            const statusDiv = document.getElementById('protocol-status');
-            statusDiv.innerHTML = \`
-              <div style="margin-top: 20px; padding: 15px; background: rgba(0, 255, 150, 0.2); border-radius: 8px;">
-                <strong>Protocol URL Received!</strong><br>
-                User ID: \${params.userId}<br>
-                Exam ID: \${params.examId}<br>
-                Event ID: \${params.eventId}<br>
-                Route: \${params.route}
-              </div>
-            \`;
-          });
-
-          // Send ready signal
-          window.electronAPI.rendererReady();
+        function reloadApp() {
+          location.reload();
         }
 
-        function testProtocol() {
-          const testUrl = 'examproc://splash?userId=testUser&examId=testExam&eventId=testEvent';
-          if (window.electronAPI) {
-            window.electronAPI.sendMessage(\`Testing protocol: \${testUrl}\`);
-          }
-          alert('Protocol test initiated! Check the status below.');
-        }
-
-        function openExternal() {
-          if (window.electronAPI) {
-            window.electronAPI.openExternal('https://www.evalvo.com');
-          } else {
-            window.open('https://www.evalvo.com', '_blank');
-          }
-        }
-
-        ${isDev ? `
         function openDevTools() {
           if (window.electronAPI) {
             window.electronAPI.openDevTools();
           }
         }
 
-        function reloadApp() {
-          location.reload();
+        function testProtocol() {
+          const testUrl = 'examproc://splash?userId=testUser&examId=testExam&eventId=testEvent';
+          document.getElementById('debug-output').innerHTML = 
+            '<div style="margin-top: 20px; padding: 15px; background: rgba(0, 255, 150, 0.2); border-radius: 8px;">' +
+            '<strong>Protocol Test:</strong> ' + testUrl + '</div>';
         }
-        ` : ''}
 
-        console.log('Evalvo Proctor App Loaded Successfully');
-        console.log('Platform:', '${process.platform}');
-        console.log('Environment:', '${isDev ? 'Development' : 'Production'}');
-        console.log('App Packaged:', ${app.isPackaged});
+        function checkAsar() {
+          const output = document.getElementById('debug-output');
+          output.innerHTML = 
+            '<div style="margin-top: 20px; padding: 15px; background: rgba(255, 255, 0, 0.2); border-radius: 8px;">' +
+            '<strong>ASAR Check:</strong><br>' +
+            'To inspect ASAR contents, run in terminal:<br>' +
+            '<code>asar list "' + (process.platform === 'darwin' ? 
+              'YourApp.app/Contents/Resources/app.asar' : 
+              'resources/app.asar') + '"</code>' +
+            '</div>';
+        }
+
+        // Protocol URL handling
+        if (window.electronAPI) {
+          window.electronAPI.onProtocolUrlReceived((event, params) => {
+            const statusDiv = document.getElementById('protocol-status');
+            statusDiv.innerHTML = 
+              '<div style="margin-top: 20px; padding: 15px; background: rgba(0, 255, 150, 0.2); border-radius: 8px;">' +
+              '<strong>Protocol URL Received!</strong><br>' +
+              'User ID: ' + params.userId + '<br>' +
+              'Exam ID: ' + params.examId + '<br>' +
+              'Event ID: ' + params.eventId + '<br>' +
+              'Route: ' + params.route + '</div>';
+          });
+
+          window.electronAPI.rendererReady();
+        }
+
+        console.log('🔍 Debug Info:', ${JSON.stringify(debugInfo, null, 2)});
+        console.log('🏗️ Attempted Build Path:', '${attemptedBuildPath || 'None'}');
+        ${loadUrlError ? `console.error('❌ loadURL Error:', '${loadUrlError.message}');` : ''}
+        ${loadFileError ? `console.error('❌ loadFile Error:', '${loadFileError.message}');` : ''}
       </script>
     </body>
     </html>
     `;
 
-    // Create a temporary HTML file in a writable directory
-    const tempDir = isDev ? __dirname : path.join(process.cwd());
-    const tempHtmlPath = path.join(tempDir, 'temp_index.html');
+    // Create a temporary HTML file
+    const tempDir = isDev ? __dirname : (process.platform === 'darwin' ? path.dirname(process.execPath) : process.cwd());
+    const tempHtmlPath = path.join(tempDir, 'debug_fallback.html');
     
     try {
       fs.writeFileSync(tempHtmlPath, fallbackHTML);
@@ -1531,12 +1634,15 @@ function createWindow() {
         slashes: true
       });
       
-      console.log('📄 Loading fallback HTML from:', fallbackUrl);
+      console.log('📄 Loading enhanced fallback HTML from:', fallbackUrl);
       
       mainWindow.loadURL(fallbackUrl).then(() => {
         console.log('✅ Fallback HTML loaded successfully');
       }).catch((error) => {
         console.error('❌ Failed to load fallback HTML:', error);
+        // Last resort - load a data URL
+        const dataUrl = `data:text/html;charset=utf-8,${encodeURIComponent(fallbackHTML)}`;
+        mainWindow.loadURL(dataUrl);
       });
       
       // Clean up temp file after loading
@@ -1549,7 +1655,7 @@ function createWindow() {
         } catch (err) {
           console.warn('Could not clean up temp HTML file:', err);
         }
-      }, 10000); // Increased timeout to 10 seconds
+      }, 15000);
       
     } catch (error) {
       console.error('❌ Failed to create fallback HTML:', error);
@@ -1559,21 +1665,7 @@ function createWindow() {
     }
   }
 
-  // Add error handling for window load failures
-  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
-    console.error('❌ Window failed to load:', {
-      errorCode,
-      errorDescription,
-      validatedURL
-    });
-    
-    // Try to load fallback HTML if main content fails
-    if (!validatedURL.includes('temp_index.html') && !validatedURL.startsWith('data:')) {
-      console.log('🔄 Attempting to load fallback HTML due to load failure');
-      createAndLoadFallbackHTML();
-    }
-  });
-
+  // Rest of your existing window setup code...
   mainWindow.once('ready-to-show', () => {
     console.log('✅ Window ready to show');
     mainWindow.show();

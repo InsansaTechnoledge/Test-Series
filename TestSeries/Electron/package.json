@@ -13,13 +13,15 @@
     "build:win": "electron-builder --win",
     "build:linux": "electron-builder --linux",
     "dist": "npm run build",
-    "clean": "rm -rf dist node_modules && npm install"
+    "clean": "rm -rf dist node_modules && npm install",
+    "build-react": "vite build",
+    "build-all": "npm run build-react && npm run build"
   },
   "build": {
     "appId": "com.evalvo.proctor",
     "productName": "Evalvo Proctor",
     "directories": {
-      "output": "dist"
+      "output": "dist-electron"
     },
     "files": [
       "main.js",
@@ -68,7 +70,13 @@
       "entitlements": "assets/entitlements.mac.plist",
       "entitlementsInherit": "assets/entitlements.mac.plist",
       "hardenedRuntime": true,
-      "gatekeeperAssess": false
+      "gatekeeperAssess": false,
+      "extraFiles": [
+        {
+          "from": "dist",
+          "to": "Resources/app/dist"
+        }
+      ]
     },
     "win": {
       "target": [

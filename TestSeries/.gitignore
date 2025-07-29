@@ -34,3 +34,5 @@ dist-ssr
 # Compiled output
 dist/
 build/
+/Electron/dist-electron/
+
