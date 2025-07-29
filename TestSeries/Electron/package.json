@@ -58,8 +58,7 @@
         {
           "target": "nsis",
           "arch": [
-            "x64",
-            "ia32"
+            "x64"
           ]
         }
       ],
@@ -109,7 +108,6 @@
     ]
   },
   "devDependencies": {
-    "dmg-license": "^1.0.11",
     "electron": "^35.5.1",
     "electron-builder": "^26.0.12",
     "electron-rebuild": "^3.2.9"
@@ -118,6 +116,9 @@
     "axios": "^1.11.0",
     "better-sqlite3": "^12.2.0",
     "electron-updater": "^6.6.2"
+  },
+  "optionalDependencies": {
+    "dmg-license": "^1.0.11"
   },
   "author": "Evalvo Team",
   "license": "MIT",
