@@ -124,3 +124,175 @@
   "license": "MIT",
   "homepage": "https://evalvo.com"
 }
+
+
+{
+  "name": "evalvo-electron-proctor",
+  "version": "1.0.0",
+  "description": "Evalvo Proctor Desktop Application",
+  "main": "main.js",
+  "scripts": {
+  "electron": "electron .",
+  "electron-dev": "ELECTRON_IS_DEV=true electron .",
+  "start": "electron .",
+  "dev": "electron .",
+
+  "prebuild": "npm run build:frontend",
+  "build": "electron-builder",
+  
+  "build:frontend": "echo 'Building frontend...' && cd ../ && npm install && npm run build",
+
+  "prebuild:mac": "npm run build:frontend",
+  "build:mac": "electron-builder --mac",
+
+  "prebuild:win": "npm run build:frontend",
+  "build:win": "electron-builder --win",
+
+  "prebuild:linux": "npm run build:frontend",
+  "build:linux": "electron-builder --linux",
+
+  "dist": "npm run build",
+  "clean": "rm -rf dist node_modules ../dist ../build && npm install",
+  "clean:frontend": "rm -rf ../dist ../build",
+  "clean:all": "rm -rf dist node_modules ../dist ../build ../node_modules ../Backend/node_modules",
+
+  "dev:frontend": "cd ../ && npm run dev",
+  "dev:backend": "cd ../Backend && npm run dev",
+  "install:frontend": "cd ../ && npm install",
+  "install:backend": "cd ../Backend && npm install",
+  "install:all": "npm install && cd ../ && npm install && cd ../Backend && npm install && cd ../Electron",
+
+  "test:build": "npm run build:frontend && echo 'Frontend built successfully' && ls -la ../dist/ || ls -la ../build/",
+  "rebuild": "npm run clean && npm run install:all && npm run build"
+},
+  "build": {
+    "appId": "com.evalvo.proctor",
+    "productName": "Evalvo Proctor",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "queueManager.js",
+      "package.json",
+      "assets/**/*",
+      "dist/**/*",
+      "node_modules/better-sqlite3/**/*",
+      "!node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+      "!node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
+      "!node_modules/*.d.ts",
+      "!node_modules/.bin",
+      "!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}",
+      "!.editorconfig",
+      "!**/._*",
+      "!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}",
+      "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
+      "!**/{appveyor.yml,.travis.yml,circle.yml}",
+      "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}"
+    ],
+    "extraResources": [
+      {
+        "from": "bin/",
+        "to": "bin/",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "assets/",
+        "to": "assets/",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "../dist/",
+        "to": "dist/",
+        "filter": ["**/*"]
+      }
+    ],
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ],
+      "category": "public.app-category.education",
+      "icon": "assets/icon.icns",
+      "entitlements": "assets/entitlements.mac.plist",
+      "entitlementsInherit": "assets/entitlements.mac.plist",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.ico"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.png"
+    },
+    "protocols": [
+      {
+        "name": "examproc",
+        "schemes": [
+          "examproc"
+        ]
+      }
+    ],
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Evalvo Proctor"
+    },
+    "dmg": {
+      "title": "Evalvo Proctor",
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "asarUnpack": [
+      "node_modules/better-sqlite3/**/*"
+    ]
+  },
+  "devDependencies": {
+    "dmg-license": "^1.0.11",
+    "electron": "^35.5.1",
+    "electron-builder": "^26.0.12",
+    "electron-rebuild": "^3.2.9"
+  },
+  "dependencies": {
+    "axios": "^1.11.0",
+    "better-sqlite3": "^12.2.0",
+    "electron-updater": "^6.6.2"
+  },
+  "author": "Evalvo Team",
+  "license": "MIT",
+  "homepage": "https://evalvo.com"
+}
