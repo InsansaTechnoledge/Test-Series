@@ -1,5 +1,5 @@
 import React, { Children, useEffect, useState } from 'react';
-import { BrowserRouter as Router, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter,HashRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import BeforeAuthLanding from '../../features/beforeAuth/BeforeAuthLanding';
 import BeforeAuthLayout from '../../layouts/BeforeAuthLayout';
 import AuthLayout from '../../layouts/authLayout';
@@ -66,6 +66,8 @@ import LeaderBoard from '../../features/afterAuth/components/StudentSide/Coding-
 import ExamAnomalyControlSection from '../../features/afterAuth/components/InstituteSide/ExamFlow/ExamAnomalyControl/ExamAnomalyControlSection';
 import QBMS from '../../features/afterAuth/components/InstituteSide/QuestionBankManagementSystem/QBMS';
 
+let Router = BrowserRouter;
+
 // Error Boundary Component
 class ElectronErrorBoundary extends React.Component {
   constructor(props) {
@@ -110,10 +112,12 @@ const ElectronHandler = () => {
     // Check if running in Electron
     const checkElectronEnvironment = () => {
       if (window.electronAPI) {
+         Router =  HashRouter;
         console.log('🔧 Running in Electron environment');
         setIsElectron(true);
         return true;
       } else {
+        Router = BrowserRouter;
         console.log('🌐 Running in web browser');
         setIsElectron(false);
         return false;
