@@ -26,8 +26,8 @@
       "preload.js",
       "queueManager.js",
       "package.json",
-      "assets/**/*",
       "dist/**/*",
+      "assets/**/*",
       "node_modules/better-sqlite3/**/*",
       "!node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
       "!node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
@@ -127,7 +127,6 @@
     ]
   },
   "devDependencies": {
-    "dmg-license": "^1.0.11",
     "electron": "^35.5.1",
     "electron-builder": "^26.0.12",
     "electron-rebuild": "^3.2.9"
@@ -136,6 +135,9 @@
     "axios": "^1.11.0",
     "better-sqlite3": "^12.2.0",
     "electron-updater": "^6.6.2"
+  },
+  "optionalDependencies": {
+    "dmg-license": "^1.0.11"
   },
   "author": "Evalvo Team",
   "license": "MIT",

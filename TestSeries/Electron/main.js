@@ -1318,16 +1318,16 @@ function createWindow() {
       
       mainWindow.loadURL(startUrl).catch((error) => {
         console.error('❌ Failed to load build file:', error);
-        createAndLoadFallbackHTML();
+        createAndLoadFallbackHTML(buildPath);
       });
     } else {
       console.warn('⚠️ Build files not found, creating fallback HTML');
-      createAndLoadFallbackHTML();
+      createAndLoadFallbackHTML(buildPath);
     }
   }
 
   // Function to create and load fallback HTML
-  function createAndLoadFallbackHTML() {
+  function createAndLoadFallbackHTML(buildPath) {
     const fallbackHTML = `
     <!DOCTYPE html>
     <html lang="en">
@@ -1434,6 +1434,7 @@ function createWindow() {
         </div>
         
         <div class="info">
+          <strong>Path:</strong> ${buildPath || 'N/A'}<br>
           <strong>Platform:</strong> ${process.platform}<br>
           <strong>Environment:</strong> ${isDev ? 'Development' : 'Production'}<br>
           <strong>Version:</strong> Electron ${process.versions.electron}<br>

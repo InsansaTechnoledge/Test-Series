@@ -28,3 +28,9 @@ dist-ssr
 *.sw?
 
 .env.*
+
+.electron/package-lock.json
+.electron/node_modules
+# Compiled output
+dist/
+build/
