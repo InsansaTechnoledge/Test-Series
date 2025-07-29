@@ -109,14 +109,19 @@ const QBMS = () => {
           theme={theme}
         />
       ) : selectedQuestionType === "none" ? (
-        <BodySkeleton
-          categories={questionTypes}
-          QuestionLength={questions?.data.length}
-          organizationId={id}
-          setSelectedQuestionType={setSelectedQuestionType}
-          setShowAnalysis={setShowAnalysis}
-          theme={theme}
-        />
+        <>
+          <BodySkeleton
+            categories={questionTypes}
+            QuestionLength={questions?.data.length}
+            organizationId={id}
+            setSelectedQuestionType={setSelectedQuestionType}
+            setShowAnalysis={setShowAnalysis}
+            theme={theme}
+          />
+
+          <AutoGeneratePaper questions={questions}/>
+        </>
+       
       ) : (
         <DetailedQuestionPage
           setSelectedQuestionType={setSelectedQuestionType}
@@ -125,7 +130,7 @@ const QBMS = () => {
           categories={questionTypes}
         />
       )}
-      <AutoGeneratePaper questions={questions}/>
+    
       
     </div>
   );

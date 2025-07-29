@@ -7,7 +7,7 @@
     "electron": "electron .",
     "electron-dev": "ELECTRON_IS_DEV=true electron .",
     "start": "electron .",
-    "dev": "electron .",
+    "dev": " electron .",
     "build": "electron-builder",
     "build:mac": "electron-builder --mac",
     "build:win": "electron-builder --win",
@@ -21,36 +21,24 @@
     "directories": {
       "output": "dist"
     },
-    "files": [
-      "main.js",
-      "preload.js",
-      "queueManager.js",
-      "package.json",
-      "assets/**/*",
-      "dist/**/*",
-      "node_modules/better-sqlite3/**/*",
-      "!node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
-      "!node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
-      "!node_modules/*.d.ts",
-      "!node_modules/.bin",
-      "!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}",
-      "!.editorconfig",
-      "!**/._*",
-      "!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}",
-      "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
-      "!**/{appveyor.yml,.travis.yml,circle.yml}",
-      "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}"
+   "files": [
+      "main.js",                      
+      "preload.js",                   
+      "queueManager.js",              
+      "package.json",                 
+      "assets/**/*",                  
+      "bin/**/*",                     
+      "build/**/*",                   
+      "node_modules/better-sqlite3/**/*"  
     ],
-    "extraResources": [
+    "extraFiles": [
       {
-        "from": "bin/",
-        "to": "bin/",
-        "filter": ["**/*"]
+        "from": "./bin/mac/proctor_engine",
+        "to": "bin/mac/proctor_engine"
       },
       {
-        "from": "assets/",
-        "to": "assets/",
-        "filter": ["**/*"]
+        "from": "./bin/win/proctor_engine.exe",
+        "to": "bin/win/proctor_engine.exe"
       }
     ],
     "mac": {
@@ -64,18 +52,15 @@
         }
       ],
       "category": "public.app-category.education",
-      "icon": "assets/icon.icns",
-      "entitlements": "assets/entitlements.mac.plist",
-      "entitlementsInherit": "assets/entitlements.mac.plist",
-      "hardenedRuntime": true,
-      "gatekeeperAssess": false
+      "icon": "assets/icon.icns"
     },
     "win": {
       "target": [
         {
           "target": "nsis",
           "arch": [
-            "x64"
+            "x64",
+            "ia32"
           ]
         }
       ],
@@ -104,11 +89,9 @@
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
-      "createStartMenuShortcut": true,
-      "shortcutName": "Evalvo Proctor"
+      "createStartMenuShortcut": true
     },
     "dmg": {
-      "title": "Evalvo Proctor",
       "contents": [
         {
           "x": 130,
@@ -123,10 +106,11 @@
       ]
     },
     "asarUnpack": [
-      "node_modules/better-sqlite3/**/*"
+      "node_modules/node-pty/**/*"
     ]
   },
   "devDependencies": {
+    "dmg-license": "^1.0.11",
     "electron": "^35.5.1",
     "electron-builder": "^26.0.12",
     "electron-rebuild": "^3.2.9"
@@ -135,9 +119,6 @@
     "axios": "^1.11.0",
     "better-sqlite3": "^12.2.0",
     "electron-updater": "^6.6.2"
-  },
-  "optionalDependencies": {
-    "dmg-license": "^1.0.11"
   },
   "author": "Evalvo Team",
   "license": "MIT",
