@@ -66,7 +66,7 @@ import LeaderBoard from '../../features/afterAuth/components/StudentSide/Coding-
 import ExamAnomalyControlSection from '../../features/afterAuth/components/InstituteSide/ExamFlow/ExamAnomalyControl/ExamAnomalyControlSection';
 import QBMS from '../../features/afterAuth/components/InstituteSide/QuestionBankManagementSystem/QBMS';
 
-let Router = BrowserRouter;
+let Router = window.electronAPI ? HashRouter : BrowserRouter;
 
 // Error Boundary Component
 class ElectronErrorBoundary extends React.Component {
