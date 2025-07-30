@@ -12,14 +12,14 @@ const app = express();
 app.set('trust proxy', 1);
 
 // CORS configuration
-const allowedOrigins = process.env.CLIENT_URL.split(',');
-
 app.use(cors({
   origin: function (origin, callback) {
+    console.log('Request origin:', origin);  // Debug log
     // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || allowedOrigins.includes(origin) || origin.startsWith('http://localhost') || origin.startsWith('file://') || origin.startsWith('app://')) {
       callback(null, true);
     } else {
+      console.log('CORS Error - Origin not allowed:', origin);  // Debug log
       callback(new Error('Not allowed by CORS'));
     }
   },

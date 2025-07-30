@@ -158,7 +158,7 @@ const DownloadedLandingPage = () => {
 
         <div
           className={`relative grid grid-cols-2 gap-1 mb-6 ${
-            theme === "light" ? "bg-indigo-200" : "bg-gray-600"
+            theme === "light" ? "bg-indigo-200" : "bg-indigo-600"
           } p-1 rounded-2xl shadow-inner`}
         >
           <div

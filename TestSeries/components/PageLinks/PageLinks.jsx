@@ -65,6 +65,7 @@ import LiveContestPage from '../../features/afterAuth/components/StudentSide/Cod
 import LeaderBoard from '../../features/afterAuth/components/StudentSide/Coding-Contests/contestResult/LeaderBoard';
 import ExamAnomalyControlSection from '../../features/afterAuth/components/InstituteSide/ExamFlow/ExamAnomalyControl/ExamAnomalyControlSection';
 import QBMS from '../../features/afterAuth/components/InstituteSide/QuestionBankManagementSystem/QBMS';
+import AppDownloadPage from '../../features/App/AppDownloadPage';
 
 let Router = window.electronAPI ? HashRouter : BrowserRouter;
 
@@ -364,7 +365,7 @@ const PageLinks = () => {
         <Route path='certificate-creation' element={<CertificateCreation />} />
         <Route path='syllabus/:syllabusId' element={<SyllabusViewPage />} />
         <Route path='qbms/:id' element={<QBMS/>}/>
-
+        <Route path='download-app' element={<AppDownloadPage/>}/>
         {user?.role === "organization" && (
           <Route path='institute-subscription' element={<YourPlanPage />} />
         )}

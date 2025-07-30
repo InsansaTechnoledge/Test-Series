@@ -393,6 +393,11 @@ const Navbar = ({setShowLogoutModal}) => {
                         Know Your Plan
                       </button>
                     )}
+                    <button 
+                      onClick={() => navigate('/download-app')}
+                      className={`block w-full text-left px-4 py-2 text-sm ${themeClasses.dropdownItem}`}>
+                      Download Application
+                    </button>
                     {
                       (user?.role === 'user' || user?.role === 'student') && (
                         <button
