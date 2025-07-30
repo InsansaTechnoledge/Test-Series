@@ -29,6 +29,7 @@
       "queueManager.js",
       "package.json",
       "dist/**/*",
+      "dist-electron/**/*",
       "assets/**/*",
       "node_modules/better-sqlite3/**/*",
       "!node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
