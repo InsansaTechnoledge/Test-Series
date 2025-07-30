@@ -34,13 +34,13 @@ export default function EvalvoDownloadPage() {
               <div className="space-y-4">
                 <button className="group w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg flex items-center justify-center space-x-3">
                   <Download className="w-5 h-5 group-hover:animate-bounce" />
-                  <span>Download for Windows</span>
+                  <a href="https://github.com/InsansaTechnoledge/Test-Series/releases/download/evalvoTech/Evalvo.Proctor.Setup.1.0.0.exe"><span>Download for Windows</span></a>
                 </button>
                 
                 <div className="flex flex-col sm:flex-row gap-3">
                   <button className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-medium transition-all duration-300 flex items-center justify-center space-x-2">
                     <Download className="w-4 h-4" />
-                    <span>macOS</span>
+                    <a href="https://github.com/InsansaTechnoledge/Test-Series/releases/download/evalvoTech/Evalvo.Proctor-1.0.0.dmg"><span>macOS</span></a>
                   </button>
                 </div>
               </div>

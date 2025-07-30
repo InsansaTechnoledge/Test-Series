@@ -11,6 +11,8 @@ const app = express();
 // Ensure trust proxy for production (required for session handling behind load balancers)
 app.set('trust proxy', 1);
 
+const allowedOrigins = process.env.CLIENT_URL.split(',');
+
 // CORS configuration
 app.use(cors({
   origin: function (origin, callback) {

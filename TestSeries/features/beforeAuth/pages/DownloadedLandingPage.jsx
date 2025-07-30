@@ -158,7 +158,7 @@ const DownloadedLandingPage = () => {
 
         <div
           className={`relative grid grid-cols-2 gap-1 mb-6 ${
-            theme === "light" ? "bg-indigo-200" : "bg-indigo-600"
+            theme === "light" ? "bg-gray-100" : "bg-gray-100"
           } p-1 rounded-2xl shadow-inner`}
         >
           <div
@@ -171,7 +171,7 @@ const DownloadedLandingPage = () => {
             onClick={
               loginEntity === "student" ? EntityChangeHandler : undefined
             }
-            className={`relative z-10 px-4 py-3 font-semibold rounded-xl transition-all duration-300 cursor-pointer ${
+            classN  ame={`relative z-10 px-4 py-3 font-semibold rounded-xl transition-all duration-300 cursor-pointer ${
               loginEntity === "institute"
                 ? `${
                     theme === "light"
