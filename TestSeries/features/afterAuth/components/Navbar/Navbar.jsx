@@ -375,106 +375,200 @@ const Navbar = ({setShowLogoutModal}) => {
               </button>
 
               {showProfileDropdown && (
-                <div className={`absolute right-0 mt-2 w-48 rounded-md ring-1 ring-black ring-opacity-5 z-50 ${themeClasses.dropdown}`}>
-                  <div className="py-1">
-                    <div className={`px-4 py-2 text-sm border-b ${themeClasses.border}`}>
-                      <div className={`font-medium ${themeClasses.textPrimary}`}>{user?.name || 'User'}</div>
-                      <div className={themeClasses.textSecondary}>{user?.email || 'user@example.com'}</div>
+                <div className={`absolute right-0 mt-2 w-72 rounded-xl shadow-xl ring-1 ring-black ring-opacity-5 z-50 ${themeClasses.dropdown} overflow-hidden`}>
+                  
+                  {/* User Info Header */}
+                  <div className={`px-6 py-4 border-b ${themeClasses.border} ${theme === 'light' ? 'bg-gradient-to-r from-indigo-50 to-blue-50' : 'bg-gray-800'}`}>
+                    <div className="flex items-center space-x-3">
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center shadow-lg ${theme === 'light' ? 'bg-indigo-600' : 'bg-indigo-400'}`}>
+                        <span className={`font-semibold text-lg ${theme === 'light' ? 'text-white' : 'text-gray-950'}`}>
+                          {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                        </span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className={`font-semibold text-lg truncate ${themeClasses.textPrimary}`}>
+                          {user?.name || 'User'}
+                        </div>
+                        <div className={`text-sm truncate ${themeClasses.textSecondary}`}>
+                          {user?.email || 'user@example.com'}
+                        </div>
+                        {user?.role && (
+                          <div className="mt-1">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${
+                              user.role === 'organization' 
+                                ? theme === 'light' 
+                                  ? 'bg-purple-100 text-purple-800' 
+                                  : 'bg-purple-900 text-purple-200'
+                                : theme === 'light'
+                                  ? 'bg-green-100 text-green-800'
+                                  : 'bg-green-900 text-green-200'
+                            }`}>
+                              {user.role}
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    {user?.role === "organization" && (
-                      <button
-                        onClick={() => {
-                          navigate('/institute-subscription');
-                          setShowProfileDropdown(false);
-                          setActiveCategory(''); // Close categories dropdown
-                        }}
-                        className={`block w-full text-left px-4 py-2 text-sm ${themeClasses.dropdownItem}`}
-                      >
-                        Know Your Plan
-                      </button>
-                    )}
-                    <button 
-                      onClick={() => navigate('/download-app')}
-                      className={`block w-full text-left px-4 py-2 text-sm ${themeClasses.dropdownItem}`}>
-                      Download Application
-                    </button>
-                    {
-                      (user?.role === 'user' || user?.role === 'student') && (
+                  </div>
+
+                  {/* Menu Items */}
+                  <div className="py-2">
+                    
+                    {/* Account Section */}
+                    <div className="px-3 py-2">
+                      <div className={`text-xs font-semibold uppercase tracking-wider mb-2 ${themeClasses.textSecondary}`}>
+                        Account
+                      </div>
+                      
+                      {(user?.role === 'user' || user?.role === 'student') && (
                         <button
                           onClick={() => {
                             if (user?._id) {
                               navigate(`/edit-profile/${user._id}`);
                               setShowProfileDropdown(false);
-                              setActiveCategory(''); // Close categories dropdown
+                              setActiveCategory('');
                             }
                           }}
-                        className={`block w-full text-left px-4 py-2 text-sm ${themeClasses.dropdownItem}`}
-                      >
-                        Edit Profile
-                      </button>
-                      )
-                    }
+                          className={`w-full flex items-center px-3 py-3 text-sm rounded-lg transition-all duration-200 ${themeClasses.dropdownItem} ${theme === 'light' ? 'hover:bg-gray-50' : 'hover:bg-gray-700'}`}
+                        >
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 ${theme === 'light' ? 'bg-blue-100' : 'bg-blue-900'}`}>
+                            <svg className={`w-4 h-4 ${theme === 'light' ? 'text-blue-600' : 'text-blue-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                          </div>
+                          <span className="font-medium">Edit Profile</span>
+                        </button>
+                      )}
 
-                    <div className={`w-full text-left px-4 py-2 text-sm flex gap-4 ${themeClasses.dropdownItem}`}>
-                      show Dock
-                      <div
-                        onClick={() => toggleDock()}
-                        className={`w-14 h-7 flex items-center bg-gray-300 rounded-full p-1 cursor-pointer transition-colors duration-300 ${
-                          isDockToggled ? 'bg-blue-500' : 'bg-gray-300'
-                        }`}
+                      {user?.role === "organization" && (
+                        <button
+                          onClick={() => {
+                            navigate('/institute-subscription');
+                            setShowProfileDropdown(false);
+                            setActiveCategory('');
+                          }}
+                          className={`w-full flex items-center px-3 py-3 text-sm rounded-lg transition-all duration-200 ${themeClasses.dropdownItem} ${theme === 'light' ? 'hover:bg-gray-50' : 'hover:bg-gray-700'}`}
+                        >
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 ${theme === 'light' ? 'bg-purple-100' : 'bg-purple-900'}`}>
+                            <svg className={`w-4 h-4 ${theme === 'light' ? 'text-purple-600' : 'text-purple-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </div>
+                          <span className="font-medium">Know Your Plan</span>
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Divider */}
+                    <div className={`mx-3 border-t ${themeClasses.border}`}></div>
+
+                    {/* Tools Section */}
+                    <div className="px-3 py-2">
+                      <div className={`text-xs font-semibold uppercase tracking-wider mb-2 ${themeClasses.textSecondary}`}>
+                        Tools & Features
+                      </div>
+                      
+                      <div className="relative group">
+                        <button
+                          onClick={() => {
+                            navigate(`/qbms/${user._id}`);
+                            setShowProfileDropdown(false);
+                            setActiveCategory('');
+                          }}
+                          className={`w-full flex items-center px-3 py-3 text-sm rounded-lg transition-all duration-200 ${themeClasses.dropdownItem} ${theme === 'light' ? 'hover:bg-gray-50 group-hover:shadow-md' : 'hover:bg-gray-700 group-hover:shadow-md'}`}
+                        >
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 ${theme === 'light' ? 'bg-gradient-to-br from-green-100 to-emerald-100' : 'bg-gradient-to-br from-green-900 to-emerald-900'}`}>
+                            <svg className={`w-4 h-4 ${theme === 'light' ? 'text-green-600' : 'text-green-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </div>
+                          <div className="flex-1 text-left">
+                            <div className="flex items-center">
+                              <span className="font-medium">QBMS</span>
+                              <span className="ml-2 bg-green-100 text-green-800 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-green-300 shadow-sm">
+                                NEW
+                              </span>
+                            </div>
+                            <div className={`text-xs mt-0.5 ${themeClasses.textSecondary}`}>
+                              Question Bank Management
+                            </div>
+                          </div>
+                        </button>
+                      </div>
+
+                      <button 
+                        onClick={() => navigate('/download-app')}
+                        className={`w-full flex items-center px-3 py-3 text-sm rounded-lg transition-all duration-200 ${themeClasses.dropdownItem} ${theme === 'light' ? 'hover:bg-gray-50' : 'hover:bg-gray-700'}`}
                       >
-                      <div
-                        className={`w-5 h-5 bg-indigo-400 rounded-full shadow-md transform transition-transform duration-300 ${
-                          isDockToggled ? 'translate-x-7' : 'translate-x-0'
-                      }`}
-                      />
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 ${theme === 'light' ? 'bg-indigo-100' : 'bg-indigo-900'}`}>
+                          <svg className={`w-4 h-4 ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                        </div>
+                        <span className="font-medium">Download Application</span>
+                      </button>
+                    </div>
+
+                    {/* Divider */}
+                    <div className={`mx-3 border-t ${themeClasses.border}`}></div>
+
+                    {/* Settings Section */}
+                    <div className="px-3 py-2">
+                      <div className={`text-xs font-semibold uppercase tracking-wider mb-2 ${themeClasses.textSecondary}`}>
+                        Preferences
+                      </div>
+                      
+                      <div className={`flex items-center justify-between px-3 py-3 text-sm rounded-lg ${themeClasses.dropdownItem}`}>
+                        <div className="flex items-center">
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 ${theme === 'light' ? 'bg-gray-100' : 'bg-gray-700'}`}>
+                            <svg className={`w-4 h-4 ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                          </div>
+                          <span className="font-medium">Show Dock</span>
+                        </div>
+                        <div
+                          onClick={() => toggleDock()}
+                          className={`w-12 h-6 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-300 ${
+                            isDockToggled 
+                              ? theme === 'light' ? 'bg-indigo-600' : 'bg-indigo-400'
+                              : theme === 'light' ? 'bg-gray-300' : 'bg-gray-600'
+                          }`}
+                        >
+                          <div
+                            className={`w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${
+                              isDockToggled ? 'translate-x-6' : 'translate-x-0'
+                            } ${theme === 'light' ? 'bg-white' : 'bg-gray-950'}`}
+                          />
+                        </div>
                       </div>
                     </div>
-                            
 
+                    {/* Divider */}
+                    <div className={`mx-3 border-t ${themeClasses.border}`}></div>
 
-                    <div className="relative group w-full">
+                    {/* Sign Out */}
+                    <div className="px-3 py-2">
                       <button
                         onClick={() => {
-                          navigate(`/qbms/${user._id}`);
+                          setShowLogoutModal(true);
                           setShowProfileDropdown(false);
                           setActiveCategory('');
                         }}
-                        title="you can manage your entire set of questions here"
-                        className={`block w-full text-left px-4 py-2 text-sm transition-all duration-200 ease-in-out hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:border-l-4 hover:border-blue-500 hover:shadow-md hover:transform hover:scale-[1.02] rounded-lg ${themeClasses.dropdownItem}`}
+                        className={`w-full flex items-center px-3 py-3 text-sm rounded-lg transition-all duration-200 ${theme === 'light' ? 'hover:bg-red-50 text-red-600' : 'hover:bg-red-900/20 text-red-400'}`}
                       >
-                        <span className="relative z-10 font-medium group-hover:text-blue-700 transition-colors duration-200 flex items-center gap-2">
-                          QBMS
-                          <span className="bg-green-100 text-green-800 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-green-300 shadow-sm">
-                            NEW
-                          </span>
-                        </span>
-                      </button>
-
-                      <div className="absolute right-full top-1/2 -translate-y-1/2 mr-3 bg-gradient-to-r from-gray-900 to-black text-white text-xs rounded-lg px-3 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-out whitespace-nowrap z-20 shadow-lg border border-gray-700 backdrop-blur-sm">
-                        <div className="flex items-center space-x-2">
-                          <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse"></div>
-                          <span className="font-medium">Question Bank Management System</span>
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 ${theme === 'light' ? 'bg-red-100' : 'bg-red-900'}`}>
+                          <svg className={`w-4 h-4 ${theme === 'light' ? 'text-red-600' : 'text-red-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                          </svg>
                         </div>
-
-                        <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1 w-2 h-2 bg-gradient-to-tl from-gray-900 to-black border-r border-t border-gray-700 transform rotate-45"></div>
-                      </div>
+                        <span className="font-medium">Sign Out</span>
+                      </button>
                     </div>
-
-                    <button
-                      onClick={() => {
-                        setShowLogoutModal(true);
-                        setShowProfileDropdown(false);
-                        setActiveCategory(''); // Close categories dropdown
-                      }}
-                      className={`block w-full text-left px-4 py-2 text-sm ${themeClasses.dropdownItem}`}
-                    >
-                      Sign out
-                    </button>
-                    
                   </div>
                 </div>
               )}
+
             </div>
           </div>
 
