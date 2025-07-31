@@ -433,6 +433,13 @@ const TestWindow = () => {
 
       const response = await submitResult(payload);
       if (response.status === 200) {
+        addToast(
+          "Exam submitted successfully! Redirecting to completed exams...",
+          "info",
+          "Please wait while we process your submission",
+          0
+        );
+        await window.electronAPI?.clearDbEvents();
         setSubmitted(true);
         if (document.fullscreenElement) {
           try {
