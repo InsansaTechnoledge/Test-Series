@@ -284,6 +284,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('stop-proctor-engine');
   },
 
+  clearDbEvents: () => {
+    console.log('🗑️ Preload: clearDbEvents called');
+    ipcRenderer.invoke('clear-db-events');
+  },
+
   // ✅ FIXED: Event listeners for proctor events
   onProctorWarning: (callback) => {
     const listener = (event, data) => {

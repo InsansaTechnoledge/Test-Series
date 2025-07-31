@@ -1814,6 +1814,15 @@ ipcMain.handle('get-url-params', () => {
   }
 });
 
+ipcMain.handle('clear-db-events', async () => {
+  if (queue) {
+    await queue.flushNow();
+    queue.clearDB();
+    return { success: true, message: 'Event queue cleared' };
+  }
+  return { success: false, message: 'No event queue found' };
+});
+
 ipcMain.handle('window-minimize', () => {
   if (mainWindow) mainWindow.minimize();
 });
@@ -1827,8 +1836,15 @@ ipcMain.handle('window-maximize', () => {
     }
   }
 });
-
-ipcMain.handle('window-close', () => {
+  
+ipcMain.handle('window-close', async () => {
+ try{ await queue.flushNow();
+  queue.clearDB();
+  queue.close();
+  console.log('🗑️ Event queue flushed and cleared');
+ }catch(error){
+   console.error('Error clearing event queue:', error);
+ }
   if (mainWindow) mainWindow.close();
 });
 
@@ -1931,6 +1947,10 @@ ipcMain.on('renderer-ready', () => {
 app.on('window-all-closed', () => {
   if (proctorProcess) {
     if (isWin) {
+      queue.flushNow();
+      queue.clearDB();  
+      queue.close();
+      console.log('🗑️ Event queue flushed and cleared');
       killProctorProcessWindows();
     } else {
       proctorProcess.kill('SIGTERM');

@@ -3,6 +3,7 @@ const fs = require('fs');
 const axios = require('axios');
 const Database = require('better-sqlite3');
 const { app } = require('electron'); // Import Electron's app module
+const { clear } = require('console');
 
 class QueueManager {
     constructor(dbPath=path.join(app.getPath('userData'), 'proctorQueue.db'), flushInterval = 5000, batchsize = 5) {
@@ -25,7 +26,7 @@ class QueueManager {
         if (!dbExists) {
             this.db.exec(`
                 CREATE TABLE IF NOT EXISTS events(
-                id INTEGER PRIMARY KEY AUTOINCREMENT,  -- Fixed typo (PROMARY -> PRIMARY)
+                id INTEGER PRIMARY KEY AUTOINCREMENT, 
                 data TEXT NOT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )`);
@@ -63,7 +64,7 @@ class QueueManager {
 
             console.log(`🔄 Flushing ${events.length} events to server...`);
 
-            const response = await axios.post("http://localhost:8000/api/v1/proctor/emit-event", { events });
+            const response = await axios.post("https://test-series-03sa.onrender.com/api/v1/proctor/emit-event", { events });
             console.log('✅ Events flushed successfully:', response.data);
 
             if (response.data.status === 200) {
@@ -75,8 +76,30 @@ class QueueManager {
         } catch (error) {
             console.error('Error flushing events:', error);
         }
+    };
+
+
+
+    async flushNow(){
+    clearInterval(this.timer);
+    await this.flush();
+}
+
+clearDB(){
+    console.log('🗑️ Clearing database...');
+    this.db.prepare('DELETE FROM events').run();
+    console.log('✅ Database cleared');
+}
+
+    close() {
+        if (this.timer) clearInterval(this.timer);
+        if(this.db)this.db.close();
+        console.log('✅ Database connection closed');
     }
+
 };
+
+
 
 // Old code (commented out):
 // const dbPath = path.join(process.cwd(),'proctorQueue.db');
