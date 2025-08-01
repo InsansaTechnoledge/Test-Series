@@ -12,7 +12,11 @@ function formatParamForJava(value, type) {
   }
 
   if (type === 'string') {
+    if (value.startsWith('"') && value.endsWith('"')) {
+    return value;
+  } else {
     return `"${value}"`;
+  }
   }
 
   if (type === 'integer[]') {
@@ -50,6 +54,8 @@ function formatJavaInputArray(inputArray, metadataParams) {
 
     const formattedParams = testCase.map((value, i) => {
       const type = metadataParams[i].type;
+      console.log(type);
+      console.log(value);
       return formatParamForJava(value, type);
     });
 
@@ -83,7 +89,11 @@ function formatParamForCpp(value, type) {
   } else if (type === 'boolean') {
     return value ? 'true' : 'false';
   } else if (type === 'string') {
+    if (value.startsWith('"') && value.endsWith('"')) {
+    return value;
+  } else {
     return `"${value}"`;
+  }
   } else if (type === 'integer[]' || type === 'float[]') {
     return `{${value.join(',')}}`;
   } else if (type === 'integer[][]' || type === 'float[][]') {
@@ -194,7 +204,12 @@ function mapTypeToC(type) {
 }
 
 function formatValueForC(value, type) {
-  if (type === 'string') return `"${value}"`;
+  if (type === 'string') { if (value.startsWith('"') && value.endsWith('"')) {
+    return value;
+  } else {
+    return `"${value}"`;
+  };
+}
   if (type === 'char') return `'${value}'`;
   if (type === 'boolean') return value ? 'true' : 'false';
   if (type === 'float') return `${value}f`;

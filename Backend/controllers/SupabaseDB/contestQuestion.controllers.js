@@ -16,6 +16,9 @@ export const testContestQuestion = async (req, res) => {
         const final = await getFinalCodeForSubmission(currentLang.langSlug, code, problem);
         const { finalCode, output, testInput } = final;
 
+        console.log(finalCode);
+        console.log(output);
+
         if (!final || !final.finalCode) {
             return new APIError(400, ["Failed to generate final code for submission"]).send(res);
         }
