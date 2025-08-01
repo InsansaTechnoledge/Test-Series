@@ -54,7 +54,7 @@ xcopy "%DIST_SOURCE%" "%DIST_TARGET%" /e /i /h /y >nul
 echo.
 echo [4/4] Building Electron Windows app...
 cd /d "%ELECTRON_PATH%"
-call npm run build:win
+call npm run build:win -- --publish always
 
 echo.
 echo ✅ All steps completed successfully!

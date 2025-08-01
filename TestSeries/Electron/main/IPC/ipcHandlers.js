@@ -1,5 +1,6 @@
 const { ipcMain, dialog, shell } = require('electron');
 const IPC_CHANNELS = require('./ipcChannels');
+const { isWin, isMac } = require('../utils/constants');
 
 class IPCHandlers {
   constructor(protocolHandler, proctorManager, queue) {
@@ -138,6 +139,17 @@ class IPCHandlers {
 
     ipcMain.on(IPC_CHANNELS.RENDERER_READY, () => {
       console.log('✅ Renderer process is ready');
+    });
+
+
+    ipcMain.handle(IPC_CHANNELS.OPEN_CAMERA_SETTINGS, () => {
+      console.log('🔧 Opening camera settings');
+      if(isWin){
+        shell.openExternal('ms-settings:privacy-webcam');
+      }
+      else if(isMac){
+        shell.openExternal('x-apple.systempreferences:com.apple.preference.security?Privacy_Camera');
+      }
     });
   }
 
