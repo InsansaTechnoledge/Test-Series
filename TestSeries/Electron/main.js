@@ -9,6 +9,11 @@ const IPCHandlers = require('./main/IPC/ipcHandlers');
 const PlatformUtils = require('./main/utils/platformUtils');
 const { isDev, APP_CONFIG } = require('./main/utils/constants');
 const QueueManager = require('./queueManager');
+const {autoUpdater} = require('electron-updater');
+const log = require('electron-log');
+
+
+
 class ElectronApp {
   constructor() {
     this.windowManager = new WindowManager();
@@ -19,6 +24,7 @@ class ElectronApp {
     
     this.mainWindow = null;
     this.isInitialized = false;
+    this.autoUpdater = autoUpdater;
   }
 
   async initialize() {
@@ -113,10 +119,56 @@ class ElectronApp {
     // Performance optimizations
     app.commandLine.appendSwitch('disable-gpu-shader-disk-cache');
     app.commandLine.appendSwitch('disk-cache-size', '0');
+
+    this.autoUpdater.on('update-available', () => {
+      console.log('🔄 Update available');
+      dialog.showMessageBox({
+        type: 'info',
+        title: 'Update Available',
+        message: 'A new version of Evalvo Proctor is available. The app will update on restart.',
+        buttons: ['OK']
+      });
+    });
+
+    this.autoUpdater.on('update-downloaded', () => {
+      console.log('✅ Update downloaded');
+      dialog.showMessageBox({
+        type: 'info',
+        title: 'Update Downloaded',
+        message: 'The update has been downloaded. The app will restart to apply the update.',
+        buttons: ['Restart Now', 'Later']
+      }).then((result) => {
+        if (result.response === 0) {
+          app.autoUpdater.quitAndInstall();
+        }
+      });
+    });
+
+    this.autoUpdater.on('error', (error) => {
+      console.error('❌ AutoUpdater error:', error);
+      dialog.showMessageBox({
+        type: 'error',
+        title: 'Update Error',
+        message: `An error occurred while checking for updates: ${error.message}`,
+        buttons: ['OK']
+      });
+    });
+
+    this.autoUpdater.logger = log;
+this.autoUpdater.logger.transports.file.level = 'info';
+
+
+
   }
 
   createWindow() {
     this.mainWindow = this.windowManager.createWindow();
+
+    this.mainWindow.on('did-finish-load', () => {
+      console.log('✅ Main window finished loading');
+      autoUpdater.checkForUpdatesAndNotify();
+    });
+    
     this.ipcHandlers.setMainWindow(this.mainWindow);
     
     MenuManager.createMenu(this.mainWindow);

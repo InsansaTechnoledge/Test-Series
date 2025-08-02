@@ -1,6 +1,6 @@
 {
   "name": "evalvo-electron-proctor",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Evalvo Proctor Desktop Application",
   "main": "main.js",
   "scripts": {
@@ -25,7 +25,7 @@
     },
     "files": [
       "main.js",
-      "preload.js",
+      "preload.js", 
       "queueManager.js",
       "package.json",
       "dist/**/*",
@@ -42,7 +42,8 @@
       "!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}",
       "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
       "!**/{appveyor.yml,.travis.yml,circle.yml}",
-      "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}"
+      "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}",
+      "main/**/*"
     ],
     "extraResources": [
       {
@@ -133,7 +134,13 @@
     },
     "asarUnpack": [
       "node_modules/better-sqlite3/**/*"
-    ]
+    ],
+    "publish": [
+      {
+        "provider": "github",
+        "owner" : "InsansaTechnoledge",
+        "repo":"Test-Series"
+      }]
   },
   "devDependencies": {
     "electron": "^35.5.1",

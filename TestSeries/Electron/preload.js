@@ -44,6 +44,32 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('clear-db-events');
   },
 
+  checkCameraPermission:async ()=>{
+    console.log('🔍 Preload: checkCameraPermission called');
+   console.log('🔍 Checking camera permission');
+      try{
+        const result = await navigator.mediaDevices.getUserMedia({ video: true }).then(
+      stream => {
+        stream.getTracks().forEach(track => track.stop()); // Stop the camera after checking
+        return { granted: true };
+      },
+      error => {
+        return { granted: false, error: error.message };
+      }
+    );
+    return result;
+  }catch(error){
+        console.error('Error checking camera permission:', error);
+        return {granted : false};
+      }
+
+  },
+
+  openCameraSettings: () => {
+    console.log('🔧 Preload: openCameraSettings called');
+    ipcRenderer.invoke('open-camera-settings');
+  },
+
   // ✅ FIXED: Event listeners for proctor events
   onProctorWarning: (callback) => {
     const listener = (event, data) => {

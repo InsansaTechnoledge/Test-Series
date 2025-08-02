@@ -1,0 +1,172 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Evalvo Proctor - Debug Mode</title>
+      <style>
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          margin: 0;
+          padding: 20px;
+          min-height: 100vh;
+        }
+        .container {
+          max-width: 1000px;
+          margin: 0 auto;
+          background: rgba(255, 255, 255, 0.1);
+          backdrop-filter: blur(10px);
+          border-radius: 20px;
+          padding: 30px;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        h1 {
+          font-size: 2.5em;
+          margin-bottom: 20px;
+          background: linear-gradient(45deg, #fff, #e0e0e0);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          text-align: center;
+        }
+        .debug-section {
+          margin: 20px 0;
+          padding: 20px;
+          background: rgba(0, 0, 0, 0.2);
+          border-radius: 10px;
+          border-left: 4px solid #00ff96;
+        }
+        .error-section {
+          margin: 20px 0;
+          padding: 20px;
+          background: rgba(255, 100, 100, 0.1);
+          border-radius: 10px;
+          border-left: 4px solid #ff6464;
+        }
+        .path-item {
+          margin: 10px 0;
+          padding: 10px;
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 5px;
+          font-family: monospace;
+          font-size: 12px;
+        }
+        .exists-true { border-left: 3px solid #00ff96; }
+        .exists-false { border-left: 3px solid #ff6464; }
+        .exists-assumed { border-left: 3px solid #ffaa00; }
+        code {
+          background: rgba(0, 0, 0, 0.3);
+          padding: 2px 6px;
+          border-radius: 4px;
+          font-family: 'Courier New', monospace;
+          font-size: 11px;
+        }
+        button {
+          background: linear-gradient(45deg, #00ff96, #00cc7a);
+          border: none;
+          color: white;
+          padding: 12px 24px;
+          font-size: 16px;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          margin: 10px 5px;
+        }
+        button:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 5px 15px rgba(0, 255, 150, 0.3);
+        }
+        .info-grid {
+          display: grid;
+          grid-template-columns: auto 1fr;
+          gap: 10px;
+          margin: 15px 0;
+        }
+        .info-label {
+          font-weight: bold;
+          color: #00ff96;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <h1>🛡️ Evalvo Proctor - Debug Mode</h1>
+        
+        <div class="error-section">
+          <h3>⚠️ Frontend Build Not Loaded</h3>
+          <p>The React application could not be loaded. This page shows debugging information to help resolve the issue.</p>
+        </div>
+
+        <div class="debug-section">
+          <h3>📊 System Information</h3>
+          <div class="info-grid">
+            <span class="info-label">Platform:</span> <span>win32</span>
+            <span class="info-label">Development:</span> <span>No</span>
+            <span class="info-label">App Packaged:</span> <span>No</span>
+            <span class="info-label">Electron Version:</span> <span>35.7.2</span>
+            <span class="info-label">Node Version:</span> <span>22.16.0</span>
+            <span class="info-label">__dirname:</span> <code>C:\Users\BHADRIKA RAVAL\Desktop\insansa_technologies\gyapak-testseries\Test-Series\TestSeries\Electron\main\window</code>
+            <span class="info-label">Resources Path:</span> <code>C:\Users\BHADRIKA RAVAL\Desktop\insansa_technologies\gyapak-testseries\Test-Series\TestSeries\Electron\node_modules\electron\dist\resources</code>
+            <span class="info-label">Attempted Build Path:</span> <code>None</code>
+          </div>
+        </div>
+
+        
+
+        <div class="debug-section">
+          <h3>🔍 Path Detection Results</h3>
+          <p>Paths checked for React build files:</p>
+          <p>No path checks recorded</p>
+        </div>
+
+        <div class="debug-section">
+          <h3>🔧 Actions</h3>
+          <button onclick="reloadApp()">Reload App</button>
+          <button onclick="openDevTools()">Open DevTools</button>
+          <button onclick="testProtocol()">Test Protocol</button>
+        </div>
+
+        <div id="protocol-status"></div>
+        <div id="debug-output"></div>
+      </div>
+
+      <script>
+        function reloadApp() {
+          location.reload();
+        }
+
+        function openDevTools() {
+          if (window.electronAPI) {
+            window.electronAPI.openDevTools();
+          }
+        }
+
+        function testProtocol() {
+          const testUrl = 'examproc://splash?userId=testUser&examId=testExam&eventId=testEvent';
+          document.getElementById('debug-output').innerHTML = 
+            '<div style="margin-top: 20px; padding: 15px; background: rgba(0, 255, 150, 0.2); border-radius: 8px;">' +
+            '<strong>Protocol Test:</strong> ' + testUrl + '</div>';
+        }
+
+        if (window.electronAPI) {
+          window.electronAPI.onProtocolUrlReceived((event, params) => {
+            const statusDiv = document.getElementById('protocol-status');
+            statusDiv.innerHTML = 
+              '<div style="margin-top: 20px; padding: 15px; background: rgba(0, 255, 150, 0.2); border-radius: 8px;">' +
+              '<strong>Protocol URL Received!</strong><br>' +
+              'User ID: ' + params.userId + '<br>' +
+              'Exam ID: ' + params.examId + '<br>' +
+              'Event ID: ' + params.eventId + '<br>' +
+              'Route: ' + params.route + '</div>';
+          });
+
+          window.electronAPI.rendererReady();
+        }
+      </script>
+    </body>
+    </html>
+    

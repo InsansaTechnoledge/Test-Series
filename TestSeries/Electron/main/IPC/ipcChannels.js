@@ -35,7 +35,10 @@ const IPC_CHANNELS = {
     
     // Renderer communication
     RENDERER_MESSAGE: 'renderer-message',
-    RENDERER_READY: 'renderer-ready'
+    RENDERER_READY: 'renderer-ready',
+
+    // Camera permissions
+    OPEN_CAMERA_SETTINGS: 'open-camera-settings',
   };
   
 module.exports = IPC_CHANNELS;

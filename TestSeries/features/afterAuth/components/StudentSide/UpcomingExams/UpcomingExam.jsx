@@ -352,8 +352,15 @@ const UpcomingExam = () => {
       // For AI-proctored exams in Electron environment
       if (isElectronEnv) {
         console.log("AI-proctored exam in Electron environment - starting proctor engine");
-        
-        // Start proctor engine first
+
+
+          const result = await window.electronAPI.checkCameraPermission();
+          console.log("Camera permission check result:", result);
+          if(!result.granted){
+            alert('Camera access is required to start the exam.');
+            return;
+          }
+          
         const proctorStarted = await startProctorEngine(examId, eventId);
         
         if (proctorStarted) {

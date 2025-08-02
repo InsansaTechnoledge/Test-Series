@@ -250,7 +250,7 @@ const CodingPlatform = () => {
 
       localStorage.setItem(
         `contest_${contest_id}_problem_${problem.question_id}_testResults`,
-        testResults.passedCount * marksForEachTestCase || 0
+        results.passedCount * marksForEachTestCase || 0
       );
     }
     setIsRunning(false);
