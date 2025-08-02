@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Settings, ChevronDown, Menu, X, Sun, Moon } from 'lucide-react';
+import { Search, Settings, ChevronDown, Menu, X, Sun, Moon, CreativeCommons, PaperclipIcon } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useUser } from '../../../../contexts/currentUserContext';
 // import logo from '../../../../assests/Landing/Navbar/evalvo logo blue 2.svg'
@@ -465,7 +465,7 @@ const Navbar = ({setShowLogoutModal}) => {
                     {/* Tools Section */}
                     <div className="px-3 py-2">
                       <div className={`text-xs font-semibold uppercase tracking-wider mb-2 ${themeClasses.textSecondary}`}>
-                        Tools & Features
+                        Tools & Products
                       </div>
                       
                       <div className="relative group">
@@ -496,6 +496,27 @@ const Navbar = ({setShowLogoutModal}) => {
                         </button>
                       </div>
 
+                      <button
+                         onClick={() => navigate('/certificate-assignment')}
+                         className={`w-full flex items-center px-3 py-3 text-sm rounded-lg transition-all duration-200 ${themeClasses.dropdownItem} ${theme === 'light' ? 'hover:bg-gray-50' : 'hover:bg-gray-700'}`}
+                      >
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 ${theme === 'light' ? 'bg-indigo-100' : 'bg-indigo-900'}`}>
+                          <PaperclipIcon className={`w-4 h-4 ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-400'}`}/>
+                        </div>
+                        <div className="flex-1 text-left">
+                            <div className="flex items-center">
+                              <span className="font-medium"> Certificates</span>
+                              <span className="ml-2 bg-yellow-100 text-yellow-800 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-yellow-300 shadow-sm">
+                                NEW
+                              </span>
+                            </div>
+                            <div className={`text-xs mt-0.5 ${themeClasses.textSecondary}`}>
+                              Choose Cerificates
+                            </div>
+                          </div>
+                       
+                      </button>
+
                       <button 
                         onClick={() => navigate('/download-app')}
                         className={`w-full flex items-center px-3 py-3 text-sm rounded-lg transition-all duration-200 ${themeClasses.dropdownItem} ${theme === 'light' ? 'hover:bg-gray-50' : 'hover:bg-gray-700'}`}
@@ -507,6 +528,8 @@ const Navbar = ({setShowLogoutModal}) => {
                         </div>
                         <span className="font-medium">Download Application</span>
                       </button>
+
+                     
                     </div>
 
                     {/* Divider */}

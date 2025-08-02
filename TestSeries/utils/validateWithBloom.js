@@ -1,5 +1,5 @@
 export const validateWithBloom = async (questionText, bloomLevel) => {
-  const API_KEY = "AIzaSyB_n2E0sL6iLbpRpz852LVX-LHBp24YK8w";
+  const API_KEY = "AIzaSyD9DRYaDczxALeUCGqdvx-AVYq-RrhVohE";
   const prompt = `
 You are a Bloom's Taxonomy classification expert. Your task is to classify the following question into one of Bloom's levels.
 

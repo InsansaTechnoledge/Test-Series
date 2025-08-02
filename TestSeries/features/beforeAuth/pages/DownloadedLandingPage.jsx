@@ -1,21 +1,19 @@
 import React, { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff, Monitor, Moon, Sun } from "lucide-react";
+import LogoLight from '../../../assests/Logo/Frame 8.svg'
+import LogoDark from '../../../assests/Logo/Frame 15.svg'
 import { useUser } from "../../../contexts/currentUserContext";
+import { useNavigate } from "react-router-dom";
 import { useTheme } from "../../../hooks/useTheme";
-import logoDark from "../../../assests/Logo/Frame 8.svg";
-import logolight from "../../../assests/Logo/Frame 15.svg";
+import { useToast } from "../../../utils/Toaster";
 import {
   checkAuth,
   orgLogin,
   studentLogin,
 } from "../../../utils/services/authService";
-import lightBg from "../../../assests/appBackground/bg light.svg";
-import darkBg from "../../../assests/appBackground/bg dark 2.svg";
-import { useToast, ToastContainer } from "../../../utils/Toaster";
 
-const DownloadedLandingPage = () => {
-  const { theme, handleTheme } = useTheme();
+const DesktopSignInPage = () => {
+  const { theme , handleTheme } = useTheme();
   const { setUser } = useUser();
   const navigate = useNavigate();
 
@@ -118,218 +116,292 @@ const DownloadedLandingPage = () => {
     }
   };
 
+  const backgroundStyle = theme === 'light'
+    ? {
+        background: "#ffffff",
+      }
+    : {
+        background: "#121212",
+      };
+
   return (
     <div
-      className={`${
-        theme === "light" ? "bg-white shadow-gray-300 " : "bg-gray-950"
-      } min-h-screen flex items-center justify-center px-4`}
-      style={{
-        backgroundImage:
-          theme === "light" ? `url(${lightBg})` : `url(${darkBg})`,
-        backgroundRepeat: "no-repeat",
-        backgroundPosition: "center",
-        backgroundSize: "cover",
-      }}
+      className="min-h-screen flex"
+      style={backgroundStyle}
     >
-      <div
-        className={` ${
-          theme === "light" ? "bg-white shadow-gray-300 " : "bg-gray-950"
-        }  w-full max-w-md ${
-          theme === "light"
-            ? "border-8 border-indigo-300/30 shadow-gray-800"
-            : "border-8 border-gray-600/30 shadow-gray-600"
-        } shadow-2xl  rounded-4xl p-8 `}
-      >
-        <div className="flex justify-center mb-4">
-          <img
-            src={theme === "light" ? logoDark : logolight}
-            alt="Evalvo Logo"
-            className="h-16"
-          />
+      {/* Left Panel - Branding */}
+      <div className="hidden lg:flex lg:w-1/2 items-center justify-center p-12 relative">
+        <div className={`text-center ${theme === "light" ? "text-gray-800" : "text-white"}`}>
+          {/* Logo */}
+          <div className="mb-8">
+            <img src={theme === 'light' ? LogoLight : LogoDark} alt="" />
+            <p className={`text-xl ${theme === "light" ? "text-gray-600" : "opacity-90"}`}>Evalvo's Desktop Application</p>
+          </div>
+          
+          {/* Features */}
+          <div className="space-y-4 text-left max-w-md">
+            <div className="flex items-center space-x-3">
+              <div className={`w-8 h-8 ${theme === "light" ? "bg-indigo-100" : "bg-white/20"} rounded-full flex items-center justify-center`}>
+                <div className={`w-2 h-2 ${theme === "light" ? "bg-indigo-600" : "bg-white"} rounded-full`}></div>
+              </div>
+              <span className="text-lg">Secure Authentication</span>
+            </div>
+            <div className="flex items-center space-x-3">
+              <div className={`w-8 h-8 ${theme === "light" ? "bg-indigo-100" : "bg-white/20"} rounded-full flex items-center justify-center`}>
+                <div className={`w-2 h-2 ${theme === "light" ? "bg-indigo-600" : "bg-white"} rounded-full`}></div>
+              </div>
+              <span className="text-lg">Multi-Platform Support</span>
+            </div>
+            <div className="flex items-center space-x-3">
+              <div className={`w-8 h-8 ${theme === "light" ? "bg-indigo-100" : "bg-white/20"} rounded-full flex items-center justify-center`}>
+                <div className={`w-2 h-2 ${theme === "light" ? "bg-indigo-600" : "bg-white"} rounded-full`}></div>
+              </div>
+              <span className="text-lg">Advanced Exam Management</span>
+            </div>
+          </div>
         </div>
+        
+      </div>
 
-        <p
-          className={`${
-            theme === "light" ? "text-gray-500" : "text-indigo-100"
-          } text-center mb-4`}
-        >
-          The ultimate platform for all of your exams
-        </p>
-
+      {/* Right Panel - Sign In Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
         <div
-          className={`relative grid grid-cols-2 gap-1 mb-6 ${
-            theme === "light" ? "bg-gray-100" : "bg-gray-100"
-          } p-1 rounded-2xl shadow-inner`}
+          className={`w-full max-w-md ${
+            theme === "light" ? "bg-white" : "bg-gray-950"
+          } rounded-3xl shadow-2xl p-8 backdrop-blur-sm border ${
+            theme === "light" ? "border-gray-200" : "border-gray-700"
+          }`}
         >
-          <div
-            className={`absolute top-1 bottom-1 w-1/2 rounded-xl shadow-md transition-transform duration-300 ease-out ${
-              loginEntity === "student" ? "transform translate-x-full" : ""
-            }`}
-          ></div>
-
-          <button
-            onClick={
-              loginEntity === "student" ? EntityChangeHandler : undefined
-            }
-            classN  ame={`relative z-10 px-4 py-3 font-semibold rounded-xl transition-all duration-300 cursor-pointer ${
-              loginEntity === "institute"
-                ? `${
-                    theme === "light"
-                      ? " bg-indigo-600 text-indigo-100"
-                      : " bg-indigo-600 text-indigo-100"
-                  }`
-                : `${
-                    theme === "light"
-                      ? "bg-gray-100 text-indigo-600"
-                      : "bg-gray-100 text-indigo-600"
-                  }`
-            }`}
-          >
-            Institute
-          </button>
-          <button
-            onClick={
-              loginEntity === "institute" ? EntityChangeHandler : undefined
-            }
-            className={`relative z-10 px-4 py-3 font-semibold rounded-xl transition-all duration-300 cursor-pointer ${
-              loginEntity === "student"
-                ? `${
-                    theme === "light"
-                      ? "bg-indigo-600 text-indigo-100"
-                      : "bg-indigo-600 text-indigo-100"
-                  }`
-                : `${
-                    theme === "light"
-                      ? "bg-gray-100 text-indigo-600"
-                      : "bg-gray-100 text-indigo-600"
-                  }`
-            }`}
-          >
-            Student
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Email */}
-          <div>
-            <label
-              className={`block mb-2 text-sm font-medium ${
-                theme === "light" ? "text-gray-800" : "text-indigo-100"
+          {/* Theme Toggle */}
+          <div className="flex justify-end mb-4">
+            <button
+              onClick={() => handleTheme(theme === "light" ? "dark" : "light")}
+              className={`p-2 rounded-full transition-all duration-300 ${
+                theme === "light"
+                  ? "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  : "bg-gray-800 text-gray-400 hover:bg-gray-700"
               }`}
+            >
+              {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
+            </button>
+          </div>
+
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h2
+              className={`text-3xl font-bold mb-2 ${
+                theme === "light" ? "text-gray-900" : "text-white"
+              }`}
+            >
+              Welcome Back
+            </h2>
+            <p
+              className={`${
+                theme === "light" ? "text-gray-600" : "text-gray-400"
+              }`}
+            >
+              Sign in to your account to continue
+            </p>
+          </div>
+
+          {/* Entity Toggle */}
+          <div
+            className={`relative grid grid-cols-2 gap-1 mb-8 ${
+              theme === "light" ? "bg-gray-100" : "bg-gray-800"
+            } p-1 rounded-2xl`}
+          >
+            <div
+              className={`absolute top-1 bottom-1 w-1/2 ${
+                theme === "light" ? "bg-white" : "bg-gray-700"
+              } rounded-xl shadow-md transition-transform duration-300 ease-out ${
+                loginEntity === "student" ? "transform translate-x-full" : ""
+              }`}
+            ></div>
+
+            <button
+              onClick={
+                loginEntity === "student" ? EntityChangeHandler : undefined
+              }
+              className={`relative z-10 px-4 py-3 font-semibold rounded-xl transition-all duration-300 ${
+                loginEntity === "institute"
+                  ? `${
+                      theme === "light"
+                        ? "text-indigo-600"
+                        : "text-indigo-400"
+                    }`
+                  : `${
+                      theme === "light"
+                        ? "text-gray-600"
+                        : "text-gray-400"
+                    }`
+              }`}
+            >
+              Institute
+            </button>
+            <button
+              onClick={
+                loginEntity === "institute" ? EntityChangeHandler : undefined
+              }
+              className={`relative z-10 px-4 py-3 font-semibold rounded-xl transition-all duration-300 ${
+                loginEntity === "student"
+                  ? `${
+                      theme === "light"
+                        ? "text-indigo-600"
+                        : "text-indigo-400"
+                    }`
+                  : `${
+                      theme === "light"
+                        ? "text-gray-600"
+                        : "text-gray-400"
+                    }`
+              }`}
+            >
+              Student
+            </button>
+          </div>
+
+          {/* Form */}
+          <div className="space-y-6">
+            {/* Email */}
+            <div>
+              <label
+                className={`block mb-2 text-sm font-medium ${
+                  theme === "light" ? "text-gray-700" : "text-gray-300"
+                }`}
+              >
+                {loginEntity === "institute"
+                  ? "Institute Email"
+                  : "Student Email"}
+              </label>
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => handleChange(e, "email")}
+                placeholder="you@example.com"
+                className={`w-full py-3 px-4 rounded-xl border-2 focus:outline-none focus:ring-0 transition-all duration-200 ${
+                  theme === "light"
+                    ? "bg-gray-50 text-gray-900 border-gray-200 focus:border-indigo-500"
+                    : "bg-gray-800 text-white border-gray-700 focus:border-indigo-400"
+                } ${errors.email ? "border-red-500" : ""}`}
+                required
+              />
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+              )}
+            </div>
+
+            {/* Password */}
+            <div className="relative">
+              <label
+                className={`block mb-2 text-sm font-medium ${
+                  theme === "light" ? "text-gray-700" : "text-gray-300"
+                }`}
+              >
+                Password
+              </label>
+              <input
+                type={showPassword ? "text" : "password"}
+                value={formData.password}
+                onChange={(e) => handleChange(e, "password")}
+                placeholder="Enter your password"
+                className={`w-full py-3 px-4 pr-12 rounded-xl border-2 focus:outline-none focus:ring-0 transition-all duration-200 ${
+                  theme === "light"
+                    ? "bg-gray-50 text-gray-900 border-gray-200 focus:border-indigo-500"
+                    : "bg-gray-800 text-white border-gray-700 focus:border-indigo-400"
+                } ${errors.password ? "border-red-500" : ""}`}
+                required
+              />
+              <button
+                type="button"
+                onClick={togglePasswordVisibility}
+                className={`absolute right-3 top-[43px] ${
+                  theme === "light" ? "text-gray-400 hover:text-gray-600" : "text-gray-500 hover:text-gray-300"
+                } transition-colors`}
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+              )}
+            </div>
+
+            {/* Remember Me & Forgot Password */}
+            <div className="flex items-center justify-between">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  className="w-4 h-4 text-indigo-600 bg-gray-100 border-gray-300 rounded focus:ring-indigo-500"
+                />
+                <span
+                  className={`ml-2 text-sm ${
+                    theme === "light" ? "text-gray-600" : "text-gray-400"
+                  }`}
+                >
+                  Remember me
+                </span>
+              </label>
+              <button
+                type="button"
+                className={`text-sm font-medium ${
+                  theme === "light"
+                    ? "text-indigo-600 hover:text-indigo-500"
+                    : "text-indigo-400 hover:text-indigo-300"
+                } transition-colors`}
+              >
+                Forgot password?
+              </button>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              onClick={handleSubmit}
+              className={`w-full py-3 rounded-xl font-semibold transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] ${
+                theme === "light"
+                  ? "bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg hover:shadow-xl"
+                  : "bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg hover:shadow-xl"
+              } disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none`}
+            >
+              {loading ? (
+                <div className="flex items-center justify-center space-x-2">
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  <span>Signing in...</span>
+                </div>
+              ) : (
+                "Sign In"
+              )}
+            </button>
+
+            {/* Global error */}
+            {errors.global && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-700 text-sm text-center">
+                  {errors.global}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className={`text-center mt-8 pt-6 border-t ${theme === "light" ? "border-gray-200" : "border-gray-700"}`}>
+            <button
+              onClick={EntityChangeHandler}
+              className={`text-sm font-medium ${
+                theme === "light"
+                  ? "text-indigo-600 hover:text-indigo-500"
+                  : "text-indigo-400 hover:text-indigo-300"
+              } transition-colors`}
             >
               {loginEntity === "institute"
-                ? "Institute Email"
-                : "Student Email"}
-            </label>
-            <input
-              type="email"
-              value={formData.email}
-              onChange={(e) => handleChange(e, "email")}
-              placeholder="you@example.com"
-              className={`w-full py-3 px-4 rounded-xl border focus:outline-none focus:ring-2 transition-all duration-200 
-                ${
-                  theme === "light"
-                    ? "bg-gray-100 text-gray-900 focus:ring-blue-500"
-                    : "bg-gray-800 text-indigo-100 focus:ring-indigo-400"
-                } 
-                ${errors.email ? "border-red-500" : "border-blue-200"}`}
-              required
-            />
-            {errors.email && (
-              <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-            )}
+                ? "Switch to Student Login"
+                : "Switch to Institute Login"}
+            </button>
           </div>
-
-          {/* Password */}
-          <div className="relative">
-            <label
-              className={`block mb-2 text-sm font-medium ${
-                theme === "light" ? "text-gray-800" : "text-indigo-100"
-              }`}
-            >
-              Password
-            </label>
-            <input
-              type={showPassword ? "text" : "password"}
-              value={formData.password}
-              onChange={(e) => handleChange(e, "password")}
-              placeholder="Enter your password"
-              className={`w-full py-3 px-4 rounded-xl border focus:outline-none focus:ring-2 transition-all duration-200 
-                ${
-                  theme === "light"
-                    ? "bg-gray-100 text-gray-900 focus:ring-blue-500"
-                    : "bg-gray-800 text-indigo-100 focus:ring-indigo-400"
-                } 
-                ${errors.password ? "border-red-500" : "border-blue-200"}`}
-              required
-            />
-            <div
-              onClick={togglePasswordVisibility}
-              className="absolute right-3 top-[43px] cursor-pointer text-gray-400 hover:text-gray-600"
-            >
-              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-            </div>
-            {errors.password && (
-              <p className="text-red-500 text-sm mt-1">{errors.password}</p>
-            )}
-          </div>
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full py-3 mt-4 rounded-xl font-semibold transition-all duration-200 shadow-lg 
-              ${
-                theme === "light"
-                  ? "bg-blue-600 text-white hover:bg-blue-700"
-                  : "bg-indigo-600 text-white hover:bg-indigo-700"
-              } 
-              disabled:opacity-70`}
-          >
-            {loading ? "Signing in..." : "Sign In"}
-          </button>
-
-          {/* Global error */}
-          {errors.global && (
-            <p className="text-red-500 text-sm mt-3 text-center">
-              {errors.global}
-            </p>
-          )}
-        </form>
-
-        <div className="text-center mt-6">
-          <button
-            onClick={EntityChangeHandler}
-            className={`text-sm font-medium underline hover:no-underline transition-colors duration-200 
-              ${
-                theme === "light"
-                  ? "text-blue-600 hover:text-blue-800"
-                  : "text-indigo-300 hover:text-indigo-500"
-              }`}
-          >
-            {loginEntity === "institute"
-              ? "Switch to Student Login"
-              : "Switch to Institute Login"}
-          </button>
-        </div>
-        <div className="text-center mt-4 relative z-10">
-          <button
-            onClick={() =>
-              handleTheme((prev) => (prev === "light" ? "dark" : "light"))
-            }
-            className={`text-xs px-4 py-2 rounded-full transition-all duration-300 ${
-              theme === "light"
-                ? "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                : "bg-gray-800 text-gray-400 hover:bg-gray-700"
-            }`}
-          >
-            Switch to {theme === "light" ? "Dark" : "Light"} Theme
-          </button>
         </div>
       </div>
-      <ToastContainer toasts={toasts} onRemove={removeToast} />
     </div>
   );
 };
 
-export default DownloadedLandingPage;
+export default DesktopSignInPage;

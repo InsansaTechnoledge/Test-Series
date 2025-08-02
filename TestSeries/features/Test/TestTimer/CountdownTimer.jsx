@@ -16,7 +16,6 @@ function CountdownTimer({
   variant = "header"
 }) {
   const { theme } = useTheme();
-  // const encrypted = localStorage.getItem(`encryptedTimeLeft_${examId}`);
 
   const getInitialSeconds = (id) => {
     if (submitted) return 0;
@@ -36,7 +35,6 @@ function CountdownTimer({
   };
 
   const getTotalInitialTime = (id) => {
-    // Check if we have a stored total time that matches current initialTime
     const storedTotal = localStorage.getItem("totalInitialTime");
     const currentTotal = initialTime * 60;
 
@@ -44,7 +42,6 @@ function CountdownTimer({
       return parseInt(storedTotal, 10);
     }
 
-    // If no stored total or it doesn't match, use current initialTime
     localStorage.setItem("totalInitialTime", currentTotal.toString());
     return currentTotal;
   };
@@ -55,40 +52,12 @@ function CountdownTimer({
     [initialTime]
   );
 
-  // Debug logging - you can remove this after testing
-  // console.log("Current time:", time, "Total initial time:", totalInitialTime, "Percentage:", (time / totalInitialTime) * 100);
-
-  // Calculate if we're in the critical time period (last 10%)
   const isInCriticalTime = useMemo(() => {
-    const criticalThreshold = totalInitialTime * 0.1; // 10% of total time
+    const criticalThreshold = totalInitialTime * 0.1;
     return time <= criticalThreshold && time > 0;
   }, [time, totalInitialTime]);
 
-  // Calculate if we're in the final minute for extra urgency
   const isInFinalMinute = useMemo(() => time <= 60 && time > 0, [time]);
-
-  // useEffect(() => {
-  //   if (submitted) {
-  //     localStorage.removeItem(`encryptedTimeLeft_${examId}`);
-  //     return;
-  //   }
-
-  //   if (time <= 0) {
-  //     handleSubmitTest();
-  //     return;
-  //   }
-
-  //   const interval = setInterval(() => {
-  //     setTime((prev) => {
-  //       const updated = prev - 1;
-  //       const encrypted = CryptoJS.AES.encrypt(updated.toString(), ENCRYPTION_KEY).toString();
-  //       localStorage.setItem(`encryptedTimeLeft_${examId}`, encrypted);
-  //       return updated;
-  //     });
-  //   }, 1000);
-
-  //   return () => clearInterval(interval);
-  // }, [time, submitted, handleSubmitTest]);
 
   useEffect(() => {
     if (submitted || pause) return;
@@ -122,343 +91,210 @@ function CountdownTimer({
 
   const { hours, minutes, seconds } = formatTime(time);
 
-  // Calculate percentage remaining
   const percentageRemaining = useMemo(() => {
     if (totalInitialTime === 0) return 0;
     const percentage = (time / totalInitialTime) * 100;
     return Math.min(100, Math.max(0, Math.round(percentage)));
   }, [time, totalInitialTime]);
 
+  // Get status-based styles
+  const getStatusStyles = () => {
+    if (isInFinalMinute) {
+      return {
+        containerBg: theme === "light" ? "bg-red-50" : "bg-red-950",
+        containerBorder: theme === "light" ? "border-red-300" : "border-red-700",
+        text: theme === "light" ? "text-red-800" : "text-red-200",
+        timeBg: theme === "light" ? "bg-red-100" : "bg-red-900",
+        timeBorder: theme === "light" ? "border-red-300" : "border-red-600",
+        timeText: theme === "light" ? "text-red-900" : "text-red-100",
+        progressBg: "bg-red-500",
+        title: "⚠️ FINAL MINUTE!",
+        animate: "animate-pulse"
+      };
+    }
+    
+    if (isInCriticalTime) {
+      return {
+        containerBg: theme === "light" ? "bg-orange-50" : "bg-orange-950",
+        containerBorder: theme === "light" ? "border-orange-300" : "border-orange-700",
+        text: theme === "light" ? "text-orange-800" : "text-orange-200",
+        timeBg: theme === "light" ? "bg-orange-100" : "bg-orange-900",
+        timeBorder: theme === "light" ? "border-orange-300" : "border-orange-600",
+        timeText: theme === "light" ? "text-orange-900" : "text-orange-100",
+        progressBg: "bg-orange-500",
+        title: "⏰ Time Running Out!",
+        animate: ""
+      };
+    }
 
+    return {
+      containerBg: theme === "light" ? "bg-white" : "bg-gray-800",
+      containerBorder: theme === "light" ? "border-gray-200" : "border-gray-600",
+      text: theme === "light" ? "text-gray-700" : "text-gray-300",
+      timeBg: theme === "light" ? "bg-gray-50" : "bg-gray-700",
+      timeBorder: theme === "light" ? "border-gray-200" : "border-gray-500",
+      timeText: theme === "light" ? "text-gray-900" : "text-white",
+      progressBg: "bg-green-500",
+      title: "Time Left",
+      animate: ""
+    };
+  };
+
+  const styles = getStatusStyles();
 
   if (variant === "header") {
-    const getContainerStyles = () => {
-      const baseStyles =
-        "w-full max-w-[1700px] -mt-4";
-
-      if (isInFinalMinute) {
-        return `${baseStyles} ${theme === "light"
-          ? "bg-red-50 text-red-900 border-2 border-red-200 shadow-red-200"
-          : "bg-red-900 text-red-100 border-2 border-red-700 shadow-red-800"
-          } animate-pulse`;
-      }
-
-      if (isInCriticalTime) {
-        return `${baseStyles} ${theme === "light"
-          ? "bg-orange-50 text-orange-900 border-2 border-orange-200 shadow-orange-200"
-          : "bg-orange-900 text-orange-100 border-2 border-orange-700 shadow-orange-800"
-          }`;
-      }
-
-      return `${baseStyles} ${theme === "light"
-        ? "bg-white text-gray-900 border border-gray-200"
-        : "bg-gray-700 text-white border border-gray-600"
-        }`;
-    };
-
-    const getTimeBoxStyles = () => {
-      const baseStyles =
-        "w-[45px] h-[34px] p-2 mt-1 ml-1 sm:w-[50px] sm:h-[44px] flex flex-col items-center justify-center text-center rounded-md text-xs sm:text-sm font-semibold transition-all duration-300";
-
-
-      if (isInFinalMinute) {
-        return `${baseStyles} ${theme === "light"
-          ? "bg-red-100 text-red-900 border border-red-300"
-          : "bg-red-800 text-red-100 border border-red-600"
-          }`;
-      }
-
-      if (isInCriticalTime) {
-        return `${baseStyles} ${theme === "light"
-          ? "bg-orange-100 text-orange-900 border border-orange-300"
-          : "bg-orange-800 text-orange-100 border border-orange-600"
-          }`;
-      }
-
-      return `${baseStyles} ${theme === "light"
-        ? "bg-gray-100 text-gray-900 border border-gray-300"
-        : "bg-gray-600 text-white border border-gray-500"
-        }`;
-    };
-
-    const getTitleStyles = () => {
-      const baseStyles =
-        "text-xs sm:text-sm md:text-base lg:text-lg font-medium mb-2 sm:mb-3 md:mb-4 tracking-wide transition-all duration-300";
-
-      if (isInFinalMinute) {
-        return `${baseStyles} text-red-600 font-bold animate-pulse`;
-      }
-
-      if (isInCriticalTime) {
-        return `${baseStyles} text-orange-600 font-semibold`;
-      }
-
-      return baseStyles;
-    };
-
-    const getNumberStyles = () => {
-      const baseStyles =
-        "text-sm sm:text-base md:text-lg pt-1 lg:text-xl xl:text-2xl font-semibold"
-
-
-
-      if (isInFinalMinute) {
-        return `${baseStyles} font-black`;
-      }
-
-      if (isInCriticalTime) {
-        return `${baseStyles} font-extrabold`;
-      }
-
-      return baseStyles;
-    };
-
-    const getSeparatorStyles = () => {
-      const baseStyles =
-        "text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-semibold opacity-50 px-1 transition-all duration-300";
-
-      if (isInCriticalTime) {
-        return `${baseStyles} opacity-70`;
-      }
-
-      return baseStyles;
-    };
-
-    const getLabelStyles = () => {
-      const baseStyles =
-        "text-[8px] sm:text-[9px] md:text-[10px] opacity-60  pb-2 transition-all duration-300"
-
-
-
-      if (isInCriticalTime) {
-        return `${baseStyles} opacity-90 font-medium`;
-      }
-
-      return baseStyles;
-    };
-
     return (
-      <div className={getContainerStyles()}>
+      <div className={`
+        w-full p-3 sm:p-4 rounded-lg border-2 shadow-lg
+        ${styles.containerBg} ${styles.containerBorder} ${styles.text} ${styles.animate}
+      `}>
+        {/* Header Title */}
+        <div className="text-center mb-3">
+          <h2 className="text-sm sm:text-base font-semibold">
+            {styles.title}
+          </h2>
+        </div>
 
-        {/* Wrapper to place time and progress side by side */}
-        <div className="flex justify-between items-start flex-wrap gap-[80px]">
-
-          {/* Left side: Timer */}
-          <div className="flex justify-center items-center gap-1 sm:gap-2 md:gap-3 lg:gap-4">
-            {/* Hours */}
-            <div className={getTimeBoxStyles()}>
-              <div className={getNumberStyles()}>{hours}</div>
-              <div className={getLabelStyles()}>Hours</div>
+        {/* Timer Display */}
+        <div className="flex justify-center items-center gap-1 sm:gap-2 mb-3">
+          {/* Hours */}
+          <div className={`
+            flex flex-col items-center justify-center rounded border
+            ${styles.timeBg} ${styles.timeBorder} ${styles.timeText}
+            w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14
+          `}>
+            <div className="text-xs sm:text-sm md:text-base font-bold leading-none">
+              {hours}
             </div>
-
-            <span className={getSeparatorStyles()}>:</span>
-
-            {/* Minutes */}
-            <div className={getTimeBoxStyles()}>
-              <div className={getNumberStyles()}>{minutes}</div>
-              <div className={getLabelStyles()}>Minutes</div>
-            </div>
-
-            <span className={getSeparatorStyles()}>:</span>
-
-            {/* Seconds */}
-            <div className={getTimeBoxStyles()}>
-              <div className={getNumberStyles()}>{seconds}</div>
-              <div className={getLabelStyles()}>Seconds</div>
+            <div className="text-[8px] sm:text-[9px] md:text-[10px] opacity-70 leading-none mt-0.5">
+              H
             </div>
           </div>
-          <h2 className={getTitleStyles()}>
-            {isInFinalMinute
-              ? "⚠️ FINAL MINUTE!"
-              : isInCriticalTime
-                ? "⏰ Time Running Out!"
-                : "Time Left"}
-          </h2>
 
-          {/* Right side: Progress Bar */}
-          <div className="w-[300px] sm:w-[450px] md:w-[500px]">
-            <div className="mt-3 sm:mt-4 md:mt-5">
-              <div
-                className={`w-full h-1 sm:h-2 rounded-full overflow-hidden ${theme === "light" ? "bg-gray-200" : "bg-gray-600"}`}
-              >
-                <div
-                  className={`h-full transition-all duration-1000 ease-linear ${isInFinalMinute
-                    ? "bg-red-500 animate-pulse"
-                    : isInCriticalTime
-                      ? "bg-orange-500"
-                      : "bg-green-500"
-                    }`}
-                  style={{ width: `${percentageRemaining}%` }}
-                />
-              </div>
-              <div
-                className={`mt-1 sm:mt-2 text-[10px] sm:text-xs opacity-60 ${isInCriticalTime ? "font-medium" : ""}`}
-              >
-                {percentageRemaining}% remaining
-              </div>
+          <div className="text-sm sm:text-base font-bold opacity-50 mx-1">:</div>
+
+          {/* Minutes */}
+          <div className={`
+            flex flex-col items-center justify-center rounded border
+            ${styles.timeBg} ${styles.timeBorder} ${styles.timeText}
+            w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14
+          `}>
+            <div className="text-xs sm:text-sm md:text-base font-bold leading-none">
+              {minutes}
             </div>
+            <div className="text-[8px] sm:text-[9px] md:text-[10px] opacity-70 leading-none mt-0.5">
+              M
+            </div>
+          </div>
+
+          <div className="text-sm sm:text-base font-bold opacity-50 mx-1">:</div>
+
+          {/* Seconds */}
+          <div className={`
+            flex flex-col items-center justify-center rounded border
+            ${styles.timeBg} ${styles.timeBorder} ${styles.timeText}
+            w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14
+          `}>
+            <div className="text-xs sm:text-sm md:text-base font-bold leading-none">
+              {seconds}
+            </div>
+            <div className="text-[8px] sm:text-[9px] md:text-[10px] opacity-70 leading-none mt-0.5">
+              S
+            </div>
+          </div>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="w-full">
+          <div className={`
+            w-full h-1.5 sm:h-2 rounded-full overflow-hidden
+            ${theme === "light" ? "bg-gray-200" : "bg-gray-600"}
+          `}>
+            <div
+              className={`h-full transition-all duration-1000 ease-linear ${styles.progressBg}`}
+              style={{ width: `${percentageRemaining}%` }}
+            />
+          </div>
+          <div className="text-center text-[10px] sm:text-xs opacity-60 mt-1">
+            {percentageRemaining}% remaining
           </div>
         </div>
       </div>
     );
-
-
   }
-  // Dynamic styles based on time remaining
-  const getContainerStyles = () => {
-    const baseStyles =
-      "w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto p-3 sm:p-4 md:p-6 rounded-lg sm:rounded-xl text-center shadow-2xl transition-all duration-300";
 
-    if (isInFinalMinute) {
-      return `${baseStyles} ${theme === "light"
-        ? "bg-red-50 text-red-900 border-2 border-red-200 shadow-red-200"
-        : "bg-red-900 text-red-100 border-2 border-red-700 shadow-red-800"
-        } animate-pulse`;
-    }
-
-    if (isInCriticalTime) {
-      return `${baseStyles} ${theme === "light"
-        ? "bg-orange-50 text-orange-900 border-2 border-orange-200 shadow-orange-200"
-        : "bg-orange-900 text-orange-100 border-2 border-orange-700 shadow-orange-800"
-        }`;
-    }
-
-    return `${baseStyles} ${theme === "light"
-      ? "bg-white text-gray-900 border border-gray-200"
-      : "bg-gray-700 text-white border border-gray-600"
-      }`;
-  };
-
-  const getTimeBoxStyles = () => {
-    const baseStyles =
-      "flex-1 max-w-[60px] xs:max-w-[70px] sm:max-w-[80px] md:max-w-[90px] lg:max-w-[100px] xl:max-w-[110px] text-center p-2 sm:p-3 md:p-4 rounded-md sm:rounded-lg md:rounded-xl transition-all duration-300";
-
-    if (isInFinalMinute) {
-      return `${baseStyles} ${theme === "light"
-        ? "bg-red-100 text-red-900 border border-red-300"
-        : "bg-red-800 text-red-100 border border-red-600"
-        }`;
-    }
-
-    if (isInCriticalTime) {
-      return `${baseStyles} ${theme === "light"
-        ? "bg-orange-100 text-orange-900 border border-orange-300"
-        : "bg-orange-800 text-orange-100 border border-orange-600"
-        }`;
-    }
-
-    return `${baseStyles} ${theme === "light"
-      ? "bg-gray-100 text-gray-900 border border-gray-300"
-      : "bg-gray-600 text-white border border-gray-500"
-      }`;
-  };
-
-  const getTitleStyles = () => {
-    const baseStyles =
-      "text-xs sm:text-sm md:text-base lg:text-lg font-medium mb-2 sm:mb-3 md:mb-4 tracking-wide transition-all duration-300";
-
-    if (isInFinalMinute) {
-      return `${baseStyles} text-red-600 font-bold animate-pulse`;
-    }
-
-    if (isInCriticalTime) {
-      return `${baseStyles} text-orange-600 font-semibold`;
-    }
-
-    return baseStyles;
-  };
-
-  const getNumberStyles = () => {
-    const baseStyles =
-      "text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-bold transition-all duration-300";
-
-    if (isInFinalMinute) {
-      return `${baseStyles} font-black`;
-    }
-
-    if (isInCriticalTime) {
-      return `${baseStyles} font-extrabold`;
-    }
-
-    return baseStyles;
-  };
-
-  const getSeparatorStyles = () => {
-    const baseStyles =
-      "text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-semibold opacity-50 px-1 transition-all duration-300";
-
-    if (isInCriticalTime) {
-      return `${baseStyles} opacity-70`;
-    }
-
-    return baseStyles;
-  };
-
-  const getLabelStyles = () => {
-    const baseStyles =
-      "text-[9px] xs:text-[10px] sm:text-xs md:text-sm lg:text-base opacity-70 transition-all duration-300";
-
-    if (isInCriticalTime) {
-      return `${baseStyles} opacity-90 font-medium`;
-    }
-
-    return baseStyles;
-  };
-
+  // Default centered variant
   return (
-    <div className={getContainerStyles()}>
-      <h2 className={getTitleStyles()}>
-        {isInFinalMinute
-          ? "⚠️ FINAL MINUTE!"
-          : isInCriticalTime
-            ? "⏰ Time Running Out!"
-            : "Time Left"}
+    <div className={`
+      w-full max-w-sm mx-auto p-4 sm:p-6 rounded-xl border-2 shadow-2xl text-center
+      ${styles.containerBg} ${styles.containerBorder} ${styles.text} ${styles.animate}
+    `}>
+      {/* Title */}
+      <h2 className="text-base sm:text-lg font-semibold mb-4 sm:mb-6">
+        {styles.title}
       </h2>
 
-      <div className="flex justify-center items-center gap-1 sm:gap-2 md:gap-3 lg:gap-4">
+      {/* Timer Display */}
+      <div className="flex justify-center items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
         {/* Hours */}
-        <div className={getTimeBoxStyles()}>
-          <div className={getNumberStyles()}>{hours}</div>
-          <div className={getLabelStyles()}>Hours</div>
+        <div className={`
+          flex flex-col items-center justify-center rounded border-2
+          ${styles.timeBg} ${styles.timeBorder} ${styles.timeText}
+          w-16 h-16 sm:w-20 sm:h-20
+        `}>
+          <div className="text-lg sm:text-xl font-bold leading-none">
+            {hours}
+          </div>
+          <div className="text-[10px] sm:text-xs opacity-70 leading-none mt-1">
+            Hours
+          </div>
         </div>
 
-        <span className={getSeparatorStyles()}>:</span>
+        <div className="text-lg sm:text-xl font-bold opacity-50">:</div>
 
         {/* Minutes */}
-        <div className={getTimeBoxStyles()}>
-          <div className={getNumberStyles()}>{minutes}</div>
-          <div className={getLabelStyles()}>Minutes</div>
+        <div className={`
+          flex flex-col items-center justify-center rounded border-2
+          ${styles.timeBg} ${styles.timeBorder} ${styles.timeText}
+          w-16 h-16 sm:w-20 sm:h-20
+        `}>
+          <div className="text-lg sm:text-xl font-bold leading-none">
+            {minutes}
+          </div>
+          <div className="text-[10px] sm:text-xs opacity-70 leading-none mt-1">
+            Minutes
+          </div>
         </div>
 
-        <span className={getSeparatorStyles()}>:</span>
+        <div className="text-lg sm:text-xl font-bold opacity-50">:</div>
 
         {/* Seconds */}
-        <div className={getTimeBoxStyles()}>
-          <div className={getNumberStyles()}>{seconds}</div>
-          <div className={getLabelStyles()}>Seconds</div>
+        <div className={`
+          flex flex-col items-center justify-center rounded border-2
+          ${styles.timeBg} ${styles.timeBorder} ${styles.timeText}
+          w-16 h-16 sm:w-20 sm:h-20
+        `}>
+          <div className="text-lg sm:text-xl font-bold leading-none">
+            {seconds}
+          </div>
+          <div className="text-[10px] sm:text-xs opacity-70 leading-none mt-1">
+            Seconds
+          </div>
         </div>
       </div>
 
-      {/* Progress bar for visual indication */}
-      <div className="mt-3 sm:mt-4 md:mt-5">
-        <div
-          className={`w-full h-1 sm:h-2 rounded-full overflow-hidden ${theme === "light" ? "bg-gray-200" : "bg-gray-600"
-            }`}
-        >
+      {/* Progress Bar */}
+      <div className="w-full">
+        <div className={`
+          w-full h-2 sm:h-3 rounded-full overflow-hidden
+          ${theme === "light" ? "bg-gray-200" : "bg-gray-600"}
+        `}>
           <div
-            className={`h-full transition-all duration-1000 ease-linear ${isInFinalMinute
-              ? "bg-red-500 animate-pulse"
-              : isInCriticalTime
-                ? "bg-orange-500"
-                : "bg-green-500"
-              }`}
+            className={`h-full transition-all duration-1000 ease-linear ${styles.progressBg}`}
             style={{ width: `${percentageRemaining}%` }}
           />
         </div>
-        <div
-          className={`mt-1 sm:mt-2 text-[10px] sm:text-xs opacity-60 ${isInCriticalTime ? "font-medium" : ""
-            }`}
-        >
+        <div className="text-xs opacity-60 mt-2">
           {percentageRemaining}% remaining
         </div>
       </div>

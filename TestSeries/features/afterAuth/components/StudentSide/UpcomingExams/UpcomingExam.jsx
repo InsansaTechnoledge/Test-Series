@@ -69,23 +69,33 @@ const UpcomingExam = () => {
   }, []);
 
   useEffect(() => {
-    if (!exams) return;
-
-    console.log("test", exams);
-
-    const upcoming = exams.filter(exam => exam.go_live === false || exam.go_live === "FALSE");
+    if (!exams || !Array.isArray(exams)) return;
+  
+    const isTrue = (val) => val === true || val === 'TRUE' || val === 'true' || val === 1 || val === '1';
+    const isFalse = (val) => val === false || val === 'FALSE' || val === 'false' || val === 0 || val === '0';
+  
+    const upcoming = exams.filter(exam => isFalse(exam.go_live));
+  
     const live = exams.filter(
-      exam => (exam.go_live === true || exam.go_live === "TRUE") && exam.hasAttempted !== true || exam.reapplicable === true
+      exam => (
+        isTrue(exam.go_live) &&
+        (!exam.hasAttempted || isTrue(exam.reapplicable))
+      )
     );
-    const attempted = exams.filter(exam => 
-      exam.hasAttempted === true && (exam.reapplicable === false || exam.reapplicable == null)
+  
+    const attempted = exams.filter(
+      exam => exam.hasAttempted === true && (isFalse(exam.reapplicable) || exam.reapplicable == null)
     );
-    
+  
+    console.log("🧪 Normalized Exams", { upcoming, live, attempted });
+  
     setUpcomingExams(upcoming);
     setLiveExams(live);
     setAttemptedExams(attempted);
+  }, [exams]);
+  
 
-  }, [JSON.stringify(exams)]);
+  console.log("liveExam" , liveExams)
 
   const showProctorWarning = (warning) => {
     // Create a warning notification

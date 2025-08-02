@@ -66,6 +66,7 @@ import LeaderBoard from '../../features/afterAuth/components/StudentSide/Coding-
 import ExamAnomalyControlSection from '../../features/afterAuth/components/InstituteSide/ExamFlow/ExamAnomalyControl/ExamAnomalyControlSection';
 import QBMS from '../../features/afterAuth/components/InstituteSide/QuestionBankManagementSystem/QBMS';
 import AppDownloadPage from '../../features/App/AppDownloadPage';
+import CertificateAssignment from '../../features/afterAuth/components/InstituteSide/Certificate_Assignment/CertificateAssignment';
 
 let Router = window.electronAPI ? HashRouter : BrowserRouter;
 
@@ -366,6 +367,7 @@ const PageLinks = () => {
         <Route path='syllabus/:syllabusId' element={<SyllabusViewPage />} />
         <Route path='qbms/:id' element={<QBMS/>}/>
         <Route path='download-app' element={<AppDownloadPage/>}/>
+        <Route path='certificate-assignment' element={<CertificateAssignment/>}/>
         {user?.role === "organization" && (
           <Route path='institute-subscription' element={<YourPlanPage />} />
         )}
