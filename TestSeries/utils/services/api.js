@@ -5,7 +5,8 @@ const PRODUCTION_SERVERS = [
   // "https://test-series-1new.onrender.com/api",
   // "https://test-series-backup-server1.onrender.com/api",
   // "https://backup-server-test-series2.onrender.com/api",
-  "https://test-series-03sa.onrender.com/api"
+  "https://test-series-03sa.onrender.com/api",
+  "https://test-series-1.onrender.com/api"
 ];
 
 let currentServerIndex = 0;

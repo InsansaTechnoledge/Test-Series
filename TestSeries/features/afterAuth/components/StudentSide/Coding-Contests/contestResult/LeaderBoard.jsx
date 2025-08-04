@@ -15,6 +15,7 @@ import {
 import { getLeaderBoard } from "../../../../../../utils/services/contestService";
 import { useUser } from "../../../../../../contexts/currentUserContext";
 import useCachedContests from "../../../../../../hooks/useCachedContests";
+import { useCachedStudents } from "../../../../../../hooks/useCachedStudents";
 import { useTheme } from "../../../../../../hooks/useTheme";
   
 const LeaderBoard = () => {
@@ -24,6 +25,7 @@ const LeaderBoard = () => {
   const [selectedContest, setSelectedContest] = useState(null);
   const { user } = useUser();
   const { contestMap } = useCachedContests();
+  const { studentMap } = useCachedStudents();
   const { theme } = useTheme();
 
   console.log("d",contestMap[selectedContest])
@@ -47,11 +49,20 @@ const LeaderBoard = () => {
 
   const CHART_COLORS = [colors.success, colors.danger];
 
+  // Helper function to get student name
+  const getStudentName = (participantId) => {
+    if (participantId === user?._id) {
+      return user?.name || 'You';
+    }
+    return studentMap[participantId]?.name || 'Unknown Student';
+  };
+
   // Fetch leaderboard data
   useEffect(() => {
     const fetchLeaderBoard = async () => {
       try {
         const response = await getLeaderBoard();
+        console.log("huhu2" , response)
         if (Array.isArray(response?.data)) {
           setLeaderBoardData(response.data);
 
@@ -75,6 +86,8 @@ const LeaderBoard = () => {
 
     fetchLeaderBoard();
   }, []);
+
+  // console.log("huhu" , user)
 
   // Filter progress for current user
   useEffect(() => {
@@ -365,6 +378,7 @@ const LeaderBoard = () => {
                       const heights = ['h-32', 'h-40', 'h-28'];
                       const positions = [1, 0, 2]; // 2nd, 1st, 3rd
                       const actualIndex = positions[index];
+                      const studentName = getStudentName(participant.participant_id);
                       
                       return (
                         <div key={participant.participant_id} className="flex flex-col items-center">
@@ -377,12 +391,12 @@ const LeaderBoard = () => {
                             <div className="text-lg">{participant.total_score?.totalObtainedMarks}</div>
                             <div className="text-xs opacity-90">points</div>
                           </div>
-                          <div className={`mt-2 px-3 py-1 rounded-full text-sm font-medium ${
+                          <div className={`mt-2 px-3 py-1 rounded-full text-sm font-medium text-center max-w-24 truncate ${
                             isCurrentUser 
                               ? (isDark ? 'bg-indigo-900 text-indigo-100 border-2 border-indigo-600' : 'bg-indigo-100 text-indigo-800 border-2 border-indigo-300')
                               : (isDark ? 'bg-gray-600 text-gray-100' : 'bg-gray-100 text-gray-700')
-                          }`}>
-                            {isCurrentUser ? 'You' : 'Student'}
+                          }`} title={studentName}>
+                            {isCurrentUser ? 'You' : studentName}
                           </div>
                         </div>
                       );
@@ -400,6 +414,7 @@ const LeaderBoard = () => {
                     .sort((a, b) => b.total_score?.totalObtainedMarks - a.total_score?.totalObtainedMarks)
                     .map((participant, index) => {
                       const isCurrentUser = participant.participant_id === user?._id;
+                      const studentName = getStudentName(participant.participant_id);
                       const percentage = getScorePercentage(
                         participant.total_score?.totalObtainedMarks,
                         participant.total_score?.totalMarks
@@ -428,7 +443,7 @@ const LeaderBoard = () => {
                                   ? (isDark ? 'text-indigo-300' : 'text-indigo-700')
                                   : (isDark ? 'text-gray-300' : 'text-gray-900')
                               }`}>
-                                {isCurrentUser ? 'You' : 'Student'}
+                                {isCurrentUser ? 'You' : studentName}
                               </div>
                               <div className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
                                 Rank {index + 1}
