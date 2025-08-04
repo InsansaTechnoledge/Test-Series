@@ -411,13 +411,6 @@ const TestWindow = () => {
       console.log("Submitting test with examId:", examId);
       console.log("Subject Specific Questions:", subjectSpecificQuestions);
 
-      localStorage.removeItem("testQuestions");
-      localStorage.removeItem(`encryptedTimeLeft_${examId}`);
-      localStorage.removeItem(`selectedSubject_${examId}`);
-      localStorage.removeItem(`selectedQuestion_${examId}`);
-      localStorage.removeItem(`examViolations_${examId}`);
-      localStorage.removeItem(`warningCount_${examId}`);
-
       const answers = calculateResultPayload(
         subjectSpecificQuestions,
         getCorrectResponse
@@ -439,6 +432,12 @@ const TestWindow = () => {
           "Please wait while we process your submission",
           0
         );
+        localStorage.removeItem("testQuestions");
+      localStorage.removeItem(`encryptedTimeLeft_${examId}`);
+      localStorage.removeItem(`selectedSubject_${examId}`);
+      localStorage.removeItem(`selectedQuestion_${examId}`);
+      localStorage.removeItem(`examViolations_${examId}`);
+      localStorage.removeItem(`warningCount_${examId}`);
         await window.electronAPI?.clearDbEvents();
         setSubmitted(true);
         if (document.fullscreenElement) {

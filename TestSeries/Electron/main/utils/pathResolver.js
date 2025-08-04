@@ -40,10 +40,12 @@ class PathResolver {
       } else {
         // Windows/Linux paths
         possiblePaths.push(
+
+          path.join(process.resourcesPath, 'dist', 'index.html'),
+                              path.join(process.resourcesPath, 'app.asar.unpacked', 'dist', 'index.html'),
           path.join(__dirname, 'dist-electron', 'dist', 'index.html'),
           path.join(__dirname, 'dist-electron', 'index.html'),
-          path.join(process.resourcesPath, 'app.asar.unpacked', 'dist', 'index.html'),
-          path.join(process.resourcesPath, 'dist', 'index.html')
+
         );
       }
     }
