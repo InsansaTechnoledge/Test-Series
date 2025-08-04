@@ -5,7 +5,7 @@ REM Set relative paths based on current (electron) directory
 set "ELECTRON_PATH=%cd%"
 set "TEST_SERIES_PATH=%ELECTRON_PATH%\.."
 set "AI_PROCTOR_PATH=%TEST_SERIES_PATH%\..\ai-proctor-engine"
-set "DIST_SOURCE=%TEST_SERIES_PATH%\dist"
+set "DIST_SOURCE=%TEST_SERIES_PATH%\dist.electron"
 set "ELECTRON_DIST_PATH=%ELECTRON_PATH%\dist-electron"
 set "DIST_TARGET=%ELECTRON_DIST_PATH%\dist"
 
@@ -24,7 +24,7 @@ popd
 echo.
 echo [2/4] Building TestSeries React app...
 pushd "%TEST_SERIES_PATH%"
-    call npm run build
+    call npm run build:electron
 popd
 
 echo.
@@ -54,8 +54,10 @@ xcopy "%DIST_SOURCE%" "%DIST_TARGET%" /e /i /h /y >nul
 echo.
 echo [4/4] Building Electron Windows app...
 cd /d "%ELECTRON_PATH%"
-call npm run build:win -- --publish always
+call npm install
+call npm run build:win
 
 echo.
 echo ✅ All steps completed successfully!
+rmdir /s /q "%DIST_SOURCE%"
 pause
