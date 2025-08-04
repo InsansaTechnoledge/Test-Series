@@ -25,6 +25,7 @@ const QuestionSection = ({
   const navigate = useNavigate();
   const hasRestored = useRef(false);
   const isInitialLoad = useRef(true);
+  const [submitCool , setSubmitCool] = useState(false)
 
   useEffect(() => {
     if (hasRestored.current || !isInitialLoad.current) return;
@@ -469,7 +470,14 @@ const QuestionSection = ({
 
         <div className="order-1 sm:order-2">
           <button
-            onClick={() => setShowSubmitModal(true)}
+            onClick={ () => {
+              if(!submitCool) {
+                setSubmitCool(true)
+                setShowSubmitModal(true)
+                setTimeout(() => setSubmitCool(false),10000)
+              }
+            }}
+            disabled={submitCool}
             className={`px-6 py-2 rounded-md text-lg font-semibold shadow transition-all duration-200
                           ${theme === "light"
                 ? "bg-blue-900 text-white hover:bg-blue-800"
@@ -477,7 +485,7 @@ const QuestionSection = ({
               }
                         `}
           >
-            Submit Test
+            {submitCool ? "Please wait..." : "Submit Test"}
           </button>
         </div>
       </div>

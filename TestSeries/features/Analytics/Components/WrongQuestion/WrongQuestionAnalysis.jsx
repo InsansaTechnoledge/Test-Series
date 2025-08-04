@@ -7,6 +7,8 @@ const WrongQuestionAnalysis = ({ examData, currentStudentId, examQuestions }) =>
     const stats = {};
     if (!Array.isArray(examData)) return [];
 
+    console.log("fufu" , examData)
+
     examData.forEach(student => {
       const wrongs = student.wrongAnswers || [];
 
@@ -41,16 +43,19 @@ const WrongQuestionAnalysis = ({ examData, currentStudentId, examQuestions }) =>
               if (question_type === 'match' && typeof correct_pairs === 'object') {
                 return Object.entries(correct_pairs).map(([k, v]) => `${k}: ${v}`).join(', ');
               }
+              // if(question_type === 'numerical') {
+              //   return typeof correct_answer === 'number' || typeof correct_answer === 'string' ? Number(correct_answer) : 'N/A'
+              // }
               return correct_answer || 'N/A';
             })(),
 
             yourResponse: (() => {
               const question = examQuestions[qid];
               if (!question) return 'N/A';
-
+            
               const { question_type, options } = question;
               const response = wrong.response;
-
+            
               if ((question_type === 'mcq' || question_type === 'msq') && Array.isArray(response)) {
                 return response.map(i => options?.[i]).filter(Boolean).join(', ') || 'N/A';
               }
@@ -60,10 +65,17 @@ const WrongQuestionAnalysis = ({ examData, currentStudentId, examQuestions }) =>
               if (question_type === 'match' && typeof response === 'object') {
                 return Object.entries(response).map(([k, v]) => `${k}: ${v}`).join(', ');
               }
+              // if (question_type === 'numerical') {
+              //   return typeof response === 'number' || typeof response === 'string'
+              //     ? Number(response)
+              //     : 'N/A';
+              // }
+            
               return typeof response === 'string' || typeof response === 'number'
                 ? response
                 : JSON.stringify(response);
             })(),
+            
 
             totalWrong: 0,
             studentIds: new Set(),

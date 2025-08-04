@@ -231,19 +231,32 @@ const Navbar = ({setShowLogoutModal}) => {
 
   const location = useLocation();
   console.log(location)
+
+  const helperFunctionToNavigateHome = (role) => {
+      if(role === 'student') return navigate('/student/student-landing')
+      
+      if(role === 'organization' || role === 'user') return navigate('/institute/institute-landing')
+
+      else {
+        navigate('/')
+      }
+  }
   
   return (
     <nav className={`z-50 ${themeClasses.nav}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           {/* Left side - Logo */}
-          <div className="flex items-center">
+          <button 
+            onClick={() => helperFunctionToNavigateHome(user?.role)}
+            className="flex items-center cursor-pointer">
+            
             <img 
               src={ theme === 'light' ? logo : logoDark} 
               alt="Evalvo" 
               className="h-8 w-auto"
             />
-          </div>
+          </button>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4">
@@ -468,55 +481,58 @@ const Navbar = ({setShowLogoutModal}) => {
                         Tools & Products
                       </div>
                       
-                      <div className="relative group">
-                        <button
-                          onClick={() => {
-                            navigate(`/qbms/${user._id}`);
-                            setShowProfileDropdown(false);
-                            setActiveCategory('');
-                          }}
-                          className={`w-full flex items-center px-3 py-3 text-sm rounded-lg transition-all duration-200 ${themeClasses.dropdownItem} ${theme === 'light' ? 'hover:bg-gray-50 group-hover:shadow-md' : 'hover:bg-gray-700 group-hover:shadow-md'}`}
-                        >
-                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 ${theme === 'light' ? 'bg-gradient-to-br from-green-100 to-emerald-100' : 'bg-gradient-to-br from-green-900 to-emerald-900'}`}>
-                            <svg className={`w-4 h-4 ${theme === 'light' ? 'text-green-600' : 'text-green-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
+                     
+
+                      {
+                        user?.role !== 'student' && (
+                          <div className="relative group">
+                          <button
+                            onClick={() => {
+                              navigate(`/qbms/${user._id}`);
+                              setShowProfileDropdown(false);
+                              setActiveCategory('');
+                            }}
+                            className={`w-full flex items-center px-3 py-3 text-sm rounded-lg transition-all duration-200 ${themeClasses.dropdownItem} ${theme === 'light' ? 'hover:bg-gray-50 group-hover:shadow-md' : 'hover:bg-gray-700 group-hover:shadow-md'}`}
+                          >
+                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 ${theme === 'light' ? 'bg-gradient-to-br from-green-100 to-emerald-100' : 'bg-gradient-to-br from-green-900 to-emerald-900'}`}>
+                              <svg className={`w-4 h-4 ${theme === 'light' ? 'text-green-600' : 'text-green-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                            </div>
+                            <div className="flex-1 text-left">
+                              <div className="flex items-center">
+                                <span className="font-medium">QBMS</span>
+                                <span className="ml-2 bg-green-100 text-green-800 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-green-300 shadow-sm">
+                                  NEW
+                                </span>
+                              </div>
+                              <div className={`text-xs mt-0.5 ${themeClasses.textSecondary}`}>
+                                Question Bank Management
+                              </div>
+                            </div>
+                          </button>
+                          <button
+                            onClick={() => navigate('/certificate-assignment')}
+                            className={`w-full flex items-center px-3 py-3 text-sm rounded-lg transition-all duration-200 ${themeClasses.dropdownItem} ${theme === 'light' ? 'hover:bg-gray-50' : 'hover:bg-gray-700'}`}
+                          >
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 ${theme === 'light' ? 'bg-indigo-100' : 'bg-indigo-900'}`}>
+                            <PaperclipIcon className={`w-4 h-4 ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-400'}`}/>
                           </div>
                           <div className="flex-1 text-left">
-                            <div className="flex items-center">
-                              <span className="font-medium">QBMS</span>
-                              <span className="ml-2 bg-green-100 text-green-800 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-green-300 shadow-sm">
-                                NEW
-                              </span>
-                            </div>
-                            <div className={`text-xs mt-0.5 ${themeClasses.textSecondary}`}>
-                              Question Bank Management
-                            </div>
-                          </div>
-                        </button>
-                      </div>
-
-                      <button
-                         onClick={() => navigate('/certificate-assignment')}
-                         className={`w-full flex items-center px-3 py-3 text-sm rounded-lg transition-all duration-200 ${themeClasses.dropdownItem} ${theme === 'light' ? 'hover:bg-gray-50' : 'hover:bg-gray-700'}`}
-                      >
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 ${theme === 'light' ? 'bg-indigo-100' : 'bg-indigo-900'}`}>
-                          <PaperclipIcon className={`w-4 h-4 ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-400'}`}/>
+                             <div className="flex items-center">
+                               <span className="font-medium"> Certificates</span>
+                               <span className="ml-2 bg-yellow-100 text-yellow-800 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-yellow-300 shadow-sm">
+                                 NEW
+                               </span>
+                             </div>
+                             <div className={`text-xs mt-0.5 ${themeClasses.textSecondary}`}>
+                               Choose Cerificates
+                             </div>
+                           </div>
+                          </button>
                         </div>
-                        <div className="flex-1 text-left">
-                            <div className="flex items-center">
-                              <span className="font-medium"> Certificates</span>
-                              <span className="ml-2 bg-yellow-100 text-yellow-800 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-yellow-300 shadow-sm">
-                                NEW
-                              </span>
-                            </div>
-                            <div className={`text-xs mt-0.5 ${themeClasses.textSecondary}`}>
-                              Choose Cerificates
-                            </div>
-                          </div>
-                       
-                      </button>
-
+                        )
+                      }
                       <button 
                         onClick={() => navigate('/download-app')}
                         className={`w-full flex items-center px-3 py-3 text-sm rounded-lg transition-all duration-200 ${themeClasses.dropdownItem} ${theme === 'light' ? 'hover:bg-gray-50' : 'hover:bg-gray-700'}`}
