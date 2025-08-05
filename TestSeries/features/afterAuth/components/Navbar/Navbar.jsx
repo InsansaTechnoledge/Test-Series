@@ -431,7 +431,7 @@ const Navbar = ({setShowLogoutModal}) => {
                         Account
                       </div>
                       
-                      {(user?.role === 'user' || user?.role === 'student') && (
+                      {(user?.role === 'student') && (
                         <button
                           onClick={() => {
                             if (user?._id ) {
