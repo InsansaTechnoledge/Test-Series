@@ -1,7 +1,7 @@
 import { Info, Settings, Monitor, Smartphone, Tablet, ArrowDownWideNarrow, ArrowDown, ArrowUp } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import SideBarDataHook from '../../data/sideBarDataHook';
+import SideBarDataHook from '../../data/SideBarDataHook';
 import dockLight from '../../../../assests/Institute/dockLight.svg'
 import dockDark from '../../../../assests/Institute/dockDark.svg'
 
@@ -10,6 +10,7 @@ import { useDock } from '../Navbar/context/DockContext';
 
 export default function BottomNavigator({ setShowLogoutModal }) {
   const {isDockToggled} = useDock();
+
 
   if (!isDockToggled) return null;
 
