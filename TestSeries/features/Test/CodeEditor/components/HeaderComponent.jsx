@@ -146,7 +146,7 @@ const HeaderComponent = ({
         {/* Right Section - Controls */}
         <div className="flex items-center space-x-2 sm:text-xs">
           {/* Action Buttons */}
-          <div className="flex items-center space-x-1">
+          <div className="flex items-center space-x-2">
             <button
               onClick={resetCode}
               className={runButtonStyles}
