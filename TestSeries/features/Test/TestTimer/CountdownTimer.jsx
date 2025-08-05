@@ -112,7 +112,7 @@ function CountdownTimer({
         animate: "animate-pulse"
       };
     }
-    
+
     if (isInCriticalTime) {
       return {
         containerBg: theme === "light" ? "bg-orange-50" : "bg-orange-950",
@@ -144,62 +144,145 @@ function CountdownTimer({
 
   if (variant === "header") {
     return (
-      <div className={`
-        w-full p-3 sm:p-4 rounded-lg border-2 shadow-lg
+      <div className={`sm:p-3 rounded-lg border-2 shadow-lg w-full
         ${styles.containerBg} ${styles.containerBorder} ${styles.text} ${styles.animate}
       `}>
-        {/* Header Title */}
-        <div className="text-center mb-3">
-          <h2 className="text-sm sm:text-base font-semibold">
-            {styles.title}
-          </h2>
-        </div>
+        <div className="grid grid-cols-[0.3fr_0.5fr_3fr] gap-1 w-full sm:h-10 md:h-10 items-center-safe">
 
-        {/* Timer Display */}
-        <div className="flex justify-center items-center gap-1 sm:gap-2 mb-3">
-          {/* Hours */}
-          <div className={`
+          {/* Header Title */}
+          <div className="text-center mb-1 sm:mb-1 px-2">
+            <h2 className="text-sm sm:text-base font-semibold">
+              {styles.title} :
+            </h2>
+          </div>
+          {/* Timer Display */}
+          <div className="flex justify-center items-center gap-3 sm:gap-3 mb-1 px-4">
+
+            {/* Hours */}
+            <div className={`
             flex flex-col items-center justify-center rounded border
             ${styles.timeBg} ${styles.timeBorder} ${styles.timeText}
-            w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14
+            w-5 h-5 sm:w-5 sm:h-5 md:w-12 md:h-12
           `}>
-            <div className="text-xs sm:text-sm md:text-base font-bold leading-none">
-              {hours}
+              <div className="text-xs sm:text-sm md:text-base font-bold leading-none">
+                {hours}
+              </div>
+              <div className="text-[8px] sm:text-[9px] md:text-[10px] opacity-70 leading-none mt-0.5">
+                H
+              </div>
             </div>
-            <div className="text-[8px] sm:text-[9px] md:text-[10px] opacity-70 leading-none mt-0.5">
-              H
+
+            <div className="text-sm sm:text-base font-bold opacity-50 mx-1">:</div>
+
+            {/* Minutes */}
+            <div className={`
+            flex flex-col items-center justify-center rounded border
+            ${styles.timeBg} ${styles.timeBorder} ${styles.timeText}
+            w-10 h-10 sm:w-12 sm:h-12 md:w-12 md:h-12
+          `}>
+              <div className="text-xs sm:text-sm md:text-base font-bold leading-none">
+                {minutes}
+              </div>
+              <div className="text-[8px] sm:text-[9px] md:text-[10px] opacity-70 leading-none mt-0.5">
+                M
+              </div>
+            </div>
+
+            <div className="text-sm sm:text-base font-bold opacity-50 mx-1">:</div>
+
+            {/* Seconds */}
+            <div className={`
+            flex flex-col items-center justify-center rounded border
+            ${styles.timeBg} ${styles.timeBorder} ${styles.timeText}
+            w-10 h-10 sm:w-12 sm:h-12 md:w-12 md:h-12
+          `}>
+              <div className="text-xs sm:text-sm md:text-base font-bold leading-none">
+                {seconds}
+              </div>
+              <div className="text-[8px] sm:text-[9px] md:text-[10px] opacity-70 leading-none mt-0.5">
+                S
+              </div>
             </div>
           </div>
 
-          <div className="text-sm sm:text-base font-bold opacity-50 mx-1">:</div>
+
+          {/* Progress Bar */}
+          <div className="w-full items-center">
+            <div className={`
+            w-full h-1.5 sm:h-2 rounded-full overflow-hidden
+            ${theme === "light" ? "bg-gray-200" : "bg-gray-600"}
+          `}>
+              <div
+                className={`h-full transition-all duration-1000 ease-linear ${styles.progressBg}`}
+                style={{ width: `${percentageRemaining}%` }}
+              />
+            </div>
+            <div className="text-center text-[10px] sm:text-xs opacity-60 mt-1">
+              {percentageRemaining}% remaining
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  else {
+    // Default centered variant
+    return (
+      <div className={`
+      w-full max-w-sm mx-auto p-4 sm:p-6 rounded-xl border-2 shadow-2xl text-center
+      ${styles.containerBg} ${styles.containerBorder} ${styles.text} ${styles.animate}
+    `}>
+        {/* Title */}
+        <h2 className="text-base sm:text-lg font-semibold mb-4 sm:mb-6">
+          {styles.title}
+        </h2>
+
+        {/* Timer Display */}
+        <div className="flex justify-center items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+          {/* Hours */}
+          <div className={`
+          flex flex-col items-center justify-center rounded border-2
+          ${styles.timeBg} ${styles.timeBorder} ${styles.timeText}
+          w-16 h-16 sm:w-20 sm:h-20
+        `}>
+            <div className="text-lg sm:text-xl font-bold leading-none">
+              {hours}
+            </div>
+            <div className="text-[10px] sm:text-xs opacity-70 leading-none mt-1">
+              Hours
+            </div>
+          </div>
+
+          <div className="text-lg sm:text-xl font-bold opacity-50">:</div>
 
           {/* Minutes */}
           <div className={`
-            flex flex-col items-center justify-center rounded border
-            ${styles.timeBg} ${styles.timeBorder} ${styles.timeText}
-            w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14
-          `}>
-            <div className="text-xs sm:text-sm md:text-base font-bold leading-none">
+          flex flex-col items-center justify-center rounded border-2
+          ${styles.timeBg} ${styles.timeBorder} ${styles.timeText}
+          w-16 h-16 sm:w-20 sm:h-20
+        `}>
+            <div className="text-lg sm:text-xl font-bold leading-none">
               {minutes}
             </div>
-            <div className="text-[8px] sm:text-[9px] md:text-[10px] opacity-70 leading-none mt-0.5">
-              M
+            <div className="text-[10px] sm:text-xs opacity-70 leading-none mt-1">
+              Minutes
             </div>
           </div>
 
-          <div className="text-sm sm:text-base font-bold opacity-50 mx-1">:</div>
+          <div className="text-lg sm:text-xl font-bold opacity-50">:</div>
 
           {/* Seconds */}
           <div className={`
-            flex flex-col items-center justify-center rounded border
-            ${styles.timeBg} ${styles.timeBorder} ${styles.timeText}
-            w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14
-          `}>
-            <div className="text-xs sm:text-sm md:text-base font-bold leading-none">
+          flex flex-col items-center justify-center rounded border-2
+          ${styles.timeBg} ${styles.timeBorder} ${styles.timeText}
+          w-16 h-16 sm:w-20 sm:h-20
+        `}>
+            <div className="text-lg sm:text-xl font-bold leading-none">
               {seconds}
             </div>
-            <div className="text-[8px] sm:text-[9px] md:text-[10px] opacity-70 leading-none mt-0.5">
-              S
+            <div className="text-[10px] sm:text-xs opacity-70 leading-none mt-1">
+              Seconds
             </div>
           </div>
         </div>
@@ -207,99 +290,21 @@ function CountdownTimer({
         {/* Progress Bar */}
         <div className="w-full">
           <div className={`
-            w-full h-1.5 sm:h-2 rounded-full overflow-hidden
-            ${theme === "light" ? "bg-gray-200" : "bg-gray-600"}
-          `}>
+          w-full h-2 sm:h-3 rounded-full overflow-hidden
+          ${theme === "light" ? "bg-gray-200" : "bg-gray-600"}
+        `}>
             <div
               className={`h-full transition-all duration-1000 ease-linear ${styles.progressBg}`}
               style={{ width: `${percentageRemaining}%` }}
             />
           </div>
-          <div className="text-center text-[10px] sm:text-xs opacity-60 mt-1">
+          <div className="text-xs opacity-60 mt-2">
             {percentageRemaining}% remaining
           </div>
         </div>
       </div>
     );
   }
-
-  // Default centered variant
-  return (
-    <div className={`
-      w-full max-w-sm mx-auto p-4 sm:p-6 rounded-xl border-2 shadow-2xl text-center
-      ${styles.containerBg} ${styles.containerBorder} ${styles.text} ${styles.animate}
-    `}>
-      {/* Title */}
-      <h2 className="text-base sm:text-lg font-semibold mb-4 sm:mb-6">
-        {styles.title}
-      </h2>
-
-      {/* Timer Display */}
-      <div className="flex justify-center items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-        {/* Hours */}
-        <div className={`
-          flex flex-col items-center justify-center rounded border-2
-          ${styles.timeBg} ${styles.timeBorder} ${styles.timeText}
-          w-16 h-16 sm:w-20 sm:h-20
-        `}>
-          <div className="text-lg sm:text-xl font-bold leading-none">
-            {hours}
-          </div>
-          <div className="text-[10px] sm:text-xs opacity-70 leading-none mt-1">
-            Hours
-          </div>
-        </div>
-
-        <div className="text-lg sm:text-xl font-bold opacity-50">:</div>
-
-        {/* Minutes */}
-        <div className={`
-          flex flex-col items-center justify-center rounded border-2
-          ${styles.timeBg} ${styles.timeBorder} ${styles.timeText}
-          w-16 h-16 sm:w-20 sm:h-20
-        `}>
-          <div className="text-lg sm:text-xl font-bold leading-none">
-            {minutes}
-          </div>
-          <div className="text-[10px] sm:text-xs opacity-70 leading-none mt-1">
-            Minutes
-          </div>
-        </div>
-
-        <div className="text-lg sm:text-xl font-bold opacity-50">:</div>
-
-        {/* Seconds */}
-        <div className={`
-          flex flex-col items-center justify-center rounded border-2
-          ${styles.timeBg} ${styles.timeBorder} ${styles.timeText}
-          w-16 h-16 sm:w-20 sm:h-20
-        `}>
-          <div className="text-lg sm:text-xl font-bold leading-none">
-            {seconds}
-          </div>
-          <div className="text-[10px] sm:text-xs opacity-70 leading-none mt-1">
-            Seconds
-          </div>
-        </div>
-      </div>
-
-      {/* Progress Bar */}
-      <div className="w-full">
-        <div className={`
-          w-full h-2 sm:h-3 rounded-full overflow-hidden
-          ${theme === "light" ? "bg-gray-200" : "bg-gray-600"}
-        `}>
-          <div
-            className={`h-full transition-all duration-1000 ease-linear ${styles.progressBg}`}
-            style={{ width: `${percentageRemaining}%` }}
-          />
-        </div>
-        <div className="text-xs opacity-60 mt-2">
-          {percentageRemaining}% remaining
-        </div>
-      </div>
-    </div>
-  );
 }
 
 export default CountdownTimer;

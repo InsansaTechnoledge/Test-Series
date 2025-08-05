@@ -14,17 +14,23 @@ export const ThemeProvider = ({ children }) => {
   // Function to get initial theme
   const getInitialTheme = () => {
     // Check localStorage first
-    if (typeof window !== 'undefined') {
+    // if (typeof window !== 'undefined') {
       const savedTheme = localStorage.getItem('theme');
       if (savedTheme) {
         return savedTheme;
       }
-    }
+    // }
     // Fall back to system preference
     return getSystemPreference();
   };
 
-  const [theme, setTheme] = useState(getInitialTheme);
+    const [theme, setTheme] = useState(getInitialTheme());
+
+    useEffect(() => {
+    // Initialize theme on mount
+    const initialTheme = getInitialTheme();
+    setTheme(initialTheme);
+  }, []);
 
   // Save to localStorage whenever theme changes
   useEffect(() => {

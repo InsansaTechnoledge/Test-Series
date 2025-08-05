@@ -297,6 +297,14 @@ const CodingPlatform = () => {
     }
   };
 
+  const resetCode = () => {
+    localStorage.removeItem(`contest_${contest_id}_problem_${problem.question_id}_language_${language}_code_`);
+    setCode(problem?.code_snippets?.find(snip => snip.langSlug === language)?.code || "");
+    setOutput("");
+    setTestResults([]);
+    setErrors([]);
+  };
+
   if (loading) {
     return (
       <div
@@ -342,6 +350,7 @@ const CodingPlatform = () => {
             editorTheme={editorTheme}
             setEditorTheme={setEditorTheme}
             submitContest={submitContest}
+            resetCode={resetCode}
           />
 
           <div className="flex-1 flex overflow-hidden">
