@@ -31,10 +31,10 @@ class PathResolver {
       if (process.platform === 'darwin') {
         // macOS paths
         possiblePaths.push(
+            path.join(process.resourcesPath, 'app' , 'dist', 'index.html'),  
           path.join(__dirname, 'dist', 'index.html'),              
           path.join(__dirname, '..', 'dist', 'index.html'),        
           path.join(process.resourcesPath, 'app.asar.unpacked', 'dist', 'index.html'),
-          path.join(process.resourcesPath, 'dist', 'index.html'),  
           path.join(process.resourcesPath, 'frontend', 'index.html')
         );
       } else {

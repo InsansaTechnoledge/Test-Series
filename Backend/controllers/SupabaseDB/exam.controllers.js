@@ -1,4 +1,4 @@
-import { createExam, deleteExam, fetchSelective, updateExam, setExamLive, fetchNonLiveExams, fetchExamsWithoutQuestionsQuery, fetchExamNameById, getExamCountForOrg, getAnalyticsFromBatchExam } from '../../utils/SqlQueries/exam.queries.js';
+import { createExam, deleteExam, fetchSelective, updateExam, setExamLive, fetchNonLiveExams, fetchExamsWithoutQuestionsQuery, fetchExamNameById, getExamCountForOrg, getAnalyticsFromBatchExam, addCertificate } from '../../utils/SqlQueries/exam.queries.js';
 import { APIError } from '../../utils/ResponseAndError/ApiError.utils.js'
 import { APIResponse } from '../../utils/ResponseAndError/ApiResponse.utils.js'
 import Result from '../../models/SecondDB/result.model.js';
@@ -230,4 +230,20 @@ export const fetchAnalyticsExamAndBatch=async (req, res) => {
   ).send(res);
 }
 
+};
+
+export const addCertificateToExam = async (req, res) => {
+  try {
+    const { id, certificate_template_mongo_id } = req.body;
+
+    const data = await addCertificate(id, certificate_template_mongo_id);
+
+    if (!data || data.length === 0) {
+      return new APIError(400, ['There was some error adding the certificate']).send(res);
+    }
+
+    return new APIResponse(200, data, 'Certificate added successfully').send(res);
+  } catch (e) {
+    return new APIError(500, ['Something went wrong while adding the certificate', e.message]).send(res);
+  }
 };

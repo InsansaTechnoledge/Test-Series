@@ -1,114 +1,159 @@
-import { CheckCircle, BookOpen, Award, X } from 'lucide-react';
-import React, { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import CertificateCard from './CertificateCard';
 import AssignExamAndContests from './AssignExamAndContests';
 import AssignedExamsAndContests from './AssignedExamsAndContests';
-import { useCachedExam } from '../../../../../../hooks/useCachedExam';
-
-const certificateTemplates = [
-  {
-    id: "template-1",
-    name: "Classical Elegance",
-    description: "Traditional academic certificate with ornate borders and formal styling",
-    image: 'https://via.placeholder.com/300x200?text=Classical+Elegance',
-    style: "Academic"
-  },
-  {
-    id: "template-2",
-    name: "Modern Professional",
-    description: "Clean, minimalist design perfect for corporate certifications",
-    image: 'https://via.placeholder.com/300x200?text=Modern+Professional',
-    style: "Business"
-  },
-  {
-    id: "template-3",
-    name: "Luxury Premium",
-    description: "Rich burgundy design with gold accents for prestigious awards",
-    image: 'https://via.placeholder.com/300x200?text=Luxury+Premium',
-    style: "Premium"
-  },
-  {
-    id: "template-4",
-    name: "Creative Dynamic",
-    description: "Vibrant and modern certificate for creative competitions",
-    image: 'https://via.placeholder.com/300x200?text=Creative+Dynamic',
-    style: "Creative"
-  }
-];
-
-const Exams = [
-    {
-        id: 123,
-        name: "first exam"
-    },
-    {
-        id: 124,
-        name: "second exam"
-    },
-    {
-        id: 125,
-        name: "third exam"
-    }
-];
-
-
-
-
+import { getAllTemplatesAvailable } from '../../../../../../utils/services/certificateService';
+import { useExams } from '../../../../../../hooks/UseExam';
+import useCachedContests from '../../../../../../hooks/useCachedContests';
+import { addCertificateToExams } from '../../../../../../utils/services/examService';
 
 const TemplateSelection = () => {
-    const [selectedCard, setSelectedCard] = useState('');
-    const [selectedExam, setSelectedExam] = useState('');
-    const [assignedItems, setAssignedItems] = useState([]);
+  const [selectedCard, setSelectedCard] = useState('');
+  const [selectedExam, setSelectedExam] = useState('');
+  const [assignedItems, setAssignedItems] = useState([]);
+  const [certificateTemplates, setCertificateTemplates] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-    // const [Exams , setExams] = useState([]);
+  const exams = useExams();
+  const { contestList } = useCachedContests();
 
-    const handleAssign = () => {
-        if (selectedCard && selectedExam) {
-            const selectedTemplate = certificateTemplates.find(t => t.id === selectedCard);
-            const selectedExamData = Exams.find(e => e.id.toString() === selectedExam);
-            
-            const newAssignment = {
-                examId: selectedExamData.id,
-                examName: selectedExamData.name,
-                templateId: selectedTemplate.id,
-                templateName: selectedTemplate.name,
-                templateStyle: selectedTemplate.style,
-                assignedDate: new Date().toLocaleDateString()
-            };
-            
-            setAssignedItems(prev => [...prev, newAssignment]);
-            
-            setSelectedCard('');
-            setSelectedExam('');
-        }
+  const Exams = useMemo(() => {
+    const ExamsData = Array.isArray(exams?.data)
+      ? exams.data.filter((e) => e?.go_live === false).map((e) => ({...e , type: 'exam'}))
+      : [];
+
+    const ContestData = Array.isArray(contestList)
+      ? contestList.filter((e) => e?.go_live === false).map((c) => ({...c , type: 'contest'}))
+      : [];
+
+    return [...ExamsData, ...ContestData];
+  }, [exams, contestList]);
+
+  useEffect(() => {
+    const fetchTemplates = async () => {
+      try {
+        setLoading(true);
+        const res = await getAllTemplatesAvailable();
+        setCertificateTemplates(Array.isArray(res?.data?.data) ? res.data.data : []);
+        setError(null);
+      } catch (err) {
+        console.error('Failed to fetch certificate templates:', err);
+        setCertificateTemplates([]);
+        setError('Failed to load templates.');
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const handleRemoveAssignment = (index) => {
-        setAssignedItems(prev => prev.filter((_, i) => i !== index));
-    };
+    fetchTemplates();
+  }, []);
 
-    return (
-        <>
-            <div className='px-6 border border-gray-200 rounded-lg mt-12 mx-auto'>
-                <h1 className='font-bold text-3xl text-gray-900 mb-1'>Choose Certificate Template</h1>
-                <span className='text-sm text-gray-500'>Select from our collection of professional certificate designs</span>
-                <CertificateCard selectedCard={selectedCard} certificateTemplates={certificateTemplates} setSelectedCard={setSelectedCard} />
-            </div>
-            
-            <AssignExamAndContests 
-                selectedCard={selectedCard}
-                selectedExam={selectedExam}
-                setSelectedExam={setSelectedExam}
-                onAssign={handleAssign}
-                Exams={Exams}
-            />
-            
-            <AssignedExamsAndContests 
-                assignedItems={assignedItems}
-                onRemove={handleRemoveAssignment}
-            />
-        </>
+  const handleAssign = () => {
+    if (!selectedCard || !selectedExam) return;
+
+    const selectedTemplate = certificateTemplates.find((t) => t._id === selectedCard);
+    const selectedExamData = Exams.find((e) => e.id?.toString() === selectedExam);
+
+    if (!selectedTemplate || !selectedExamData) return;
+
+    const alreadyAssigned = assignedItems.some(
+      (item) =>
+        item.examId === selectedExamData.id &&
+        item.templateId === selectedTemplate._id
     );
+
+    if (alreadyAssigned) return;
+
+    const newAssignment = {
+      examId: selectedExamData.id,
+      type: selectedExamData.type,
+      examName: selectedExamData.name,
+      templateId: selectedTemplate._id,
+      templateName: selectedTemplate.name,
+      templateStyle: selectedTemplate.style,
+      assignedDate: new Date().toLocaleDateString(),
+    };
+
+    setAssignedItems((prev) => [...prev, newAssignment]);
+    setSelectedCard('');
+    setSelectedExam('');
+  };
+
+ 
+  
+  
+
+  const handleAssignCertificateToTemplateOnBackend = async () => {
+    const formData = assignedItems.map((a) => ({
+        id: a.examId,
+        certificate_template_mongo_id: a.templateId
+    }));
+
+    console.log("data to send to Supabase", formData)
+
+    try{
+        const results = await Promise.all(
+            formData.map((assignment) => addCertificateToExams(assignment))
+        );
+
+        console.log('✅ All assignments succeeded:', results);
+    } catch(e) {
+        console.error('❌ Error assigning one or more certificates:', e);
+        alert('Some certificate assignments failed. Check the console for details.');
+    }
+
+
+  }
+
+  console.log("check" , assignedItems)
+
+  const handleRemoveAssignment = (index) => {
+    setAssignedItems((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  return (
+    <>
+      <div className="px-6 border border-gray-200 rounded-lg mt-12 mx-auto">
+        <h1 className="font-bold text-3xl text-gray-900 mb-1">Choose Certificate Template</h1>
+        <span className="text-sm text-gray-500">
+          Select from our collection of professional certificate designs
+        </span>
+
+        {loading ? (
+          <div className="text-center py-8 text-gray-500 text-lg">
+            Loading templates...
+          </div>
+        ) : error ? (
+          <div className="text-center py-8 text-red-500 text-lg">{error}</div>
+        ) : certificateTemplates.length > 0 ? (
+          <CertificateCard
+            selectedCard={selectedCard}
+            certificateTemplates={certificateTemplates}
+            setSelectedCard={setSelectedCard}
+          />
+        ) : (
+          <div className="flex items-center justify-center text-gray-800 text-xl font-semibold py-8">
+            No Templates Available
+          </div>
+        )}
+      </div>
+
+      <AssignExamAndContests
+        selectedCard={selectedCard}
+        selectedExam={selectedExam}
+        setSelectedExam={setSelectedExam}
+        onAssign={handleAssign}
+        Exams={Exams}
+      />
+
+      <AssignedExamsAndContests
+        assignedItems={assignedItems}
+        onRemove={handleRemoveAssignment}
+        handleAssignCertificateToTemplateOnBackend={handleAssignCertificateToTemplateOnBackend}
+      />
+    </>
+  );
 };
 
 export default TemplateSelection;

@@ -1,7 +1,7 @@
 import { Award, BookOpen, X } from 'lucide-react';
 import React from 'react'
 
-const AssignedExamsAndContests = ({ assignedItems, onRemove }) => {
+const AssignedExamsAndContests = ({ assignedItems, onRemove , handleAssignCertificateToTemplateOnBackend}) => {
     if (assignedItems.length === 0) {
         return (
             <div className='px-6 border border-gray-200 rounded-lg py-8 mt-12 mx-auto'>
@@ -13,10 +13,21 @@ const AssignedExamsAndContests = ({ assignedItems, onRemove }) => {
 
     return (
         <div className='px-6 border border-gray-200 rounded-lg  py-6 mt-12 mx-auto'>
+            <div className='flex justify-between px-12'>
+            <div>
             <h2 className='font-bold text-2xl text-gray-900 mb-4'>Assigned Exams & Contests</h2>
             <span className='text-sm text-gray-500 mb-6 block'>
                 Manage your certificate assignments for exams and contests
             </span>
+            </div>
+
+            <button 
+                onClick={() => handleAssignCertificateToTemplateOnBackend()}
+                className='bg-green-600 px-3 py-4 rounded-2xl text-lg text-gray-50 w-sm cursor-pointer'
+                >
+                Confirm
+            </button>
+            </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {assignedItems.map((item, index) => (

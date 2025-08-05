@@ -1,49 +1,174 @@
-import React from 'react'
+import React from 'react';
+import Select from 'react-select';
 
-const AssignExamAndContests = ({ selectedCard, selectedExam, setSelectedExam, onAssign , Exams }) => {
-    const handleExamAssign = () => {
-        if (selectedCard && selectedExam) {
-            onAssign();
-        }
-    };
+const AssignExamAndContests = ({ selectedCard, selectedExam, setSelectedExam, onAssign, Exams }) => {
+  const handleExamAssign = () => {
+    if (selectedCard && selectedExam) {
+      onAssign();
+    }
+  };
 
-    const isAssignDisabled = !selectedCard || !selectedExam;
+  const isAssignDisabled = !selectedCard || !selectedExam;
 
-    return (
-        <div className='px-6 border border-gray-200 rounded-lg py-4 mt-12 mx-auto'>
-            <h1 className='font-bold text-3xl text-gray-900 mb-1'>Assign Exam or Contest</h1>
-            <span className='text-sm text-gray-500'>
-              Select an exam or contest to assign the chosen certificate template
-            </span>
-          
-            <div className="flex gap-4 mt-4">
-                <select
-                    id="examSelect"
-                    name="examSelect"
-                    value={selectedExam}
-                    onChange={(e) => setSelectedExam(e.target.value)}
-                    className="block w-full mt-1 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                    >
-                    <option value="">Choose Exams or Contests</option>
-                    {Exams.map(e => (
-                        <option key={e.id} value={e.id}>{e.name}</option>
-                    ))}
-                </select>
+  const options = Exams?.map((e) => ({
+    value: e.id,
+    label: (
+      <div className="flex items-center justify-between w-full py-1">
+        <span className="font-medium text-gray-800">{e.name}</span>
+        <span
+          className={`text-xs font-semibold px-3 py-1 rounded-full text-white shadow-sm ${
+            e.type === 'exam' 
+              ? 'bg-gradient-to-r from-green-400 to-green-500' 
+              : 'bg-gradient-to-r from-indigo-400 to-indigo-500'
+          }`}
+        >
+          {e.type.toUpperCase()}
+        </span>
+      </div>
+    ),
+  })) || [];
 
-                <button  
-                    onClick={handleExamAssign}
-                    disabled={isAssignDisabled}
-                    className={`py-2 px-6 rounded-lg font-medium transition-colors duration-200 ${
-                        isAssignDisabled 
-                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
-                            : 'bg-indigo-600 text-white hover:bg-indigo-700 cursor-pointer'
-                    }`}
-                >
-                    Assign
-                </button>
-            </div>
+  const customSelectStyles = {
+    control: (provided, state) => ({
+      ...provided,
+      minHeight: '48px',
+      border: state.isFocused ? '2px solid #6366f1' : '2px solid #e5e7eb',
+      borderRadius: '12px',
+      boxShadow: state.isFocused ? '0 0 0 3px rgba(99, 102, 241, 0.1)' : 'none',
+      transition: 'all 0.2s ease-in-out',
+      '&:hover': {
+        border: '2px solid #6366f1',
+      }
+    }),
+    placeholder: (provided) => ({
+      ...provided,
+      color: '#9ca3af',
+      fontSize: '16px',
+      fontWeight: '500'
+    }),
+    option: (provided, state) => ({
+      ...provided,
+      backgroundColor: state.isSelected 
+        ? '#6366f1' // bg after selected 
+        : state.isFocused 
+        ? '#f8fafc' 
+        : 'white',
+      color: state.isSelected ? 'white' : '#374151',
+      padding: '12px 16px',
+      cursor: 'pointer',
+      '&:hover': {
+        backgroundColor: state.isSelected ? '#6366f1' : '#f1f5f9'
+      }
+    }),
+    menu: (provided) => ({
+      ...provided,
+      borderRadius: '12px',
+      boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+      border: '1px solid #e5e7eb',
+      overflow: 'hidden',
+      zIndex: 9999, // High z-index to ensure it appears above other elements
+    }),
+    menuList: (provided) => ({
+      ...provided,
+      padding: '8px',
+      maxHeight: '200px', // Limit height and add scroll
+    }),
+    menuPortal: (provided) => ({
+      ...provided,
+      zIndex: 9999, // High z-index for portal
+    })
+  };
+
+  return (
+    <div className="mx-auto mt-12">
+      <div className="bg-white border-2 border-gray-100 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-visible">
+        {/* Header Section */}
+        <div className="bg-gradient-to-r from-indigo-50 to-purple-50 px-8 py-6 border-b border-gray-100">
+          <div className="flex items-center gap-3 mb-2">
+            <h1 className="font-bold text-3xl text-gray-900">Assign Exam or Contest</h1>
+          </div>
+          <p className="text-gray-600 text-lg">
+            Select an exam or contest to assign the chosen certificate template
+          </p>
         </div>
-    );
+
+        {/* Content Section */}
+        <div className="px-8 py-8">
+          {/* Status Indicator */}
+          <div className="flex items-center gap-4 mb-6">
+            <div className="flex items-center gap-2">
+              <div className={`w-3 h-3 rounded-full ${selectedCard ? 'bg-green-400' : 'bg-gray-300'}`}></div>
+              <span className={`text-sm font-medium ${selectedCard ? 'text-green-600' : 'text-gray-500'}`}>
+                Certificate {selectedCard ? 'Selected' : 'Not Selected'}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className={`w-3 h-3 rounded-full ${selectedExam ? 'bg-green-400' : 'bg-gray-300'}`}>
+              </div>
+              <span className={`text-sm font-medium ${selectedExam ? 'text-green-600' : 'text-gray-500'}`}>
+                Exam/Contest {selectedExam ? 'Selected' : 'Not Selected'}
+              </span>
+            </div>
+          </div>
+
+          {/* Main Action Area */}
+          <div className="flex gap-6 items-end">
+            <div className="flex-1 relative z-10">
+              <label className="block text-sm font-semibold text-gray-700 mb-3">
+                Choose Exam or Contest
+              </label>
+              <Select
+                styles={customSelectStyles}
+                options={options}
+                placeholder="Search and select exams or contests..."
+                isSearchable
+                onChange={(selected) => {
+                  if (selected) setSelectedExam(selected.value);
+                  else setSelectedExam('');
+                }}
+                value={options.find(option => option.value === selectedExam) || null}
+                noOptionsMessage={() => "No exams or contests found"}
+                menuPortalTarget={document.body} // Render menu in document body
+                menuPosition="fixed" // Use fixed positioning
+                menuPlacement="auto" // Auto placement
+              />
+            </div>
+
+            <button
+              onClick={handleExamAssign}
+              disabled={isAssignDisabled}
+              className={`px-8 py-3 rounded-xl font-semibold text-lg transition-all duration-300 shadow-lg transform hover:scale-105 focus:outline-none focus:ring-4 ${
+                isAssignDisabled
+                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none transform-none'
+                  : 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white hover:from-indigo-700 hover:to-indigo-800 focus:ring-indigo-200 shadow-indigo-200'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Assign
+              </div>
+            </button>
+          </div>
+
+          {/* Help Text */}
+          {!selectedCard && (
+            <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+              <div className="flex items-center gap-2">
+                <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+                <span className="text-amber-700 text-sm font-medium">
+                  Please select a certificate template first before assigning an exam or contest.
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 };
 
-export default AssignExamAndContests
+export default AssignExamAndContests;

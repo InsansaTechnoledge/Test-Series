@@ -1,4 +1,4 @@
-import Schema from 'mongoose'
+import {Schema} from 'mongoose'
 import { connTwo } from '../../database/MongoDB.js';
 
 

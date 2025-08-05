@@ -201,4 +201,13 @@ export const getAnalyticsFromBatchExam=async(orgId)=>{
   return data;                                           
 }
 
+export const addCertificate = async (id, certificate_template_mongo_id) => {
+  const { data, error } = await supabase
+    .from('batch_exam')
+    .update({ certificate_template_mongo_id })
+    .eq('id', id)
+    .select(); 
 
+  if (error) throw error;
+  return data;
+};

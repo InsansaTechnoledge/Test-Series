@@ -41,3 +41,8 @@ export const fetchAnalyticsOnExams = async()=>{
   const response =await api.get(`/v1/exam/analytics`);
   return response.data;
 }
+
+export const addCertificateToExams = async (assignment) => {
+  const response = await api.patch('/v1/exam' , assignment)
+  return response.data
+}

@@ -6,14 +6,14 @@ const CertificateCard = ({selectedCard , setSelectedCard , certificateTemplates}
       <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-6 py-4'>
         {certificateTemplates.map(c => (
           <button
-              onClick={() => setSelectedCard(c.id)}
-              key={c.id}
+              onClick={() => setSelectedCard(c._id)}
+              key={c._id}
               className={`relative bg-white shadow-md rounded-xl overflow-hidden hover:shadow-xl transition-shadow duration-300 ${
-                  selectedCard === c.id ? 'border-4 border-indigo-600' : ''
+                  selectedCard === c._id ? 'border-4 border-indigo-600' : ''
               }`}
               >
              
-              {selectedCard === c.id && (
+              {selectedCard === c._id && (
                   <div className="absolute top-2 right-2 bg-indigo-600 text-white rounded-full w-6 h-6 flex items-center justify-center">
                   <CheckCircle size={16}/>
                   </div>
