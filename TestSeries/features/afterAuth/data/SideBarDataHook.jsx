@@ -13,7 +13,7 @@ const SideBarDataHook = () => {
   const rolePrefix = user.role === 'organization' ? '/institute' : '/student';
 
   // For organization users (filtered by access)
-  if (user.role === 'organization') {
+  if (user.role === 'organization' ) {
     const filteredControls = controlData
       .filter(control =>
         hasRoleAccess({

@@ -234,15 +234,44 @@ export const fetchAnalyticsExamAndBatch=async (req, res) => {
 
 export const addCertificateToExam = async (req, res) => {
   try {
-    const { id, certificate_template_mongo_id } = req.body;
 
-    const data = await addCertificate(id, certificate_template_mongo_id);
+      const assignments = req.body;
 
-    if (!data || data.length === 0) {
-      return new APIError(400, ['There was some error adding the certificate']).send(res);
-    }
+      if(!Array.isArray(assignments) || assignments.length === 0) {
+        return new APIError(500 , 'the data is not valid').send(res);
+      }
 
-    return new APIResponse(200, data, 'Certificate added successfully').send(res);
+      const results = [];
+      const errors = [];
+
+      for(const a of assignments) {
+        const { id, certificate_template_mongo_id , type } = a;
+
+        if (!id || !certificate_template_mongo_id || !type) {
+          errors.push({ id, error: 'Missing required fields' });
+          continue;
+        }
+
+        if (type === 'exam') {
+          try {
+            const data = await addCertificate(id, certificate_template_mongo_id);
+  
+            if (!data || data.length === 0) {
+              errors.push({ id, error: 'No data returned from Supabase' });
+            } else {
+              results.push({ id, status: 'success' });
+            }
+          } catch (err) {
+            errors.push({ id, error: err.message || 'Unexpected error' });
+          }
+        } else if (type === 'contest') {
+          errors.push({ id, error: 'Contest type not supported yet' });
+        } else {
+          errors.push({ id, error: 'Unknown type' });
+        }
+
+      }
+      return new APIResponse(200, { results, errors }, 'Certificate assignment completed').send(res);
   } catch (e) {
     return new APIError(500, ['Something went wrong while adding the certificate', e.message]).send(res);
   }

@@ -87,22 +87,20 @@ const TemplateSelection = () => {
   const handleAssignCertificateToTemplateOnBackend = async () => {
     const formData = assignedItems.map((a) => ({
         id: a.examId,
-        certificate_template_mongo_id: a.templateId
+        certificate_template_mongo_id: a.templateId,
+        type: a.type
     }));
 
     console.log("data to send to Supabase", formData)
 
     try{
-        const results = await Promise.all(
-            formData.map((assignment) => addCertificateToExams(assignment))
-        );
-
+        const results = await addCertificateToExams(formData)
         console.log('✅ All assignments succeeded:', results);
+        alert('success');
     } catch(e) {
         console.error('❌ Error assigning one or more certificates:', e);
         alert('Some certificate assignments failed. Check the console for details.');
     }
-
 
   }
 
