@@ -38,7 +38,7 @@ const CreateUser = () => {
 
 
   // Get current total users from the actual source (user or organization metadata)
-  const currentTotalUsers = user?.role === 'organization'
+  const currentTotalUsers = (user?.role === 'organization'|| user?.role === 'user')
     ? user.metaData?.totalUsers || 0
     : organization?.metaData?.totalUsers || 0;
 

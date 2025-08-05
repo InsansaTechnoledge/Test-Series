@@ -37,9 +37,7 @@ const Navbar = ({setShowLogoutModal}) => {
   // const [isDockToggled, setDockIsToggled] = useState(false);
   const {isDockToggled,toggleDock} = useDock();
 
- 
-
-  console.log("check", user)
+  console.log("check ", user)
 
   // Search functionality (unchanged)
   const performSearch = (query) => {
@@ -141,7 +139,7 @@ const Navbar = ({setShowLogoutModal}) => {
   };
 
 
-  const rolePrefix = user.role === 'organization' ? '/institute' : '/student';
+  const rolePrefix = user.role === ('organization' || 'user') ? '/institute' : '/student';
 
 
   const handleResultClick = (result) => {
@@ -215,7 +213,7 @@ const Navbar = ({setShowLogoutModal}) => {
   };
 
   const handleFeatureClick = (path) => {
-    const rolePrefix = user.role === 'organization' ? '/institute' : '/student';
+    const rolePrefix = user.role === 'organization' || user.role === 'user' ? '/institute' : '/student';
     navigate(`${rolePrefix}/${path}`);
     setShowMobileMenu(false); 
     setActiveCategory(''); // Close categories dropdown after navigation

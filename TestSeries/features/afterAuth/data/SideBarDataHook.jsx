@@ -10,10 +10,11 @@ const SideBarDataHook = () => {
   const { user, hasRoleAccess } = useUser();
 
   // Determine base path based on user role
-  const rolePrefix = user.role === 'organization' ? '/institute' : '/student';
+  const rolePrefix = (user.role === 'organization' || user.role === 'user') ? '/institute' : '/student';
+
 
   // For organization users (filtered by access)
-  if (user.role === 'organization' ) {
+  if (user.role === 'organization' || user.role === 'user') {
     const filteredControls = controlData
       .filter(control =>
         hasRoleAccess({
