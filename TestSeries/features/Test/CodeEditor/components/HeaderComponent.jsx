@@ -1,5 +1,5 @@
 import React from 'react'
-import { ChevronLeft, ChevronRight, Play, Code, Clock, Star, Users, TestTube, Send, Palette } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Play, Code, Clock, Star, Users, TestTube, Send, Palette, RotateCcw } from 'lucide-react'
 import { useTheme } from '../../../../hooks/useTheme';
 import { UploadCloud, Save } from "lucide-react";
 import { TerminalSquare } from "lucide-react";
@@ -18,7 +18,8 @@ const HeaderComponent = ({
   runTests,
   editorTheme,
   setEditorTheme,
-  submitContest
+  submitContest,
+  resetCode,
 }) => {
   const currentProblemData = problems[currentProblem];
 
@@ -63,7 +64,7 @@ const HeaderComponent = ({
     ? 'hover:bg-blue-100 disabled:opacity-50 disabled:hover:bg-transparent'
     : 'hover:bg-gray-700 disabled:opacity-50 disabled:hover:bg-transparent'
     }`;
-  const runButtonStyles = `w-10 h-10 rounded-lg flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 border shadow-sm ${theme === 'light'
+  const runButtonStyles = `px-6 py-2 rounded-lg flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 border shadow-sm ${theme === 'light'
     ? 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
     : 'bg-gray-800 text-gray-300 border-gray-600 hover:bg-gray-700'
     }`;
@@ -84,14 +85,27 @@ const HeaderComponent = ({
       }`}>
 
       {/* Main Header */}
-      <CountdownTimer
-        initialTime={duration}
-        handleSubmitTest={submitContest}
-        // submitted={submitted} 
-        submitted={false} // Assuming you have a way to track if the contest is submitted
-        examId={contest_id}
-        variant="header"
-      />
+      <div className='w-full flex items-center p-2'>
+        {/* Main Header */}
+        <CountdownTimer
+          initialTime={duration}
+          handleSubmitTest={submitContest}
+          // submitted={submitted}  
+          submitted={false} // Assuming you have a way to track if the contest is submitted
+          examId={contest_id}
+          variant="header"
+        />
+        <div className="flex items-center justify-between ml-4 w-auto">
+          <button
+            onClick={submitContest}
+            disabled={isRunning}
+            className={`${submitButtonStyles} flex items-center w-full justify-center space-x-2`}
+          >
+            <UploadCloud className="w-4 h-4" />
+            <span>Submit this Contest</span>
+          </button>
+        </div>
+      </div>
       <div className="p-4 flex justify-between items-center">
 
         {/* Left Section - Navigation */}
@@ -130,10 +144,44 @@ const HeaderComponent = ({
         </div>
 
         {/* Right Section - Controls */}
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2 sm:text-xs">
+          {/* Action Buttons */}
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={resetCode}
+              className={runButtonStyles}
+            >
+           <RotateCcw className='h-4 w-4'/>
+              <span>Reset</span>
+            </button>
+
+            <button
+              onClick={runCode}
+              disabled={isRunning}
+              className={runButtonStyles}
+            >
+              {isRunning ? (
+                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <Play className="w-4 h-4" />
+              )}
+              <span>{isRunning ? 'Running Code' : 'Run Code'}</span>
+            </button>
+
+
+            <button
+              onClick={runTests}
+              disabled={isRunning}
+              className={secondaryButtonStyles}
+            >
+              <TerminalSquare className="w-4 h-4" />
+              <span>{isRunning ? 'Running Test Cases' : 'Submit Question'}</span>
+            </button>
+
+          </div>
           {/* Language Selector */}
          
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-1 sm:text-xs">
             {/* <Code className={`w-4 h-4 ${
               theme === 'light' ? 'text-blue-600' : 'text-blue-400'
             }`} /> */}
@@ -151,7 +199,7 @@ const HeaderComponent = ({
           </div>
 
           {/* Editor Theme Selector */}
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 w-fit">
             {/* <Palette className={`w-4 h-4 ${
               theme === 'light' ? 'text-blue-600' : 'text-blue-400'
             }`} /> */}
@@ -169,39 +217,7 @@ const HeaderComponent = ({
             </select>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={runCode}
-              disabled={isRunning}
-              className={runButtonStyles}
-            >
-              {isRunning ? (
-                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-              ) : (
-                <Play className="w-4 h-4" />
-              )}
-            </button>
-
-
-            <button
-              onClick={runTests}
-              disabled={isRunning}
-              className={secondaryButtonStyles}
-            >
-              <TerminalSquare className="w-4 h-4" />
-              <span>{isRunning ? 'Running Test Cases' : 'Submit Test Cases'}</span>
-            </button>
-
-            <button
-              onClick={submitContest}
-              disabled={isRunning}
-              className={submitButtonStyles}
-            >
-              <UploadCloud className="w-4 h-4" />
-              <span>Submit this Contest</span>
-            </button>
-          </div>
+          
 
 
 

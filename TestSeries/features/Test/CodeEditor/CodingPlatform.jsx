@@ -297,6 +297,14 @@ const CodingPlatform = () => {
     }
   };
 
+  const resetCode = () => {
+    localStorage.removeItem(`contest_${contest_id}_problem_${problem.question_id}_language_${language}_code_`);
+    setCode(problem?.code_snippets?.find(snip => snip.langSlug === language)?.code || "");
+    setOutput("");
+    setTestResults([]);
+    setErrors([]);
+  };
+
   if (loading) {
     return (
       <div
@@ -342,6 +350,7 @@ const CodingPlatform = () => {
             editorTheme={editorTheme}
             setEditorTheme={setEditorTheme}
             submitContest={submitContest}
+            resetCode={resetCode}
           />
 
           <div className="flex-1 flex overflow-hidden">
@@ -407,7 +416,7 @@ const CodingPlatform = () => {
 
               {/* Tab Bar (absolute at bottom or above panel) */}
               <div
-                className="absolute left-0 right-0 flex items-center justify-between px-4 bg-gray-100 dark:bg-gray-800 border-t border-gray-300 dark:border-gray-600"
+                className={`absolute left-0 right-0 flex items-center justify-between px-4 ${theme === 'light' ? 'bg-gray-100' : 'bg-gray-800'} border-t ${theme === 'light' ? 'border-gray-300' : 'border-gray-600'}`}
                 style={{
                   height: '40px',
                   bottom: showTestResults ? `${outputPanel.height}px` : '10%',
@@ -416,16 +425,16 @@ const CodingPlatform = () => {
                 }}
               >
                 {/* Tab Buttons */}
-                <div className="flex gap-4">
+                <div className={`flex gap-4 ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>
                   <button
                     onClick={() => setOutputTab("testResults")}
-                    className={`text-sm font-medium ${outputTab === "testResults" ? "text-blue-600" : ""}`}
+                    className={`text-sm font-medium ${outputTab === "testResults" ? theme === 'light' ? 'text-blue-400' : 'text-blue-200' : ''}`}
                   >
                     Test Results
                   </button>
                   <button
                     onClick={() => setOutputTab("output")}
-                    className={`text-sm font-medium ${outputTab === "output" ? "text-blue-600" : ""}`}
+                    className={`text-sm font-medium ${outputTab === "output" ? theme === 'light' ? 'text-blue-400' : 'text-blue-200' : ''}`}
                   >
                     Output
                   </button>
@@ -434,7 +443,7 @@ const CodingPlatform = () => {
                 {/* Toggle Button */}
                 <button
                   onClick={() => setShowTestResults((prev) => !prev)}
-                  className="text-sm flex items-center gap-1"
+                  className={`text-sm flex items-center gap-1 ${theme === 'light' ? 'text-blue-400' : 'text-blue-200'}`}
                 >
                   {showTestResults ? "Hide ▼" : "Show ▲"}
                 </button>

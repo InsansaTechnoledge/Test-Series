@@ -1,5 +1,6 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import ExamToaster from '../Toaster/StandardExamWarningToaster';
+import { useTheme } from '../../../hooks/useTheme';
 
 export const useExamSecurity = ({
   eventDetails,
@@ -27,9 +28,10 @@ export const useExamSecurity = ({
   const fullscreenAttemptRef = useRef(0);
   const windowCheckIntervalRef = useRef(null); // New ref for window monitoring
   const maxFullscreenAttempts = 3;
+  const {theme} = useTheme();
   
   // Lenient settings
-  const violationCooldown = 20000000; // 2000
+  const violationCooldown = 2000; // 2000
   const violationsPerWarning = 3;
   const maxWarnings = 5;
   const lastViolationTimeRef = useRef(0);
@@ -547,6 +549,7 @@ export const useExamSecurity = ({
       <ExamToaster 
         toasts={toasts} 
         onDismiss={dismissToast} 
+        theme={theme}
       />
     )
   };
