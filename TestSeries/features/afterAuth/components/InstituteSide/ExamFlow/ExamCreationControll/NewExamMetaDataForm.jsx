@@ -1,9 +1,14 @@
 import React from 'react'
 import { Settings } from 'lucide-react';
 import ExamControllSettings from '../ExamControll/ExamControllSettings'
+import { useUser } from '../../../../../../contexts/currentUserContext';
 
 const NewExamMetaDataForm = ({handleSubmit , theme , form, setForm , handleChange , batches , isExamControllOpen , setIsExamControllOpen , canAccessPage , canCreateMoreExams}) => {
     console.log("f", batches)
+
+    const {user} = useUser();
+    console.log("FF",user);
+    
   return (
     <div>
        <div className="borderoverflow-hidden mb-8  rounded-3xl p-6 transform hover:scale-105 transition-all duration-300 ">
@@ -199,7 +204,7 @@ const NewExamMetaDataForm = ({handleSubmit , theme , form, setForm , handleChang
             </button>
             {
             isExamControllOpen && (
-                <ExamControllSettings handleChange={handleChange} form={form} theme={theme}/>
+                <ExamControllSettings user={user} handleChange={handleChange} form={form} theme={theme}/>
             )
             }
         </div>

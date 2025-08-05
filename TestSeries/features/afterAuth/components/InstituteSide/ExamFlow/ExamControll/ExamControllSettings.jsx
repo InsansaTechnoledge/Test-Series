@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { useUser } from '../../../../../../contexts/currentUserContext';
+import { Lock } from 'lucide-react';
 
-const ExamControllSettings = ({ handleChange, form, theme }) => {
+const ExamControllSettings = ({user, handleChange, form, theme }) => {
+
+
 
   useEffect(() => {
     console.log("sfa", form.auto_submittable )
@@ -23,24 +27,34 @@ const ExamControllSettings = ({ handleChange, form, theme }) => {
 
       {/* AI Proctoring */}
       <div className={cardStyle}>
-        <label htmlFor="ai_proctored" className={`font-semibold mb-3 flex items-center space-x-2 ${labelText}`}>
-          <span>Enable AI Proctoring?</span>
-        </label>
-        <div className="flex items-center space-x-3 mt-2">
-          <input
-            id="ai_proctored"
-            name="ai_proctored"
-            type="checkbox"
-            className="h-5 w-5 text-green-600 border-gray-300 rounded focus:ring-green-500 transition"
-            onChange={(e) => {
-              setIsAiProcted(prev => !prev);
-              handleChange(e);
-            }}
-            
-            checked={form.ai_proctored}
-          />
-          <span className={`font-medium ${spanText}`}>Yes</span>
-        </div>
+        {
+          (user?.planFeatures?.proctore_feature?.isActive &&  user?.planFeatures?.proctore_feature?.value) ?
+          (
+            <>
+             <label htmlFor="ai_proctored" className={`font-semibold mb-3 flex items-center space-x-2 ${labelText}`}>
+              <span>Enable AI Proctoring?</span>
+             </label>
+            <div className="flex items-center space-x-3 mt-2">
+              <input
+                id="ai_proctored"
+                name="ai_proctored"
+                type="checkbox"
+                className="h-5 w-5 text-green-600 border-gray-300 rounded focus:ring-green-500 transition"
+                onChange={(e) => {
+                  setIsAiProcted(prev => !prev);
+                  handleChange(e);
+                }}
+                
+                checked={form.ai_proctored}
+              />
+              <span className={`font-medium ${spanText}`}>Yes</span>
+            </div>
+            </>
+          ) : (
+            <span className={`${theme === 'light' ? 'text-red-600' : 'text-red-400'} flex justify-between`}>Ai Proctor is not included in your plan <Lock/></span>
+          )
+        }
+       
       </div>
 
       {/* Auto Submit on Proctor Violation */}

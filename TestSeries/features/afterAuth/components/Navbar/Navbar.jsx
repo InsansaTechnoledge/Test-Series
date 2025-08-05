@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Settings, ChevronDown, Menu, X, Sun, Moon, CreativeCommons, PaperclipIcon } from 'lucide-react';
+import { Search, Settings, ChevronDown, Menu, X, Sun, Moon, CreativeCommons, PaperclipIcon, Lock } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useUser } from '../../../../contexts/currentUserContext';
 // import logo from '../../../../assests/Landing/Navbar/evalvo logo blue 2.svg'
@@ -434,7 +434,7 @@ const Navbar = ({setShowLogoutModal}) => {
                       {(user?.role === 'user' || user?.role === 'student') && (
                         <button
                           onClick={() => {
-                            if (user?._id) {
+                            if (user?._id ) {
                               navigate(`/edit-profile/${user._id}`);
                               setShowProfileDropdown(false);
                               setActiveCategory('');
@@ -484,12 +484,16 @@ const Navbar = ({setShowLogoutModal}) => {
                       {
                         user?.role !== 'student' && (
                           <div className="relative group">
+                          {/** QBMS TOOL */}
+                      
                           <button
+
                             onClick={() => {
                               navigate(`/qbms/${user._id}`);
                               setShowProfileDropdown(false);
                               setActiveCategory('');
                             }}
+                            disabled={!user?.planFeatures?.questionBank_feature?.isActive || !user?.planFeatures?.questionBank_feature?.value}
                             className={`w-full flex items-center px-3 py-3 text-sm rounded-lg transition-all duration-200 ${themeClasses.dropdownItem} ${theme === 'light' ? 'hover:bg-gray-50 group-hover:shadow-md' : 'hover:bg-gray-700 group-hover:shadow-md'}`}
                           >
                             <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 ${theme === 'light' ? 'bg-gradient-to-br from-green-100 to-emerald-100' : 'bg-gradient-to-br from-green-900 to-emerald-900'}`}>
@@ -499,18 +503,36 @@ const Navbar = ({setShowLogoutModal}) => {
                             </div>
                             <div className="flex-1 text-left">
                               <div className="flex items-center">
-                                <span className="font-medium">QBMS</span>
-                                <span className="ml-2 bg-green-100 text-green-800 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-green-300 shadow-sm">
-                                  NEW
-                                </span>
-                              </div>
-                              <div className={`text-xs mt-0.5 ${themeClasses.textSecondary}`}>
-                                Question Bank Management
-                              </div>
+                                {
+                                  user?.planFeatures?.questionBank_feature?.isActive && user?.planFeatures?.questionBank_feature?.value ? (
+                                      <div>
+                                         <span className="font-medium">QBMS</span>
+                                          <span className="ml-2 bg-green-100 text-green-800 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-green-300 shadow-sm">
+                                            NEW
+                                          </span>
+                                        
+                                        <div className={`text-xs mt-0.5 ${themeClasses.textSecondary}`}>
+                                          Question Bank Management
+                                        </div>
+                                      </div>
+                                  ) : (
+                                    <div className='cursor-not-allowed'>
+                                      <span className="font-medium flex gap-6">QBMS <Lock className={`${theme === 'light' ? 'text-red-600' : 'text-red-400'} w-4 h-4`}/></span>
+                                      <div className={`text-xs mt-0.5 ${themeClasses.textSecondary}`}>
+                                          Question Bank Management
+                                        </div>
+                                    </div>
+                                  )
+                                }
+                               </div>
                             </div>
                           </button>
+
+                           {/** Certificate TOOL */}
+
                           <button
                             onClick={() => navigate('/certificate-assignment')}
+                            disabled={!user?.planFeatures?.certification_feature?.isActive || !user?.planFeatures?.certification_feature?.value > 0}
                             className={`w-full flex items-center px-3 py-3 text-sm rounded-lg transition-all duration-200 ${themeClasses.dropdownItem} ${theme === 'light' ? 'hover:bg-gray-50' : 'hover:bg-gray-700'}`}
                           >
                           <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 ${theme === 'light' ? 'bg-indigo-100' : 'bg-indigo-900'}`}>
@@ -518,21 +540,38 @@ const Navbar = ({setShowLogoutModal}) => {
                           </div>
                           <div className="flex-1 text-left">
                              <div className="flex items-center">
-                               <span className="font-medium"> Certificates</span>
-                               <span className="ml-2 bg-yellow-100 text-yellow-800 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-yellow-300 shadow-sm">
-                                 NEW
-                               </span>
-                             </div>
-                             <div className={`text-xs mt-0.5 ${themeClasses.textSecondary}`}>
-                               Choose Cerificates
-                             </div>
+                              {
+                                user?.planFeatures?.certification_feature?.isActive && user?.planFeatures?.certification_feature?.value > 0 ? (
+                                  <div>
+                                    <span className="font-medium"> Certificates</span>
+                                    <span className="ml-2 bg-yellow-100 text-yellow-800 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-yellow-300 shadow-sm">
+                                      NEW
+                                    </span>
+                                  
+                                    <div className={`text-xs mt-0.5 ${themeClasses.textSecondary}`}>
+                                      Choose Cerificates 
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className='cursor-not-allowed' >
+                                   <span className="font-medium flex gap-6"> Certificates <Lock className={`${theme === 'light' ? 'text-red-600' : 'text-red-400'} w-4 h-4`}/></span>
+                                    <div className={`text-xs mt-0.5  ${themeClasses.textSecondary}`}>
+                                      Choose Cerificates 
+                                    </div>
+                                  </div>
+                                )
+                              }
+                            </div>
                            </div>
                           </button>
                         </div>
                         )
                       }
+
+                       {/** Application TOOL */}
                       <button 
                         onClick={() => navigate('/download-app')}
+                        disabled={!user?.planFeatures?.proctore_feature?.isActive || !user?.planFeatures?.proctore_feature?.value}
                         className={`w-full flex items-center px-3 py-3 text-sm rounded-lg transition-all duration-200 ${themeClasses.dropdownItem} ${theme === 'light' ? 'hover:bg-gray-50' : 'hover:bg-gray-700'}`}
                       >
                         <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 ${theme === 'light' ? 'bg-indigo-100' : 'bg-indigo-900'}`}>
@@ -540,7 +579,13 @@ const Navbar = ({setShowLogoutModal}) => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                           </svg>
                         </div>
-                        <span className="font-medium">Download Application</span>
+                        {
+                          user?.planFeatures?.proctore_feature?.isActive && user?.planFeatures?.proctore_feature?.value ? (
+                            <span className="font-medium">Download Application</span>
+                          ) : (
+                            <span className="font-medium flex gap-6 cursor-not-allowed">Download Application <Lock className={`${theme === 'light' ? 'text-red-600' : 'text-red-400'} w-4 h-4`}/></span>
+                          )
+                        }
                       </button>
 
                      
