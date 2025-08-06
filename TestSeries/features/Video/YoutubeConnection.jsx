@@ -15,7 +15,7 @@ const Connection = () => {
           const callbackResponse = await callBack(code);
 
           // Navigate to video upload, absolute path
-          navigate('/video/upload');
+          navigate('/institute/video/upload');
         } catch (error) {
           console.error('Error during  callback:', error);
         }

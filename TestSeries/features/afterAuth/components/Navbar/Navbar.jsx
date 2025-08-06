@@ -193,6 +193,7 @@ const Navbar = ({setShowLogoutModal}) => {
   }, []);
 
   const handleCategoryClick = (categoryName) => {
+    console.log(`Category clicked: ${categoryName}`);
     setActiveCategory(activeCategory === categoryName ? '' : categoryName);
   };
 
@@ -213,6 +214,7 @@ const Navbar = ({setShowLogoutModal}) => {
   };
 
   const handleFeatureClick = (path) => {
+    console.log(`Navigating to ${path}`);
     const rolePrefix = user.role === 'organization' || user.role === 'user' ? '/institute' : '/student';
     navigate(`${rolePrefix}/${path}`);
     setShowMobileMenu(false); 
@@ -430,8 +432,8 @@ const Navbar = ({setShowLogoutModal}) => {
                       <div className={`text-xs font-semibold uppercase tracking-wider mb-2 ${themeClasses.textSecondary}`}>
                         Account
                       </div>
-                      
-                      {(user?.role === 'student') && (
+
+                      {(user?.role === 'student' || user.role === 'user') && (
                         <button
                           onClick={() => {
                             if (user?._id ) {
@@ -454,7 +456,7 @@ const Navbar = ({setShowLogoutModal}) => {
                       {user?.role === "organization" && (
                         <button
                           onClick={() => {
-                            navigate('/institute-subscription');
+                            navigate('/institute/institute-subscription');
                             setShowProfileDropdown(false);
                             setActiveCategory('');
                           }}
@@ -531,7 +533,7 @@ const Navbar = ({setShowLogoutModal}) => {
                            {/** Certificate TOOL */}
 
                           <button
-                            onClick={() => navigate('/certificate-assignment')}
+                            onClick={() => navigate('/institute/certificate-assignment')}
                             disabled={!user?.planFeatures?.certification_feature?.isActive || !user?.planFeatures?.certification_feature?.value > 0}
                             className={`w-full flex items-center px-3 py-3 text-sm rounded-lg transition-all duration-200 ${themeClasses.dropdownItem} ${theme === 'light' ? 'hover:bg-gray-50' : 'hover:bg-gray-700'}`}
                           >
@@ -689,6 +691,10 @@ const Navbar = ({setShowLogoutModal}) => {
           selectedResultIndex={selectedResultIndex}
           handleResultClick={handleResultClick}
           searchResults={searchResults}
+          handleCategoryClick={handleCategoryClick}
+          handleFeatureClick={handleFeatureClick}
+          setShowMobileMenu={setShowMobileMenu}
+          setActiveCategory={setActiveCategory}
         />
 
       </div>
