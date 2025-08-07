@@ -119,7 +119,8 @@ const studentSchema = new Schema({
         type:String,
         enum:['Male', 'Female' , 'Other'],
         required: true
-    } 
+    },
+    sessionId: { type: String, default: null }
 }, {
     timestamps: true
 });

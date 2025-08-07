@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import passport from '../utils/PassportAuth/Passport.js';
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
+import { validateSessionMiddleware } from '../middleware/validateSessionMiddleware.middleware.js';
 
 const app = express();
 
@@ -70,6 +71,8 @@ app.use((req, res, next) => {
 // Initialize Passport.js
 app.use(passport.initialize());
 app.use(passport.session());
+
+// app.use(validateSessionMiddleware);
 
 // Routes
 routes(app);

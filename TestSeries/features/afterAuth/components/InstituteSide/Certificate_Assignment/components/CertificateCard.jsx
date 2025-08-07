@@ -1,7 +1,7 @@
 import { CheckCircle } from 'lucide-react';
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 
-const CertificateCard = ({ selectedCard, setSelectedCard, certificateTemplates, slidesToShow, gap = 24 }) => {
+const CertificateCard = ({ selectedCard, setSelectedCard, certificateTemplates, slidesToShow, gap  }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);

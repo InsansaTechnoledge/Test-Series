@@ -6,6 +6,7 @@ export const VITE_SECRET_KEY_FOR_COUNTDOWN_TIMER='secret-key-for-time-left'
  
 export const VITE_PLAN_FEATURE_MAP= `{
   "/institute/batch-list": ["batch_feature"],
+  "/institute/certificate-assignment" : ["batch_feature"],
   "/institute/create-batch": ["batch_feature"],
   "/institute/edit-batch": ["batch_feature"],
   "/institute/batch-details": ["batch_feature"],

@@ -148,7 +148,8 @@ const TemplateSelection = () => {
                 selectedCard={selectedCard}
                 setSelectedCard={setSelectedCard}
                 certificateTemplates={certificateTemplates}
-                slidesToShow={2}
+                slidesToShow={3}
+                gap={24}
               />
             </div>
         ) : (
