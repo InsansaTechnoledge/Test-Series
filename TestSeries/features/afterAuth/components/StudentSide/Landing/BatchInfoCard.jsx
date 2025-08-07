@@ -161,7 +161,7 @@ const BatchInfoCard = () => {
                 } ${!studentBatch?.syllabus_id ? 'opacity-60 cursor-not-allowed' : ''}`}
               onClick={() => {
                 if (studentBatch?.syllabus_id) {
-                  navigate(`/syllabus/${studentBatch?.syllabus_id}`);
+                  navigate(`/institute/syllabus/${studentBatch?.syllabus_id}`);
                 }
               }}
               disabled={!studentBatch?.syllabus_id}

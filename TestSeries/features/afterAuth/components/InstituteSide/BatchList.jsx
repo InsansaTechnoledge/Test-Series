@@ -515,7 +515,7 @@ const getPageNumbers = () => {
                 <div className="mb-6">
                   {batch.syllabus_id ? (
                     <button
-                      onClick={() => navigate(`/syllabus/${batch.syllabus_id}`)}
+                      onClick={() => navigate(`/institute/syllabus/${batch.syllabus_id}`)}
                       className={`inline-flex items-center space-x-2 ${
                         theme === "light"
                           ? "text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100"

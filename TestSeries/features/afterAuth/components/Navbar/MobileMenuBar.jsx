@@ -74,7 +74,9 @@ const MobileMenuBar = ({
           {categories.map((category) => (
             <div key={category.name}>
               <button
-                onClick={() => handleCategoryClick(category.name)}
+                onClick={() => {
+                  handleCategoryClick(category.name);             
+                }}
                 className={`flex items-center justify-between w-full px-3 py-2 text-base font-medium rounded-md ${
                   activeCategory === category.name
                     ? themeClasses.activeButton
@@ -95,12 +97,15 @@ const MobileMenuBar = ({
                   }`} 
                 />
               </button>
+              
 
               {activeCategory === category.name && (
                 <div className="mt-1 ml-8 space-y-1">
+                 
                   {category.features.map((featureName) => {
                     const control = controls.find(c => c.name === featureName);
                     return control ? (
+                     
                       <button
                         key={control.name}
                         onClick={(e) => {
@@ -109,11 +114,13 @@ const MobileMenuBar = ({
                         }}
                         className={`flex items-center w-full px-3 py-2 text-sm rounded-md ${themeClasses.dropdownItem}`}
                       >
+                         
                         <img 
                           src={control.icon} 
                           alt={control.name} 
                           className="w-4 h-4 mr-3"
                         />
+
                         {control.name}
                       </button>
                     ) : null;
@@ -154,7 +161,7 @@ const MobileMenuBar = ({
             {user?.role === 'organization' && (
               <button
                 onClick={() => {
-                  navigate('/institute-subscription');
+                  navigate('/institute/institute-subscription');
                   setShowMobileMenu(false);
                   setActiveCategory('');
                 }}

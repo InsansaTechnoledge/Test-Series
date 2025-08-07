@@ -330,7 +330,15 @@ const PageLinks = () => {
                 <Route path='create-contest/:contestId?' element={<CreateContest />} />
                 <Route path='contest-list' element={<ContestList />} />
                 <Route path='code-create' element={<QuestionCreator />} />
+                <Route path='video' element={<YoutubeConnection />} />
+                <Route path='video/upload' element={<UploadVideo />} />
+                <Route path='syllabus/:syllabusId' element={<SyllabusViewPage />} />
+                <Route path='certificate-assignment' element={<CertificateAssignment/>}/>
+                {user?.role === "organization" && (
+          <Route path='institute-subscription' element={<YourPlanPage />} />
+        )}
                 <Route path='*' element={<FallBackPageForOrg />} />
+                
               </Route>
             </Route>
 
@@ -359,18 +367,12 @@ const PageLinks = () => {
         </Route>
 
         {/* Top-level routes */}
-        <Route path='video' element={<YoutubeConnection />} />
-        <Route path='video/upload' element={<UploadVideo />} />
+        
         <Route path='session-expired' element={<SessionExpireError />} />
-        <Route path='syllabus/:syllabusId' element={<SyllabusViewPage />} />
+         <Route path='download-app' element={<AppDownloadPage/>}/>
         <Route path='qbms/:id' element={<QBMS/>}/>
-        <Route path='download-app' element={<AppDownloadPage/>}/>
-        <Route path='certificate-assignment' element={<CertificateAssignment/>}/>
-        {user?.role === "organization" && (
-          <Route path='institute-subscription' element={<YourPlanPage />} />
-        )}
         {
-          user?.role === 'user' || user?.role === 'student' && (
+          ( user?.role === 'user' || user?.role === 'student' ) && (
             <Route path='edit-profile/:id' element={<ProfilePage/>}/>
           )
         }

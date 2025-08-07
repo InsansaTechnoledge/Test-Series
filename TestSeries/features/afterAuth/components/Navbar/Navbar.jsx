@@ -12,6 +12,7 @@ import EpicThemeSlider from './ThemeSlide.jsx';
 import SearchResults from './SearchResults.jsx';
 import MobileMenuBar from './MobileMenuBar.jsx';
 import { useDock } from './context/DockContext.jsx';
+import { getOrganizationById } from '../../../../utils/services/organizationService.js';
 
 const Navbar = ({setShowLogoutModal}) => {
   const [activeCategory, setActiveCategory] = useState('');
@@ -36,6 +37,9 @@ const Navbar = ({setShowLogoutModal}) => {
   const { controls, categories } = SideBarDataHook();
   // const [isDockToggled, setDockIsToggled] = useState(false);
   const {isDockToggled,toggleDock} = useDock();
+  const [organizationName, setOrganizationName] = useState('');
+
+  const [orgLogo , setOrgLogo] = useState('');
 
   console.log("check ", user)
 
@@ -192,6 +196,7 @@ const Navbar = ({setShowLogoutModal}) => {
   
 
   const handleCategoryClick = (categoryName) => {
+    console.log(`Category clicked: ${categoryName}`);
     setActiveCategory(activeCategory === categoryName ? '' : categoryName);
   };
 
@@ -212,6 +217,7 @@ const Navbar = ({setShowLogoutModal}) => {
   };
 
   const handleFeatureClick = (path) => {
+    console.log(`Navigating to ${path}`);
     const rolePrefix = user.role === 'organization' || user.role === 'user' ? '/institute' : '/student';
     navigate(`${rolePrefix}/${path}`);
     setShowMobileMenu(false); 
@@ -239,6 +245,26 @@ const Navbar = ({setShowLogoutModal}) => {
       }
   }
   
+  console.log("Gf", user);
+
+  useEffect(() => {
+    const fetchOrgName = async () => {
+      if (user?.role !== 'organization' && user?.organizationId?._id) {
+        try {
+          const res = await getOrganizationById(user.organizationId._id);
+          console.log('gd', res)
+          setOrganizationName(res.data?.name || 'Unknown Org');
+          setOrgLogo(res?.data?.logoUrl || '')
+        } catch (err) {
+          console.error('Failed to fetch organization name:', err);
+          setOrganizationName('Unknown Org');
+        }
+      }
+    };
+
+    fetchOrgName();
+  }, [user]);
+  
   return (
     <nav className={`z-50 ${themeClasses.nav}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -248,11 +274,31 @@ const Navbar = ({setShowLogoutModal}) => {
             onClick={() => helperFunctionToNavigateHome(user?.role)}
             className="flex items-center cursor-pointer">
             
-            <img 
-              src={ theme === 'light' ? logo : logoDark} 
-              alt="Evalvo" 
-              className="h-8 w-auto"
-            />
+            {
+              user?.role === 'organization' ? (
+                <img 
+                src={ theme === 'light' ? logo : logoDark} 
+                alt="Evalvo" 
+                className="h-8 w-auto"
+              />
+              ) : (
+                <div className="flex items-center gap-4 px-4 py-2 rounded-xl ">
+                  <img
+                    className="h-12 w-12 rounded-full object-cover border-2 shadow-sm"
+                    src={orgLogo}
+                    alt="Organization Logo"
+                  />
+                  <span
+                    className={`text-xl font-bold tracking-wide ${
+                      theme === 'light' ? 'text-gray-800' : 'text-white'
+                    }`}
+                  >
+                    {organizationName}
+                  </span>
+                </div>
+              )
+            }
+           
           </button>
 
           {/* Desktop Navigation */}
@@ -429,8 +475,8 @@ const Navbar = ({setShowLogoutModal}) => {
                       <div className={`text-xs font-semibold uppercase tracking-wider mb-2 ${themeClasses.textSecondary}`}>
                         Account
                       </div>
-                      
-                      {(user?.role === 'student') && (
+
+                      {(user?.role === 'student' || user.role === 'user') && (
                         <button
                           onClick={() => {
                             if (user?._id ) {
@@ -453,7 +499,7 @@ const Navbar = ({setShowLogoutModal}) => {
                       {user?.role === "organization" && (
                         <button
                           onClick={() => {
-                            navigate('/institute-subscription');
+                            navigate('/institute/institute-subscription');
                             setShowProfileDropdown(false);
                             setActiveCategory('');
                           }}
@@ -530,7 +576,7 @@ const Navbar = ({setShowLogoutModal}) => {
                            {/** Certificate TOOL */}
 
                           <button
-                            onClick={() => navigate('/certificate-assignment')}
+                            onClick={() => navigate('/institute/certificate-assignment')}
                             disabled={!user?.planFeatures?.certification_feature?.isActive || !user?.planFeatures?.certification_feature?.value > 0}
                             className={`w-full flex items-center px-3 py-3 text-sm rounded-lg transition-all duration-200 ${themeClasses.dropdownItem} ${theme === 'light' ? 'hover:bg-gray-50' : 'hover:bg-gray-700'}`}
                           >
