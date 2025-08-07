@@ -1,4 +1,4 @@
-import { createExam, deleteExam, fetchSelective, updateExam, setExamLive, fetchNonLiveExams, fetchExamsWithoutQuestionsQuery, fetchExamNameById, getExamCountForOrg, getAnalyticsFromBatchExam, addCertificate } from '../../utils/SqlQueries/exam.queries.js';
+import { createExam, deleteExam, fetchSelective, updateExam, setExamLive, fetchNonLiveExams, fetchExamsWithoutQuestionsQuery, fetchExamNameById, getExamCountForOrg, getAnalyticsFromBatchExam, addCertificate, addCertificateToContest } from '../../utils/SqlQueries/exam.queries.js';
 import { APIError } from '../../utils/ResponseAndError/ApiError.utils.js'
 import { APIResponse } from '../../utils/ResponseAndError/ApiResponse.utils.js'
 import Result from '../../models/SecondDB/result.model.js';
@@ -265,7 +265,17 @@ export const addCertificateToExam = async (req, res) => {
             errors.push({ id, error: err.message || 'Unexpected error' });
           }
         } else if (type === 'contest') {
-          errors.push({ id, error: 'Contest type not supported yet' });
+            try{
+              const data = await addCertificateToContest(id, certificate_template_mongo_id);
+              if (!data || data.length === 0) {
+                errors.push({ id, error: 'No data returned from Supabase' });
+              } else {
+                results.push({ id, status: 'success' });
+              }
+            } catch(err) {
+
+              errors.push({ id, error: 'Contest type not supported yet' });
+            }
         } else {
           errors.push({ id, error: 'Unknown type' });
         }

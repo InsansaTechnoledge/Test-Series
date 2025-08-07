@@ -160,37 +160,36 @@ const Navbar = ({setShowLogoutModal}) => {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (searchResultsRef.current && !searchResultsRef.current.contains(event.target) &&
-          searchInputRef.current && !searchInputRef.current.contains(event.target)) {
+      if (
+        searchResultsRef.current &&
+        !searchResultsRef.current.contains(event.target) &&
+        searchInputRef.current &&
+        !searchInputRef.current.contains(event.target)
+      ) {
         setShowSearchResults(false);
         setSelectedResultIndex(-1);
       }
-      
-      // Close categories dropdown when clicking outside
+  
       const categoryDropdowns = document.querySelectorAll('[data-category-dropdown]');
       const categoryButtons = document.querySelectorAll('[data-category-button]');
-      
+  
       let clickedInsideCategory = false;
       categoryDropdowns.forEach(dropdown => {
-        if (dropdown.contains(event.target)) {
-          clickedInsideCategory = true;
-        }
+        if (dropdown.contains(event.target)) clickedInsideCategory = true;
       });
-      
       categoryButtons.forEach(button => {
-        if (button.contains(event.target)) {
-          clickedInsideCategory = true;
-        }
+        if (button.contains(event.target)) clickedInsideCategory = true;
       });
-      
-      if (!clickedInsideCategory) {
+  
+      if (!clickedInsideCategory && window.innerWidth >= 768) {
         setActiveCategory('');
       }
     };
-
+  
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+  
 
   const handleCategoryClick = (categoryName) => {
     setActiveCategory(activeCategory === categoryName ? '' : categoryName);
@@ -689,6 +688,11 @@ const Navbar = ({setShowLogoutModal}) => {
           selectedResultIndex={selectedResultIndex}
           handleResultClick={handleResultClick}
           searchResults={searchResults}
+          handleCategoryClick={handleCategoryClick}
+          handleFeatureClick={handleFeatureClick}
+          setActiveCategory={setActiveCategory}
+          setShowMobileMenu={setShowMobileMenu}
+          setShowLogoutModal={setShowLogoutModal}
         />
 
       </div>

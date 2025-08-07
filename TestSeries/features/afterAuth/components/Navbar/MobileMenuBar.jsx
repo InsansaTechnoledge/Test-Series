@@ -22,9 +22,24 @@ const MobileMenuBar = ({
   searchResultsRef,
   selectedResultIndex,
   handleResultClick,
-  searchResults
+  searchResults,
+  handleCategoryClick,
+  setActiveCategory,
+  setShowMobileMenu,
+  setShowLogoutModal
 }) => {
   const navigate = useNavigate();
+
+  const handleMobileFeatureClick = (path) => {
+    const rolePrefix = user.role === 'organization' ? '/institute' : '/student';
+    navigate(`${rolePrefix}/${path}`);
+
+    // Delay closing menu and resetting category
+    setTimeout(() => {
+      setShowMobileMenu(false);
+      setActiveCategory('');
+    }, 100);
+  };
 
   return (
     showMobileMenu && (
@@ -88,7 +103,10 @@ const MobileMenuBar = ({
                     return control ? (
                       <button
                         key={control.name}
-                        onClick={() => handleFeatureClick(control.path)}
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevent bubble
+                          handleMobileFeatureClick(control.path);
+                        }}
                         className={`flex items-center w-full px-3 py-2 text-sm rounded-md ${themeClasses.dropdownItem}`}
                       >
                         <img 
@@ -138,7 +156,7 @@ const MobileMenuBar = ({
                 onClick={() => {
                   navigate('/institute-subscription');
                   setShowMobileMenu(false);
-                  setActiveCategory(''); // Close categories dropdown
+                  setActiveCategory('');
                 }}
                 className={`block w-full text-left px-3 py-2 text-base font-medium rounded-md ${themeClasses.dropdownItem}`}
               >
@@ -152,7 +170,7 @@ const MobileMenuBar = ({
                   if (user?._id) {
                     navigate(`/edit-profile/${user._id}`);
                     setShowMobileMenu(false);
-                    setActiveCategory(''); // Close categories dropdown
+                    setActiveCategory('');
                   }
                 }}
                 className={`block w-full text-left px-3 py-2 text-base font-medium rounded-md ${themeClasses.dropdownItem}`}
@@ -165,7 +183,7 @@ const MobileMenuBar = ({
               onClick={() => {
                 setShowLogoutModal(true);
                 setShowMobileMenu(false);
-                setActiveCategory(''); // Close categories dropdown
+                setActiveCategory('');
               }}
               className={`block w-full text-left px-3 py-2 text-base font-medium rounded-md ${themeClasses.dropdownItem}`}
             >

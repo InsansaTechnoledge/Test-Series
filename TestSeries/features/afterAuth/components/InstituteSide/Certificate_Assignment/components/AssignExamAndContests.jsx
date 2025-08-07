@@ -1,7 +1,7 @@
 import React from 'react';
 import Select from 'react-select';
 
-const AssignExamAndContests = ({ selectedCard, selectedExam, setSelectedExam, onAssign, Exams }) => {
+const AssignExamAndContests = ({ selectedCard, selectedExam, setSelectedExam, onAssign, Exams , assignedItems}) => {
   const handleExamAssign = () => {
     if (selectedCard && selectedExam) {
       onAssign();
@@ -10,7 +10,12 @@ const AssignExamAndContests = ({ selectedCard, selectedExam, setSelectedExam, on
 
   const isAssignDisabled = !selectedCard || !selectedExam;
 
-  const options = Exams?.map((e) => ({
+  console.log("fr", {assignedItems} , Exams)
+
+  // it would filter the exams that are even assigned but not submitted 
+  const options = Exams?.filter(
+    (e) => !assignedItems?.find((a) => a.examId === e.id)
+  )?.map((e) => ({
     value: e.id,
     label: (
       <div className="flex items-center justify-between w-full py-1">
@@ -27,7 +32,7 @@ const AssignExamAndContests = ({ selectedCard, selectedExam, setSelectedExam, on
       </div>
     ),
   })) || [];
-
+  
   const customSelectStyles = {
     control: (provided, state) => ({
       ...provided,
@@ -80,14 +85,14 @@ const AssignExamAndContests = ({ selectedCard, selectedExam, setSelectedExam, on
   };
 
   return (
-    <div className="mx-auto mt-12">
+    <div className=" max-w-7xl mx-auto mt-12 rounded-2xl">
       <div className="bg-white border-2 border-gray-100 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-visible">
         {/* Header Section */}
-        <div className="bg-gradient-to-r from-indigo-50 to-purple-50 px-8 py-6 border-b border-gray-100">
+        <div className="bg-indigo-600 px-8 py-6 border-b rounded-t-2xl border-gray-100">
           <div className="flex items-center gap-3 mb-2">
-            <h1 className="font-bold text-3xl text-gray-900">Assign Exam or Contest</h1>
+            <h1 className="font-bold text-2xl text-gray-100">Assign Exam or Contest</h1>
           </div>
-          <p className="text-gray-600 text-lg">
+          <p className="text-gray-100 text-sm">
             Select an exam or contest to assign the chosen certificate template
           </p>
         </div>
@@ -154,12 +159,12 @@ const AssignExamAndContests = ({ selectedCard, selectedExam, setSelectedExam, on
 
           {/* Help Text */}
           {!selectedCard && (
-            <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+            <div className="mt-6 p-4 bg-indigo-50 border border-indigo-200 rounded-xl">
               <div className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                 </svg>
-                <span className="text-amber-700 text-sm font-medium">
+                <span className="text-indigo-700 text-sm font-medium">
                   Please select a certificate template first before assigning an exam or contest.
                 </span>
               </div>
