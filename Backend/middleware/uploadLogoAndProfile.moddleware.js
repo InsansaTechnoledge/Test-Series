@@ -8,7 +8,7 @@ export const getCloudinaryUploader = (folderName) => {
     params: async (req, file) => ({
       folder: folderName,
       allowed_formats: ['jpg', 'png', 'jpeg'],
-      transformation: [{ width: 500, height: 500, crop: 'limit' }],
+      transformation: [{ width: 1654, height: 1170, crop: 'limit' }],
       public_id: `${Date.now()}-${file.originalname.split('.')[0]}` // Optional
     })
   });
