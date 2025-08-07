@@ -3,6 +3,7 @@ import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
 import { Organization } from "../../models/FirstDB/organization.model.js";
 import User from "../../models/FirstDB/user.model.js";
 import Student from "../../models/FirstDB/student.model.js";
+import { sessionStore } from "../../config/express.config.js";
 
 export const UserLogin = async (req, res) => {
     try {
@@ -22,7 +23,7 @@ export const UserLogin = async (req, res) => {
   
       // Destroy previous session if different
       if (existingUser.sessionId && existingUser.sessionId !== sessionId) {
-        req.sessionStore.destroy(existingUser.sessionId, (err) => {
+        sessionStore.destroy(existingUser.sessionId, (err) => {
           if (err) console.error("Error destroying old session:", err);
           else console.log("Previous session destroyed successfully.");
         });
@@ -98,7 +99,7 @@ export const organizationLogin = async (req, res) => {
   
       // Destroy previous session if it exists and is different
       if (existingOrg.sessionId && existingOrg.sessionId !== sessionId) {
-        req.sessionStore.destroy(existingOrg.sessionId, (err) => {
+        sessionStore.destroy(existingOrg.sessionId, (err) => {
           if (err) {
             console.error("Error destroying previous session:", err);
           } else {
@@ -147,7 +148,7 @@ export const organizationLogin = async (req, res) => {
   
         // Destroy previous session if exists and different
         if (existingUser.sessionId && existingUser.sessionId !== sessionId) {
-          req.sessionStore.destroy(existingUser.sessionId, (err) => {
+          sessionStore.destroy(existingUser.sessionId, (err) => {
             if (err) console.error('Error destroying old session:', err);
             else console.log('Previous user session destroyed.');
           });
@@ -165,7 +166,7 @@ export const organizationLogin = async (req, res) => {
   
         // Destroy previous session if exists and different
         if (existingOrg.sessionId && existingOrg.sessionId !== sessionId) {
-          req.sessionStore.destroy(existingOrg.sessionId, (err) => {
+          sessionStore.destroy(existingOrg.sessionId, (err) => {
             if (err) console.error('Error destroying old session:', err);
             else console.log('Previous org session destroyed.');
           });
@@ -211,7 +212,7 @@ export const organizationLogin = async (req, res) => {
   
       // Destroy previous session if exists and different
       if (existingStudent.sessionId && existingStudent.sessionId !== sessionId) {
-        req.sessionStore.destroy(existingStudent.sessionId, (err) => {
+        sessionStore.destroy(existingStudent.sessionId, (err) => {
           if (err) console.error('Error destroying old student session:', err);
           else console.log('Previous student session destroyed.');
         });

@@ -21,16 +21,36 @@ export const validateSessionMiddleware = async (req, res, next) => {
 
     const dbUser = await Model.findById(req.user._id).select('sessionId');
     
-    // Session ID mismatch or user not found → force logout
     if (!dbUser || dbUser.sessionId !== req.sessionID) {
-      console.warn(`❌ Session mismatch for ${role} ${req.user._id}: Invalidating session`);
-
-      req.logout?.(() => {});
-      req.session?.destroy(() => {});
-      res.clearCookie('connect.sid'); // important to clear cookie
-
-      return new APIError(401, ['You have been logged out due to login from another device']).send(res);
-    }
+        console.warn(`❌ Session mismatch for ${role} ${req.user._id}: Invalidating session`);
+      
+        // ✅ First logout (calls passport logic which may use session)
+        if (typeof req.logout === 'function') {
+          try {
+            await new Promise((resolve, reject) => {
+              req.logout(err => {
+                if (err) return reject(err);
+                resolve();
+              });
+            });
+          } catch (err) {
+            console.error("Error during logout:", err);
+          }
+        }
+      
+        // ✅ Then destroy session
+        if (req.session) {
+          req.session.destroy(err => {
+            if (err) console.error("Session destroy error:", err);
+          });
+        }
+      
+        // ✅ Clear cookie
+        res.clearCookie('connect.sid');
+      
+        return new APIError(401, ['You have been logged out due to login from another device']).send(res);
+      }
+      
 
     return next();
   } catch (err) {

@@ -5,11 +5,12 @@ import { isLoggedInMiddleware } from '../../../middleware/isLoggedIn.middleware.
 import { validateSessionMiddleware } from '../../../middleware/validateSessionMiddleware.middleware.js';
 const router = express.Router();
 
-router.post('/user-login',validateSessionMiddleware,authenticateUserMiddleware, UserLogin);
-router.post('/logout',Logout);
+router.post('/user-login',authenticateUserMiddleware, UserLogin);
 // router.post('/org-login',authenticateOrganizationMiddleware,organizationLogin);
-router.post('/institute-login',validateSessionMiddleware,authenticateInstituteMiddleware,instituteLogin);
-router.post('/student-login',validateSessionMiddleware,authenticateStudentMiddleware,studentLogin);
-router.get('/check-auth',isLoggedInMiddleware,checkAuth);
+router.post('/institute-login',authenticateInstituteMiddleware,instituteLogin);
+router.post('/student-login',authenticateStudentMiddleware,studentLogin);
+
+router.get('/check-auth',isLoggedInMiddleware ,validateSessionMiddleware,checkAuth);
+router.post('/logout',isLoggedInMiddleware,validateSessionMiddleware,Logout);
 
 export default router;
