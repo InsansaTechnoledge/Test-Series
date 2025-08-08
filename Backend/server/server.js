@@ -1,3 +1,13 @@
+import { webcrypto } from 'crypto';
+if (typeof globalThis.crypto === 'undefined') {
+    Object.defineProperty(globalThis, 'crypto', {
+      value: crypto,
+      configurable: false,
+      enumerable: false,
+      writable: false,
+    });
+  }
+
 import fs from 'fs'
 import Dotenv from 'dotenv'
 // Dotenv.config({path: '.env.development.local'})
