@@ -1,5 +1,11 @@
+import fs from 'fs'
 import Dotenv from 'dotenv'
-Dotenv.config({path: '.env.development.local'})
+// Dotenv.config({path: '.env.development.local'})
+if (fs.existsSync('.env.development.local')) {
+    Dotenv.config({ path: '.env.development.local' });
+  } else {
+    Dotenv.config(); // loads from `.env` by default
+  }
 
 import connectDB from '../database/MongoDB.js'
 import { connectToSupabase } from '../database/SupabaseDB.js'
