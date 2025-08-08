@@ -30,6 +30,11 @@ const planFeatureSchema = new Schema({
     createdBy: {
         type: Types.ObjectId,
         ref: 'AdminUser',
+    },
+    category:{
+        type: String,
+        required: true,
+        trim: true
     }
 },{
     timestamps: true,

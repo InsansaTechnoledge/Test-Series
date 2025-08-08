@@ -7,18 +7,26 @@ import useCachedContests from "../../../../hooks/useCachedContests";
 import { usePageAccess } from "../../../../contexts/PageAccessContext";
 import Banner from "../../../../assests/Institute/contest list.svg"
 import { useTheme } from "../../../../hooks/useTheme";
+import {useUser} from "../../../../contexts/currentUserContext";
 
 const ContestList = () => {
     const { contestList, isLoading } = useCachedContests();
     const [contest, setContest] = useState([]);
 
-    console.log("rsdf", contest);
+    const {hasRoleAccess}=useUser();
     
      const canAccessPage  = usePageAccess();
      const  {theme} = useTheme()
-  
-           
-             if (!canAccessPage) {
+     const canDeleteContest = hasRoleAccess({
+      keyFromPageOrAction: "actions.deleteContest",
+    location: null
+  });
+     const canPublishContest = hasRoleAccess({
+      keyFromPageOrAction: "actions.publishContest",
+      location: null,
+  });
+
+           if (!canAccessPage) {
                return (
                  <div className="flex items-center justify-center ">
                    <div className="text-center bg-red-100 px-4 py-3 my-auto">
@@ -141,7 +149,7 @@ const ContestList = () => {
           </div>
         ) : (
 
-          <ContestCard contest={contest} setContest={setContest} theme={theme} />
+          <ContestCard contest={contest} setContest={setContest} theme={theme} canDeleteContest={canDeleteContest} canPublishContest={canPublishContest} />
 
 
 

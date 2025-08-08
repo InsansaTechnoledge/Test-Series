@@ -13,7 +13,8 @@ export const getPlanFeaturesMap = async (planId) => {
             if(feature.featureId && feature.featureId.key) {
                 featuresMap[feature.featureId.key] = {
                     isActive: feature.featureId.isActive,
-                    value: feature.value
+                    value: feature.value,
+                    category: feature.featureId.category
                 };
             }
         }

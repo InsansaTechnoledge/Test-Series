@@ -330,7 +330,6 @@ const PageLinks = () => {
                 <Route path='create-contest/:contestId?' element={<CreateContest />} />
                 <Route path='contest-list' element={<ContestList />} />
                 <Route path='code-create' element={<QuestionCreator />} />
-                <Route path='video' element={<YoutubeConnection />} />
                 <Route path='video/upload' element={<UploadVideo />} />
                 <Route path='syllabus/:syllabusId' element={<SyllabusViewPage />} />
                 <Route path='certificate-assignment' element={<CertificateAssignment/>}/>

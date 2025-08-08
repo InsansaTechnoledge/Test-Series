@@ -1,4 +1,3 @@
-import { featureKeyToCategory } from "../utils/dataMapping.util.js";
 import { APIError } from "../utils/ResponseAndError/ApiError.utils.js";
 
 export const checkRoleAccess= (featureKey) => {
@@ -16,7 +15,7 @@ export const checkRoleAccess= (featureKey) => {
             return next();
            }
 
-     const roleKey=featureKeyToCategory[featureKey];
+     const roleKey=user.planFeatures?.[featureKey].category;
 
      if(!user.roleFeatures || typeof user.roleFeatures !== 'object' || !user.roleFeatures[roleKey]) {
          console.log(`You do not have access to the feature: ${featureKey} in your plan.`);

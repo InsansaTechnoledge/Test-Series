@@ -3,7 +3,7 @@ import validator from 'validator';
 import bcrypt from 'bcrypt';
 import { connOne } from '../../database/MongoDB.js';
 import { getTotalBatches } from '../../controllers/SupabaseDB/batch.controllers.js';
-import { categoryToFeatureKey, featureKeyToMetaDataKey } from '../../utils/dataMapping.util.js';
+import { featureKeyToMetaDataKey } from '../../utils/dataMapping.util.js';
 import { getTotalContest } from '../../controllers/SupabaseDB/contest.controllers.js';
 
 
@@ -240,7 +240,9 @@ OrganizationSchema.methods.getFullMetadata = async function (roleFeatures) {
   const selectedMetadata = {};
 
   for (const category of Object.keys(roleFeatures)) {
-    const featureKey = categoryToFeatureKey[category];
+    const featureKey = Object.keys(this.planFeatures || {}).find(
+    (key) => this.planFeatures[key]?.category === category
+  );
     const metaKey = featureKeyToMetaDataKey[featureKey];
 
     if (metaKey && fullMetadata.hasOwnProperty(metaKey)) {
@@ -254,8 +256,6 @@ OrganizationSchema.methods.getFullMetadata = async function (roleFeatures) {
 
 OrganizationSchema.set('toObject', { virtuals: false });
 OrganizationSchema.set('toJSON', { virtuals: true });
-
-
 
 
 export const Organization = connOne.model('Organization' , OrganizationSchema)
