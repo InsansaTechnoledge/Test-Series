@@ -11,12 +11,14 @@ const StudentViewPage = () => {
   const location = useLocation();
   const studentId = location.state?.studentId;
   const { studentMap } = useCachedStudents();
-  const { batchMap } = useCachedBatches();
+  const { batchMap , batches } = useCachedBatches();
   const navigate = useNavigate();
   const studentData = studentMap?.[studentId];
   const { theme } = useTheme();
 
   const batchName = batchMap?.[studentData.batch?.currentBatch]?.name || 'N/A';
+
+  // console.log("ffd", batches , studentData)
 
   if (!studentData) {
     return (

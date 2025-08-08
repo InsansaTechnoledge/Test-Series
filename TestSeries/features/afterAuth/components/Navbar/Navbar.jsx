@@ -12,6 +12,7 @@ import EpicThemeSlider from './ThemeSlide.jsx';
 import SearchResults from './SearchResults.jsx';
 import MobileMenuBar from './MobileMenuBar.jsx';
 import { useDock } from './context/DockContext.jsx';
+import { getOrganizationById } from '../../../../utils/services/organizationService.js';
 
 const Navbar = ({setShowLogoutModal}) => {
   const [activeCategory, setActiveCategory] = useState('');
@@ -36,6 +37,9 @@ const Navbar = ({setShowLogoutModal}) => {
   const { controls, categories } = SideBarDataHook();
   // const [isDockToggled, setDockIsToggled] = useState(false);
   const {isDockToggled,toggleDock} = useDock();
+  const [organizationName, setOrganizationName] = useState('');
+
+  const [orgLogo , setOrgLogo] = useState('');
 
   console.log("check ", user)
 
@@ -160,37 +164,36 @@ const Navbar = ({setShowLogoutModal}) => {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (searchResultsRef.current && !searchResultsRef.current.contains(event.target) &&
-          searchInputRef.current && !searchInputRef.current.contains(event.target)) {
+      if (
+        searchResultsRef.current &&
+        !searchResultsRef.current.contains(event.target) &&
+        searchInputRef.current &&
+        !searchInputRef.current.contains(event.target)
+      ) {
         setShowSearchResults(false);
         setSelectedResultIndex(-1);
       }
-      
-      // Close categories dropdown when clicking outside
+  
       const categoryDropdowns = document.querySelectorAll('[data-category-dropdown]');
       const categoryButtons = document.querySelectorAll('[data-category-button]');
-      
+  
       let clickedInsideCategory = false;
       categoryDropdowns.forEach(dropdown => {
-        if (dropdown.contains(event.target)) {
-          clickedInsideCategory = true;
-        }
+        if (dropdown.contains(event.target)) clickedInsideCategory = true;
       });
-      
       categoryButtons.forEach(button => {
-        if (button.contains(event.target)) {
-          clickedInsideCategory = true;
-        }
+        if (button.contains(event.target)) clickedInsideCategory = true;
       });
-      
-      if (!clickedInsideCategory) {
+  
+      if (!clickedInsideCategory && window.innerWidth >= 768) {
         setActiveCategory('');
       }
     };
-
+  
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+  
 
   const handleCategoryClick = (categoryName) => {
     console.log(`Category clicked: ${categoryName}`);
@@ -242,6 +245,26 @@ const Navbar = ({setShowLogoutModal}) => {
       }
   }
   
+  console.log("Gf", user);
+
+  useEffect(() => {
+    const fetchOrgName = async () => {
+      if (user?.role !== 'organization' && user?.organizationId?._id) {
+        try {
+          const res = await getOrganizationById(user.organizationId._id);
+          console.log('gd', res)
+          setOrganizationName(res.data?.name || 'Unknown Org');
+          setOrgLogo(res?.data?.logoUrl || '')
+        } catch (err) {
+          console.error('Failed to fetch organization name:', err);
+          setOrganizationName('Unknown Org');
+        }
+      }
+    };
+
+    fetchOrgName();
+  }, [user]);
+  
   return (
     <nav className={`z-50 ${themeClasses.nav}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -251,11 +274,31 @@ const Navbar = ({setShowLogoutModal}) => {
             onClick={() => helperFunctionToNavigateHome(user?.role)}
             className="flex items-center cursor-pointer">
             
-            <img 
-              src={ theme === 'light' ? logo : logoDark} 
-              alt="Evalvo" 
-              className="h-8 w-auto"
-            />
+            {
+              user?.role === 'organization' ? (
+                <img 
+                src={ theme === 'light' ? logo : logoDark} 
+                alt="Evalvo" 
+                className="h-8 w-auto"
+              />
+              ) : (
+                <div className="flex items-center gap-4 px-4 py-2 rounded-xl ">
+                  <img
+                    className="h-12 w-12 rounded-full object-cover border-2 shadow-sm"
+                    src={orgLogo}
+                    alt="Organization Logo"
+                  />
+                  <span
+                    className={`text-xl font-bold tracking-wide ${
+                      theme === 'light' ? 'text-gray-800' : 'text-white'
+                    }`}
+                  >
+                    {organizationName}
+                  </span>
+                </div>
+              )
+            }
+           
           </button>
 
           {/* Desktop Navigation */}
@@ -693,8 +736,9 @@ const Navbar = ({setShowLogoutModal}) => {
           searchResults={searchResults}
           handleCategoryClick={handleCategoryClick}
           handleFeatureClick={handleFeatureClick}
-          setShowMobileMenu={setShowMobileMenu}
           setActiveCategory={setActiveCategory}
+          setShowMobileMenu={setShowMobileMenu}
+          setShowLogoutModal={setShowLogoutModal}
         />
 
       </div>

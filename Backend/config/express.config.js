@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import passport from '../utils/PassportAuth/Passport.js';
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
+import { validateSessionMiddleware } from '../middleware/validateSessionMiddleware.middleware.js';
 
 const app = express();
 
@@ -34,6 +35,12 @@ app.use(express.json({limit: "40mb"}));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+const sessionStore = MongoStore.create({
+  mongoUrl: process.env.MONGODB1_URL,
+  ttl: 24 * 60 * 60,
+  touchAfter: 24 * 3600,
+})
+
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
@@ -47,12 +54,10 @@ app.use(session({
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: 24 * 60 * 60 * 1000,
   },
-  store: MongoStore.create({
-    mongoUrl: process.env.MONGODB1_URL,
-    ttl: 24 * 60 * 60,
-    touchAfter: 24 * 3600,
-  })
+  store: sessionStore
 }));
+
+export {sessionStore};
 
 // Add middleware to handle preflight requests properly
 app.use((req, res, next) => {
@@ -70,6 +75,8 @@ app.use((req, res, next) => {
 // Initialize Passport.js
 app.use(passport.initialize());
 app.use(passport.session());
+
+// app.use(validateSessionMiddleware);
 
 // Routes
 routes(app);

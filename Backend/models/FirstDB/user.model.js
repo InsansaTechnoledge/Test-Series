@@ -120,7 +120,8 @@ const userSchema = new Schema({
       enum: ['User', 'Organization'],
     }
   },
-  youtubeInfo:youtubeInfoSchema
+  youtubeInfo:youtubeInfoSchema,
+  sessionId: { type: String, default: null }
 
 
 }, {

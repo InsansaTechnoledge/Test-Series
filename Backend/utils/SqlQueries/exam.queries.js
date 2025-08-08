@@ -44,7 +44,8 @@ export const fetchSelective = async (conditions) => {
       reapplicable,
       auto_submittable,
       ai_proctored,
-      subjects
+      subjects,
+      certificate_template_mongo_id
 
     `);
 
@@ -155,7 +156,8 @@ export const fetchNonLiveExams = async (organization_id) => {
           year
         ),
         ai_proctored,
-        auto_submittable
+        auto_submittable,
+        certificate_template_mongo_id
       `)
     .eq("go_live", false)
     .eq("organization_id", organization_id);
@@ -211,3 +213,14 @@ export const addCertificate = async (id, certificate_template_mongo_id) => {
   if (error) throw error;
   return data;
 };
+
+export const addCertificateToContest = async(id , certificate_template_mongo_id) => {
+  const {data , error} = await supabase
+  .from('organization_contest')
+  .update({certificate_template_mongo_id})
+  .eq('id', id)
+  .select();
+
+  if(error) throw error
+  return data;
+}

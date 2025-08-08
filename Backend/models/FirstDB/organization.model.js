@@ -46,7 +46,8 @@ const addressSchema = new Schema({
     coordinates: {
       type: [Number], // [longitude, latitude]
       required: false
-    }
+    },
+   
   }
 }, {
   _id: false
@@ -172,6 +173,7 @@ totalExams: {
         type: Number,
         default: 0,
       },
+      sessionId: { type: String, default: null }
 }, 
 {
     timestamps: true
