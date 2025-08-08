@@ -66,6 +66,9 @@ import ExamAnomalyControlSection from '../../features/afterAuth/components/Insti
 import QBMS from '../../features/afterAuth/components/InstituteSide/QuestionBankManagementSystem/QBMS';
 import AppDownloadPage from '../../features/App/AppDownloadPage';
 import CertificateAssignment from '../../features/afterAuth/components/InstituteSide/Certificate_Assignment/CertificateAssignment';
+import LogComponent from '../../features/afterAuth/components/InstituteSide/LogsComponent/LogComponent';
+// import LogComponent from '../../features/afterAuth/components/InstituteSide/Logs/LogComponent';
+LogComponent
 
 let Router = window.electronAPI ? HashRouter : BrowserRouter;
 
@@ -334,6 +337,7 @@ const PageLinks = () => {
                 <Route path='video/upload' element={<UploadVideo />} />
                 <Route path='syllabus/:syllabusId' element={<SyllabusViewPage />} />
                 <Route path='certificate-assignment' element={<CertificateAssignment/>}/>
+                <Route path='check-logs' element={<LogComponent/>}/>
                 {user?.role === "organization" && (
           <Route path='institute-subscription' element={<YourPlanPage />} />
         )}

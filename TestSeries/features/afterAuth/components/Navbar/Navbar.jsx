@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Settings, ChevronDown, Menu, X, Sun, Moon, CreativeCommons, PaperclipIcon, Lock } from 'lucide-react';
+import { Search, Settings, ChevronDown, Menu, X, Sun, Moon, CreativeCommons, PaperclipIcon, Lock, LogsIcon, EyeIcon } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useUser } from '../../../../contexts/currentUserContext';
 // import logo from '../../../../assests/Landing/Navbar/evalvo logo blue 2.svg'
@@ -497,6 +497,8 @@ const Navbar = ({setShowLogoutModal}) => {
                       )}
 
                       {user?.role === "organization" && (
+                        <>
+                        
                         <button
                           onClick={() => {
                             navigate('/institute/institute-subscription');
@@ -512,6 +514,19 @@ const Navbar = ({setShowLogoutModal}) => {
                           </div>
                           <span className="font-medium">Know Your Plan</span>
                         </button>
+
+                        <button
+                          onClick={() => {
+                            navigate('check-logs')
+                          }}
+                          className={`w-full flex items-center px-3 py-3 text-sm rounded-lg transition-all duration-200 ${themeClasses.dropdownItem} ${theme === 'light' ? 'hover:bg-gray-50' : 'hover:bg-gray-700'}`}
+                        >
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 ${theme === 'light' ? 'bg-purple-100' : 'bg-purple-900'}`}>
+                            <EyeIcon/>
+                          </div>
+                          <span className="font-medium">Check Who's Online!!</span>
+                        </button>
+                        </>
                       )}
                     </div>
 
