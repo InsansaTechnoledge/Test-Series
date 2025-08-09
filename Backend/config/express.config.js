@@ -46,6 +46,7 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   name: 'connect.sid',
+  proxy: true,
   cookie: {
     // Must be true in production for SameSite=none to work
     secure: process.env.NODE_ENV === 'production', 
@@ -73,8 +74,21 @@ app.use((req, res, next) => {
 });
 
 // Initialize Passport.js
+app.use((req, _res, next) => {
+  // express-session has attached req.session by here
+  console.log('🗃️  Session keys before passport:', Object.keys(req.session || {}));
+  next();
+});
+
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.use((req, _res, next) => {
+  // passport.session() has run by here (if cookie+store ok)
+  console.log('🧩 After passport.session - req.user:', req.user);
+  console.log('🧩 After passport.session - req.session.passport:', req.session?.passport);
+  next();
+});
 
 app.use(validateSessionMiddleware);
 
