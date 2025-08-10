@@ -11,23 +11,6 @@ const app = express();
 
 app.set('trust proxy', 1);
 
-// CORS configuration
-// app.use(cors({
-//   origin: function (origin, callback) {
-//     console.log('Request origin:', origin);
-//     if (!origin || allowedOrigins.includes(origin) || origin.startsWith('http://localhost') || origin.startsWith('file://') || origin.startsWith('app://')) {
-//       callback(null, true);
-//     } else {
-//       console.log('CORS Error - Origin not allowed:', origin);
-//       callback(new Error('Not allowed by CORS'));
-//     }
-//   },
-//   credentials: true,
-//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-//   allowedHeaders: ['Content-Type', 'Authorization'],
-//   exposedHeaders: ['Set-Cookie']
-// }));
-
 const isProd = process.env.NODE_ENV === 'production';
 const allowedOrigins = (process.env.CLIENT_URL || '')
   .split(',')
@@ -35,40 +18,54 @@ const allowedOrigins = (process.env.CLIENT_URL || '')
   .filter(Boolean);
 
 app.use(cors({
-  origin(origin, cb) {
+  origin: function (origin, callback) {
     console.log('Request origin:', origin);
-    // allow same-origin/no-Origin (e.g., curl, SSR)
-    if (!origin) return cb(null, true);
-
-    const normalized = origin.replace(/\/$/, '');
-    const ok =
-      allowedOrigins.includes(normalized) ||
-      (!isProd && /^http:\/\/localhost(:\d+)?$/.test(normalized));
-
-    if (ok) return cb(null, true);
-
-    console.log('CORS Error - Origin not allowed:', origin);
-    return cb(new Error('Not allowed by CORS'));
+    if (!origin || allowedOrigins.includes(origin) || origin.startsWith('http://localhost') || origin.startsWith('file://') || origin.startsWith('app://')) {
+      callback(null, true);
+    } else {
+      console.log('CORS Error - Origin not allowed:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
   },
   credentials: true,
-  methods: ['GET','POST','PUT','DELETE','OPTIONS','PATCH'],
-  allowedHeaders: ['Content-Type','Authorization'],
-  exposedHeaders: ['Set-Cookie'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['Set-Cookie']
 }));
 
-app.options(/.*/, cors({
-  origin(origin, cb) {
-    if (!origin) return cb(null, true);
-    const normalized = origin.replace(/\/$/, '');
-    const ok =
-      allowedOrigins.includes(normalized) ||
-      (!isProd && /^http:\/\/localhost(:\d+)?$/.test(normalized));
-    return ok ? cb(null, true) : cb(new Error('Not allowed by CORS'));
-  },
-  credentials: true,
-}));
+// app.use(cors({
+//   origin(origin, cb) {
+//     console.log('Request origin:', origin);
+//     // allow same-origin/no-Origin (e.g., curl, SSR)
+//     if (!origin) return cb(null, true);
 
+//     const normalized = origin.replace(/\/$/, '');
+//     const ok =
+//       allowedOrigins.includes(normalized) ||
+//       (!isProd && /^http:\/\/localhost(:\d+)?$/.test(normalized));
 
+//     if (ok) return cb(null, true);
+
+//     console.log('CORS Error - Origin not allowed:', origin);
+//     return cb(new Error('Not allowed by CORS'));
+//   },
+//   credentials: true,
+//   methods: ['GET','POST','PUT','DELETE','OPTIONS','PATCH'],
+//   allowedHeaders: ['Content-Type','Authorization'],
+//   exposedHeaders: ['Set-Cookie'],
+// }));
+
+// app.options(/.*/, cors({
+//   origin(origin, cb) {
+//     if (!origin) return cb(null, true);
+//     const normalized = origin.replace(/\/$/, '');
+//     const ok =
+//       allowedOrigins.includes(normalized) ||
+//       (!isProd && /^http:\/\/localhost(:\d+)?$/.test(normalized));
+//     return ok ? cb(null, true) : cb(new Error('Not allowed by CORS'));
+//   },
+//   credentials: true,
+// }));
 
 app.use(express.json({limit: "40mb"}));
 app.use(express.urlencoded({ extended: true }));
