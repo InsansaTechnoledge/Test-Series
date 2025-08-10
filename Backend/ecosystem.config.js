@@ -28,4 +28,4 @@ export const apps = [
         ignore_watch: ['node_modules', 'logs'],
     },
 ];
-  g
+  
