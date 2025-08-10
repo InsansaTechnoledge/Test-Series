@@ -90,7 +90,7 @@ app.use(session({
     // Use 'none' for cross-origin in production, 'lax' for development
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: 24 * 60 * 60 * 1000,
-    domain: '.evalvotech.com',
+    // domain: '.evalvotech.com',
   },
   store: sessionStore
 }));
@@ -126,8 +126,6 @@ app.use((req, _res, next) => {
   console.log('🧩 After passport.session - req.session.passport:', req.session?.passport);
   next();
 });
-
-app.use(validateSessionMiddleware);
 
 // Routes
 routes(app);
