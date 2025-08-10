@@ -17,7 +17,7 @@ import Dotenv from 'dotenv';
 if (fs.existsSync('.env.development.local')) {
   Dotenv.config({ path: '.env.development.local' });
 } else {
-  // Dotenv.config(); // defaults to `.env`
+  Dotenv.config(); // defaults to `.env`
 }
 
 // Optional: Confirm env loaded
