@@ -106,7 +106,7 @@ passport.use('institute-local', new LocalStrategy({
       if (roleFeatures && Object.keys(roleFeatures).length > 0) {
         console.log('Role features found:', roleFeatures);
          planFeatures = planId ? await getPlanFeaturesMap(planId) : {};
-        metaData = user.organizationId ? await user.organizationId.getFullMetadata(roleFeatures) : {};
+        metaData = user.organizationId ? await user.organizationId.getFullMetadata(roleFeatures,planFeatures) : {};
       }
 
 
@@ -203,7 +203,7 @@ passport.deserializeUser(async (object, done) => {
         if (user.planPurchased) {
           planFeatures = await getPlanFeaturesMap(user.planPurchased);
         }
-        metaData = await user.getFullMetadata(roleFeatures);
+        metaData = await user.getFullMetadata(roleFeatures,planFeatures);
 
         return done(null, { ...user.toObject(), role: 'organization', planFeatures, metaData });
       }
@@ -223,7 +223,7 @@ passport.deserializeUser(async (object, done) => {
 
         if (user.organizationId && user.organizationId.planPurchased && Object.keys(roleFeatures).length > 0) {
           planFeatures = await getPlanFeaturesMap(user.organizationId.planPurchased);
-          metaData = await user.organizationId.getFullMetadata(roleFeatures);
+          metaData = await user.organizationId.getFullMetadata(roleFeatures,planFeatures);
         }
 
 
