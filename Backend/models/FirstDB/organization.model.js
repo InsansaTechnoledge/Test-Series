@@ -215,7 +215,7 @@ OrganizationSchema.virtual('totalRoleGroups',{
 })
 
 
-OrganizationSchema.methods.getFullMetadata = async function (roleFeatures) {
+OrganizationSchema.methods.getFullMetadata = async function (roleFeatures,planFeatures) {
 
   const shouldReturnAll = !roleFeatures || Object.keys(roleFeatures).length === 0;
 
@@ -242,8 +242,8 @@ OrganizationSchema.methods.getFullMetadata = async function (roleFeatures) {
   const selectedMetadata = {};
 
   for (const category of Object.keys(roleFeatures)) {
-    const featureKey = Object.keys(this.planFeatures || {}).find(
-    (key) => this.planFeatures[key]?.category === category
+    const featureKey = Object.keys(planFeatures || {}).find(
+    (key) => planFeatures[key]?.category === category
   );
     const metaKey = featureKeyToMetaDataKey[featureKey];
 
