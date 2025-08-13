@@ -127,6 +127,16 @@ app.use((req, _res, next) => {
   next();
 });
 
+app.use((req, res, next) => {
+  res.on('finish', () => {
+    if (req.path === '/auth/institute-login') {
+      console.log('Set-Cookie on login:', res.getHeader('Set-Cookie'));
+    }
+  });
+  next();
+});
+
+
 // Routes
 routes(app);
 

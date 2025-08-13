@@ -300,8 +300,8 @@ const QuestionSection = ({
         <div className="flex items-center gap-4">
           <div
             className={`px-5 py-1 rounded-full text-sm font-medium m-1 ${theme === "dark"
-                ? "bg-blue-900 text-blue-200 border border-blue-700"
-                : "bg-blue-100 text-blue-800 border border-blue-300"
+                ? "bg-indigo-900 text-blue-200 border border-indigo-700"
+                : "bg-indigo-100 text-indigo-800 border border-indigo-300"
               }`}
           >
             {questionSubject}
@@ -468,7 +468,7 @@ const QuestionSection = ({
           </button>
         </div>
 
-        <div className="order-1 sm:order-2">
+        {/* <div className="order-1 sm:order-2">
           <button
             onClick={ () => {
               if(!submitCool) {
@@ -484,10 +484,10 @@ const QuestionSection = ({
                 : "bg-blue-700 text-white hover:bg-blue-600"
               }
                         `}
-          >
+          > 
             {submitCool ? "Please wait..." : "Submit Test"}
           </button>
-        </div>
+        </div> */}
       </div>
 
       {showSubmitModal && (
