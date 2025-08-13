@@ -23,7 +23,7 @@ const ContestCard = ({ contest, setContest, theme , canDeleteContest, canPublish
     return new Date(dateString).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
-      year: "numeric",
+      year: "numeric",  
     });
   };
 
