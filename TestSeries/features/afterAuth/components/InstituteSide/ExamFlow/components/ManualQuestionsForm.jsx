@@ -99,17 +99,17 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
       showToast_new("Please enter a question text", "warning");
       return;
     }
-    // const { isValid, matchedLevel } = await validateWithBloom(form.question_text, bloomLevel);
+    const { isValid, matchedLevel } = await validateWithBloom(form.question_text, bloomLevel);
 
-    // console.log("✅ Bloom Match:", bloomLevel);
-    // console.log("✅ Detected Bloom Level:", matchedLevel);
-    // console.log("bloom level/////",bloomLevel);
-    // if (!isValid) {
-    //   showToast_new(`❌ Incorrect Bloom level! ${bloomLevel}, correct ${matchedLevel}`, "error");
-    //   return;
-    // }
+    console.log("✅ Bloom Match:", bloomLevel);
+    console.log("✅ Detected Bloom Level:", matchedLevel);
+    console.log("bloom level/////",bloomLevel);
+    if (!isValid) {
+      showToast_new(`❌ Incorrect Bloom level! ${bloomLevel}, correct ${matchedLevel}`, "error");
+      return;
+    }
 
-    // showToast_new(`✅ Question matches Bloom level: ${matchedLevel}`, "success");
+    showToast_new(`✅ Question matches Bloom level: ${matchedLevel}`, "success");
 
     const newQuestion = {
       id: uuidv4(),
@@ -628,26 +628,81 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
               />
 
               {/* Options */}
-              {(form.sub_form.type === "mcq" || form.sub_form.type === "msq") && (
-                <>
-                  {form.sub_form.options.map((opt, i) => (
-                    <input
-                      key={i}
-                      className={inputCommon}
-                      placeholder={`Option ${i + 1}`}
-                      value={opt}
-                      onChange={(e) => {
-                        const updated = [...form.sub_form.options];
-                        updated[i] = e.target.value;
-                        setForm((prev) => ({
-                          ...prev,
-                          sub_form: { ...prev.sub_form, options: updated },
-                        }));
-                      }}
-                    />
-                  ))}
-                </>
-              )}
+          {(form.sub_form.type === "mcq" || form.sub_form.type === "msq") &&
+  form.sub_form.options.map((opt, i) => {
+    const isChecked =
+      form.sub_form.type === "mcq"
+        ? form.sub_form.correct_option === i
+        : form.sub_form.correct_options.includes(i);
+
+    const handleCheckChange = () => {
+      if (form.sub_form.type === "mcq") {
+        // Only one correct option
+        setForm((prev) => ({
+          ...prev,
+          sub_form: {
+            ...prev.sub_form,
+            correct_option: i,
+          },
+        }));
+      } else {
+        // MSQ: multiple correct options
+        const current = form.sub_form.correct_options || [];
+        if (current.includes(i)) {
+          // Remove this option
+          setForm((prev) => ({
+            ...prev,
+            sub_form: {
+              ...prev.sub_form,
+              correct_options: current.filter((val) => val !== i),
+            },
+          }));
+        } else {
+          // Add this option
+          setForm((prev) => ({
+            ...prev,
+            sub_form: {
+              ...prev.sub_form,
+              correct_options: [...current, i],
+            },
+          }));
+        }
+      }
+    };
+
+    return (
+      <div key={i} className="flex items-center space-x-2">
+        {form.sub_form.type === "mcq" ? (
+          <input
+            type="radio"
+            name="correct-option"
+            checked={isChecked}
+            onChange={handleCheckChange}
+          />
+        ) : (
+          <input
+            type="checkbox"
+            checked={isChecked}
+            onChange={handleCheckChange}
+          />
+        )}
+        <input
+          className={inputCommon}
+          placeholder={`Option ${i + 1}`}
+          value={opt}
+          onChange={(e) => {
+            const updated = [...form.sub_form.options];
+            updated[i] = e.target.value;
+            setForm((prev) => ({
+              ...prev,
+              sub_form: { ...prev.sub_form, options: updated },
+            }));
+          }}
+        />
+      </div>
+    );
+  })}
+
 
               {/* MCQ correct index */}
               {/* {form.sub_form.type === "mcq" && (
@@ -730,6 +785,24 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
                 type="button"
                 className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                 onClick={() => {
+
+                   const currentSubForm = form.sub_form;
+
+    // Debug: log the correct answer depending on question type
+    if (currentSubForm.type === "mcq") {
+      console.log("Adding MCQ - Correct option index:", currentSubForm.correct_option);
+      console.log("Correct answer text:", currentSubForm.options[currentSubForm.correct_option]);
+    } else if (currentSubForm.type === "msq") {
+      console.log("Adding MSQ - Correct options indices:", currentSubForm.correct_options);
+      console.log(
+        "Correct answers text:",
+        currentSubForm.correct_options.map((i) => currentSubForm.options[i])
+      );
+    } else if (currentSubForm.type === "fill" || currentSubForm.type === "numerical") {
+      console.log("Correct answer:", currentSubForm.correct_answer);
+    } else if (currentSubForm.type === "tf") {
+      console.log("Correct answer (True/False):", currentSubForm.is_true);
+    }
                   setForm((prev) => ({
                     ...prev,
                     sub_question_ids: [
@@ -756,7 +829,6 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
               >
                 Add Sub-question
               </button>
-
               {/* Preview sub-questions */}
               {form.sub_question_ids.length > 0 && (
                 <div className="mt-2 text-sm text-gray-700">

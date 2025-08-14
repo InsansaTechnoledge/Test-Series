@@ -35,11 +35,9 @@ export const sendUserCredentialsMail = async (orgName = '1234', userName, email,
                         </a>
                     </p>
                     <div style="font-size: 10px; color: #555; margin-top: 30px; text-align: center; font-style: italic;">
-  Note: This certificate is issued to the recipient mentioned above. Do not share this document with anyone.  
+  Note: These credentials are issued to the recipient mentioned above. Do not share this document with anyone.  
   For any queries, please contact your organization.
 </div>
-
-                    <p style="font-size: 14px; color: #555;">For security purposes, we recommend changing your password immediately after logging in.</p>
                     <p>Best regards,<br>
                     <strong>EvalvoTech Team</strong></p>
                 </div>
