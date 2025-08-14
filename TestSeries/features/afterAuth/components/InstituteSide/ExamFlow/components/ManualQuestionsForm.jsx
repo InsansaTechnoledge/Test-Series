@@ -19,6 +19,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
   const [bloomLevel, setBloomLevel] = useState("Remember");
   
   const { showToast_new } = useToast_new();
+  const [loading , setLoading] = useState(false);
 
   const [codeData, setCodeData] = useState({
     title: "",
@@ -94,6 +95,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
   };
 
   const handleAdd = async () => {
+    setLoading(true);
     // Basic validation
     if (!form.question_text.trim()) {
       showToast_new("Please enter a question text", "warning");
@@ -106,6 +108,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
     console.log("bloom level/////",bloomLevel);
     if (!isValid) {
       showToast_new(`❌ Incorrect Bloom level! ${bloomLevel}, correct ${matchedLevel}`, "error");
+      setLoading(false);
       return;
     }
 
@@ -195,6 +198,8 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
     }
 
     setQuestions((prev) => [...prev, newQuestion]);
+
+    setLoading(false);
 
     // Reset form after adding
     setForm(initialFormState);
@@ -914,7 +919,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
           className="py-2.5 px-6 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-medium rounded-xl shadow-md hover:scale-[1.02] transition-transform duration-200"
           onClick={handleAdd}
         >
-          Add Question
+          {loading === false ? 'Add Question' : 'Adding question...'}
         </button>
 
 
