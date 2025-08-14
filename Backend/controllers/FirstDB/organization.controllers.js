@@ -127,7 +127,7 @@ export const deleteOrganization = async (req, res) => {
     return new APIResponse(200, organization, 'Organization deleted successfully').send(res);
   } catch (err) {
     console.error('Error deleting Organization:', err);
-    new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while deleting the organization", err.message || ""]).send(res);
+    return new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while deleting the organization", err.message || ""]).send(res);
 
   }
 };

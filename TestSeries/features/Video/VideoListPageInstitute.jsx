@@ -5,6 +5,7 @@ import Banner from "../../assests/Institute/uploaded videos.svg";
 import { usePageAccess } from "../../contexts/PageAccessContext";
 import { useTheme } from "../../hooks/useTheme";
 import { useToast, ToastContainer } from "../../utils/Toaster";
+import { useUser } from "../../contexts/currentUserContext";
 
 const VideoListPageInstitute = () => {
   const { batches } = useCachedBatches();
@@ -12,6 +13,12 @@ const VideoListPageInstitute = () => {
   const [videoIds, setVideoIds] = useState([]);
   const { theme } = useTheme();
   const { toasts, showToast, removeToast } = useToast();
+  const {hasRoleAccess}=useUser();
+
+    const candeleteVideo = hasRoleAccess({
+    keyFromPageOrAction: "actions.deleteVideo",
+    location: null,
+  });
 
   const canAccessPage = usePageAccess();
 
@@ -160,12 +167,13 @@ const VideoListPageInstitute = () => {
                       : "bg-gray-50 border-t"
                   }`}
                 >
-                  <button
+                  {candeleteVideo && (<button
                     onClick={() => handleDelete(videoId)}
+                    disabled={!candeleteVideo}
                     className="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 text-sm font-semibold rounded-lg shadow hover:scale-105 transition-transform"
                   >
                     Delete
-                  </button>
+                  </button>)}
                 </div>
               </div>
             ))

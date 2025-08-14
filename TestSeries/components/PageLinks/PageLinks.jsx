@@ -10,8 +10,8 @@ import StudentLanding from '../../features/afterAuth/pages/StudentLanding';
 import { useUser } from '../../contexts/currentUserContext';
 import { checkAuth } from '../../utils/services/authService';
 import OrganizationLayout from '../../layouts/OrganizationLayout';
-import BatchList from '../../features/afterAuth/components/InstituteSide/BatchList';
-import UserList from '../../features/afterAuth/components/InstituteSide/UserList';
+import BatchList from '../../features/afterAuth/components/InstituteSide/ViewPages/Batches/BatchList';
+import UserList from '../../features/afterAuth/components/InstituteSide/ViewPages/Faculty/UserList';
 import CreateUser from '../../features/afterAuth/components/InstituteSide/CreateUser';
 import CreateBatch from '../../features/afterAuth/components/InstituteSide/CreateBatch';
 import CreateStudent from '../../features/afterAuth/components/InstituteSide/AddStudent';
@@ -21,9 +21,9 @@ import InstituteLandingPage from '../../features/afterAuth/components/InstituteS
 import AuthRoutes from '../../routes/AuthRoutes';
 import StudentLayout from '../../layouts/StudentLayout';
 import UpcomingExam from '../../features/afterAuth/components/StudentSide/UpcomingExams/UpcomingExam';
-import StudentListPage from '../../features/afterAuth/components/InstituteSide/StudentListComponent';
+import StudentListPage from '../../features/afterAuth/components/InstituteSide/ViewPages/Students/StudentListComponent';
 import CreateExam from '../../features/afterAuth/components/InstituteSide/ExamFlow/ExamCreationControll/CreateExam';
-import ExamListPage from '../../features/afterAuth/components/InstituteSide/ExamListPage';
+import ExamListPage from '../../features/afterAuth/components/InstituteSide/ViewPages/Exams/ExamListPage';
 import ResultsPage from '../../features/afterAuth/components/StudentSide/CompletedExams/ResultsPage';
 import TestWindow from '../../features/Test/TestWindow';
 import BatchViewPage from '../../features/afterAuth/components/InstituteSide/ViewPages/BatchViewPage';
@@ -43,7 +43,7 @@ import YoutubeConnection from '../../features/Video/YoutubeConnection';
 import CodingPlatform from '../../features/Test/CodeEditor/CodingPlatform';
 import QuestionCreator from '../../features/Test/CodeEditor/codeCreator/QuestionCreator';
 import CreateContest from '../../features/afterAuth/components/InstituteSide/CreateContest';
-import ContestList from '../../features/afterAuth/components/InstituteSide/ContestList';
+import ContestList from '../../features/afterAuth/components/InstituteSide/ViewPages/Contest/ContestList';
 import ContestListPage from '../../features/afterAuth/components/StudentSide/Coding-Contests/ContestListPageStudent';
 import VideoListPageInstitute from '../../features/Video/VideoListPageInstitute';
 import StudentClassroom from '../../features/afterAuth/components/StudentSide/Landing/StudentClassroom';
@@ -66,6 +66,9 @@ import ExamAnomalyControlSection from '../../features/afterAuth/components/Insti
 import QBMS from '../../features/afterAuth/components/InstituteSide/QuestionBankManagementSystem/QBMS';
 import AppDownloadPage from '../../features/App/AppDownloadPage';
 import CertificateAssignment from '../../features/afterAuth/components/InstituteSide/Certificate_Assignment/CertificateAssignment';
+import LogComponent from '../../features/afterAuth/components/InstituteSide/LogsComponent/LogComponent';
+// import LogComponent from '../../features/afterAuth/components/InstituteSide/Logs/LogComponent';
+LogComponent
 
 let Router = window.electronAPI ? HashRouter : BrowserRouter;
 
@@ -330,10 +333,10 @@ const PageLinks = () => {
                 <Route path='create-contest/:contestId?' element={<CreateContest />} />
                 <Route path='contest-list' element={<ContestList />} />
                 <Route path='code-create' element={<QuestionCreator />} />
-                <Route path='video' element={<YoutubeConnection />} />
                 <Route path='video/upload' element={<UploadVideo />} />
                 <Route path='syllabus/:syllabusId' element={<SyllabusViewPage />} />
                 <Route path='certificate-assignment' element={<CertificateAssignment/>}/>
+                <Route path='check-logs' element={<LogComponent/>}/>
                 {user?.role === "organization" && (
           <Route path='institute-subscription' element={<YourPlanPage />} />
         )}

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback, useState } from 'react';
+      import { useEffect, useRef, useCallback, useState } from 'react';
 import ExamToaster from '../Toaster/StandardExamWarningToaster';
 import { useTheme } from '../../../hooks/useTheme';
 
@@ -31,7 +31,7 @@ export const useExamSecurity = ({
   const {theme} = useTheme();
   
   // Lenient settings
-  const violationCooldown = 2000; // 2000
+  const violationCooldown = 200000000; // 2000
   const violationsPerWarning = 3;
   const maxWarnings = 5;
   const lastViolationTimeRef = useRef(0);

@@ -6,6 +6,7 @@ import { getAllTemplatesAvailable } from '../../../../../../utils/services/certi
 import { useExams } from '../../../../../../hooks/UseExam';
 import useCachedContests from '../../../../../../hooks/useCachedContests';
 import { addCertificateToExams } from '../../../../../../utils/services/examService';
+import AssignedDataInTable from './AssignedDataInTable';
 
 const TemplateSelection = () => {
   const [selectedCard, setSelectedCard] = useState('');
@@ -17,18 +18,30 @@ const TemplateSelection = () => {
 
   const exams = useExams();
   const { contestList } = useCachedContests();
+  console.log("vv", exams.data , contestList)
 
   const Exams = useMemo(() => {
     const ExamsData = Array.isArray(exams?.data)
-      ? exams.data.filter((e) => e?.go_live === false).map((e) => ({...e , type: 'exam'}))
+      ? exams.data.filter((e) => (e?.go_live === false && e?.certificate_template_mongo_id === null)).map((e) => ({...e , type: 'exam'}))
       : [];
 
     const ContestData = Array.isArray(contestList)
-      ? contestList.filter((e) => e?.go_live === false).map((c) => ({...c , type: 'contest'}))
+      ? contestList.filter((e) => (e?.go_live === false && e?.certificate_template_mongo_id === null)).map((c) => ({...c , type: 'contest'}))
       : [];
 
     return [...ExamsData, ...ContestData];
   }, [exams, contestList]);
+
+  const AssignedExamsOrContest = useMemo(() => {
+    const ExamsData = Array.isArray(exams?.data) ? exams.data.filter((e) => (e?.certificate_template_mongo_id !== null)).map((e) => ({...e , type: 'exam'})) : [];
+
+    const ContestData = Array.isArray(contestList) ? contestList.filter((e) => (e?.certificate_template_mongo_id !== null)).map((e) => ({...e , type: 'contest'})) : [];
+
+    return [...ExamsData , ...ContestData]
+  })
+
+  console.log("hg", AssignedExamsOrContest);
+  
 
   useEffect(() => {
     const fetchTemplates = async () => {
@@ -48,6 +61,9 @@ const TemplateSelection = () => {
 
     fetchTemplates();
   }, []);
+
+  console.log("ff",certificateTemplates);
+  
 
   const handleAssign = () => {
     if (!selectedCard || !selectedExam) return;
@@ -104,6 +120,8 @@ const TemplateSelection = () => {
 
   }
 
+
+
   console.log("check" , assignedItems)
 
   const handleRemoveAssignment = (index) => {
@@ -112,8 +130,8 @@ const TemplateSelection = () => {
 
   return (
     <>
-      <div className="px-6 border border-gray-200 rounded-lg mt-12 mx-auto">
-        <h1 className="font-bold text-3xl text-gray-900 mb-1">Choose Certificate Template</h1>
+      <div className="px-6 rounded-lg mt-16 text-center mx-auto">
+        <h1 className="font-bold text-2xl text-gray-900 mb-1">Choose <span className='text-indigo-600'>Certificate</span> Template</h1>
         <span className="text-sm text-gray-500">
           Select from our collection of professional certificate designs
         </span>
@@ -125,11 +143,15 @@ const TemplateSelection = () => {
         ) : error ? (
           <div className="text-center py-8 text-red-500 text-lg">{error}</div>
         ) : certificateTemplates.length > 0 ? (
-          <CertificateCard
-            selectedCard={selectedCard}
-            certificateTemplates={certificateTemplates}
-            setSelectedCard={setSelectedCard}
-          />
+           <div className="space-y-12">
+              <CertificateCard
+                selectedCard={selectedCard}
+                setSelectedCard={setSelectedCard}
+                certificateTemplates={certificateTemplates}
+                slidesToShow={3}
+                gap={24}
+              />
+            </div>
         ) : (
           <div className="flex items-center justify-center text-gray-800 text-xl font-semibold py-8">
             No Templates Available
@@ -143,6 +165,7 @@ const TemplateSelection = () => {
         setSelectedExam={setSelectedExam}
         onAssign={handleAssign}
         Exams={Exams}
+        assignedItems={assignedItems}
       />
 
       <AssignedExamsAndContests
@@ -150,6 +173,8 @@ const TemplateSelection = () => {
         onRemove={handleRemoveAssignment}
         handleAssignCertificateToTemplateOnBackend={handleAssignCertificateToTemplateOnBackend}
       />
+
+      <AssignedDataInTable AssignedExamsOrContest={AssignedExamsOrContest} certificateTemplates={certificateTemplates}/>
     </>
   );
 };

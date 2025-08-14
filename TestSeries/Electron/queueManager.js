@@ -64,7 +64,7 @@ class QueueManager {
 
             console.log(`🔄 Flushing ${events.length} events to server...`);
 
-            const response = await axios.post("https://test-series-03sa.onrender.com/api/v1/proctor/emit-event", { events });
+            const response = await axios.post("https://backend.evalvotech.com/api/v1/proctor/emit-event", { events });
             console.log('✅ Events flushed successfully:', response.data);
 
             if (response.data.status === 200) {

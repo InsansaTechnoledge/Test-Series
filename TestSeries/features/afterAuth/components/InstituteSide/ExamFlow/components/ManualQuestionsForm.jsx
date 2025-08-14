@@ -99,17 +99,17 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
       showToast_new("Please enter a question text", "warning");
       return;
     }
-    const { isValid, matchedLevel } = await validateWithBloom(form.question_text, bloomLevel);
+    // const { isValid, matchedLevel } = await validateWithBloom(form.question_text, bloomLevel);
 
-    console.log("✅ Bloom Match:", bloomLevel);
-    console.log("✅ Detected Bloom Level:", matchedLevel);
-    console.log("bloom level/////",bloomLevel);
-    if (!isValid) {
-      showToast_new(`❌ Incorrect Bloom level! ${bloomLevel}, correct ${matchedLevel}`, "error");
-      return;
-    }
+    // console.log("✅ Bloom Match:", bloomLevel);
+    // console.log("✅ Detected Bloom Level:", matchedLevel);
+    // console.log("bloom level/////",bloomLevel);
+    // if (!isValid) {
+    //   showToast_new(`❌ Incorrect Bloom level! ${bloomLevel}, correct ${matchedLevel}`, "error");
+    //   return;
+    // }
 
-    showToast_new(`✅ Question matches Bloom level: ${matchedLevel}`, "success");
+    // showToast_new(`✅ Question matches Bloom level: ${matchedLevel}`, "success");
 
     const newQuestion = {
       id: uuidv4(),

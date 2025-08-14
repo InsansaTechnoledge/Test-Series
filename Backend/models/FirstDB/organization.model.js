@@ -3,7 +3,7 @@ import validator from 'validator';
 import bcrypt from 'bcrypt';
 import { connOne } from '../../database/MongoDB.js';
 import { getTotalBatches } from '../../controllers/SupabaseDB/batch.controllers.js';
-import { categoryToFeatureKey, featureKeyToMetaDataKey } from '../../utils/dataMapping.util.js';
+import { featureKeyToMetaDataKey } from '../../utils/dataMapping.util.js';
 import { getTotalContest } from '../../controllers/SupabaseDB/contest.controllers.js';
 
 
@@ -46,7 +46,8 @@ const addressSchema = new Schema({
     coordinates: {
       type: [Number], // [longitude, latitude]
       required: false
-    }
+    },
+   
   }
 }, {
   _id: false
@@ -172,6 +173,7 @@ totalExams: {
         type: Number,
         default: 0,
       },
+      sessionId: { type: String, default: null }
 }, 
 {
     timestamps: true
@@ -213,7 +215,7 @@ OrganizationSchema.virtual('totalRoleGroups',{
 })
 
 
-OrganizationSchema.methods.getFullMetadata = async function (roleFeatures) {
+OrganizationSchema.methods.getFullMetadata = async function (roleFeatures,planFeatures) {
 
   const shouldReturnAll = !roleFeatures || Object.keys(roleFeatures).length === 0;
 
@@ -240,7 +242,9 @@ OrganizationSchema.methods.getFullMetadata = async function (roleFeatures) {
   const selectedMetadata = {};
 
   for (const category of Object.keys(roleFeatures)) {
-    const featureKey = categoryToFeatureKey[category];
+    const featureKey = Object.keys(planFeatures || {}).find(
+    (key) => planFeatures[key]?.category === category
+  );
     const metaKey = featureKeyToMetaDataKey[featureKey];
 
     if (metaKey && fullMetadata.hasOwnProperty(metaKey)) {
@@ -254,8 +258,6 @@ OrganizationSchema.methods.getFullMetadata = async function (roleFeatures) {
 
 OrganizationSchema.set('toObject', { virtuals: false });
 OrganizationSchema.set('toJSON', { virtuals: true });
-
-
 
 
 export const Organization = connOne.model('Organization' , OrganizationSchema)

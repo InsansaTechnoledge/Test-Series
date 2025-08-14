@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 import Student from '../../models/FirstDB/student.model.js';
 import { APIError } from '../../utils/ResponseAndError/ApiError.utils.js';
 import { APIResponse } from '../../utils/ResponseAndError/ApiResponse.utils.js';
+import { sendStudentCredentialsMail } from '../../utils/emailUtils/sendStudentCredentialMail.js';
 
 export const createOneStudent = async (req, res) => {
   try {
@@ -18,9 +19,11 @@ export const createOneStudent = async (req, res) => {
 
     if (!data.name || !data.email || !data.password || !data.gender) return new APIError(401, 'required data is missing from student').send(res)
 
-    const upload = Student.create(data)
+    const upload = await Student.create(data)
 
-    return new APIResponse(200, upload, ['sudents created successfully']).send(res)
+    await sendStudentCredentialsMail(data.organizationId, data.name, data.email, data.password);
+
+    return new APIResponse(200, upload, ['students created successfully']).send(res)
   } catch (e) {
     new APIError(err?.response?.status || err?.status || 500, ["Something went wrong while creating the user", err.message || ""]).send(res);
 
@@ -59,6 +62,14 @@ export const bulkCreateStudents = async (req, res) => {
     );
 
     const inserted = await Student.insertMany(preparedStudents);
+
+    await Promise.all(
+      inserted.map(async (student) => {
+       const studentTest = preparedStudents.find(s => s.email === student.email);
+
+        await sendStudentCredentialsMail(studentTest.organizationId, studentTest.name, studentTest.email, studentTest.password);
+      })
+    );
     return new APIResponse(201, inserted, 'Students uploaded successfully').send(res);
   } catch (err) {
     console.error('Bulk Upload Error:', err);
@@ -147,6 +158,13 @@ export const uploadStudentExcel = async (req, res) => {
     }
 
     const inserted = await Student.insertMany(students);
+
+    await Promise.all(
+      inserted.map(async (student) => {
+        const studentTest = students.find(s => s._id.equals(student._id));
+        await sendStudentCredentialsMail(studentTest.organizationId, studentTest.name, studentTest.email, studentTest.password);
+      })
+    );
 
     // Cleanup file
     fs.unlinkSync(req.file.path);

@@ -14,7 +14,7 @@ import {
 } from "../../../../../utils/services/contestService";
 import { useToast, ToastContainer } from "../../../../../utils/Toaster";
 
-const ContestCard = ({ contest, setContest, theme }) => {
+const ContestCard = ({ contest, setContest, theme , canDeleteContest, canPublishContest }) => {
   const [loadingDelete, setLoadingDelete] = useState({});
   const [loadingGoLive, setLoadingGoLive] = useState({});
   const { toasts, showToast, showConfirmToast, removeToast } = useToast();
@@ -23,7 +23,7 @@ const ContestCard = ({ contest, setContest, theme }) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
-      year: "numeric",
+      year: "numeric",  
     });
   };
 
@@ -223,7 +223,7 @@ return (
                     </div>
                   </div>
 
-                  <button
+                  {canDeleteContest && (<button
                     onClick={() => handleDelete(contestItem.id)}
                     disabled={loadingDelete[contestItem.id]}
                     className={`p-2 rounded-xl transition-all duration-300 hover:scale-110 ${theme === 'dark'
@@ -236,7 +236,7 @@ return (
                     ) : (
                       <Trash2 className="w-5 h-5" />
                     )}
-                  </button>
+                  </button>)}
                 </div>
 
                 {/* Status Badge */}
@@ -334,7 +334,7 @@ return (
                   )}
 
                   {/* Go Live Button */}
-                  {(!contestItem.go_live || (contestItem.go_live && !canMakeGoLive)) && (
+                  {canPublishContest && (!contestItem.go_live || (contestItem.go_live && !canMakeGoLive)) && (
                     <div className="pt-2">
                       <button
                         onClick={() => {

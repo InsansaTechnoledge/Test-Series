@@ -1,6 +1,7 @@
 import User from "../../models/FirstDB/user.model.js";
 import { APIResponse } from "../../utils/ResponseAndError/ApiResponse.utils.js";
 import { APIError } from "../../utils/ResponseAndError/ApiError.utils.js";
+import { sendUserCredentialsMail } from "../../utils/emailUtils/sendUserCredentialsMail.js";
 
 export const registerUser = async (req, res) => {
     try {
@@ -25,6 +26,8 @@ export const registerUser = async (req, res) => {
         userData.organizationId = req.user.role === "organization" ? req.user._id : (req.user.organizationId ? req.user.organizationId._id || req.user.organizationId : null);
 
         const user = await User.create(userData);
+
+        await sendUserCredentialsMail(userData.organizationId, userData.name, userData.email, userData.password, userData.role);
 
         return new APIResponse(200, user, "User registered successfully!!",).send(res);
 

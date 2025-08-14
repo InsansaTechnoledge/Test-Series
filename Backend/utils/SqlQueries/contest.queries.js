@@ -54,10 +54,14 @@ export const fetchContest = async (organizationId, batchId,userId) => {
 
   // Case 2: Only batchId is present
   if (batchId && !userId) {
+      if (typeof batchId === 'string') {
+  batchId = batchId.split(','); // convert to array
+}
+
     const batchRes = await supabase
       .from('batchxcontest')
       .select('contest_id')
-      .eq('batch_id', batchId);
+      .in('batch_id', batchId);
     if (batchRes.error) throw batchRes.error;
 
     const contestIds = batchRes.data.map(item => item.contest_id);
@@ -66,6 +70,7 @@ export const fetchContest = async (organizationId, batchId,userId) => {
       .select()
       .in('id', contestIds);
 
+ 
     data = contestRes.data;
     error = contestRes.error;
   }
