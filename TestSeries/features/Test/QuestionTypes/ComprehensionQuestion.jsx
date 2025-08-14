@@ -85,7 +85,7 @@ const ComprehensionQuestion = ({ selectedQuestion, option, setOption }) => {
   </div>
 </div>
 
-      );
+);
       
 };
 

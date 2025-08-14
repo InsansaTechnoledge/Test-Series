@@ -45,7 +45,8 @@ export const fetchSelective = async (conditions) => {
       auto_submittable,
       ai_proctored,
       subjects,
-      certificate_template_mongo_id
+      certificate_template_mongo_id,
+      is_subjective
 
     `);
 
@@ -157,7 +158,7 @@ export const fetchNonLiveExams = async (organization_id) => {
         ),
         ai_proctored,
         auto_submittable,
-        certificate_template_mongo_id
+        certificate_template_mongo_id,
       `)
     .eq("go_live", false)
     .eq("organization_id", organization_id);

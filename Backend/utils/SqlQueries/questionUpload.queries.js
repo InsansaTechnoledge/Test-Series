@@ -221,3 +221,32 @@ export const insertCode = async (codeData) => {
   }
   return data;
 };
+
+export const insertDescriptive = async (descriptiveData) => {
+  // Expecting: { id, question_text, min_words?, max_words?, reference_answer?, rubric?, keywords? }
+  // Normalize optional JSON fields
+  const payload = {
+    ...descriptiveData,
+    rubric:
+      descriptiveData?.rubric && typeof descriptiveData.rubric === 'string'
+        ? JSON.parse(descriptiveData.rubric)
+        : descriptiveData?.rubric ?? null,
+    keywords:
+      descriptiveData?.keywords
+        ? Array.isArray(descriptiveData.keywords)
+          ? descriptiveData.keywords
+          : JSON.parse(descriptiveData.keywords)
+        : null,
+  };
+
+  const { data, error } = await supabase
+    .from('question_descriptive')
+    .insert(payload)
+    .select();
+
+  if (error) {
+    console.error('Error inserting Descriptive:', error);
+    throw error;
+  }
+  return data;
+};

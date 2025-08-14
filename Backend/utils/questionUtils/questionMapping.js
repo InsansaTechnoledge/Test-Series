@@ -82,6 +82,17 @@ export const mapQuestionData = (row, type, baseId) => {
           sub_question_ids: (safeParse(row.sub_question_ids) || []).map(sub => sub.id)
         };
 
+      case 'descriptive':
+        return {
+          id: baseId,
+          question_text: row.question_text,
+          min_words: row.min_words ? Number(row.min_words) : null,
+          max_words: row.max_words ? Number(row.max_words) : null,
+          reference_answer: row.reference_answer || null,
+          rubric: row.rubric ? safeParse(row.rubric, {}) : null,
+          keywords: row.keywords ? safeParse(row.keywords, []) : null
+        };
+
       default:
         throw new Error(`Unknown question type: ${type}`);
     }

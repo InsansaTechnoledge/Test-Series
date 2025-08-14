@@ -46,8 +46,8 @@ export default function EvalvoDownloadPage() {
                 <button
                   className="group w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg flex items-center justify-center space-x-3"
                   onClick={() => handleDownload(
-                    'https://github.com/InsansaTechnoledge/Test-Series/releases/download/evalvoTech/Evalvo.Proctor.Setup.1.0.0.exe',
-                    'Evalvo.Proctor.Setup.1.0.0.exe'
+                   ' https://github.com/InsansaTechnoledge/Test-Series/releases/download/v1.0.1/Evalvo.Proctor.Setup.1.0.1.exe',
+                    'Evalvo.Proctor.Setup.1.0.1.exe'
                   )}
                 >
                   <Download className="w-5 h-5 group-hover:animate-bounce" />

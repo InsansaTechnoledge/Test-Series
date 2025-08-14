@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Settings, ChevronDown, Menu, X, Sun, Moon, CreativeCommons, PaperclipIcon, Lock, LogsIcon, EyeIcon, User, Download, CreditCard, Eye, Palette, Monitor, LogOut, Home } from 'lucide-react';
+import { Search, Settings, ChevronDown, Menu, X, Sun, Moon, CreativeCommons, PaperclipIcon, Lock, LogsIcon, EyeIcon, User, Download, CreditCard, Eye, Palette, Monitor, LogOut, Home, Contact, Mail } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useUser } from '../../../../contexts/currentUserContext';
 // import logo from '../../../../assests/Landing/Navbar/evalvo logo blue 2.svg'
@@ -158,6 +158,8 @@ const Navbar = ({setShowLogoutModal}) => {
     setActiveCategory('');
   };
 
+  const profileDropDown = useRef(null);
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -184,11 +186,21 @@ const Navbar = ({setShowLogoutModal}) => {
       if (!clickedInsideCategory && window.innerWidth >= 768) {
         setActiveCategory('');
       }
+
+      if (
+        profileDropDown.current &&
+        !profileDropDown.current.contains(event.target) &&
+        !event.target.closest('[data-profile-button]') 
+      ) {
+        setShowProfileDropdown(false);
+      }
     };
   
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+ 
   
   const handleCategoryClick = (categoryName) => {
     console.log(`Category clicked: ${categoryName}`);
@@ -409,6 +421,7 @@ const Navbar = ({setShowLogoutModal}) => {
             {/* Profile Dropdown */}
             <div className="relative">
               <button
+                data-profile-button
                 onClick={handleProfileDropdownToggle}
                 className="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
@@ -421,7 +434,7 @@ const Navbar = ({setShowLogoutModal}) => {
               </button>
 
               {showProfileDropdown && (
-                <div className={`absolute right-0 mt-2 w-80 rounded-2xl shadow-2xl ring-1 ring-black ring-opacity-5 z-50 ${themeClasses.dropdown} overflow-hidden max-h-[80vh] overflow-y-auto`}>
+                <div ref={profileDropDown} className={`absolute right-0 mt-2 w-80 rounded-2xl shadow-2xl ring-1 ring-black ring-opacity-5 z-50 ${themeClasses.dropdown} overflow-hidden max-h-[80vh] overflow-y-auto`}>
                   
                   {/* Compact User Info Header */}
                   <div className={`px-4 py-3 border-b ${themeClasses.border} ${theme === 'light' ? 'bg-gradient-to-r from-indigo-50 to-blue-50' : 'bg-gray-800'}`}>
@@ -442,11 +455,11 @@ const Navbar = ({setShowLogoutModal}) => {
                           <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium capitalize mt-1 ${
                             user.role === 'organization' 
                               ? theme === 'light' 
-                                ? 'bg-purple-100 text-purple-800' 
-                                : 'bg-purple-900 text-purple-200'
+                                ? 'bg-indigo-100 text-indigo-800' 
+                                : 'bg-indigo-900 text-indigo-200'
                               : theme === 'light'
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-green-900 text-green-200'
+                                ? 'bg-indigo-100 text-indigo-800'
+                                : 'bg-indigo-900 text-indigo-200'
                           }`}>
                             {user.role}
                           </span>
@@ -457,7 +470,7 @@ const Navbar = ({setShowLogoutModal}) => {
 
                   {/* Quick Actions Grid */}
                   <div className="p-3">
-                    <div className="grid grid-cols-3 gap-2 mb-3">
+                    <div className="grid grid-cols-4 gap-2 mb-3">
                       
                       {/* Edit Profile (for student/user) */}
                       {(user?.role === 'student' || user.role === 'user') && (
@@ -499,9 +512,9 @@ const Navbar = ({setShowLogoutModal}) => {
                             setShowProfileDropdown(false);
                             setActiveCategory('');
                           }}
-                          className={`flex flex-col items-center p-3 rounded-xl transition-all duration-200 ${theme === 'light' ? 'hover:bg-purple-50 bg-purple-25' : 'hover:bg-purple-900/20 bg-purple-900/10'}`}
+                          className={`flex flex-col items-center p-3 rounded-xl transition-all duration-200 ${theme === 'light' ? 'hover:bg-indigo-50 bg-indigo-25' : 'hover:bg-indigo-900/20 bg-indigo-900/10'}`}
                         >
-                          <CreditCard className={`w-5 h-5 mb-1 ${theme === 'light' ? 'text-purple-600' : 'text-purple-400'}`} />
+                          <CreditCard className={`w-5 h-5 mb-1 ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-400'}`} />
                           <span className={`text-xs font-medium ${themeClasses.textPrimary}`}>Current Plan</span>
                         </button>
                       )}
@@ -514,9 +527,9 @@ const Navbar = ({setShowLogoutModal}) => {
                             setShowProfileDropdown(false);
                             setActiveCategory('');
                           }}
-                          className={`flex flex-col items-center p-3 rounded-xl transition-all duration-200 ${theme === 'light' ? 'hover:bg-orange-50 bg-orange-25' : 'hover:bg-orange-900/20 bg-orange-900/10'}`}
+                          className={`flex flex-col items-center p-3 rounded-xl transition-all duration-200 ${theme === 'light' ? 'hover:bg-indigo-50 bg-indigo-25' : 'hover:bg-indigo-900/20 bg-indigo-900/10'}`}
                         >
-                          <Eye className={`w-5 h-5 mb-1 ${theme === 'light' ? 'text-orange-600' : 'text-orange-400'}`} />
+                          <Eye className={`w-5 h-5 mb-1 ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-400'}`} />
                           <span className={`text-xs font-medium ${themeClasses.textPrimary}`}>Online Activity</span>
                         </button>
                       )}
@@ -541,6 +554,20 @@ const Navbar = ({setShowLogoutModal}) => {
                           <Lock className="absolute top-1 right-1 w-3 h-3 text-red-500" />
                         )}
                       </button>
+
+                      {/* ticket generation */}
+                      <button 
+                        onClick={() => {
+                          navigate('');
+                          setShowProfileDropdown(false);
+                          setActiveCategory('');
+                        }}
+                        disabled={!user?.planFeatures?.proctore_feature?.isActive || !user?.planFeatures?.proctore_feature?.value}
+                        className={`flex flex-col items-center p-3 rounded-xl transition-all duration-200 relative ${theme === 'light' ? 'hover:bg-indigo-50 bg-indigo-25' : 'hover:bg-indigo-900/20 bg-indigo-900/10'}`}
+                      >
+                        <Mail className={`w-5 h-5 mb-1 ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-400'}`} />
+                        <span className={`text-xs font-medium ${themeClasses.textPrimary}`}>Contact Us</span>
+                      </button>
                     </div>
 
                     {/* Tools Section for non-students */}
@@ -561,12 +588,12 @@ const Navbar = ({setShowLogoutModal}) => {
                             disabled={!user?.planFeatures?.questionBank_feature?.isActive || !user?.planFeatures?.questionBank_feature?.value}
                             className={`w-full flex items-center px-3 py-2 text-sm rounded-lg transition-all duration-200 ${
                               user?.planFeatures?.questionBank_feature?.isActive && user?.planFeatures?.questionBank_feature?.value
-                                ? themeClasses.dropdownItem + (theme === 'light' ? ' hover:bg-green-50' : ' hover:bg-green-900/20')
+                                ? themeClasses.dropdownItem + (theme === 'light' ? ' hover:bg-indigo-50' : ' hover:bg-indigo-900/20')
                                 : 'opacity-50 cursor-not-allowed ' + themeClasses.dropdownItem
                             }`}
                           >
-                            <div className={`w-6 h-6 rounded-lg flex items-center justify-center mr-3 ${theme === 'light' ? 'bg-green-100' : 'bg-green-900'}`}>
-                              <svg className={`w-3 h-3 ${theme === 'light' ? 'text-green-600' : 'text-green-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div className={`w-6 h-6 rounded-lg flex items-center justify-center mr-3 ${theme === 'light' ? 'bg-indigo-100' : 'bg-indigo-900'}`}>
+                              <svg className={`w-3 h-3 ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-200'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                               </svg>
                             </div>
@@ -598,18 +625,18 @@ const Navbar = ({setShowLogoutModal}) => {
                             disabled={!user?.planFeatures?.certification_feature?.isActive || !user?.planFeatures?.certification_feature?.value > 0}
                             className={`w-full flex items-center px-3 py-2 text-sm rounded-lg transition-all duration-200 ${
                               user?.planFeatures?.certification_feature?.isActive && user?.planFeatures?.certification_feature?.value > 0
-                                ? themeClasses.dropdownItem + (theme === 'light' ? ' hover:bg-yellow-50' : ' hover:bg-yellow-900/20')
+                                ? themeClasses.dropdownItem + (theme === 'light' ? ' hover:bg-indigo-50' : ' hover:bg-indigo-900/20')
                                 : 'opacity-50 cursor-not-allowed ' + themeClasses.dropdownItem
                             }`}
                           >
-                            <div className={`w-6 h-6 rounded-lg flex items-center justify-center mr-3 ${theme === 'light' ? 'bg-yellow-100' : 'bg-yellow-900'}`}>
-                              <PaperclipIcon className={`w-3 h-3 ${theme === 'light' ? 'text-yellow-600' : 'text-yellow-400'}`}/>
+                            <div className={`w-6 h-6 rounded-lg flex items-center justify-center mr-3 ${theme === 'light' ? 'bg-indigo-100' : 'bg-indigo-900'}`}>
+                              <PaperclipIcon className={`w-3 h-3 ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-200'}`}/>
                             </div>
                             <div className="flex-1 text-left">
                               <div className="flex items-center justify-between">
                                 <span className="font-medium">Certificates</span>
                                 <div className="flex items-center gap-1">
-                                  <span className="bg-yellow-100 text-yellow-800 text-[9px] font-semibold px-1.5 py-0.5 rounded-full">
+                                  <span className="bg-green-100 text-green-800 text-[9px] font-semibold px-1.5 py-0.5 rounded-full">
                                     NEW
                                   </span>
                                   {(!user?.planFeatures?.certification_feature?.isActive || !user?.planFeatures?.certification_feature?.value > 0) && (

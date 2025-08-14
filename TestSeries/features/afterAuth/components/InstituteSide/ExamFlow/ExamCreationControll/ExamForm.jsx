@@ -26,6 +26,7 @@ const ExamForm = ({
     subjects: [], 
     auto_submittable: true,
     ai_proctored: false,
+    is_subjective:false,
   },
 }) => {
   const { theme } = useTheme();
