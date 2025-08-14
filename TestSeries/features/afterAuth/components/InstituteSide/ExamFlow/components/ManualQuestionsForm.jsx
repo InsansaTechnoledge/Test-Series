@@ -5,8 +5,8 @@ import { useEffect } from "react";
 import CodeCreatorForm from "../../../../../Test/CodeEditor/codeCreator/codeCreatorForm";
 import { useTheme } from "../../../../../../hooks/useTheme";
 // import { useToast, ToastContainer } from "../../../../../../utils/Toaster";
-import { validateWithBloom } from "../../../../../../utils/validateWithBloom";
 import { useToast_new } from "../../../../../../utils/Toaster_new";
+import { validateBloom } from "../../../../../../utils/services/bloomClient";
 
  // adjust path if different
 
@@ -99,7 +99,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
       showToast_new("Please enter a question text", "warning");
       return;
     }
-    const { isValid, matchedLevel } = await validateWithBloom(form.question_text, bloomLevel);
+    const { isValid, matchedLevel } = await validateBloom(form.question_text, bloomLevel);
 
     console.log("✅ Bloom Match:", bloomLevel);
     console.log("✅ Detected Bloom Level:", matchedLevel);

@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { generateSampleExcel } from './SampleExcel';
 import { Upload, FileSpreadsheet, Download, CheckCircle, AlertCircle, Info } from 'lucide-react';
 import { useTheme } from '../../../../../../hooks/useTheme';
-import { validateWithBloom } from "../../../../../../utils/validateWithBloom";
+import { validateBloom } from '../../../../../../utils/services/bloomClient';
 const BulkUpload = ({ setQuestions, organizationId }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState(null);
@@ -127,7 +127,7 @@ const BulkUpload = ({ setQuestions, organizationId }) => {
 
         if (base.bloom_level && base.question_text) {
           try {
-            const { isValid, matchedLevel } = await validateWithBloom(base.question_text, base.bloom_level);
+            const { isValid, matchedLevel } = await validateBloom(base.question_text, base.bloom_level);
             base.bloom_match = isValid;
             base.detected_level = matchedLevel;
           } catch (err) {
