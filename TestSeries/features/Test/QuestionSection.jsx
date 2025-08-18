@@ -21,40 +21,41 @@ const QuestionSection = ({
 }) => {
   const [option, setOption] = useState("");
   const { theme } = useTheme();
-  const [showSubmitModal, setShowSubmitModal] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  // const [showSubmitModal, setShowSubmitModal] = useState(false);
+  // const [submitted, setSubmitted] = useState(false);
   const navigate = useNavigate();
   const hasRestored = useRef(false);
   const isInitialLoad = useRef(true);
   const [submitCool , setSubmitCool] = useState(false)
   
 
-  // useEffect(() => {
-  //   if (hasRestored.current || !isInitialLoad.current) return;
-  //   hasRestored.current = true;
-  //   isInitialLoad.current = false;
+  useEffect(() => {
+    if (hasRestored.current || !isInitialLoad.current) return;
+    hasRestored.current = true;
+    isInitialLoad.current = false;
 
-  //   const savedData = sessionStorage.getItem("subjectSpecificQuestions");
-  //   const savedQuestionId = localStorage.getItem("selectedQuestionId");
+    const savedData = sessionStorage.getItem("subjectSpecificQuestions");
+    const savedQuestionId = localStorage.getItem("selectedQuestionId");
 
-  //   if (savedData) {
-  //     const parsed = JSON.parse(savedData);
-  //     setSubjectSpecificQuestions(parsed);
+    if (savedData) {
+      const parsed = JSON.parse(savedData);
+      setSubjectSpecificQuestions(parsed);
 
-  //     if (savedQuestionId) {
-  //       const allQs = [];
-  //       Object.keys(parsed).forEach((subject) => {
-  //         parsed[subject].forEach((ques) => {
-  //           allQs.push({ ...ques, subject });
-  //         });
-  //       });
-  //       const restored = allQs.find((q) => q.id === savedQuestionId);
-  //       if (restored) {
-  //         setSelectedQuestion(restored);
-  //       }
-  //     }
-  //   }
-  // }, []);
+      if (savedQuestionId) {
+        const allQs = [];
+        Object.keys(parsed).forEach((subject) => {
+          parsed[subject].forEach((ques) => {
+            allQs.push({ ...ques, subject });
+          });
+        });
+        const restored = allQs.find((q) => q.id === savedQuestionId);
+        if (restored) {
+          setSelectedQuestion(restored);
+        }
+      }
+    }
+  }, []);
+
   useEffect(() => {
     if (subjectSpecificQuestions) {
       sessionStorage.setItem(
@@ -64,24 +65,24 @@ const QuestionSection = ({
     }
   }, [subjectSpecificQuestions]);
 
-  // useEffect(() => {
-  //   if (selectedQuestion) {
-  //     localStorage.setItem("selectedQuestionId", selectedQuestion.id);
-  //   }
-  // }, [selectedQuestion]);
-
   useEffect(() => {
-    if (submitted) {
-      const timeout = setTimeout(() => {
-        sessionStorage.removeItem("subjectSpecificQuestions");
-        localStorage.removeItem("selectedQuestionId");
-        console.log("Submitting test...");
-        handleSubmitTest();
-        navigate("/student/completed-exams");
-      }, 2500);
-      return () => clearTimeout(timeout);
+    if (selectedQuestion) {
+      localStorage.setItem("selectedQuestionId", selectedQuestion.id);
     }
-  }, [submitted, navigate]);
+  }, [selectedQuestion]);
+
+  // useEffect(() => {
+  //   if (submitted) {
+  //     const timeout = setTimeout(() => {
+  //       sessionStorage.removeItem("subjectSpecificQuestions");
+  //       localStorage.removeItem("selectedQuestionId");
+  //       console.log("Submitting test...");
+  //       handleSubmitTest();
+  //       navigate("/student/completed-exams");
+  //     }, 2500);
+  //     return () => clearTimeout(timeout);
+  //   }
+  // }, [submitted, navigate]);
   //Sanjana
     useEffect(() => {
     if (!selectedQuestion || !subjectSpecificQuestions) return;
@@ -91,7 +92,7 @@ const QuestionSection = ({
 
     setSubjectSpecificQuestions((prev) => ({
         ...prev,
-        [originalSubject]: prev[originalSubject].map((q) =>
+        [originalSubject]:prev[originalSubject].map((q) =>
             q.id === currentQuestion.id
                 ? {
                     ...q,
@@ -196,7 +197,7 @@ const QuestionSection = ({
 
   const handleNext = () => {
     const currentQuestion = allQuestions[currentQuestionIndex];
-    const originalSubject = currentQuestion.originalSubject;
+    const originalSubject = currentQuestion.originalSubject || currentQuestion.subject;
 
     setSubjectSpecificQuestions((prev) => ({
       ...prev,
@@ -485,40 +486,21 @@ const QuestionSection = ({
           </button>
         </div>
 
-        {/* <div className="order-1 sm:order-2">
-          <button
-            onClick={ () => {
-              if(!submitCool) {
-                setSubmitCool(true)
-                setShowSubmitModal(true)
-                setTimeout(() => setSubmitCool(false),10000)
-              }
-            }}
-            disabled={submitCool}
-            className={`px-6 py-2 rounded-md text-lg font-semibold shadow transition-all duration-200
-                          ${theme === "light"
-                ? "bg-blue-900 text-white hover:bg-blue-800"
-                : "bg-blue-700 text-white hover:bg-blue-600"
-              }
-                        `}
-          > 
-            {submitCool ? "Please wait..." : "Submit Test"}
-          </button>
-        </div> */}
+        
       </div>
-
+{/* 
       {showSubmitModal && (
         <SubmitModal
           setShowSubmitModal={setShowSubmitModal}
           setSubmitted={setSubmitted}
         />
-      )}
+      )} */}
 
-      {submitted && (
+      {/* {submitted && (
         <div className="fixed top-6 right-6 z-50 bg-green-100 border border-green-400 text-green-700 px-6 py-3 rounded-lg shadow-lg animate-fade-in-out transition-all">
           Your test has been submitted successfully!
         </div>
-      )}
+      )} */}
     </div>
   );
 };
