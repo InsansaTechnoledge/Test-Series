@@ -263,7 +263,8 @@ const TestWindow = () => {
   useEffect(() => {
     if (submitted) {
       clearAllToasts();
-
+       sessionStorage.removeItem("subjectSpecificQuestions");
+        localStorage.removeItem("selectedQuestionId");
       localStorage.removeItem(`selectedSubject_${examId}`);
       localStorage.removeItem(`selectedQuestion_${examId}`);
       localStorage.removeItem(`examViolations_${examId}`);
