@@ -7,12 +7,15 @@ import { useTheme } from "../../../../../../hooks/useTheme";
 // import { useToast, ToastContainer } from "../../../../../../utils/Toaster";
 import { useToast_new } from "../../../../../../utils/Toaster_new";
 import { validateBloom } from "../../../../../../utils/services/bloomClient";
+import WordLimitsControls from "./WordLimitsControls";
+import RubricBuilder from "./RubricBuilderForDescriptive";
+import KeywordsChips from "./KeywordsChips";
 
  // adjust path if different
 
 
 const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
-  console.log('sdvsz', examDetails?.subjects)
+  console.log('sdvsz', examDetails)
   const { user } = useUser();
   console.log("sdgv", user);
   //  const { toasts, showToast, removeToast } = useToast();
@@ -43,6 +46,14 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
   // Add code-specific properties if needed
   // newQuestion.test_cases = [];
 
+  const [descriptiveUI, setDescriptiveUI] = useState({
+    min_words: null,
+    max_words: null,
+    reference_answer: "",
+    rubric: { criteria: [], total_marks: 0 },
+    keywords: []
+  });
+
   const initialFormState = {
     type: "mcq",
     question_text: "",
@@ -60,6 +71,12 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
     negative_marks: "0",
     subject: "",
     chapter: "",
+    min_words: "",
+    max_words: "",
+    reference_answer: "",
+    rubric: "",
+    keywords: "",
+
 
     passage: "",
     sub_question_ids: [],
@@ -153,14 +170,14 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
       newQuestion.right_items = form.right_items;
 
       if (form.correct_pairs_input.trim() === "") {
-        showToast("Please enter matching pairs in JSON format.", "warning");
+        showToast_new("Please enter matching pairs in JSON format.", "warning");
         return;
       }
 
       try {
         newQuestion.correct_pairs = JSON.parse(form.correct_pairs_input);
       } catch (err) {
-        showToast(
+        showToast_new(
           'Correct Pairs must be a valid JSON object (e.g., {"1": "A"})',
           "warning"
         );
@@ -197,6 +214,40 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
       newQuestion.difficulty = codeData.difficulty;
     }
 
+    if (form.type === "descriptive") {
+      const { min_words, max_words, rubric, keywords, reference_answer } = descriptiveUI;
+    
+      // basic validations mirroring your DB check
+      if (min_words == null && max_words == null) {
+        showToast_new("Provide at least min or max words.", "warning");
+        setLoading(false);
+        return;
+      }
+      if (min_words != null && min_words < 0) {
+        showToast_new("Min words cannot be negative.", "warning");
+        setLoading(false);
+        return;
+      }
+      if (max_words != null && max_words <= 0) {
+        showToast_new("Max words must be > 0.", "warning");
+        setLoading(false);
+        return;
+      }
+      if (min_words != null && max_words != null && min_words > max_words) {
+        showToast_new("Min words cannot exceed Max words.", "warning");
+        setLoading(false);
+        return;
+      }
+    
+      newQuestion.min_words = min_words ?? null;
+      newQuestion.max_words = max_words ?? null;
+      newQuestion.reference_answer = reference_answer || "";
+      newQuestion.rubric = rubric?.criteria?.length ? rubric : null;   // object → jsonb
+      newQuestion.keywords = Array.isArray(keywords) && keywords.length ? keywords : null; // array → text[]
+    }
+    
+
+
     setQuestions((prev) => [...prev, newQuestion]);
 
     setLoading(false);
@@ -222,6 +273,17 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
         cpp: "",
       },
     });
+
+    if (form.type === "descriptive") {
+      setDescriptiveUI({
+        min_words: null,
+        max_words: null,
+        reference_answer: "",
+        rubric: { criteria: [], total_marks: 0 },
+        keywords: []
+      });
+    }
+    
   };
 
   
@@ -234,6 +296,50 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
     }`;
   const LabelCommon = `text-lg font-bold ${theme === "light" ? "text-gray-700" : "text-indigo-200"
     }`;
+
+  const getQuestionTypesByExamType = (examTypes) => {
+    switch(examTypes) {
+      case 'objective' : 
+        return [
+          { value: 'mcq' , label: 'MCQ' },
+          { value: 'msq' , label: 'MSQ' },
+          { value: 'numerical' , label: 'Numerical'},
+          {value : 'tf' , label: 'True / False'}
+        ];
+
+        case 'subjective' : 
+          return [
+            { value: "descriptive", label: "Descriptive" },
+            {value: 'fill' , label : "Fill in the Blanks"},
+            {value: 'comprehension' , label: 'Comprehension'},
+            { value: "match", label: "Match the Following" },
+          ]
+
+        case "semi_subjective":
+          return [
+            { value: "descriptive", label: "Descriptive" },
+            { value: "mcq", label: "MCQ" },
+            { value: "msq", label: "MSQ" },
+            { value: "fill", label: "Fill in the Blank" },
+            { value: "tf", label: "True / False" },
+            { value: "numerical", label: "Numerical" },
+            { value: "match", label: "Match the Following" },
+            { value: "comprehension", label: "Comprehension" },
+          ];
+      
+        default:
+          return [
+            { value: "descriptive", label: "Descriptive" },
+            { value: "mcq", label: "MCQ" },
+            { value: "msq", label: "MSQ" },
+            { value: "fill", label: "Fill in the Blank" },
+            { value: "tf", label: "True / False" },
+            { value: "numerical", label: "Numerical" },
+            { value: "match", label: "Match the Following" },
+            { value: "comprehension", label: "Comprehension" },
+          ];
+    }
+  }
 
 
   return (
@@ -251,17 +357,16 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
             value={form.type}
             onChange={handleChange}
           >
-            <option value="mcq">MCQ</option>
-            <option value="msq">MSQ</option>
-            <option value="fill">Fill in the Blank</option>
-            <option value="tf">True/False</option>
-            <option value="numerical">Numerical</option>
-            <option value="match">Match the Following</option>
-            <option value="comprehension">Comprehension</option>
-            {user?.planFeatures?.coding_feature?.isActive === true ||
-              user?.planFeatures?.coding_feature?.isActive === "true" ? (
+            {getQuestionTypesByExamType(examDetails?.exam_type).map((qt) => (
+              <option key={qt.value} value={qt.value}>
+                {qt.label}
+              </option>
+            ))}
+            {/* Coding question is still feature-based */}
+            {/* {(user?.planFeatures?.coding_feature?.isActive === true ||
+              user?.planFeatures?.coding_feature?.isActive === "true") && (
               <option value="code">Code</option>
-            ) : null}
+            )} */}
           </select>
         </div>
 
@@ -277,6 +382,49 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
             placeholder="Enter question..."
           />
         </div>
+
+        {/* Descriptive */}
+        {form.type === "descriptive" && (
+          <div className="space-y-4">
+            <WordLimitsControls
+              minWords={descriptiveUI.min_words}
+              maxWords={descriptiveUI.max_words}
+              onChange={(patch) => setDescriptiveUI(prev => ({ ...prev, ...patch }))}
+              inputClass={inputCommon}
+              labelClass={LabelCommon}
+            />
+
+            <div>
+              <label className={LabelCommon}>Reference / Sample Answer (optional)</label>
+              <textarea
+                className={inputCommon}
+                rows={3}
+                value={descriptiveUI.reference_answer}
+                onChange={(e) =>
+                  setDescriptiveUI(prev => ({ ...prev, reference_answer: e.target.value }))
+                }
+                placeholder="Add a concise reference answer for graders"
+              />
+            </div>
+
+            <RubricBuilder
+              value={descriptiveUI.rubric}
+              onChange={(rubric) => setDescriptiveUI(prev => ({ ...prev, rubric }))}
+              inputClass={inputCommon}
+              labelClass={LabelCommon}
+              cardClass={`border rounded-2xl p-4 ${theme === "light" ? "bg-white" : "bg-gray-700"}`}
+            />
+
+            <KeywordsChips
+              value={descriptiveUI.keywords}
+              onChange={(keywords) => setDescriptiveUI(prev => ({ ...prev, keywords }))}
+              inputClass={inputCommon}
+              labelClass={LabelCommon}
+            />
+          </div>
+        )}
+
+
 
         {/* MCQ / MSQ Options */}
         {(form.type === "mcq" || form.type === "msq") && (
@@ -392,6 +540,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
             })}
           </div>
         )}
+
         <select
           className={inputCommon}
           value={bloomLevel}
@@ -405,33 +554,6 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
           <option value="Create">Create</option>
         </select>
 
-        {/* Correct Option(s) */}
-        {/* {form.type === "mcq" && (
-        <input
-          className={inputCommon}
-          type="number"
-          name="correct_option"
-          value={form.correct_option}
-          onChange={handleChange}
-          placeholder="Correct Option Index (0-based)"
-          min={0}
-          max={form.options.length - 1}
-        />
-      )} */}
-
-        {/* {form.type === "msq" && (
-        <input
-          className={inputCommon}
-          placeholder="Correct Option Indexes (comma-separated)"
-          onChange={(e) => {
-            const values = e.target.value
-              .split(",")
-              .map((v) => parseInt(v.trim()))
-              .filter((v) => !isNaN(v));
-            setForm((prev) => ({ ...prev, correct_options: values }));
-          }}
-        />
-      )} */}
 
         {/* Fill / Numerical Answer */}
         {(form.type === "fill" || form.type === "numerical") && (
@@ -529,6 +651,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
           </div>
         )}
 
+        {/* Coding */}
         {form.type === "code" && (
           <div
             className={` border rounded p-4 space-y-3  ${theme == "light" ? "bg-white" : "bg-gray-700"
@@ -544,6 +667,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
           </div>
         )}
 
+        {/* Compehension */}
         {form.type === "comprehension" && (
           <>
             {/* Comprehension Passage */}
@@ -925,11 +1049,6 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
 
 
       </div>
-      {/* <ToastContainer
-        toasts={toasts}
-        onRemove={removeToast}
-
-      /> */}
     </>
   );
 };

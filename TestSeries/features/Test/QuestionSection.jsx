@@ -9,6 +9,7 @@ import CodeQuestion from "./QuestionTypes/CodeQuestion";
 import NumericalQuestion from "./QuestionTypes/NumericQuestion";
 import FillInTheBlankQuestion from "./QuestionTypes/FillInTheBlankQuestion";
 import SubmitModal from "./utils/SubmitResultComponent";
+import DescriptiveQuestion from "./QuestionTypes/DescriptiveQuestion";
 
 const QuestionSection = ({
   setSelectedQuestion,
@@ -26,33 +27,34 @@ const QuestionSection = ({
   const hasRestored = useRef(false);
   const isInitialLoad = useRef(true);
   const [submitCool , setSubmitCool] = useState(false)
+  
 
-  useEffect(() => {
-    if (hasRestored.current || !isInitialLoad.current) return;
-    hasRestored.current = true;
-    isInitialLoad.current = false;
+  // useEffect(() => {
+  //   if (hasRestored.current || !isInitialLoad.current) return;
+  //   hasRestored.current = true;
+  //   isInitialLoad.current = false;
 
-    const savedData = sessionStorage.getItem("subjectSpecificQuestions");
-    const savedQuestionId = localStorage.getItem("selectedQuestionId");
+  //   const savedData = sessionStorage.getItem("subjectSpecificQuestions");
+  //   const savedQuestionId = localStorage.getItem("selectedQuestionId");
 
-    if (savedData) {
-      const parsed = JSON.parse(savedData);
-      setSubjectSpecificQuestions(parsed);
+  //   if (savedData) {
+  //     const parsed = JSON.parse(savedData);
+  //     setSubjectSpecificQuestions(parsed);
 
-      if (savedQuestionId) {
-        const allQs = [];
-        Object.keys(parsed).forEach((subject) => {
-          parsed[subject].forEach((ques) => {
-            allQs.push({ ...ques, subject });
-          });
-        });
-        const restored = allQs.find((q) => q.id === savedQuestionId);
-        if (restored) {
-          setSelectedQuestion(restored);
-        }
-      }
-    }
-  }, []);
+  //     if (savedQuestionId) {
+  //       const allQs = [];
+  //       Object.keys(parsed).forEach((subject) => {
+  //         parsed[subject].forEach((ques) => {
+  //           allQs.push({ ...ques, subject });
+  //         });
+  //       });
+  //       const restored = allQs.find((q) => q.id === savedQuestionId);
+  //       if (restored) {
+  //         setSelectedQuestion(restored);
+  //       }
+  //     }
+  //   }
+  // }, []);
   useEffect(() => {
     if (subjectSpecificQuestions) {
       sessionStorage.setItem(
@@ -62,11 +64,11 @@ const QuestionSection = ({
     }
   }, [subjectSpecificQuestions]);
 
-  useEffect(() => {
-    if (selectedQuestion) {
-      localStorage.setItem("selectedQuestionId", selectedQuestion.id);
-    }
-  }, [selectedQuestion]);
+  // useEffect(() => {
+  //   if (selectedQuestion) {
+  //     localStorage.setItem("selectedQuestionId", selectedQuestion.id);
+  //   }
+  // }, [selectedQuestion]);
 
   useEffect(() => {
     if (submitted) {
@@ -153,6 +155,9 @@ const QuestionSection = ({
           option !== null &&
           Object.keys(option).length > 0
         );
+      case "descriptive":
+        return typeof option === "string" && option.trim() !== "";
+        
       case "comprehension":
         return (
           typeof option === "object" &&
@@ -275,6 +280,9 @@ const QuestionSection = ({
         return null;
       case "match":
         return {};
+      case "descriptive":
+        return "";
+        
       case "comprehension":
         return sub_questions.reduce((acc, subQ) => {
           acc[subQ.id] = handleClearResponse(subQ);
@@ -377,6 +385,15 @@ const QuestionSection = ({
                   setOption={setOption}
                 />
               );
+              case "descriptive":
+                return (
+                  <DescriptiveQuestion
+                    selectedQuestion={selectedQuestion}
+                    option={option}
+                    setOption={setOption}
+                  />
+                );
+              
             case "code":
               return (
                 <CodeQuestion

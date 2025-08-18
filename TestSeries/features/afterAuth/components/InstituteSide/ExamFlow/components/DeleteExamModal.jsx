@@ -4,21 +4,37 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useUser } from '../../../../../../contexts/currentUserContext';
 import { useNavigate } from 'react-router-dom';
 
-
 const DeleteExamModal = ({ examId, setShowDeleteModal }) => {
   const [loading, setLoading] = useState(false);
-  const {user}=useUser();
-  const orgId=user?.role==='organization'? user?._id : ( user?.organizationId._id || user.organizationId ); 
-  const queryClient=useQueryClient();
-  const navigate=useNavigate();
+  const { user } = useUser();
+  const orgId = user?.role === 'organization'
+    ? user?._id
+    : (user?.organizationId?._id || user?.organizationId); 
+
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  // Normalize the incoming examId so it works for both string and object
+  const normalizedExamId = React.useMemo(() => {
+    if (!examId) return null;
+    if (typeof examId === 'string') return examId;
+    if (typeof examId === 'object') {
+      return examId.id || examId.exam_id || examId._id || null;
+    }
+    return null;
+  }, [examId]);
 
   const handleDelete = async () => {
+    if (!normalizedExamId) {
+      console.error('❌ Missing exam id');
+      return;
+    }
     try {
       setLoading(true);
-      await deleteExam(examId);
+      await deleteExam(normalizedExamId);
       setShowDeleteModal(false);
-      queryClient.invalidateQueries(['pendingExams',orgId]);
-      navigate('/institute/exam-list'); // Go back to the previous page after deletion
+      if (orgId) queryClient.invalidateQueries(['pendingExams', orgId]);
+      navigate('/institute/exam-list');
     } catch (error) {
       console.error('Error deleting exam:', error);
     } finally {
@@ -39,13 +55,12 @@ const DeleteExamModal = ({ examId, setShowDeleteModal }) => {
             onClick={() => setShowDeleteModal(false)}
             disabled={loading}
           >
-            Cancel        
-
+            Cancel
           </button>
           <button
             onClick={handleDelete}
             className="px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded transition-colors"
-            disabled={loading}
+            disabled={loading || !normalizedExamId}
           >
             {loading ? 'Deleting...' : 'Delete'}
           </button>

@@ -69,6 +69,8 @@ const TestWindow = () => {
   const handleSubmitRef = useRef(null);
   const [isPaused, setIsPaused] = useState(false);
 
+  console.log('etfv', questions)
+
   // Enhanced useExamSecurity hook with toaster
   const {
     violationCount,
@@ -249,7 +251,7 @@ const TestWindow = () => {
     if (selectedSubject && subjectSpecificQuestions && selectedQuestion && isInitialSetupComplete) {
       const questionsForSubject = subjectSpecificQuestions[selectedSubject];
       if (questionsForSubject && questionsForSubject.length > 0) {
-        const questionExists = questionsForSubject.find((q) => q._id === selectedQuestion._id);
+        const questionExists = questionsForSubject.find((q) => q.id === selectedQuestion.id);
         if (!questionExists) {
           setSelectedQuestion(questionsForSubject[0]);
         }

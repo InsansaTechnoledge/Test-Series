@@ -1,234 +1,369 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Settings } from 'lucide-react';
 import ExamControllSettings from '../ExamControll/ExamControllSettings'
 import { useUser } from '../../../../../../contexts/currentUserContext';
 
 const NewExamMetaDataForm = ({handleSubmit , theme , form, setForm , handleChange , batches , isExamControllOpen , setIsExamControllOpen , canAccessPage , canCreateMoreExams}) => {
-    console.log("f", batches)
 
+    console.log("check" , form)
     const {user} = useUser();
-    console.log("FF",user);
+    
+    const [selectedExamType, setSelectedExamType] = useState('semi-subjective');
+
+    const examTypes = [
+        { id: 'semi-subjective', label: 'Hybrid (Objective + Subjective)', hint: 'Mix of auto-graded and manual', value: 'semi_subjective' },
+        { id: 'objective',       label: 'Objective Only',                  hint: 'MCQ/MSQ/TF/Numerical',          value: 'objective' },
+        { id: 'subjective',      label: 'Subjective Only',                 hint: 'Essay/Comprehension/Fill',      value: 'subjective' }
+      ];
+      
+    const handleExamTypeChange = (examType) => {
+        setSelectedExamType(examType.id);
+      
+        setForm((prev) => ({
+          ...prev,
+          exam_type: examType.value,    
+          is_subjective: examType.value === "subjective" || examType.value === "semi_subjective",
+        }));
+      };
+      
     
   return (
-    <div>
-       <div className="borderoverflow-hidden mb-8  rounded-3xl p-6 transform hover:scale-105 transition-all duration-300 ">
-        
-        <div className="bg-gradient-to-r from-[#4c51bf] to-indigo-600 px-8 py-8 rounded-t-2xl  shadow-xl  ">
-        <h1 className="text-2xl font-extrabold text-white flex items-center space-x-3">
-            <span>Create New Exam</span>
-        </h1>
-        </div>
-        <form onSubmit={handleSubmit} className={`p-8 space-y-8 rounded-b-3xl shadow-2xl ${
-        theme === 'light' 
-            ? 'backdrop-blur-md bg-white/30 border border-white/40' 
-            : 'bg-gray-800 border border-gray-700'
-        }`}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Exam Name */}
-            <div className="md:col-span-2">
+    <div className=" mx-auto">
+       
 
-            <label className={`font-bold mb-3 flex items-center space-x-2 text-sm ${
-                theme === 'light' ? 'text-gray-800' : 'text-gray-100'
-            }`}>
-                <span>Choose a name for your exam</span>
-            </label>
-            <input
-                name="name"
-                placeholder="Enter exam name..."
-                className={`p-4 rounded-2xl transition-all duration-300 text-lg w-full pr-14 ${
-                theme === 'light'
-                    ? 'bg-white text-gray-900 border-2 border-gray-200 focus:ring-indigo-200 focus:border-indigo-400 placeholder-gray-400'
-                    : 'bg-gray-800 text-indigo-100 border-2 border-gray-600 focus:ring-indigo-500 focus:border-indigo-300 placeholder-indigo-300'
+       <div className="overflow-hidden mb-8 rounded-3xl shadow-2xl mx-auto transform transition-all duration-500 ease-in-out">
+        
+        <div className="bg-gradient-to-r from-[#4c51bf] to-indigo-600 px-8 py-10 relative overflow-hidden">
+          <h1 className="text-3xl font-black text-white relative z-10 tracking-tight">
+            Create New Exam
+          </h1>
+          <p className="text-indigo-100 mt-2 text-lg font-medium relative z-10">Design and configure your examination</p>
+        </div>
+
+        <div className="space-y-2 mt-8 mb-8 max-w-7xl mx-auto">
+            <label
+                className={`block text-sm font-semibold ${
+                theme === 'light' ? 'text-gray-700' : 'text-gray-200'
                 }`}
-                value={form.name}
-                onChange={handleChange}
-                required
-            />
+            >
+                Choose exam type
+            </label>
+
+        <div
+            role="tablist"
+            aria-label="Exam type"
+            className={`w-full rounded-xl border shadow-sm p-1 ${
+            theme === 'light'
+                ? 'bg-white border-gray-200'
+                : 'bg-gray-800/70 border-gray-700'
+            } flex`}
+        >
+            {examTypes.map((examType, idx) => {
+            const selected = selectedExamType === examType.id;
+            return (
+                <button
+                key={examType.id}
+                type="button"
+                role="tab"
+                aria-selected={selected}
+                onClick={() => handleExamTypeChange(examType)}
+                className={[
+                    'flex-1 relative px-4 py-2.5 text-sm font-semibold rounded-lg transition-all',
+                    'outline-none focus-visible:ring-2 focus-visible:ring-indigo-500',
+                    selected
+                    ? theme === 'light'
+                        ? 'bg-indigo-600 text-white shadow'
+                        : 'bg-indigo-500 text-white shadow'
+                    : theme === 'light'
+                    ? 'text-gray-600 hover:bg-gray-50'
+                    : 'text-gray-300 hover:bg-gray-700/60',
+                    idx === 0 ? 'ml-0' : 'ml-1',
+                ].join(' ')}
+                >
+                {examType.label}
+                {selected && (
+                    <span
+                    aria-hidden="true"
+                    className="absolute inset-x-3 -bottom-1 h-[2px] rounded-full bg-white/70"
+                    />
+                )}
+                </button>
+            );
+            })}
+        </div>
+
+        <p
+            className={`text-xs ${
+            theme === 'light' ? 'text-gray-500' : 'text-gray-400'
+            }`}
+        >
+            Tip: You can change this later before adding questions (in pending state).
+        </p>
+        </div>
+
+
+        <form onSubmit={handleSubmit} className={`p-8 space-y-8 relative ${
+          theme === 'light' 
+              ? 'backdrop-blur-md bg-white/30 border border-white/40' 
+              : 'bg-gray-800 border border-gray-700'
+        }`}>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Exam Name */}
+            <div className="lg:col-span-2">
+              <div className="group">
+                <label className={`font-semibold mb-4 flex items-center space-x-3 text-base ${
+                    theme === 'light' ? 'text-gray-700' : 'text-gray-200'
+                }`}>
+                  <span>Choose a name for your exam</span>
+                </label>
+                <div className="relative">
+                  <input
+                      name="name"
+                      placeholder="Enter exam name..."
+                      className={`p-5 rounded-2xl transition-all duration-300 text-lg w-full shadow-lg border-2 focus:ring-2 ${
+                      theme === 'light'
+                          ? 'bg-white text-gray-900 border-gray-200 focus:ring-indigo-200 focus:border-indigo-400 placeholder-gray-400'
+                          : 'bg-gray-800 text-indigo-100 border-gray-600 focus:ring-indigo-500 focus:border-indigo-300 placeholder-indigo-300'
+                      }`}
+                      value={form.name}
+                      onChange={handleChange}
+                      required
+                  />
+                </div>
+              </div>
             </div>
 
             {/* Date */}
-            <div>
-            <label className={`font-bold mb-3 flex items-center space-x-2 text-sm ${
-                theme === 'light' ? 'text-gray-800' : 'text-gray-100'
-            }`}>
-
+            <div className="group">
+              <label className={`font-semibold mb-4 flex items-center space-x-3 text-base ${
+                  theme === 'light' ? 'text-gray-700' : 'text-gray-200'
+              }`}>
                 <span>Schedule your exam</span>
-            </label>
-            <input
-                type="datetime-local"
-                name="date"
-                className={`p-4 rounded-2xl transition-all duration-300 text-lg w-full  ${
-                theme === 'light'
-                    ? 'bg-white text-gray-900 border-2 border-gray-200 focus:ring-indigo-200 focus:border-indigo-400 placeholder-gray-400'
-                    : 'bg-gray-800 text-indigo-100 border-2 border-gray-600 focus:ring-indigo-500 focus:border-indigo-300 placeholder-indigo-300'
-                }`}
-                value={form.date}
-                onChange={handleChange}
-                required
-            />
+              </label>
+              <input
+                  type="datetime-local"
+                  name="date"
+                  className={`p-5 rounded-2xl transition-all duration-300 text-lg w-full shadow-lg border-2 focus:ring-2 ${
+                  theme === 'light'
+                      ? 'bg-white text-gray-900 border-gray-200 focus:ring-indigo-200 focus:border-indigo-400 placeholder-gray-400'
+                      : 'bg-gray-800 text-indigo-100 border-gray-600 focus:ring-indigo-500 focus:border-indigo-300 placeholder-indigo-300'
+                  }`}
+                  value={form.date}
+                  onChange={handleChange}
+                  required
+              />
             </div>
 
             {/* Total Marks */}
-            <div>
-            <label className={`font-bold mb-3 flex items-center space-x-2 text-sm ${
-                theme === 'light' ? 'text-gray-800' : 'text-gray-100'
-            }`}>
-
+            <div className="group">
+              <label className={`font-semibold mb-4 flex items-center space-x-3 text-base ${
+                  theme === 'light' ? 'text-gray-700' : 'text-gray-200'
+              }`}>
                 <span>Total Marks</span>
-            </label>
-            <input
-                name="total_marks"
-                type="number"
-                placeholder="Enter total marks..."
-                className={`p-4 rounded-2xl transition-all duration-300 text-lg w-full  ${
-                theme === 'light'
-                    ? 'bg-white text-gray-900 border-2 border-gray-200 focus:ring-indigo-200 focus:border-indigo-400 placeholder-gray-400'
-                    : 'bg-gray-800 text-indigo-100 border-2 border-gray-600 focus:ring-indigo-500 focus:border-indigo-300 placeholder-indigo-300'
-                }`}
-                value={form.total_marks}
-                onChange={handleChange}
-            />
+              </label>
+              <input
+                  name="total_marks"
+                  type="number"
+                  placeholder="Enter total marks..."
+                  className={`p-5 rounded-2xl transition-all duration-300 text-lg w-full shadow-lg border-2 focus:ring-2 ${
+                  theme === 'light'
+                      ? 'bg-white text-gray-900 border-gray-200 focus:ring-indigo-200 focus:border-indigo-400 placeholder-gray-400'
+                      : 'bg-gray-800 text-indigo-100 border-gray-600 focus:ring-indigo-500 focus:border-indigo-300 placeholder-indigo-300'
+                  }`}
+                  value={form.total_marks}
+                  onChange={handleChange}
+              />
             </div>
 
             {/* Duration */}
-            <div>
-            <label className={`font-bold mb-3 flex items-center space-x-2 text-sm ${
-                theme === 'light' ? 'text-gray-800' : 'text-gray-100'
-            }`}>
-
+            <div className="group">
+              <label className={`font-semibold mb-4 flex items-center space-x-3 text-base ${
+                  theme === 'light' ? 'text-gray-700' : 'text-gray-200'
+              }`}>
                 <span>Duration (minutes)</span>
-            </label>
-            <input
-                name="duration"
-                type="number"
-                placeholder="Enter duration in minutes..."
-                className={`p-4 rounded-2xl transition-all duration-300 text-lg w-full pr-14 ${
-                theme === 'light'
-                    ? 'bg-white text-gray-900 border-2 border-gray-200 focus:ring-indigo-200 focus:border-indigo-400 placeholder-gray-400'
-                    : 'bg-gray-800 text-indigo-100 border-2 border-gray-600 focus:ring-indigo-500 focus:border-indigo-300 placeholder-indigo-300'
-                }`}
-                value={form.duration}
-                onChange={handleChange}
-            />
+              </label>
+              <input
+                  name="duration"
+                  type="number"
+                  placeholder="Enter duration in minutes..."
+                  className={`p-5 rounded-2xl transition-all duration-300 text-lg w-full shadow-lg border-2 focus:ring-2 ${
+                  theme === 'light'
+                      ? 'bg-white text-gray-900 border-gray-200 focus:ring-indigo-200 focus:border-indigo-400 placeholder-gray-400'
+                      : 'bg-gray-800 text-indigo-100 border-gray-600 focus:ring-indigo-500 focus:border-indigo-300 placeholder-indigo-300'
+                  }`}
+                  value={form.duration}
+                  onChange={handleChange}
+              />
             </div>
 
             {/* Batch Selection */}
-            <div>
-            <label className={`font-bold mb-3 flex items-center space-x-2 text-sm ${
-                theme === 'light' ? 'text-gray-800' : 'text-gray-100'
-            }`}>
-
+            <div className="group">
+              <label className={`font-semibold mb-4 flex items-center space-x-3 text-base ${
+                  theme === 'light' ? 'text-gray-700' : 'text-gray-200'
+              }`}>
                 <span>Select Batch</span>
-            </label>
-            <select
-                name="batch_id"
-                className={`p-4 rounded-2xl transition-all duration-300 text-lg w-full pr-14 ${
-                theme === 'light'
-                    ? 'bg-white text-gray-900 border-2 border-gray-200 focus:ring-indigo-200 focus:border-indigo-400 placeholder-gray-400'
-                    : 'bg-gray-800 text-indigo-100 border-2 border-gray-600 focus:ring-indigo-500 focus:border-indigo-300 placeholder-indigo-300'
-                }`}
-                value={form.batch_id}
-                onChange={handleChange}
-                required
-            >
-                <option value="">-- Select Batch --</option>
-                {Array.isArray(batches) && batches.map((batch, index) => (
-                <option key={batch?.id || index} value={batch?.id || ''}>
-                    {batch?.name || 'Unnamed Batch'} - {batch?.year || 'No Year'}
-                </option>
-                ))}
-            </select>
+              </label>
+              <select
+                  name="batch_id"
+                  className={`p-5 rounded-2xl transition-all duration-300 text-lg w-full shadow-lg border-2 focus:ring-2 ${
+                  theme === 'light'
+                      ? 'bg-white text-gray-900 border-gray-200 focus:ring-indigo-200 focus:border-indigo-400'
+                      : 'bg-gray-800 text-indigo-100 border-gray-600 focus:ring-indigo-500 focus:border-indigo-300'
+                  }`}
+                  value={form.batch_id}
+                  onChange={handleChange}
+                  required
+              >
+                  <option value="">-- Select Batch --</option>
+                  {Array.isArray(batches) && batches.map((batch, index) => (
+                  <option key={batch?.id || index} value={batch?.id || ''}>
+                      {batch?.name || 'Unnamed Batch'} - {batch?.year || 'No Year'}
+                  </option>
+                  ))}
+              </select>
             </div>
-
-            {/* <p>{form.batch_id}</p> */}
 
             {/* Select Subject */}
-
-            <div>
-            <label
-                className={`font-bold mb-3 flex items-center space-x-2 text-sm ${
-                theme === 'light' ? 'text-gray-800' : 'text-gray-100'
+            <div className={`lg:col-span-2 rounded-xl border p-4 shadow-sm ${
+              theme === "light" 
+                ? "border-gray-200 bg-white" 
+                : "border-gray-700 bg-gray-900"
+            }`}>
+              <label
+                htmlFor="subjects"
+                className={`mb-4 flex items-center gap-3 text-base font-semibold ${
+                  theme === "light" ? "text-gray-700" : "text-gray-200"
                 }`}
-            >
-                <span>Select Subjects to include in exam</span>
-            </label>
+              >
+               
+                <span>Select subjects to include in exam</span>
+              </label>
 
-            <select
-                multiple
-                name="subjects"
-                id="subjects"
-                className="w-full px-3 py-2 rounded-md border border-gray-300 h-40"
-                value={form.subjects}
-                onChange={(e) => {
-                    const selectedOptions = Array.from(e.target.selectedOptions).map(option => option.value);
-                    setForm(prev => ({ ...prev, subjects: selectedOptions }));
-                }}
+              <div className="relative">
+                <select
+                  multiple
+                  name="subjects"
+                  id="subjects"
+                  className={`h-44 w-full rounded-lg border px-3 py-2 text-sm outline-none transition focus:ring-2 focus:ring-indigo-500 ${
+                    theme === "light"
+                      ? "border-gray-300 bg-white text-gray-900"
+                      : "border-gray-600 bg-gray-800 text-gray-100"
+                  }`}
+                  value={form.subjects}
+                  onChange={(e) => {
+                    const selectedOptions = Array.from(e.target.selectedOptions).map((o) => o.value);
+                    setForm((prev) => ({ ...prev, subjects: selectedOptions }));
+                  }}
                 >
-                <option disabled value="">Select Subjects</option>
-                {batches.find(batch => batch.id === form.batch_id)?.subjects?.map((subject, idx) => (
-                    <option key={idx} value={subject}>
-                    {subject}
+                  <option disabled value="">
+                    Select Subjects
+                  </option>
+                  {batches.find((batch) => batch.id === form.batch_id)?.subjects?.map((subject, idx) => (
+                    <option key={idx} value={subject} className="py-2">
+                      {subject}
                     </option>
-                ))}
-            </select>
-            {form?.subjects?.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-2">
-                {form.subjects.map((subj, index) => (
-                <span
-                    key={index}
-                    className="bg-blue-100 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full"
+                  ))}
+                </select>
+                <div
+                  className={`mt-2 text-xs ${
+                    theme === "light" ? "text-gray-500" : "text-gray-400"
+                  }`}
                 >
-                    {subj}
-                </span>
-                ))}
-            </div>
-            )}
-            </div>
+                  Hold <span className="font-semibold">Ctrl/Cmd</span> to select multiple
+                </div>
+              </div>
 
-        </div>
+              {Array.isArray(form?.subjects) && form.subjects.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {form.subjects.map((subj, index) => (
+                    <span
+                      key={`${subj}-${index}`}
+                      className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold ring-1 ring-inset ${
+                        theme === "light"
+                          ? "bg-indigo-50 text-indigo-700 ring-indigo-200"
+                          : "bg-indigo-900/30 text-indigo-200 ring-indigo-800/60"
+                      }`}
+                    >
+                      {subj}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setForm((prev) => ({
+                            ...prev,
+                            subjects: (prev.subjects || []).filter((s) => s !== subj),
+                          }))
+                        }
+                        className={`ml-1 rounded-full p-0.5 transition ${
+                          theme === "light" ? "hover:bg-indigo-100" : "hover:bg-indigo-800/60"
+                        }`}
+                        aria-label={`Remove ${subj}`}
+                        title="Remove"
+                      >
+                        <svg
+                          className="h-3.5 w-3.5"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M18 6L6 18M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
 
-        {/*Exam controll section */}
-        
-        <div>
-            <button
-            type="button"
-            className={`flex items-center mb-4 gap-2 px-4 py-2 rounded-lg font-semibold transition-all duration-200 shadow-md border 
-                ${theme === 'light'
-                ? 'bg-white text-gray-800 border-gray-300 hover:bg-gray-100'
-                : 'bg-indigo-800 text-white border-indigo-600 hover:bg-indigo-700'}
+          {/*Exam controll section */}
+          <div>
+              <button
+              type="button"
+              className={`flex items-center mb-4 gap-2 px-4 py-2 rounded-lg font-semibold transition-all duration-200 shadow-md border 
+                  ${theme === 'light'
+                  ? 'bg-white text-gray-800 border-gray-300 hover:bg-gray-100'
+                  : 'bg-indigo-800 text-white border-indigo-600 hover:bg-indigo-700'}
+              `}
+              onClick={() => setIsExamControllOpen(prev => !prev)}
+              >
+              <Settings className="w-5 h-5" />
+              {!isExamControllOpen ? 'Advance Examination Control' : 'Close Examination Control'}
+              </button>
+              {
+              isExamControllOpen && (
+                  <div className="animate-in slide-in-from-top-2 duration-300">
+                    <ExamControllSettings user={user} handleChange={handleChange} form={form} theme={theme}/>
+                  </div>
+              )
+              }
+          </div>
+          
+
+          {/* Submit Button */}
+          <div className="flex justify-center pt-6">
+          <button
+                type="submit"
+                disabled={canAccessPage === false || canCreateMoreExams === false}
+                className={`group text-white px-12 py-4 rounded-3xl flex items-center gap-3 font-bold text-lg transition-all duration-300 transform
+            ${canAccessPage === false || canCreateMoreExams === false
+                    ? 'bg-gray-300 cursor-not-allowed' 
+                    : (theme === 'light' ? 'bg-amber-600 hover:scale-105 hover:shadow-2xl' : 'bg-amber-500') }
             `}
-            onClick={() => setIsExamControllOpen(prev => !prev)}
             >
-            <Settings className="w-5 h-5" />
-            {!isExamControllOpen ? 'Exam Controller' : 'Close Exam Controller'}
+                <span className={`text-center ${canAccessPage === false || canCreateMoreExams === false ? "text-red-600" : ""}`}>
+                {!canAccessPage
+                    ? 'Access Denied'
+                    : !canCreateMoreExams
+                    ? 'Limit Exceeded'
+                    : (form.id ? 'Update Exam' : 'Create Exam')
+                }
+                </span>
             </button>
-            {
-            isExamControllOpen && (
-                <ExamControllSettings user={user} handleChange={handleChange} form={form} theme={theme}/>
-            )
-            }
-        </div>
-        
-
-        {/* Submit Button */}
-        <button
-            type="submit"
-            disabled={canAccessPage === false || canCreateMoreExams === false}
-            className={`group text-white px-12 py-4 rounded-3xl flex items-center gap-3 font-bold text-lg transition-all duration-300 transform
-        ${canAccessPage === false || canCreateMoreExams === false
-                ? 'bg-gray-300 cursor-not-allowed'
-                : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 hover:scale-105 hover:shadow-2xl'}
-        `}
-        >
-            <span className={`text-center ${canAccessPage === false || canCreateMoreExams === false ? "text-red-600" : ""}`}>
-            {!canAccessPage
-                ? 'Access Denied'
-                : !canCreateMoreExams
-                ? 'Limit Exceeded'
-                : (form.id ? 'Update Exam' : 'Create Exam')
-            }
-            </span>
-        </button>
+          </div>
         </form>
         </div>
     </div>

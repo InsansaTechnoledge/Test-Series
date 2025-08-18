@@ -154,7 +154,9 @@ const CreateExam = () => {
 
       {!examDetails || editingExam ? (
         <ExamForm
+          setShowDeleteModal={setShowDeleteModal}
           canCreateMoreExams={canCreateMoreExams}
+          showDeleteModal={showDeleteModal}
           onSubmit={(updatedExam) => {
             setExamDetails(updatedExam);
             setEditingExam(false);
@@ -166,11 +168,15 @@ const CreateExam = () => {
           initialData={
             examDetails || {
               name: "",
-              date: "",
-              total_marks: "",
-              duration: "",
-              batch_id: "",
-              subjects: [],
+                date: "",
+                total_marks: "",
+                duration: "",
+                batch_id: "",
+                is_subjective: false,
+                subjects: [],
+                auto_submittable: true,
+                ai_proctored: false,
+                exam_type: ""
             }
           } // for edit form
         />
@@ -182,12 +188,20 @@ const CreateExam = () => {
         >
           <div className="flex justify-between items-center ">
             <div className="">
+              
               <h2
                 className={`text-xl font-semibold ${
                   theme === "light" ? "text-green-600" : "text-green-400"
                 }`}
               >
                 <span className={`${theme === 'light' ? 'text-gray-700' : 'text-white'}`}>Exam Name :</span> {examDetails.name}
+              </h2>
+
+              <h2  className={`text-lg font-normal ${
+                  theme === "light" ? "text-green-600" : "text-green-400"
+                }`}>
+                  <span className={`${theme === 'light' ? 'text-gray-700' : 'text-white'}`}>Exam Type :</span> {examDetails?.exam_type}
+
               </h2>
             
               <p

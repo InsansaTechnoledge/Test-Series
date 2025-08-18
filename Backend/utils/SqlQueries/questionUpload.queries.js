@@ -223,22 +223,7 @@ export const insertCode = async (codeData) => {
 };
 
 export const insertDescriptive = async (descriptiveData) => {
-  // Expecting: { id, question_text, min_words?, max_words?, reference_answer?, rubric?, keywords? }
-  // Normalize optional JSON fields
-  const payload = {
-    ...descriptiveData,
-    rubric:
-      descriptiveData?.rubric && typeof descriptiveData.rubric === 'string'
-        ? JSON.parse(descriptiveData.rubric)
-        : descriptiveData?.rubric ?? null,
-    keywords:
-      descriptiveData?.keywords
-        ? Array.isArray(descriptiveData.keywords)
-          ? descriptiveData.keywords
-          : JSON.parse(descriptiveData.keywords)
-        : null,
-  };
-
+  const payload = Array.isArray(descriptiveData) ? descriptiveData : [descriptiveData];
   const { data, error } = await supabase
     .from('question_descriptive')
     .insert(payload)
@@ -250,3 +235,4 @@ export const insertDescriptive = async (descriptiveData) => {
   }
   return data;
 };
+

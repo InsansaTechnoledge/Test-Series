@@ -27,7 +27,7 @@ const ExamPageIntroHeader = ({Banner , Available_Limit , NeedHelpComponent , can
 
             <div className="flex items-center justify-center">
               <p className="mt-8 text-indigo-700 bg-indigo-50 border border-indigo-100 px-5 py-4 rounded-2xl text-base flex items-center gap-3 shadow-sm backdrop-blur-sm">
-                <AlertTriangle className="w-5 h-5 text-indigo-400" />
+                <AlertTriangle className="w-5 h-5 text-red-400" />
                 <span>
                   <span className="font-semibold">Note:</span> For your current plan, you have an available limit of
                   <span className={`${Available_Limit > 0 ? "text-green-500" : "text-red-500"} mx-2`}>{Available_Limit}</span>Exams
