@@ -86,6 +86,9 @@ const QuestionSection = ({
     useEffect(() => {
     if (!selectedQuestion || !subjectSpecificQuestions) return;
 
+   
+    
+
     const currentQuestion = selectedQuestion;
     const originalSubject = currentQuestion.originalSubject || currentQuestion.subject;
 
