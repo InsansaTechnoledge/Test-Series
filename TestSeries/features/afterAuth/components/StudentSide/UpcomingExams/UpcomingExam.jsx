@@ -339,9 +339,11 @@ const UpcomingExam = () => {
       return;
     }
   
-    console.log("Launching exam:", examId, "AI Proctored:", isAiProctoredFlag);
+    console.log("Launching exam ", examId, "AI Proctored:", isAiProctoredFlag);
   
     // Check if the exam is AI-proctored (handle different data types)
+
+
     const isProctored = isAiProctoredFlag === true || 
                        isAiProctoredFlag === "TRUE" || 
                        isAiProctoredFlag === "true" || 
@@ -354,10 +356,12 @@ const UpcomingExam = () => {
         console.log("AI-proctored exam in Electron environment - starting proctor engine");
 
 
-          const result = await window.electronAPI.checkCameraPermission();
-          console.log("Camera permission check result:", result);
-          if(!result.granted){
-            alert('Camera access is required to start the exam.');
+          const resultCamera = await window.electronAPI.checkCameraPermission();
+          console.log("Camera permission check result:", resultCamera);
+          const resultMic = await window.electronAPI.checkMicPermission();
+          console.log("Microphone permission check result:", resultMic);
+          if(!resultCamera.granted || !resultMic.granted){
+            alert('Camera and microphone access are required to start the exam.');
             return;
           }
           

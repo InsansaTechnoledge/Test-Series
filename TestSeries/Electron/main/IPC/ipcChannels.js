@@ -29,6 +29,7 @@ const IPC_CHANNELS = {
     PROCTOR_EVENT: 'proctor-event',
     PROCTOR_WARNING: 'proctor-warning',
     PROCTOR_LOG: 'proctor-log',
+    PROCTOR_AUDIO_LEVEL: 'proctor-audio-level',
     
     // Queue management
     CLEAR_DB_EVENTS: 'clear-db-events',
@@ -39,6 +40,7 @@ const IPC_CHANNELS = {
 
     // Camera permissions
     OPEN_CAMERA_SETTINGS: 'open-camera-settings',
+    OPEN_MIC_SETTINGS: 'open-mic-settings',
   };
   
 module.exports = IPC_CHANNELS;

@@ -10,18 +10,18 @@ class ProctorProcess {
     this.process = null;
   }
 
-  launch(params, onEvent, onWarning, onLog) {
+  launch(params, onEvent, onWarning, onLog, onAudioLevelEvent) {
     try {
       const binaryPath = PathResolver.getBinaryPath();
-      
+
       const userId = params.userId;
       const examId = params.examId;
       const eventId = params.eventId || params.examId;
-      
+
       if (!userId || !examId) {
         throw new Error(`❌ Missing required parameters. userId: ${userId}, examId: ${examId}`);
       }
-      
+
       console.log('🚀 Launching proctor engine with params:', { userId, examId, eventId });
 
       this.process = spawn(binaryPath, [
@@ -33,7 +33,7 @@ class ProctorProcess {
         windowsHide: true,
       });
 
-      this.setupEventHandlers(onEvent, onWarning, onLog);
+      this.setupEventHandlers(onEvent, onWarning, onLog, onAudioLevelEvent);
 
       console.log('✅ Proctor engine launched successfully');
       return { success: true, message: 'Proctor engine started successfully' };
@@ -45,18 +45,18 @@ class ProctorProcess {
   }
 
 
-  setupEventHandlers(onEvent, onWarning, onLog) {
+  setupEventHandlers(onEvent, onWarning, onLog, onAudioLevelEvent) {
     if (!this.process) return;
 
     const rl = readline.createInterface({ input: this.process.stdout });
 
     rl.on('line', (line) => {
       console.log('📤 Raw output from proctor engine:', line);
-      
+
       try {
         const parsed = JSON.parse(line);
         console.log('📊 Parsed proctor data:', parsed);
-        
+
         if (parsed?.eventType === 'anomaly') {
           if (parsed?.image && fs.existsSync(parsed.image)) {
             const imageBuffer = fs.readFileSync(parsed.image);
@@ -65,6 +65,10 @@ class ProctorProcess {
           }
           console.log('📸 Anomaly detected:', parsed);
           onWarning(parsed);
+        } else if (parsed?.eventType === 'audio-level') {
+          const audioLevel = parseFloat(parsed.details);
+          console.log("audio level", audioLevel.toFixed(3));
+          onAudioLevelEvent(audioLevel);
         } else {
           onEvent(parsed);
         }
@@ -105,7 +109,7 @@ class ProctorProcess {
     return { success: false, message: 'Proctor Engine was not running.' };
   }
 
- 
+
   isRunning() {
     return this.process !== null;
   }

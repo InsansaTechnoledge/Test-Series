@@ -64,11 +64,38 @@ contextBridge.exposeInMainWorld('electronAPI', {
       }
 
   },
+  
+  
+  checkMicPermission: async () => {
+  console.log('🎤 Preload: checkMicPermission called');
+  console.log('🎤 Checking microphone permission');
+  try {
+    const result = await navigator.mediaDevices.getUserMedia({ audio: true }).then(
+      stream => {
+        stream.getTracks().forEach(track => track.stop()); // Stop after check
+        return { granted: true };
+      },
+      error => {
+        return { granted: false, error: error.message };
+      }
+    );
+    return result;
+  } catch (error) {
+    console.error('Error checking microphone permission:', error);
+    return { granted: false };
+  }
+},
+
 
   openCameraSettings: () => {
     console.log('🔧 Preload: openCameraSettings called');
     ipcRenderer.invoke('open-camera-settings');
   },
+
+  openMicSettings: () => {
+  console.log('🔧 Preload: openMicSettings called');
+  ipcRenderer.invoke('open-mic-settings');
+},
 
   // ✅ FIXED: Event listeners for proctor events
   onProctorWarning: (callback) => {
@@ -77,6 +104,15 @@ contextBridge.exposeInMainWorld('electronAPI', {
       callback(event, data);
     };
     ipcRenderer.on('proctor-warning', listener);
+    return listener;
+  },
+
+  onAudioLevelEvent:(callback)=>{
+    const listener = (event,data)=>{
+      console.log("preload:audio level: ",data);
+      callback(event,data);
+    };
+    ipcRenderer.on('proctor-audio-level',listener);
     return listener;
   },
 
@@ -104,6 +140,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.removeAllListeners('proctor-warning');
     ipcRenderer.removeAllListeners('proctor-event');
     ipcRenderer.removeAllListeners('proctor-log');
+    ipcRenderer.removeAllListeners('proctor-audio-level');
   },
 
   // Protocol URL handling

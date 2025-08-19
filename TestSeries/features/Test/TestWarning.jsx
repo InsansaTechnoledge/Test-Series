@@ -9,12 +9,12 @@ import { VITE_SECRET_KEY_FOR_TESTWINDOW } from '../constants/env';
 import LoadingTest from './LoadingTest';
 import { checkToStopExamForStudent } from '../../utils/services/proctorService';
 
-const TestHeader = ({ isAutoSubmittable, isProctorRunning, handleSubmit , setSelectedQuestion}) => {
+const TestHeader = ({ isAutoSubmittable, isProctorRunning, handleSubmit , setSelectedQuestion,isAiProctored}) => {
   const [eventDetails, setEventDetails] = useState();
   const [subjectSpecificQuestions, setSubjectSpecificQuestions] = useState();
   const [selectedSubject, setSelectedSubject] = useState();
   const [warning, setWarning] = useState(null);
-  const [warningCount, setWarningCount] = useState(0);
+  const [warningCount, setWarningCount] = useState(0); isAiProctored
   const [proctorRunning, setProctorRunning] = useState(false);
   const [countdown, setCountdown] = useState(null);
   const [allWarnings, setAllWarnings] = useState([]);
@@ -24,7 +24,7 @@ const TestHeader = ({ isAutoSubmittable, isProctorRunning, handleSubmit , setSel
 
   // Organization stop toast states
   const [showOrgStopToast, setShowOrgStopToast] = useState(false);
-  const [orgStopCountdown, setOrgStopCountdown] = useState(5);
+  const [orgStopCountdown, setOrgStopCountdown] = useState(15);
   const [isElectronEnv, setIsElectronEnv] = useState(false);
 
   // Add refs to prevent duplicate processing
@@ -58,7 +58,7 @@ const TestHeader = ({ isAutoSubmittable, isProctorRunning, handleSubmit , setSel
 
   // Initialize proctor engine in Electron environment
   useEffect(() => {
-    if (isElectronEnv && user && examId && !proctorRunning) {
+    if (isElectronEnv && user && examId && !proctorRunning && isAiProctored) {
       initializeProctor();
     }
 
@@ -70,7 +70,7 @@ const TestHeader = ({ isAutoSubmittable, isProctorRunning, handleSubmit , setSel
   }, [isElectronEnv, user, examId]);
 
   const initializeProctor = async () => {
-    if (!window?.electronAPI) {
+    if (!window?.electronAPI  && isAiProctored) {
       console.warn('⚠️ Electron API not available');
       return;
     }
@@ -312,14 +312,18 @@ const TestHeader = ({ isAutoSubmittable, isProctorRunning, handleSubmit , setSel
     }
   }, [selectedSubject, subjectSpecificQuestions]);
 
+
+  const warningRef = useRef(warningCount);
+warningRef.current = warningCount;
+
   // Enhanced useEffect with toast notification for organization stop
   useEffect(() => {
     // Only start polling if autoSubmittable is false AND warning count >= 5
-    if (autoSubmittable || warningCount < 5 || !user?._id) {
+    if (autoSubmittable || warningRef.current < 5 || !user?._id) {
       return; // Exit early if conditions aren't met
     }
 
-    console.log("🔄 Starting stopExam polling - warningCount:", warningCount, "autoSubmittable:", autoSubmittable);
+    console.log("🔄 Starting stopExam polling - warningCount:", warningRef.current, "autoSubmittable:", autoSubmittable);
 
     const intervalId = setInterval(async () => {
       try {
@@ -336,7 +340,7 @@ const TestHeader = ({ isAutoSubmittable, isProctorRunning, handleSubmit , setSel
 
 
           setShowOrgStopToast(true);
-          setOrgStopCountdown(15);
+          // setOrgStopCountdown(15);
 
           // Start countdown timer
           orgStopTimerRef.current = setInterval(() => {
@@ -369,7 +373,7 @@ const TestHeader = ({ isAutoSubmittable, isProctorRunning, handleSubmit , setSel
         orgStopTimerRef.current = null;
       }
     };
-  }, [warningCount, autoSubmittable, user?._id]); // Dependencies ensure effect runs when these change
+  }, [warningRef.current, autoSubmittable, user?._id]); // Dependencies ensure effect runs when these change
 
   console.log("sd", isAutoSubmittable);
 

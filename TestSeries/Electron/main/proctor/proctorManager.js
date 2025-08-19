@@ -20,13 +20,14 @@ class ProctorManager {
     }
 
     const onEvent = (data) => this.safeSend(mainWindow, 'proctor-event', data);
+    const onAudioLevelEvent = (data) => this.safeSend(mainWindow, 'proctor-audio-level', data);
     const onWarning = (data) => {
       this.queue.addEvent(data);
       this.safeSend(mainWindow, 'proctor-warning', data);
     };
     const onLog = (data) => this.safeSend(mainWindow, 'proctor-log', data);
 
-    return this.proctorProcess.launch(params, onEvent, onWarning, onLog);
+    return this.proctorProcess.launch(params, onEvent, onWarning, onLog,onAudioLevelEvent);
   }
 
   

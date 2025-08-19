@@ -151,6 +151,16 @@ class IPCHandlers {
         shell.openExternal('x-apple.systempreferences:com.apple.preference.security?Privacy_Camera');
       }
     });
+
+    ipcMain.handle(IPC_CHANNELS.OPEN_MIC_SETTINGS, () => {
+  console.log('🎤 Opening microphone settings');
+  if (isWin) {
+    shell.openExternal('ms-settings:privacy-microphone');
+  } else if (isMac) {
+    shell.openExternal('x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone');
+  }
+});
+
   }
 
   setDeeplinkURL(url) {

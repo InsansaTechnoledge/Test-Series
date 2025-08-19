@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, use } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useUser } from "../../contexts/currentUserContext";
 import { useCachedQuestions } from "../../hooks/useCachedQuestions";
@@ -20,6 +20,7 @@ import { useCallback } from "react";
 import { useExamManagement } from "../../hooks/UseExam";
 import BioBreakTimerUI from "./TestTimer/BioBreakTimerUI";
 import { Shield, AlertTriangle, CheckCircle, Clock, Users, Calendar, User, BookOpen, Timer, Send } from "lucide-react";
+import AudioLevelBar from "./utils/AudioLevelBar";
 
 const TestWindow = () => {
   const [eventDetails, setEventDetails] = useState();
@@ -68,8 +69,6 @@ const TestWindow = () => {
   const { theme } = useTheme();
   const handleSubmitRef = useRef(null);
   const [isPaused, setIsPaused] = useState(false);
-
-  console.log('etfv', questions)
 
   // Enhanced useExamSecurity hook with toaster
   const {
@@ -416,7 +415,7 @@ const TestWindow = () => {
       }, 1000);
 
       setTimeout(async () => {
-        if (window?.electronAPI?.startProctorEngineAsync) {
+        if (window?.electronAPI?.startProctorEngineAsync && eventDetails.ai_proctored) {
           const params = {
             userId: user._id,
             examId,
@@ -548,6 +547,8 @@ const TestWindow = () => {
           </div>
         </div>
 
+       {eventDetails?.ai_proctored && <AudioLevelBar />}
+
         {/* Test Header Controls */}
         <div className={`border-t ${theme === 'light' ? 'border-gray-200' : 'border-gray-700'}`}>
           <div className="max-w-7xl mx-auto px-6 py-2">
@@ -556,6 +557,7 @@ const TestWindow = () => {
               isProctorRunning={isProctorRunning} 
               handleSubmit={handleSubmitTest} 
               setSelectedQuestion={setSelectedQuestion}
+              isAiProctored={eventDetails?.ai_proctored}
             />
           </div>
         </div>
