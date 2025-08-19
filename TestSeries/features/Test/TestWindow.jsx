@@ -25,7 +25,8 @@ const TestWindow = () => {
   const [eventDetails, setEventDetails] = useState();
   const [selectedQuestion, setSelectedQuestion] = useState();
   const [subjectSpecificQuestions, setSubjectSpecificQuestions] = useState();
-  const [selectedSubject, setSelectedSubject] = useState();
+  // This is ONLY for UI filtering in QuestionListSection, NOT for navigation control
+  const [selectedSubjectFilter, setSelectedSubjectFilter] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [examViolations, setExamViolations] = useState([]);
   const [warningCount, setWarningCount] = useState(0);
@@ -42,6 +43,12 @@ const TestWindow = () => {
   const examId = searchParams.get("examId");
   const isProctorRunning = searchParams.get("isProctorRunning") === "true";
   const { exams } = useExamManagement();
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const submittingRef = useRef(false);         // hard guard against re-entry
+  const submitCooldownRef = useRef(null);      // debounce timer
+  const SUBMIT_COOLDOWN_MS = 1500;             // tweak as you like (1.5s)
+
 
   const currentExam = exams.find((exam) => exam.id === examId);
   const isAutoSubmittable = currentExam?.auto_submittable;
@@ -118,13 +125,14 @@ const TestWindow = () => {
   // Restore state on component mount
   useEffect(() => {
     if (!isStateRestored && examId) {
-      const savedSelectedSubject = loadStateFromStorage(`selectedSubject_${examId}`);
+      // Load UI filter state (for QuestionListSection display only)
+      const savedSelectedSubjectFilter = loadStateFromStorage(`selectedSubjectFilter_${examId}`);
       const savedSelectedQuestion = loadStateFromStorage(`selectedQuestion_${examId}`);
       const savedExamViolations = loadStateFromStorage(`examViolations_${examId}`);
       const savedWarningCount = loadStateFromStorage(`warningCount_${examId}`);
 
-      if (savedSelectedSubject) {
-        setSelectedSubject(savedSelectedSubject);
+      if (savedSelectedSubjectFilter !== null) {
+        setSelectedSubjectFilter(savedSelectedSubjectFilter);
       }
       if (savedSelectedQuestion) {
         setSelectedQuestion(savedSelectedQuestion);
@@ -139,10 +147,10 @@ const TestWindow = () => {
 
   // Save state whenever it changes
   useEffect(() => {
-    if (isStateRestored && isSecurityHookInitialized && examId && selectedSubject) {
-      saveStateToStorage(`selectedSubject_${examId}`, selectedSubject);
+    if (isStateRestored && isSecurityHookInitialized && examId) {
+      saveStateToStorage(`selectedSubjectFilter_${examId}`, selectedSubjectFilter);
     }
-  }, [selectedSubject, examId, isStateRestored, isSecurityHookInitialized]);
+  }, [selectedSubjectFilter, examId, isStateRestored, isSecurityHookInitialized]);
 
   useEffect(() => {
     if (isStateRestored && isSecurityHookInitialized && examId && selectedQuestion) {
@@ -228,44 +236,38 @@ const TestWindow = () => {
     }
   }, [eventDetails, isStateRestored, isInitialSetupComplete, secretKey, addToast]);
 
-  // Set default subject
+  // Set initial question (first question overall, not subject-specific)
   useEffect(() => {
-    if (eventDetails && isInitialSetupComplete && !selectedSubject) {
-      const defaultSubject = eventDetails.subjects[0] || "Unspecified";
-      setSelectedSubject(defaultSubject);
-    }
-  }, [eventDetails, isInitialSetupComplete, selectedSubject]);
-
-  // Handle question selection
-  useEffect(() => {
-    if (selectedSubject && subjectSpecificQuestions && isInitialSetupComplete && !selectedQuestion) {
-      const questionsForSubject = subjectSpecificQuestions[selectedSubject];
-      if (questionsForSubject && questionsForSubject.length > 0) {
-        setSelectedQuestion(questionsForSubject[0]);
-      }
-    }
-  }, [selectedSubject, subjectSpecificQuestions, isInitialSetupComplete]);
-
-  // Handle subject change
-  useEffect(() => {
-    if (selectedSubject && subjectSpecificQuestions && selectedQuestion && isInitialSetupComplete) {
-      const questionsForSubject = subjectSpecificQuestions[selectedSubject];
-      if (questionsForSubject && questionsForSubject.length > 0) {
-        const questionExists = questionsForSubject.find((q) => q.id === selectedQuestion.id);
-        if (!questionExists) {
-          setSelectedQuestion(questionsForSubject[0]);
+    if (subjectSpecificQuestions && isInitialSetupComplete && !selectedQuestion) {
+      // Find the very first question across all subjects (sorted order)
+      const sortedSubjects = Object.keys(subjectSpecificQuestions).sort();
+      let firstQuestion = null;
+      
+      for (const subject of sortedSubjects) {
+        const questionsInSubject = subjectSpecificQuestions[subject];
+        if (questionsInSubject && questionsInSubject.length > 0) {
+          firstQuestion = {
+            ...questionsInSubject[0],
+            subject: subject,
+            originalSubject: subject
+          };
+          break;
         }
       }
+      
+      if (firstQuestion) {
+        setSelectedQuestion(firstQuestion);
+      }
     }
-  }, [selectedSubject, subjectSpecificQuestions, isInitialSetupComplete]);
+  }, [subjectSpecificQuestions, isInitialSetupComplete, selectedQuestion]);
 
   // Handle submission cleanup
   useEffect(() => {
     if (submitted) {
       clearAllToasts();
-       sessionStorage.removeItem("subjectSpecificQuestions");
-        localStorage.removeItem("selectedQuestionId");
-      localStorage.removeItem(`selectedSubject_${examId}`);
+      sessionStorage.removeItem("subjectSpecificQuestions");
+      localStorage.removeItem("selectedQuestionId");
+      localStorage.removeItem(`selectedSubjectFilter_${examId}`);
       localStorage.removeItem(`selectedQuestion_${examId}`);
       localStorage.removeItem(`examViolations_${examId}`);
       localStorage.removeItem(`warningCount_${examId}`);
@@ -321,7 +323,7 @@ const TestWindow = () => {
         addToast("Exam submitted successfully! Redirecting to completed exams...", "info", "Please wait while we process your submission", 0);
         localStorage.removeItem("testQuestions");
         localStorage.removeItem(`encryptedTimeLeft_${examId}`);
-        localStorage.removeItem(`selectedSubject_${examId}`);
+        localStorage.removeItem(`selectedSubjectFilter_${examId}`);
         localStorage.removeItem(`selectedQuestion_${examId}`);
         localStorage.removeItem(`examViolations_${examId}`);
         localStorage.removeItem(`warningCount_${examId}`);
@@ -356,6 +358,31 @@ const TestWindow = () => {
       window.electronAPI.closeWindow();
     }
   }, [examId, subjectSpecificQuestions, getCorrectResponse, examViolations, warningCount, user._id, setSubmitted, addToast, submitResult]);
+
+  // ADD (below handleSubmitRef etc.)
+const handleSubmitClick = useCallback(async () => {
+  // hard guard (covers rapid clicks + cross-calls)
+  if (submittingRef.current) return;
+
+  // soft debounce: if a cooldown is active, ignore
+  if (submitCooldownRef.current) return;
+
+  submittingRef.current = true;
+  setIsSubmitting(true);
+
+  try {
+    await handleSubmitRef.current?.(); // uses your existing handleSubmitTest
+  } finally {
+    // start debounce cooldown
+    submitCooldownRef.current = setTimeout(() => {
+      submitCooldownRef.current = null;
+    }, SUBMIT_COOLDOWN_MS);
+
+    setIsSubmitting(false);
+    submittingRef.current = false;
+  }
+}, [SUBMIT_COOLDOWN_MS]);
+
 
   useEffect(() => {
     handleSubmitRef.current = handleSubmitTest;
@@ -537,13 +564,59 @@ const TestWindow = () => {
               )}
 
               {/* Submit Button - More prominent */}
-              <button
+              {/* <button
                 onClick={handleSubmitTest}
                 className="flex items-center space-x-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors"
               >
                 <Send className="h-4 w-4" />
                 <span>Submit Exam</span>
-              </button>
+              </button> */}
+
+            <button
+              onClick={handleSubmitClick}
+              disabled={isSubmitting || submitted}
+              aria-busy={isSubmitting}
+              className={[
+                "flex items-center space-x-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors",
+                "focus:outline-none focus:ring-2 focus:ring-offset-2",
+                theme === "light"
+                  ? "focus:ring-blue-400 focus:ring-offset-white"
+                  : "focus:ring-blue-600 focus:ring-offset-gray-800",
+                isSubmitting || submitted
+                  ? "bg-gray-400 text-white cursor-not-allowed"
+                  : "bg-red-600 hover:bg-red-700 text-white"
+              ].join(" ")}
+            >
+              {isSubmitting ? (
+                <>
+                  {/* Spinner */}
+                  <svg
+                    className="h-4 w-4 animate-spin"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12" cy="12" r="10"
+                      stroke="currentColor" strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                    />
+                  </svg>
+                  <span>Submitting…</span>
+                </>
+              ) : (
+                <>
+                  <Send className="h-4 w-4" />
+                  <span>Submit Exam</span>
+                </>
+              )}
+            </button>
+
             </div>
           </div>
         </div>
@@ -586,12 +659,14 @@ const TestWindow = () => {
               </div>
               <div className="p-4">
                 <QuestionListSection
-                  selectedSubject={selectedSubject}
-                  setSelectedSubject={isPaused ? () => {} : setSelectedSubject}
+                  // Pass the UI filter state (for display filtering only)
+                  selectedSubject={selectedSubjectFilter}
+                  setSelectedSubject={isPaused ? () => {} : setSelectedSubjectFilter}
+                  // Pass the actual selected question
                   selectedQuestion={selectedQuestion}
                   setSelectedQuestion={isPaused ? () => {} : setSelectedQuestion}
+                  // Always pass ALL questions (never filtered by parent)
                   subjectSpecificQuestions={subjectSpecificQuestions}
-                  setSubjectSpecificQuestions={isPaused ? () => {} : setSubjectSpecificQuestions}
                   eventDetails={eventDetails}
                 />
               </div>
@@ -606,9 +681,11 @@ const TestWindow = () => {
                 <QuestionSection
                   selectedQuestion={selectedQuestion}
                   setSelectedQuestion={isPaused ? () => {} : setSelectedQuestion}
+                  // Always pass ALL questions (this enables cross-subject navigation)
                   subjectSpecificQuestions={subjectSpecificQuestions}
                   setSubjectSpecificQuestions={isPaused ? () => {} : setSubjectSpecificQuestions}
-                  selectedSubject={selectedSubject}
+                  // This is just for displaying current subject (cosmetic)
+                  selectedSubject={selectedQuestion?.subject || selectedQuestion?.originalSubject}
                   handleSubmitTest={isPaused ? () => {} : handleSubmitTest}
                 />
               </div>
