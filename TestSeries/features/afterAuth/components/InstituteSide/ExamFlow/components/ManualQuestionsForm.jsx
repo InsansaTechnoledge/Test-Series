@@ -304,15 +304,16 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
           { value: 'mcq' , label: 'MCQ' },
           { value: 'msq' , label: 'MSQ' },
           { value: 'numerical' , label: 'Numerical'},
-          {value : 'tf' , label: 'True / False'}
+          {value : 'tf' , label: 'True / False'},
+          { value: "comprehension", label: "Comprehension" },
+          { value: "match", label: "Match the Following" },
         ];
 
         case 'subjective' : 
           return [
             { value: "descriptive", label: "Descriptive" },
             {value: 'fill' , label : "Fill in the Blanks"},
-            {value: 'comprehension' , label: 'Comprehension'},
-            { value: "match", label: "Match the Following" },
+            { value: "numerical", label: "Numerical" },
           ]
 
         case "semi_subjective":
