@@ -558,7 +558,7 @@ const Navbar = ({setShowLogoutModal}) => {
                       {/* ticket generation */}
                       <button 
                         onClick={() => {
-                          navigate('');
+                          navigate('/ticket-generation');
                           setShowProfileDropdown(false);
                           setActiveCategory('');
                         }}
