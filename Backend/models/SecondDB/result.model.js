@@ -15,6 +15,23 @@ const wrongAnswersSchema = new Schema({
     _id: false
 });
 
+const descriptiveResponsesSchema = new Schema({
+    questionId: {
+        type: String,
+        required: [true, 'questionId is required']
+    },
+    response: {
+        type: Schema.Types.Mixed,
+        required: [true, 'response is required']
+    },
+    obtainedMarks: {
+        type: Number,
+        default: 0
+    }
+},{
+    _id: false
+});
+
 const resultSchema = new Schema({
     studentId: {
         type: Types.ObjectId,
@@ -51,6 +68,14 @@ const resultSchema = new Schema({
     resultDate: {
         type: Date,
         default: Date.now()
+    },
+    evaluated:{
+        type: Boolean,
+        default: true
+    },
+    descriptiveResponses: {
+        type: [descriptiveResponsesSchema],
+        default: []
     }
 },{
     timestamps: true

@@ -67,6 +67,7 @@ import QBMS from '../../features/afterAuth/components/InstituteSide/QuestionBank
 import AppDownloadPage from '../../features/App/AppDownloadPage';
 import CertificateAssignment from '../../features/afterAuth/components/InstituteSide/Certificate_Assignment/CertificateAssignment';
 import LogComponent from '../../features/afterAuth/components/InstituteSide/LogsComponent/LogComponent';
+import EvaluateExamPaper from '../../features/Test/ExamEvaluation/EvaluateExamPaper';
 // import LogComponent from '../../features/afterAuth/components/InstituteSide/Logs/LogComponent';
 LogComponent
 
@@ -337,6 +338,7 @@ const PageLinks = () => {
                 <Route path='syllabus/:syllabusId' element={<SyllabusViewPage />} />
                 <Route path='certificate-assignment' element={<CertificateAssignment/>}/>
                 <Route path='check-logs' element={<LogComponent/>}/>
+                        <Route path='evaluate-exams' element={<EvaluateExamPaper />} />
                 {user?.role === "organization" && (
           <Route path='institute-subscription' element={<YourPlanPage />} />
         )}
@@ -379,6 +381,7 @@ const PageLinks = () => {
             <Route path='edit-profile/:id' element={<ProfilePage/>}/>
           )
         }
+
       </Routes>
     </Router>
   );

@@ -137,7 +137,7 @@ export const fetchAllResultsForExam = async (req, res) => {
     const results = await Result.find({ examId }).populate({
       path: 'studentId',
       model: Student, 
-      select: 'name studentId'
+      select: 'name id'
     });
 
     if (!results || results.length === 0) {
@@ -151,7 +151,7 @@ export const fetchAllResultsForExam = async (req, res) => {
         results: results.map(result => ({
           ...result._doc,
           studentName: result.studentId.name,
-          studentId: result.studentId.studentId
+          studentId: result.studentId.id
         })),
         questions
       },
