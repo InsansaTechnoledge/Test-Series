@@ -1,36 +1,119 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Settings } from 'lucide-react';
 import ExamControllSettings from '../ExamControll/ExamControllSettings'
 import { useUser } from '../../../../../../contexts/currentUserContext';
 
 const NewExamMetaDataForm = ({handleSubmit , theme , form, setForm , handleChange , batches , isExamControllOpen , setIsExamControllOpen , canAccessPage , canCreateMoreExams}) => {
-
     console.log("check" , form)
     const {user} = useUser();
     
     const [selectedExamType, setSelectedExamType] = useState('semi-subjective');
-
+    
     const examTypes = [
-        { id: 'semi-subjective', label: 'Hybrid (Objective + Subjective)', hint: 'Mix of auto-graded and manual', value: 'semi_subjective' },
-        { id: 'objective',       label: 'Objective Only',                  hint: 'MCQ/MSQ/TF/Numerical',          value: 'objective' },
-        { id: 'subjective',      label: 'Subjective Only',                 hint: 'Essay/Comprehension/Fill',      value: 'subjective' }
-      ];
-      
+        { 
+            id: 'semi-subjective', 
+            label: 'Hybrid (Objective + Subjective)', 
+            hint: 'Mix of auto-graded and manual', 
+            value: 'semi_subjective',
+            is_subjective: true 
+        },
+        { 
+            id: 'objective', 
+            label: 'Objective Only', 
+            hint: 'MCQ/MSQ/TF/Numerical', 
+            value: 'objective',
+            is_subjective: false 
+        },
+        { 
+            id: 'subjective', 
+            label: 'Subjective Only', 
+            hint: 'Essay/Comprehension/Fill', 
+            value: 'subjective',
+            is_subjective: true 
+        }
+    ];
+
+    // Function to handle separate date and time changes
+    const handleDateTimeChange = (e) => {
+        const { name, value } = e.target;
+        
+        if (name === 'date' || name === 'exam_time') {
+            // Get current date and time values
+            const currentDate = name === 'date' ? value : (form.date || '');
+            const currentTime = name === 'exam_time' ? value : (form.exam_time || '');
+            
+            // Update the form with the individual field
+            setForm(prev => ({
+                ...prev,
+                [name]: value
+            }));
+        } else {
+            handleChange(e);
+        }
+    };
+
+    // Initialize separate time from existing datetime value
+    useEffect(() => {
+        if (form.date && !form.exam_time) {
+            // If date field contains a full datetime, extract the time part
+            if (form.date.includes('T')) {
+                const timeStr = form.date.split('T')[1]?.slice(0, 5);
+                if (timeStr) {
+                    setForm(prev => ({
+                        ...prev,
+                        exam_time: timeStr
+                    }));
+                }
+            }
+        }
+    }, [form.date]);
+
+    // Sync selectedExamType with form.exam_type and ensure is_subjective is correct
+    useEffect(() => {
+        if (form.exam_type) {
+            // Find the exam type that matches the form's exam_type
+            const examType = examTypes.find(type => type.value === form.exam_type);
+            if (examType) {
+                // Update selectedExamType if it doesn't match
+                if (examType.id !== selectedExamType) {
+                    setSelectedExamType(examType.id);
+                }
+                
+                // Ensure is_subjective is correct for the current exam_type
+                if (form.is_subjective !== examType.is_subjective) {
+                    setForm(prev => ({
+                        ...prev,
+                        is_subjective: examType.is_subjective
+                    }));
+                }
+            }
+        } else {
+            // If no exam_type is set, set default values
+            const defaultExamType = examTypes.find(type => type.id === selectedExamType);
+            if (defaultExamType) {
+                setForm(prev => ({
+                    ...prev,
+                    exam_type: defaultExamType.value,
+                    is_subjective: defaultExamType.is_subjective
+                }));
+            }
+        }
+    }, [form.exam_type, selectedExamType]); // Dependencies: run when either changes
+
     const handleExamTypeChange = (examType) => {
         setSelectedExamType(examType.id);
-      
+        
         setForm((prev) => ({
-          ...prev,
-          exam_type: examType.value,    
-          is_subjective: examType.value === "subjective" || examType.value === "semi_subjective",
+            ...prev,
+            exam_type: examType.value,
+            is_subjective: examType.is_subjective, // Use predefined value
         }));
-      };
+    };
       
     
   return (
     <div className=" mx-auto">
        
-
        <div className="overflow-hidden mb-8 rounded-3xl shadow-2xl mx-auto transform transition-all duration-500 ease-in-out">
         
         <div className="bg-gradient-to-r from-[#4c51bf] to-indigo-600 px-8 py-10 relative overflow-hidden">
@@ -39,7 +122,7 @@ const NewExamMetaDataForm = ({handleSubmit , theme , form, setForm , handleChang
           </h1>
           <p className="text-indigo-100 mt-2 text-lg font-medium relative z-10">Design and configure your examination</p>
         </div>
-
+        
         <div className="space-y-2 mt-8 mb-8 max-w-7xl mx-auto">
             <label
                 className={`block text-sm font-semibold ${
@@ -139,18 +222,39 @@ const NewExamMetaDataForm = ({handleSubmit , theme , form, setForm , handleChang
               <label className={`font-semibold mb-4 flex items-center space-x-3 text-base ${
                   theme === 'light' ? 'text-gray-700' : 'text-gray-200'
               }`}>
-                <span>Schedule your exam</span>
+                <span>Select exam date</span>
               </label>
               <input
-                  type="datetime-local"
+                  type="date"
                   name="date"
                   className={`p-5 rounded-2xl transition-all duration-300 text-lg w-full shadow-lg border-2 focus:ring-2 ${
                   theme === 'light'
-                      ? 'bg-white text-gray-900 border-gray-200 focus:ring-indigo-200 focus:border-indigo-400 placeholder-gray-400'
-                      : 'bg-gray-800 text-indigo-100 border-gray-600 focus:ring-indigo-500 focus:border-indigo-300 placeholder-indigo-300'
+                      ? 'bg-white text-gray-900 border-gray-200 focus:ring-indigo-200 focus:border-indigo-400'
+                      : 'bg-gray-800 text-indigo-100 border-gray-600 focus:ring-indigo-500 focus:border-indigo-300'
                   }`}
-                  value={form.date}
-                  onChange={handleChange}
+                  value={form.date ? (form.date.includes('T') ? form.date.split('T')[0] : form.date) : ''}
+                  onChange={handleDateTimeChange}
+                  required
+              />
+            </div>
+
+            {/* Time */}
+            <div className="group">
+              <label className={`font-semibold mb-4 flex items-center space-x-3 text-base ${
+                  theme === 'light' ? 'text-gray-700' : 'text-gray-200'
+              }`}>
+                <span>Select exam time</span>
+              </label>
+              <input
+                  type="time"
+                  name="exam_time"
+                  className={`p-5 rounded-2xl transition-all duration-300 text-lg w-full shadow-lg border-2 focus:ring-2 ${
+                  theme === 'light'
+                      ? 'bg-white text-gray-900 border-gray-200 focus:ring-indigo-200 focus:border-indigo-400'
+                      : 'bg-gray-800 text-indigo-100 border-gray-600 focus:ring-indigo-500 focus:border-indigo-300'
+                  }`}
+                  value={form.exam_time || ''}
+                  onChange={handleDateTimeChange}
                   required
               />
             </div>
@@ -236,7 +340,6 @@ const NewExamMetaDataForm = ({handleSubmit , theme , form, setForm , handleChang
                   theme === "light" ? "text-gray-700" : "text-gray-200"
                 }`}
               >
-               
                 <span>Select subjects to include in exam</span>
               </label>
 
@@ -336,7 +439,7 @@ const NewExamMetaDataForm = ({handleSubmit , theme , form, setForm , handleChang
               {
               isExamControllOpen && (
                   <div className="animate-in slide-in-from-top-2 duration-300">
-                    <ExamControllSettings user={user} handleChange={handleChange} form={form} theme={theme}/>
+                    <ExamControllSettings user={user} handleChange={handleChange} form={form} theme={theme} selectedExamType={selectedExamType}/>
                   </div>
               )
               }

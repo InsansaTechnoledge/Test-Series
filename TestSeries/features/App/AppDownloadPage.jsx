@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Download, Check, Shield, Lock, Database, Zap } from 'lucide-react';
-import Logo from '../../assests/Logo/Frame 8.svg';
+import { Download, Check, Shield, Lock, Database, Zap, Monitor, Apple, Laptop } from 'lucide-react';
+import Logo from '../../assests/Logo/Frame 8.svg'
 
 export default function EvalvoDownloadPage() {
   const [isVisible, setIsVisible] = useState(false);
@@ -9,272 +9,322 @@ export default function EvalvoDownloadPage() {
     setIsVisible(true);
   }, []);
 
-  // Fixed function to handle download click
   const handleDownload = (url, filename) => {
-    // Create a temporary anchor element
     const link = document.createElement('a');
     link.href = url;
-    link.download = filename || ''; // This attribute triggers download
-    link.target = '_blank'; // Open in new tab as fallback
-    
-    // Append to body, click, and remove
+    link.download = filename || '';
+    link.target = '_blank';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
   return (
-    <div className="bg-white min-h-screen">
-      {/* Main Content */}
-      <div className="px-6 pt-16 pb-20">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left Content */}
-            <div className={`space-y-8 transform transition-all duration-1000 ${isVisible ? 'translate-x-0 opacity-100' : '-translate-x-10 opacity-0'}`}>
-              <div className="space-y-6">
-                <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
-                  Download
-                  <img className='mt-4' src={Logo} alt="" />
-                </h1>
-                <p className="text-xl text-gray-600 leading-relaxed max-w-lg">
-                  Powerful Examination and evaluation platform with analytics.
-                </p>
-              </div>
+    <div className="bg-gray-50 min-h-screen overflow-hidden">
+      {/* Main Container - Full Viewport */}
+      <div className="h-screen flex flex-col">
+        
+        {/* Header */}
+        <header className="bg-white border-b border-gray-200 px-6 py-4">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+                <img src={Logo} alt="" />
+            </div>
+            <div className="text-sm text-gray-500">v1.0.1</div>
+          </div>
+        </header>
 
-              {/* Download Buttons */}
-              <div className="space-y-4">
-                <button
-                  className="group w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg flex items-center justify-center space-x-3"
-                  onClick={() => handleDownload(
-                   ' https://github.com/InsansaTechnoledge/Test-Series/releases/download/v1.0.1/Evalvo.Proctor.Setup.1.0.1.exe',
-                    'Evalvo.Proctor.Setup.1.0.1.exe'
-                  )}
-                >
-                  <Download className="w-5 h-5 group-hover:animate-bounce" />
-                  <span>Download for Windows</span>
-                </button>
+        {/* Main Content - Scrollable */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="max-w-7xl mx-auto px-6 py-12">
+            
+            {/* Hero Section */}
+            <div className={`grid lg:grid-cols-2 gap-16 items-center mb-16 transform transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
+              
+              {/* Left Content */}
+              <div className="space-y-8">
+                <div className="space-y-4">
+                  <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-50 text-indigo-700 border border-indigo-200">
+                    <Zap className="w-4 h-4 mr-2" />
+                    Latest Release
+                  </div>
+                  <h1 className="text-5xl font-bold text-gray-900 leading-tight">
+                    Download Evalvo
+                  </h1>
+                  <p className="text-xl text-gray-600 leading-relaxed">
+                    Powerful examination and evaluation platform with advanced analytics and secure proctoring capabilities.
+                  </p>
+                </div>
 
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <button
-                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-medium transition-all duration-300 flex items-center justify-center space-x-2"
-                    onClick={() => handleDownload(
-                      'https://github.com/InsansaTechnoledge/Test-Series/releases/download/evalvoTech/Evalvo.Proctor-1.0.0.dmg',
-                      'Evalvo.Proctor-1.0.0.dmg'
-                    )}
-                  >
-                    <Download className="w-4 h-4" />
-                    <span>Download for macOS</span>
-                  </button>
+                {/* Download Buttons */}
+                <div className="space-y-4">
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <button
+                      className="group flex-1 bg-gray-900 hover:bg-gray-800 text-white px-6 py-4 rounded-lg font-medium transition-all duration-200 transform hover:scale-[1.02] flex items-center justify-center space-x-3 shadow-lg"
+                      onClick={() => handleDownload(
+                        'https://github.com/InsansaTechnoledge/Test-Series/releases/download/v1.0.1/Evalvo.Proctor.Setup.1.0.1.exe',
+                        'Evalvo.Proctor.Setup.1.0.1.exe'
+                      )}
+                    >
+                      <Laptop className="w-5 h-5" />
+                      <span>Download for Windows</span>
+                      <Download className="w-4 h-4 opacity-70 group-hover:translate-y-0.5 transition-transform" />
+                    </button>
+
+                    <button
+                      className="flex-1 bg-white hover:bg-gray-50 text-gray-900 px-6 py-4 rounded-lg font-medium transition-all duration-200 border border-gray-300 hover:border-gray-400 flex items-center justify-center space-x-3"
+                      onClick={() => handleDownload(
+                        'https://github.com/InsansaTechnoledge/Test-Series/releases/download/evalvoTech/Evalvo.Proctor-1.0.0.dmg',
+                        'Evalvo.Proctor-1.0.0.dmg'
+                      )}
+                    >
+                      <Apple className="w-5 h-5" />
+                      <span>Download for macOS</span>
+                      <Download className="w-4 h-4 opacity-70" />
+                    </button>
+                  </div>
+
+                  <div className="flex items-center space-x-6 text-sm text-gray-500">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                      <span>Windows 10/11</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                      <span>macOS 12.0+</span>
+                    </div>
+                    {/* <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                      <span>~200MB</span>
+                    </div> */}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Right Content - Simple Laptop Mockup */}
-            <div className={`relative transform transition-all duration-1000 delay-300 ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-10 opacity-0'}`}>
-              <div className="relative max-w-lg mx-auto">
-
-                
-                {/* Laptop Screen */}
-                <div className="bg-gray-800 rounded-t-2xl p-4 shadow-2xl">
+              {/* Right Content - App Preview */}
+              <div className="relative">
+                <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
+                  {/* Browser Chrome */}
+                  <div className="bg-gray-100 px-4 py-3 border-b border-gray-200 flex items-center space-x-3">
+                    <div className="flex space-x-2">
+                      <div className="w-3 h-3 bg-red-400 rounded-full"></div>
+                      <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                      <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+                    </div>
+                    <div className="flex-1 bg-white rounded px-3 py-1 text-sm text-gray-500">
+                      evalvotech.com
+                    </div>
+                  </div>
                   
+                  {/* App Interface */}
+                  <div className="h-80 bg-gradient-to-br from-indigo-50 to-white p-8">
+                    <div className="space-y-6">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center">
+                            <Monitor className="w-6 h-6 text-white" />
+                          </div>
+                          <div>
+                            <div className="font-semibold text-gray-900">Exam Dashboard</div>
+                            <div className="text-sm text-gray-500">Active Proctoring</div>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                          <span className="text-sm text-gray-600">Secure</span>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="font-medium text-gray-900">Mathematics Exam</span>
+                            <span className="text-sm text-green-600 bg-green-50 px-2 py-1 rounded">Active</span>
+                          </div>
+                          <div className="text-sm text-gray-500">120 minutes • 50 questions</div>
+                        </div>
+                        
+                        <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="font-medium text-gray-900">Physics Assessment</span>
+                            <span className="text-sm text-gray-500 bg-gray-50 px-2 py-1 rounded">Scheduled</span>
+                          </div>
+                          <div className="text-sm text-gray-500">90 minutes • 40 questions</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-
-                {/* Laptop Base */}
-                <div className="bg-gray-700 rounded-b-2xl h-6 shadow-lg relative">
-                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-1 bg-gray-600 rounded-full"></div>
+                
+                {/* Floating elements */}
+                <div className="absolute -top-4 -right-4 bg-white rounded-lg shadow-lg border border-gray-200 p-3">
+                  <div className="flex items-center space-x-2 text-sm">
+                    <Shield className="w-4 h-4 text-green-600" />
+                    <span className="text-gray-700">Secure</span>
+                  </div>
                 </div>
+                
+                <div className="absolute -bottom-4 -left-4 bg-indigo-600 rounded-lg shadow-lg p-3">
+                  <div className="flex items-center space-x-2 text-sm text-white">
+                    <Zap className="w-4 h-4" />
+                    <span>Real-time Analytics</span>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-                {/* Shadow */}
-                <div className="absolute -bottom-4 left-4 right-4 h-4 bg-gray-200 rounded-full blur-lg opacity-50"></div>
+            {/* Quick Stats */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-gray-900 mb-2">500+</div>
+                <div className="text-gray-600">Active Users</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-gray-900 mb-2">99.9%</div>
+                <div className="text-gray-600">Uptime</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-gray-900 mb-2">100+</div>
+                <div className="text-gray-600">Exams Conducted</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-gray-900 mb-2">24/7</div>
+                <div className="text-gray-600">Support</div>
+              </div>
+            </div>
+
+            {/* System Requirements & Security - Side by Side */}
+            <div className="grid lg:grid-cols-2 gap-12">
+              
+              {/* System Requirements */}
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">System Requirements</h2>
+                <div className="space-y-4">
+                  <div className="bg-white rounded-lg border border-gray-200 p-6">
+                    <div className="flex items-center space-x-3 mb-4">
+                      <Laptop className="w-6 h-6 text-blue-600" />
+                      <h3 className="font-semibold text-gray-900">Windows</h3>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="text-gray-500">OS:</span>
+                        <div className="font-medium text-gray-900">Windows 10/11</div>
+                      </div>
+                      <div>
+                        <span className="text-gray-500">RAM:</span>
+                        <div className="font-medium text-gray-900">8 GB</div>
+                      </div>
+                      <div>
+                        <span className="text-gray-500">Processor:</span>
+                        <div className="font-medium text-gray-900">Intel i5 / AMD Ryzen 5</div>
+                      </div>
+                      <div>
+                        <span className="text-gray-500">Storage:</span>
+                        <div className="font-medium text-gray-900">2 GB</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-lg border border-gray-200 p-6">
+                    <div className="flex items-center space-x-3 mb-4">
+                      <Apple className="w-6 h-6 text-gray-800" />
+                      <h3 className="font-semibold text-gray-900">macOS</h3>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="text-gray-500">OS:</span>
+                        <div className="font-medium text-gray-900">macOS 12.0+</div>
+                      </div>
+                      <div>
+                        <span className="text-gray-500">RAM:</span>
+                        <div className="font-medium text-gray-900">8 GB</div>
+                      </div>
+                      <div>
+                        <span className="text-gray-500">Processor:</span>
+                        <div className="font-medium text-gray-900">Intel / Apple Silicon</div>
+                      </div>
+                      <div>
+                        <span className="text-gray-500">Storage:</span>
+                        <div className="font-medium text-gray-900">2 GB</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Security & Compliance */}
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Security & Compliance</h2>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
+                      <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center mx-auto mb-3">
+                        <Shield className="w-6 h-6 text-blue-600" />
+                      </div>
+                      <div className="font-medium text-gray-900 mb-1">SOC 2 Type II</div>
+                      <div className="text-sm text-gray-500">Security Certified</div>
+                    </div>
+                    <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
+                      <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center mx-auto mb-3">
+                        <Lock className="w-6 h-6 text-green-600" />
+                      </div>
+                      <div className="font-medium text-gray-900 mb-1">GDPR</div>
+                      <div className="text-sm text-gray-500">Privacy Compliant</div>
+                    </div>
+                    <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
+                      <div className="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center mx-auto mb-3">
+                        <Database className="w-6 h-6 text-purple-600" />
+                      </div>
+                      <div className="font-medium text-gray-900 mb-1">ISO 27001</div>
+                      <div className="text-sm text-gray-500">Info Security</div>
+                    </div>
+                    <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
+                      <div className="w-12 h-12 bg-orange-50 rounded-lg flex items-center justify-center mx-auto mb-3">
+                        <Zap className="w-6 h-6 text-orange-600" />
+                      </div>
+                      <div className="font-medium text-gray-900 mb-1">HIPAA Ready</div>
+                      <div className="text-sm text-gray-500">Healthcare Safe</div>
+                    </div>
+                  </div>
+
+                  {/* Security Features */}
+                  <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                    <h4 className="font-semibold text-gray-900 mb-4">Security Features</h4>
+                    <div className="grid grid-cols-1 gap-3">
+                      {[
+                        'End-to-end AES-256 encryption',
+                        'Multi-factor authentication (MFA)',
+                        'Role-based access control (RBAC)',
+                        'Audit logging and monitoring',
+                        'Regular security assessments',
+                        '24/7 security monitoring'
+                      ].map((feature, index) => (
+                        <div key={index} className="flex items-center space-x-3">
+                          <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
+                          <span className="text-sm text-gray-700">{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* System Requirements */}
-      <div className="bg-white py-20">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">System Requirements</h2>
-            <p className="text-xl text-gray-600">Ensure your system meets these requirements for optimal performance</p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Windows Requirements */}
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-xl p-6 border border-blue-200">
-              <div className="flex items-center space-x-3 mb-6">
-                <h3 className="text-xl font-bold text-gray-900">Windows</h3>
-              </div>
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">OS Version:</span>
-                  <span className="font-medium">Windows 10/11</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Processor:</span>
-                  <span className="font-medium">Intel i5 / AMD Ryzen 5</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Memory:</span>
-                  <span className="font-medium">8 GB RAM</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Storage:</span>
-                  <span className="font-medium">2 GB available</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Graphics:</span>
-                  <span className="font-medium">DirectX 11</span>
-                </div>
-              </div>
-            </div>
-
-            {/* macOS Requirements */}
-            <div className="bg-gradient-to-br from-gray-50 to-slate-100 rounded-xl p-6 border border-gray-200">
-              <div className="flex items-center space-x-3 mb-6">
-                <h3 className="text-xl font-bold text-gray-900">macOS</h3>
-              </div>
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">OS Version:</span>
-                  <span className="font-medium">macOS 12.0+</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Processor:</span>
-                  <span className="font-medium">Intel / Apple Silicon</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Memory:</span>
-                  <span className="font-medium">8 GB RAM</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Storage:</span>
-                  <span className="font-medium">2 GB available</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Graphics:</span>
-                  <span className="font-medium">Metal support</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Recommended Specs */}
-            <div className="bg-gradient-to-br from-green-50 to-emerald-100 rounded-xl p-6 border border-green-200">
-              <div className="flex items-center space-x-3 mb-6">
-                <h3 className="text-xl font-bold text-gray-900">Recommended</h3>
-              </div>
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Processor:</span>
-                  <span className="font-medium">Intel i7 / AMD Ryzen 7</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Memory:</span>
-                  <span className="font-medium">16 GB RAM</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Storage:</span>
-                  <span className="font-medium">SSD with 10 GB</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Network:</span>
-                  <span className="font-medium">Broadband Internet</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Display:</span>
-                  <span className="font-medium">1920x1080 or higher</span>
-                </div>
+        {/* Footer */}
+        <footer className="bg-white border-t border-gray-200 px-6 py-4">
+          <div className="max-w-7xl mx-auto flex items-center justify-between text-sm text-gray-500">
+            <div>© 2025 Evalvo. All rights reserved.</div>
+            <div className="flex items-center space-x-6">
+              <span>Need help? Contact support</span>
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                <span>All systems operational</span>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Compliance & Security */}
-      <div className="bg-gray-900 text-white py-20">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Security & Compliance</h2>
-            <p className="text-xl text-gray-300">Enterprise-grade security standards and regulatory compliance</p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="bg-indigo-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="w-8 h-8" />
-              </div>
-              <h3 className="text-lg font-semibold mb-2">SOC 2 Type II</h3>
-              <p className="text-gray-300 text-sm">Certified for security, availability, and confidentiality</p>
-            </div>
-
-            <div className="text-center">
-              <div className="bg-indigo-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Lock className="w-8 h-8" />
-              </div>
-              <h3 className="text-lg font-semibold mb-2">GDPR Compliant</h3>
-              <p className="text-gray-300 text-sm">Full compliance with European data protection regulations</p>
-            </div>
-
-            <div className="text-center">
-              <div className="bg-indigo-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Database className="w-8 h-8" />
-              </div>
-              <h3 className="text-lg font-semibold mb-2">ISO 27001</h3>
-              <p className="text-gray-300 text-sm">International standard for information security management</p>
-            </div>
-
-            <div className="text-center">
-              <div className="bg-indigo-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Zap className="w-8 h-8" />
-              </div>
-              <h3 className="text-lg font-semibold mb-2">HIPAA Ready</h3>
-              <p className="text-gray-300 text-sm">Healthcare data protection compliance available</p>
-            </div>
-          </div>
-
-          <div className="mt-16 bg-gray-800 rounded-xl p-8">
-            <h3 className="text-2xl font-bold mb-6 text-center">Security Features</h3>
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <Check className="w-5 h-5 text-green-400 flex-shrink-0" />
-                  <span>End-to-end AES-256 encryption</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Check className="w-5 h-5 text-green-400 flex-shrink-0" />
-                  <span>Multi-factor authentication (MFA)</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Check className="w-5 h-5 text-green-400 flex-shrink-0" />
-                  <span>Role-based access control (RBAC)</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Check className="w-5 h-5 text-green-400 flex-shrink-0" />
-                  <span>Audit logging and monitoring</span>
-                </div>
-              </div>
-              <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <Check className="w-5 h-5 text-green-400 flex-shrink-0" />
-                  <span>Regular security assessments</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Check className="w-5 h-5 text-green-400 flex-shrink-0" />
-                  <span>Data residency controls</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Check className="w-5 h-5 text-green-400 flex-shrink-0" />
-                  <span>Secure API endpoints</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Check className="w-5 h-5 text-green-400 flex-shrink-0" />
-                  <span>24/7 security monitoring</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        </footer>
       </div>
     </div>
   );

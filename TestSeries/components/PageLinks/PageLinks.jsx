@@ -67,6 +67,7 @@ import QBMS from '../../features/afterAuth/components/InstituteSide/QuestionBank
 import AppDownloadPage from '../../features/App/AppDownloadPage';
 import CertificateAssignment from '../../features/afterAuth/components/InstituteSide/Certificate_Assignment/CertificateAssignment';
 import LogComponent from '../../features/afterAuth/components/InstituteSide/LogsComponent/LogComponent';
+import ContactUsComponent from '../../features/afterAuth/components/ErrorContact/ContactUsComponent';
 // import LogComponent from '../../features/afterAuth/components/InstituteSide/Logs/LogComponent';
 LogComponent
 
@@ -379,6 +380,7 @@ const PageLinks = () => {
             <Route path='edit-profile/:id' element={<ProfilePage/>}/>
           )
         }
+        <Route path='ticket-generation' element={<ContactUsComponent/>}/>
       </Routes>
     </Router>
   );

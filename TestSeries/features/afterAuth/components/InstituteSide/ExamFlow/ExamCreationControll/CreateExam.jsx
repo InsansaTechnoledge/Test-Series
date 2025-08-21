@@ -169,14 +169,15 @@ const CreateExam = () => {
             examDetails || {
               name: "",
                 date: "",
+                exam_time: '',
                 total_marks: "",
                 duration: "",
                 batch_id: "",
-                is_subjective: false,
+                is_subjective: true,
                 subjects: [],
                 auto_submittable: true,
                 ai_proctored: false,
-                exam_type: ""
+                exam_type: 'semi_subjective'
             }
           } // for edit form
         />

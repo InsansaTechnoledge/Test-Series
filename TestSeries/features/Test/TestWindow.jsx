@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, use } from "react";
+import React, { useEffect, useState, useRef, use, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useUser } from "../../contexts/currentUserContext";
 import { useCachedQuestions } from "../../hooks/useCachedQuestions";
@@ -43,7 +43,7 @@ const TestWindow = () => {
   const searchParams = new URLSearchParams(location.search);
   const examId = searchParams.get("examId");
   const isProctorRunning = searchParams.get("isProctorRunning") === "true";
-  const { exams } = useExamManagement();
+  // const { exams } = useExamManagement();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const submittingRef = useRef(false);         // hard guard against re-entry
@@ -51,8 +51,23 @@ const TestWindow = () => {
   const SUBMIT_COOLDOWN_MS = 1500;             // tweak as you like (1.5s)
 
 
-  const currentExam = exams.find((exam) => exam.id === examId);
-  const isAutoSubmittable = currentExam?.auto_submittable;
+  // const currentExam = exams.find((exam) => exam.id === examId);
+  // const isAutoSubmittable = currentExam?.auto_submittable;
+
+  const { exams } = useExamManagement();
+  const currentExam = useMemo(() => {
+   return Array.isArray(exams) ? exams.find((e) => String(e.id) === String(examId)) : undefined;
+ }, [exams, examId]);
+
+ const isAutoSubmittable = !!currentExam?.auto_submittable;
+
+ useEffect(() => {
+   if (currentExam) {
+     console.log("Current Exam Data:", currentExam.auto_submittable);
+   } else {
+     console.log("Current Exam Data: (loading)");
+   }
+ }, [currentExam]);
 
   console.log("Current Exam Data:", currentExam.auto_submittable);
   console.log("fs", examId);
