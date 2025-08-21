@@ -23,9 +23,8 @@ export const addResult = async (req, res) => {
 
 export const updateResult = async (req, res) => {
     try {
-        const { id } = req.params;
-        const resultData = req.body;
-        const result = await Result.findByIdAndUpdate(id, resultData);
+        const data = req.body;
+        const result = await Result.findByIdAndUpdate(data._id, data);
         return new APIResponse(200, result, "Result Updated").send(res);
 
     }

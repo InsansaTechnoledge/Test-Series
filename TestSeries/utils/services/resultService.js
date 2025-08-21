@@ -5,3 +5,8 @@ export const submitResult = async (payload) => {
     
     return response.data;
 }
+
+export const saveDescriptiveResponse = async (data) => {
+    const response = await api.patch(`/v1/result/`, data);
+    return response.data;
+}

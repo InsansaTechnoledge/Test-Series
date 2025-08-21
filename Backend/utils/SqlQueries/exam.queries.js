@@ -47,8 +47,8 @@ export const fetchSelective = async (conditions) => {
       subjects,
       certificate_template_mongo_id,
       is_subjective,
-      exam_type
-
+      exam_type,
+      status
     `);
 
   Object.entries(conditions).forEach(([key, value]) => {
@@ -135,8 +135,9 @@ export const setExamLive = async (examId, orgId, status) => {
   const { data, error } = await supabase
     .from('batch_exam')
     .update({
-      go_live: status,  
-      updated_at: new Date() 
+      go_live: status,
+      status: status ? 'live' :'scheduled', 
+      updated_at: new Date()
     })
     
     .eq('id', examId)
@@ -227,3 +228,14 @@ export const addCertificateToContest = async(id , certificate_template_mongo_id)
   if(error) throw error
   return data;
 }
+
+export const publishExamResultQuery = async (examId) => {
+  const { data, error } = await supabase
+    .from('batch_exam')
+    .update({ status: 'published' })
+    .eq('id', examId)
+    .select();
+
+  if (error) throw error;
+  return data;
+};

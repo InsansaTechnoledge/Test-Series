@@ -1,6 +1,6 @@
 import { Award, Clock } from "lucide-react";
 
-const ResultsOverview = ({studentsData}) => {
+const ResultsOverview = ({studentsData,handlePublishResult,status}) => {
   console.log("Results Overview Data:", studentsData);
   const evaluatedCount = studentsData.filter(s => s.evaluated).length;
   const totalStudents = studentsData.length;
@@ -26,9 +26,13 @@ const ResultsOverview = ({studentsData}) => {
       </div>
       
       {canPublish ? (
-        <button className="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center">
+        <button 
+        className={status === 'published' ? "w-full bg-gray-400 text-white py-3 px-4 rounded-lg cursor-not-allowed" : "w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center"}
+        disabled={!canPublish || status === 'published'}
+        onClick={handlePublishResult}
+        >
           <Award className="w-5 h-5 mr-2" />
-          Publish Results
+          {status === 'published' ? "Results Published" : "Publish Results"}
         </button>
       ) : (
         <div className="text-center p-4 bg-gray-50 rounded-lg">

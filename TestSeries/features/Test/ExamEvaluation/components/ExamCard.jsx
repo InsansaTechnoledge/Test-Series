@@ -6,8 +6,14 @@ const ExamCard = ({ exam, onSelect }) => {
   return (
     <div 
       className="p-6 rounded-lg border border-gray-200 hover:border-gray-300 cursor-pointer transition-all"
-      onClick={() => onSelect(exam)}
+      onClick={() => {
+        if(exam.status === 'live' || exam.status === 'published') {
+          onSelect(exam);
+        }
+        return;
+      }}
     >
+      {console.log("Exam Card Data:", exam)}
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-gray-900">{exam.name}</h3>
@@ -30,14 +36,14 @@ const ExamCard = ({ exam, onSelect }) => {
           </div>
         </div>
         <div className="flex flex-col items-end">
-          {/* <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-            exam.status === 'completed' 
+          <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+            exam.status === 'published' 
               ? 'bg-green-100 text-green-800' 
-              : 'bg-yellow-100 text-yellow-800'
+              : (exam.status === 'live' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800')
           }`}>
-            {exam.status === 'completed' ? 'Completed' : 'Ongoing'}
-          </span> */}
-          <ChevronRight className="w-5 h-5 text-gray-400 mt-2" />
+            {exam.status === 'published' ? 'Published' : (exam.status === 'live' ? 'Ongoing' : 'Upcoming')}
+          </span>
+          {(exam.status === 'live' || exam.status === 'published') && (<ChevronRight className="w-5 h-5 text-gray-400 mt-2" />)}
         </div>
       </div>
     </div>

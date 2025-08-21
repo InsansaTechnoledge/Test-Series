@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { CheckCircle, XCircle, AlertCircle, Clock } from 'lucide-react';
 
-const QuestionEvaluation = ({ question, result, onUpdateMarks, onSave }) => {
+const QuestionEvaluation = ({ question, result, onSave }) => {
   const [marks, setMarks] = useState(question.marksObtained || '');
   const [feedback, setFeedback] = useState(question.feedback || '');
 
@@ -17,6 +17,7 @@ const QuestionEvaluation = ({ question, result, onUpdateMarks, onSave }) => {
 
     if (question.question_type === 'descriptive') {
       const descriptiveResponse = result.descriptiveResponses.find(r => r.questionId === question.id);
+
       if (descriptiveResponse) {
         return { status: 'descriptive', response: descriptiveResponse.response };
       }
@@ -61,12 +62,12 @@ const QuestionEvaluation = ({ question, result, onUpdateMarks, onSave }) => {
               </>
             )}
           </div>
-          
+
           <div className="grid grid-cols-1 gap-3">
             {question.options.map((option, index) => {
               const isSelected = studentResponse === option || studentResponse === index;
               const isCorrect = question.correct_option === index;
-              
+
               let className = "p-3 rounded-lg border-2 ";
               if (isSelected && isCorrect) {
                 className += "border-green-500 bg-green-50 text-green-800";
@@ -77,7 +78,7 @@ const QuestionEvaluation = ({ question, result, onUpdateMarks, onSave }) => {
               } else {
                 className += "border-gray-200 bg-gray-50 text-gray-700";
               }
-              
+
               return (
                 <div key={index} className={className}>
                   <div className="flex items-center space-x-3">
@@ -100,7 +101,7 @@ const QuestionEvaluation = ({ question, result, onUpdateMarks, onSave }) => {
               );
             })}
           </div>
-          
+
           {question.explanation && (
             <div className="mt-4 p-4 bg-blue-50 rounded-lg">
               <h5 className="font-medium text-blue-900 mb-2">Explanation:</h5>
@@ -118,7 +119,7 @@ const QuestionEvaluation = ({ question, result, onUpdateMarks, onSave }) => {
             <AlertCircle className="w-6 h-6 text-blue-500" />
             <span className="text-lg font-medium text-blue-700">Descriptive Answer - Requires Manual Evaluation</span>
           </div>
-          
+
           <div>
             <h5 className="font-medium text-gray-900 mb-3">Student's Answer:</h5>
             <div className="bg-gray-50 p-4 rounded-lg border">
@@ -135,7 +136,7 @@ const QuestionEvaluation = ({ question, result, onUpdateMarks, onSave }) => {
               )}
             </div>
           </div>
-          
+
           {question.reference_answer && (
             <div>
               <h5 className="font-medium text-gray-900 mb-3">Reference Answer:</h5>
@@ -146,22 +147,37 @@ const QuestionEvaluation = ({ question, result, onUpdateMarks, onSave }) => {
               </div>
             </div>
           )}
-          
+
           {question.rubric && (
             <div>
               <h5 className="font-medium text-gray-900 mb-3">Evaluation Rubric:</h5>
               <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
-                <p className="text-yellow-800 text-sm">{question.rubric}</p>
+                <div className="mb-3">
+                  <span className="text-yellow-900 font-medium">Total Marks: {question.rubric.total_marks}</span>
+                </div>
+                <div className="space-y-3">
+                  {question.rubric.criteria.map((criterion) => (
+                    <div key={criterion.id} className="bg-white p-3 rounded border border-yellow-200">
+                      <div className="flex justify-between items-start mb-2">
+                        <h6 className="font-medium text-gray-900">{criterion.name}</h6>
+                        <span className="text-sm font-medium text-yellow-800 bg-yellow-100 px-2 py-1 rounded">
+                          {criterion.max_marks} marks
+                        </span>
+                      </div>
+                      <p className="text-gray-700 text-sm">{criterion.description}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           )}
-          
+
           {question.keywords && question.keywords.length > 0 && (
             <div>
               <h5 className="font-medium text-gray-900 mb-3">Key Points to Look For:</h5>
               <div className="flex flex-wrap gap-2">
                 {question.keywords.map((keyword, index) => (
-                  <span 
+                  <span
                     key={index}
                     className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm"
                   >
@@ -182,12 +198,12 @@ const QuestionEvaluation = ({ question, result, onUpdateMarks, onSave }) => {
             <XCircle className="w-6 h-6 text-red-500" />
             <span className="text-lg font-medium text-red-700">Incorrect Answer</span>
           </div>
-          
+
           <div className="bg-red-50 p-4 rounded-lg border border-red-200">
             <h5 className="font-medium text-red-900 mb-2">Student's Response:</h5>
             <p className="text-red-800">{studentResponse}</p>
           </div>
-          
+
           {question.explanation && (
             <div className="mt-4 p-4 bg-blue-50 rounded-lg">
               <h5 className="font-medium text-blue-900 mb-2">Explanation:</h5>
@@ -204,7 +220,7 @@ const QuestionEvaluation = ({ question, result, onUpdateMarks, onSave }) => {
           <CheckCircle className="w-6 h-6 text-green-500" />
           <span className="text-lg font-medium text-green-700">Correct Answer</span>
         </div>
-        
+
         <div className="bg-green-50 p-4 rounded-lg border border-green-200">
           <p className="text-green-800">Student answered this question correctly</p>
         </div>
@@ -213,25 +229,20 @@ const QuestionEvaluation = ({ question, result, onUpdateMarks, onSave }) => {
   };
 
   const shouldShowMarkingSection = () => {
-    return question.question_type === 'descriptive';
+    return question.question_type === 'descriptive' && !result.evaluated;
   };
 
   const getAutoMarks = () => {
     if (responseStatus === 'unattempted') return 0;
-    
-    if (question.question_type === 'mcq') {
+
+    if (question.question_type !== 'descriptive') {
       if (responseStatus === 'correct') return question.positive_marks;
       if (responseStatus === 'wrong') return question.negative_marks || 0;
     }
-    
-    if (question.question_type === 'descriptive') {
-      return 0; 
-    }
 
-    if (responseStatus === 'correct') return question.positive_marks;
-    if (responseStatus === 'wrong') return question.negative_marks || 0;
-    
-    return 0;
+    else {
+      return result.descriptiveResponses.find(r => r.questionId === question.id)?.obtainedMarks || 0;
+    }
   };
 
   const autoMarks = getAutoMarks();
@@ -248,15 +259,15 @@ const QuestionEvaluation = ({ question, result, onUpdateMarks, onSave }) => {
               <span className="text-sm text-gray-600">Difficulty: {question.difficulty}</span>
             </div>
           </div>
-          {question.question_type !== 'descriptive' && (
+          {(
             <div className="text-right">
               <div className="text-2xl font-bold text-gray-900">{autoMarks}</div>
-              <div className="text-sm text-gray-600">Auto Marks</div>
+              <div className="text-sm text-gray-600">{question.question_type !== 'descriptive' ? <span>Auto Marks</span> : <span>Given Marks</span>}</div>
             </div>
           )}
         </div>
       </div>
-      
+
       <div className="p-6 space-y-6">
         <div>
           <h4 className="font-medium text-gray-900 mb-3">Question:</h4>
@@ -264,12 +275,12 @@ const QuestionEvaluation = ({ question, result, onUpdateMarks, onSave }) => {
             {question.question_text}
           </div>
         </div>
-        
+
         <div>
           <h4 className="font-medium text-gray-900 mb-3">Student Response:</h4>
           {renderStudentResponse()}
         </div>
-        
+
         {shouldShowMarkingSection() && (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -282,32 +293,29 @@ const QuestionEvaluation = ({ question, result, onUpdateMarks, onSave }) => {
                   min="0"
                   max={question.positive_marks}
                   value={marks}
-                  onChange={(e) => setMarks(e.target.value)}
+                  onChange={(e) => {
+                    const val = Number(e.target.value);
+                    if (val > question.positive_marks) {
+                      setMarks(question.positive_marks);
+                    } else if (val < 0) {
+                      setMarks(0);
+                    } else {
+                      setMarks(val);
+                    }
+                  }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder={`Out of ${question.positive_marks}`}
                 />
+
               </div>
-              
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Feedback (Optional)
-                </label>
-                <textarea
-                  value={feedback}
-                  onChange={(e) => setFeedback(e.target.value)}
-                  rows="3"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Provide feedback for the student..."
-                />
-              </div>
+
             </div>
-            
+
             <div className="flex justify-end space-x-3">
               <button
                 onClick={() => {
                   console.log("Marks:", marks, "Feedback:", feedback);
-                  onUpdateMarks && onUpdateMarks(question.id, parseInt(marks) || 0, feedback);
-                  onSave && onSave();
+                  onSave && onSave(question.id, parseInt(marks) || 0, feedback);
                 }}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
@@ -316,12 +324,12 @@ const QuestionEvaluation = ({ question, result, onUpdateMarks, onSave }) => {
             </div>
           </>
         )}
-        
-        {question.question_type !== 'descriptive' && responseStatus !== 'unattempted' && (
+
+        {responseStatus !== 'unattempted' && (
           <div className="bg-gray-50 p-4 rounded-lg">
             <div className="flex items-center justify-between">
               <span className="text-gray-700">
-                {responseStatus === 'correct' ? 'Automatically graded as correct' : 'Automatically graded as incorrect'}
+                {result.descriptiveResponses.find(r => r.questionId === question.id) ? (<span>Marks Given : </span>) : (responseStatus === 'correct' ? 'Automatically graded as correct' : 'Automatically graded as incorrect')}
               </span>
               <span className="font-medium text-gray-900">
                 Marks: {autoMarks}/{question.positive_marks}
