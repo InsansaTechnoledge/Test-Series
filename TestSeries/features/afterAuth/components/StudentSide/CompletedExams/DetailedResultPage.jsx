@@ -28,7 +28,7 @@ const ResultPage = () => {
         setLoading(true);
         const data = await getResultDetail(examId, false, resultId);
         console.log("Fetched Result Data:", data);
-        setResultData(data);
+        setResultData(data.data);
       } catch (err) {
         setError(err.message || "Failed to fetch result data");
       } finally {

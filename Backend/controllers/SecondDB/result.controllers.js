@@ -23,9 +23,8 @@ export const addResult = async (req, res) => {
 
 export const updateResult = async (req, res) => {
     try {
-        const { id } = req.params;
-        const resultData = req.body;
-        const result = await Result.findByIdAndUpdate(id, resultData);
+        const data = req.body;
+        const result = await Result.findByIdAndUpdate(data._id, data);
         return new APIResponse(200, result, "Result Updated").send(res);
 
     }
@@ -137,7 +136,7 @@ export const fetchAllResultsForExam = async (req, res) => {
     const results = await Result.find({ examId }).populate({
       path: 'studentId',
       model: Student, 
-      select: 'name studentId'
+      select: 'name id'
     });
 
     if (!results || results.length === 0) {
@@ -151,7 +150,7 @@ export const fetchAllResultsForExam = async (req, res) => {
         results: results.map(result => ({
           ...result._doc,
           studentName: result.studentId.name,
-          studentId: result.studentId.studentId
+          studentId: result.studentId.id
         })),
         questions
       },

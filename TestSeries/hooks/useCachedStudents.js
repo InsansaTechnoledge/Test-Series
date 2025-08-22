@@ -2,11 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchStudents } from "../utils/services/studentService";
 import { useUser } from "../contexts/currentUserContext";
 
-export const useCachedStudents = () => {
+export const useCachedStudents = (batchId=null) => {
     const {user}= useUser();
     const fetchStudentsFunction = async () => {
         try{
-            const response = await fetchStudents();
+            const response = await fetchStudents(batchId);
             if (response.status !== 200) {
                 throw new Error("Network response was not ok");
             }

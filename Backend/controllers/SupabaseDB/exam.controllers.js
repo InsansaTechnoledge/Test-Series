@@ -1,4 +1,4 @@
-import { createExam, deleteExam, fetchSelective, updateExam, setExamLive, fetchNonLiveExams, fetchExamsWithoutQuestionsQuery, fetchExamNameById, getExamCountForOrg, getAnalyticsFromBatchExam, addCertificate, addCertificateToContest } from '../../utils/SqlQueries/exam.queries.js';
+import { createExam, deleteExam, fetchSelective, updateExam, setExamLive, fetchNonLiveExams, fetchExamsWithoutQuestionsQuery, fetchExamNameById, getExamCountForOrg, getAnalyticsFromBatchExam, addCertificate, addCertificateToContest, publishExamResultQuery } from '../../utils/SqlQueries/exam.queries.js';
 import { APIError } from '../../utils/ResponseAndError/ApiError.utils.js'
 import { APIResponse } from '../../utils/ResponseAndError/ApiResponse.utils.js'
 import Result from '../../models/SecondDB/result.model.js';
@@ -284,5 +284,21 @@ export const addCertificateToExam = async (req, res) => {
       return new APIResponse(200, { results, errors }, 'Certificate assignment completed').send(res);
   } catch (e) {
     return new APIError(500, ['Something went wrong while adding the certificate', e.message]).send(res);
+  }
+};
+
+export const publishExamResult = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await publishExamResultQuery(id);
+
+    return new APIResponse(200, result, "Exam published successfully").send(res);
+  } catch (err) {
+    console.error("❌ Error publishing exam result:", err);
+    return new APIError(
+      err?.status || 500,
+      ["Something went wrong while publishing exam result", err.message]
+    ).send(res);
   }
 };

@@ -21,7 +21,7 @@ const Page = () => {
     const [hideFaculty, setHideFaculty] = useState(false);
     const [hideStudents, setHideStudents] = useState(false);
     const { user ,hasRoleAccess} = useUser();
-    const { students } = useCachedStudents();
+    const { students } = useCachedStudents(user.role === 'user'?batchId:null);
     const [filteredStudents, setFilteredStudents] = useState([]);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const navigate = useNavigate();

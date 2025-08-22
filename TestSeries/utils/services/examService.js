@@ -46,3 +46,8 @@ export const addCertificateToExams = async (assignment) => {
   const response = await api.patch('/v1/exam' , assignment)
   return response.data
 }
+
+export const publishExamResults = async (examId) => {
+  const response = await api.patch(`/v1/exam/${examId}/publish`);
+  return response.data;
+}

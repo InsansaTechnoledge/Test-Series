@@ -330,6 +330,7 @@ const TestWindow = () => {
         ...answers,
         violations: examViolations,
         warningCount,
+        evaluated:eventDetails?.exam_type === 'subjective' ||eventDetails?.exam_type === 'semi_subjective' ? false : true,
       };
 
       const response = await submitResult(payload);

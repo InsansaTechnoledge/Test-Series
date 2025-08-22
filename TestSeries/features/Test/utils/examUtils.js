@@ -33,6 +33,8 @@ export const getCorrectResponse = (question) => {
             ],
           };
         }, {});
+      case 'descriptive':
+        return question.reference_answer ?? null;
       default:
         return question.correct_response ?? null;
     }
@@ -95,6 +97,7 @@ export const calculateResultPayload = (subjectSpecificQuestions, getCorrectRespo
   let totalMarks = 0;
   let wrongAnswers = [];
   let unattempted = [];
+  let descriptiveResponses = [];
 
   for (let q of allResponses) {
     try {
@@ -105,6 +108,14 @@ export const calculateResultPayload = (subjectSpecificQuestions, getCorrectRespo
         continue;
       }
 
+      if (q.question_type === 'descriptive') {
+        descriptiveResponses.push({
+          questionId: q.question_id,
+          response: q.user_response,
+        });
+        continue;
+      }
+      
       const isCorrect = isResponseCorrect(q.user_response, q.correct_response, q.question_type);
       
       if (isCorrect) {
@@ -124,9 +135,10 @@ export const calculateResultPayload = (subjectSpecificQuestions, getCorrectRespo
   }
 
   return {
-    marks: Math.round(totalMarks * 100) / 100, // Round to 2 decimal places
+    marks: Math.round(totalMarks * 100) / 100, 
     wrongAnswers,
     unattempted,
+    descriptiveResponses,
   };
 };
 
@@ -159,7 +171,7 @@ const isResponseCorrect = (userResponse, correctResponse, questionType) => {
       
       case 'comprehension':
         return compareComprehension(userResponse, correctResponse);
-      
+
       default:
         console.warn('Unknown question type:', questionType);
         return normalizeResponse(userResponse) === normalizeResponse(correctResponse);
