@@ -47,7 +47,7 @@ import student from "../../../assests/Navigator/students/sttudent - nor.svg"
 import exam from "../../../assests/Navigator/exam/exam - nor.svg"
 import video from "../../../assests/Navigator/videos/video - nor.svg"
 import contest from "../../../assests/Navigator/code contest/code contest - nor.svg"
-import { User } from 'lucide-react';
+import { Book, User } from 'lucide-react';
 
 export const controlData = [
   {
@@ -111,6 +111,12 @@ export const controlData = [
     icon: AnomalyIconActive,
     activeIcon: AnomalyIcon
   },
+  {
+    name: "Exam Evaluation Center",
+    path: "evaluate-exams",
+    icon: Book,
+    activeIcon: AnomalyIcon
+  },
     {
     name: "Upload videos",
     path: "video",
@@ -171,7 +177,7 @@ export const categoryData = [
       'Create Exams',
       'Exam List Page',
       'Exam Anomaly Center',
-
+      'Exam Evaluation Center'
     ]
   },
   {

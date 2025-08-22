@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import profileDefault from "../../../../assests/Institute/profile.png";
 import HeadingUtil from "../../utility/HeadingUtil";
 import { AlertTriangle, Eye, EyeOff, RefreshCcw } from "lucide-react";
@@ -36,6 +36,47 @@ const CreateUser = () => {
   const { user, getFeatureKeyFromLocation } = useUser();
   const location = useLocation();
 
+  const [isSubmitting , setIsSubmitting] = useState(false);
+  const [cooldown , setCooldown] = useState(0)
+  const submitTimerRef = useRef(null)
+  const cooldownIntervalRef = useRef(null);
+
+  useEffect(() => {
+    if (cooldown > 0) {
+      cooldownIntervalRef.current = setInterval(() => {
+        setCooldown((c) => (c > 1 ? c - 1 : 0));
+      }, 1000);
+    }
+    return () => {
+      if (cooldownIntervalRef.current) {
+        clearInterval(cooldownIntervalRef.current);
+        cooldownIntervalRef.current = null;
+      }
+    };
+  }, [cooldown]);
+
+  function endSubmittingAfterRemaining(startAtMs, minMs = 5000) {
+    const elapsed = Date.now() - startAtMs;
+    const remaining = Math.max(0, minMs - elapsed);
+  
+    if (submitTimerRef.current) {
+      clearTimeout(submitTimerRef.current);
+      submitTimerRef.current = null;
+    }
+    if (remaining === 0) {
+      setIsSubmitting(false);
+      setCooldown(0);
+      return;
+    }
+    setCooldown(Math.ceil(remaining / 1000));
+    submitTimerRef.current = setTimeout(() => {
+      setIsSubmitting(false);
+      setCooldown(0);
+      submitTimerRef.current = null;
+    }, remaining);
+  }
+  
+ 
 
   // Get current total users from the actual source (user or organization metadata)
   const currentTotalUsers = (user?.role === 'organization'|| user?.role === 'user')
@@ -209,6 +250,13 @@ const inputCommon = `p-4 rounded-2xl transition-all duration-300 text-lg w-full 
   }`;
 
 const onsubmitForm = async () => {
+
+  if (isSubmitting) return;
+
+  const startedAt = Date.now();
+  setIsSubmitting(true);
+  setCooldown(5);
+
   console.log("Submitting form with data:", formData);
   // Check if limit is exceeded before processing
   if (isLimitExceeded) {
@@ -305,13 +353,15 @@ const onsubmitForm = async () => {
         error?.message ||
         "An unexpected error occurred";
       setError((prev) => ({ ...prev, form: errorMessage }));
+    } finally {
+      endSubmittingAfterRemaining(startedAt, 5000);
     }
   };
 
   return (
     <div
       className={`${theme === "light"
-        ? "bg-gradient-to-br from-gray-50 via-white to-indigo-50"
+        ? ""
         : ""
         } min-h-screen `}
     >
@@ -381,7 +431,7 @@ const onsubmitForm = async () => {
                           <label className={`py-3 px-6 rounded-2xl cursor-pointer text-sm font-bold transition-all duration-300 ${isLimitExceeded
                             ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                             :
-                            'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:shadow-xl hover:scale-105 transform'
+                            'bg-indigo-600 text-white hover:shadow-xl hover:scale-105 transform'
                             }`}>
                             {profile ? "Change Profile Photo" : "Upload Profile Photo"}
                             <input
@@ -668,7 +718,7 @@ const onsubmitForm = async () => {
                             disabled={isLimitExceeded}
                             className={`py-3 px-8 rounded-2xl font-bold transition-all duration-300 mb-6 ${isLimitExceeded
                               ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                              : 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:shadow-xl hover:scale-105 transform'
+                              : 'bg-indigo-600 text-white hover:shadow-xl hover:scale-105 transform'
                               } ${theme === 'light' ? 'border-2 border-gray-200 focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300  bg-gray-50 group-hover:bg-white' : 'border-2 border-indigo-400 transition-all duration-300  bg-indigo-100 group-hover:bg-indigo-50 text-gray-800'} rounded-2xl  text-lg font-medium`}
                           >
                             {batchesVisible ? "Hide All Batches" : "Show All Batches"}
@@ -732,14 +782,18 @@ const onsubmitForm = async () => {
                         <button
                           type="button"
                           onClick={onsubmitForm}
-                          disabled={isLimitExceeded}
+                          disabled={isLimitExceeded || isSubmitting}
                           className={`py-4 px-12 rounded-2xl font-black text-lg transition-all duration-300 ${isLimitExceeded
                             ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                             :
-                            'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:shadow-2xl hover:scale-105 transform'
+                            'bg-indigo-600 text-white hover:shadow-2xl hover:scale-105 transform'
                             }`}
                         >
-                          {isLimitExceeded ? 'Limit Exceeded' : 'Create User'}
+                           {isLimitExceeded
+                            ? "Limit Exceeded"
+                            : isSubmitting
+                              ? `Creating…${cooldown ? ` (${cooldown}s)` : ""}`
+                              : "Create User"}
                         </button>
                       </div>
                     </div>

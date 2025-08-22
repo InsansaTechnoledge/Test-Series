@@ -143,6 +143,12 @@ const CreateExam = () => {
     console.log(questions,"question..........")
   })
 
+  const NotScheduled = () => {
+    return(
+      <span className={`text-sm ${theme === 'light' ? 'text-red-500' : 'text-red-400'} font-bold`}> N/A <span className="text-xs text-gray-400">(Not of Scheduled type)</span></span>
+    )
+  } 
+
   return (
     <div className="p-6  mx-auto ">
       <ExamPageIntroHeader
@@ -211,7 +217,7 @@ const CreateExam = () => {
                 } mt-2`}
               >
                 Date: {examDetails.date} | Duration: {examDetails.duration} mins
-                | Total Marks: {examDetails.total_marks} | Exam Scheduled for: {examDetails?.exam_time || 'Not of Scheduled type'}
+                | Total Marks: {examDetails.total_marks} | Exam Scheduled for: {examDetails?.exam_time || NotScheduled()}
               </p>
 
               {Array.isArray(examDetails?.subjects) &&

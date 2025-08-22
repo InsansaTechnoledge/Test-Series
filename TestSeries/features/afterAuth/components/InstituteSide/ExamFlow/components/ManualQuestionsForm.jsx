@@ -303,7 +303,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
         return [
           { value: 'mcq' , label: 'MCQ' },
           { value: 'msq' , label: 'MSQ' },
-          { value: 'numerical' , label: 'Numerical'},
+          // { value: 'numerical' , label: 'Numerical'},
           {value : 'tf' , label: 'True / False'},
           { value: "comprehension", label: "Comprehension" },
           { value: "match", label: "Match the Following" },
@@ -360,7 +360,9 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
           >
             {getQuestionTypesByExamType(examDetails?.exam_type).map((qt) => (
               <option key={qt.value} value={qt.value}>
-                {qt.label}
+                {qt.label === "Comprehension"
+                  ? `${qt.label} (Not included in bulk upload)`
+                  : qt.label}
               </option>
             ))}
             {/* Coding question is still feature-based */}
@@ -369,6 +371,7 @@ const ManualQuestionForm = ({ setQuestions, organizationId, examDetails }) => {
               <option value="code">Code</option>
             )} */}
           </select>
+
         </div>
 
         {/* Question Text */}

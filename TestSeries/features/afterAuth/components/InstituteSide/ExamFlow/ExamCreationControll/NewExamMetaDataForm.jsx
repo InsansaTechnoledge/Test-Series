@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Settings } from 'lucide-react';
 import ExamControllSettings from '../ExamControll/ExamControllSettings'
 import { useUser } from '../../../../../../contexts/currentUserContext';
@@ -8,7 +8,26 @@ const NewExamMetaDataForm = ({handleSubmit , theme , form, setForm , handleChang
     const {user} = useUser();
     
     const [selectedExamType, setSelectedExamType] = useState('semi-subjective');
-    const [autoSchedule, setAutoSchedule] = useState(true); // New state for auto-schedule toggle
+    const [autoSchedule, setAutoSchedule] = useState(true); 
+
+    const visibleBatches = useMemo(() => {
+        const list = Array.isArray(batches) ? batches : [];
+        if (user?.role === "user") {
+          const allowed = new Set(Array.isArray(user?.batch) ? user.batch : []);
+          return list.filter(b => b?.id && allowed.has(b.id));
+        }
+        return list; // org. see it all
+      }, [batches, user?.role, user?.batch]);
+
+      useEffect(() => {
+        if (user?.role === "user") {
+          const allowed = new Set(Array.isArray(user?.batch) ? user.batch : []);
+          if (form.batch_id && !allowed.has(form.batch_id)) {
+            setForm(prev => ({ ...prev, batch_id: "", subjects: [] }));
+          }
+        }
+      }, [user?.role, user?.batch, form.batch_id, setForm]);
+      
     
     const examTypes = [
         { 
@@ -379,24 +398,27 @@ const NewExamMetaDataForm = ({handleSubmit , theme , form, setForm , handleChang
               }`}>
                 <span>Select Batch</span>
               </label>
-              <select
-                  name="batch_id"
-                  className={`p-5 rounded-2xl transition-all duration-300 text-lg w-full shadow-lg border-2 focus:ring-2 ${
-                  theme === 'light'
-                      ? 'bg-white text-gray-900 border-gray-200 focus:ring-indigo-200 focus:border-indigo-400'
-                      : 'bg-gray-800 text-indigo-100 border-gray-600 focus:ring-indigo-500 focus:border-indigo-300'
-                  }`}
-                  value={form.batch_id}
-                  onChange={handleChange}
-                  required
-              >
-                  <option value="">-- Select Batch --</option>
-                  {Array.isArray(batches) && batches.map((batch, index) => (
-                  <option key={batch?.id || index} value={batch?.id || ''}>
-                      {batch?.name || 'Unnamed Batch'} - {batch?.year || 'No Year'}
-                  </option>
-                  ))}
-              </select>
+              {/* Batch Selection */}
+                <select
+                name="batch_id"
+                className={`p-5 rounded-2xl transition-all duration-300 text-lg w-full shadow-lg border-2 focus:ring-2 ${
+                    theme === 'light'
+                    ? 'bg-white text-gray-900 border-gray-200 focus:ring-indigo-200 focus:border-indigo-400'
+                    : 'bg-gray-800 text-indigo-100 border-gray-600 focus:ring-indigo-500 focus:border-indigo-300'
+                }`}
+                value={form.batch_id}
+                onChange={handleChange}
+                required
+                >
+                <option value="">-- Select Batch --</option>
+                    {visibleBatches.map((batch) => (
+                        <option key={batch.id} value={batch.id}>
+                        {batch.name || 'Unnamed Batch'} - {batch.year || 'No Year'}
+                        </option>
+                    ))}
+                </select>
+
+
             </div>
 
             {/* Select Subject */}

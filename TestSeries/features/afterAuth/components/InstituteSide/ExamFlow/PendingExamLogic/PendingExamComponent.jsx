@@ -1,7 +1,24 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import PendingExamBoxHeader from './PendingExamBoxHeader'
+import { useUser } from '../../../../../../contexts/currentUserContext';
 
 const PendingExamComponent = ({form , theme , pendingLoading , pendingExams , batchMap , onSubmit }) => {
+  
+  const {user} = useUser();
+  console.log("role" , user.role);
+  
+  const AllowedBatched = user.batch 
+  
+  const allowedSet = useMemo(() => new Set(AllowedBatched), [AllowedBatched]);
+  console.log("batch array"  , allowedSet);
+
+  const PendingExamToShow = useMemo(
+    () => pendingExams.filter(exam => typeof exam?.batch_id === "string" && allowedSet.has(exam.batch_id)),
+    [pendingExams, allowedSet]
+  );
+  console.log("pending" , PendingExamToShow);
+
+
   return (
     <div>
       {!form.id && (
@@ -12,7 +29,7 @@ const PendingExamComponent = ({form , theme , pendingLoading , pendingExams , ba
           }`}>
             
             {/* Header */}
-            <PendingExamBoxHeader theme={theme}/>
+            <PendingExamBoxHeader theme={theme} role={user.role}/>
 
             {/* Content */}
             <div className="p-8">
@@ -27,7 +44,7 @@ const PendingExamComponent = ({form , theme , pendingLoading , pendingExams , ba
                 </div>
               )}
 
-           {pendingExams.length === 0 ? (
+           {PendingExamToShow.length === 0 ? (
               <div className="text-center py-12">
                 <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${
                      theme === 'light' ? 'bg-indigo-100' : 'bg-indigo-900/50'
@@ -46,7 +63,7 @@ const PendingExamComponent = ({form , theme , pendingLoading , pendingExams , ba
                </div>
              ) : (
                <div className="space-y-4">
-                 {pendingExams.map((exam, index) => (
+                 {PendingExamToShow.map((exam, index) => (
                    <div
                      key={exam?.id || index}
                      className={`group rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300 ${

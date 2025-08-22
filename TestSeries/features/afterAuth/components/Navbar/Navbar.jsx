@@ -273,7 +273,7 @@ const Navbar = ({setShowLogoutModal}) => {
   
   return (
     <nav className={`z-50 ${themeClasses.nav}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className=" mx-auto px-4 sm:px-6 lg:px-12">
         <div className="flex justify-between h-16">
           {/* Left side - Logo */}
           <button 
