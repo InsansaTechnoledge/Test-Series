@@ -32,6 +32,7 @@ export const fetchSelective = async (conditions) => {
       id,
       name,
       date,
+      exam_time,
       duration,
       total_marks,
       organization_id,

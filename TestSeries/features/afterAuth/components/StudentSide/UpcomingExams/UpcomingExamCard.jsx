@@ -1,220 +1,211 @@
-import { BookOpen, CalendarDays, Clock, Goal, ReceiptText } from 'lucide-react'
 import React from 'react'
-import dateFormatter from '../../../../../utils/dateFormatter';
-import { useTheme } from '../../../../../hooks/useTheme';
+import { ExamCountdown, getExamTargetISO, toISTDisplayString } from './CountDownUtil';
+import HeadingUtil from '../../../utility/HeadingUtil';
+import ExamBadge from './ExamBadge';
 
-const UpcomingExamCard = ({ data }) => {
-    const { theme } = useTheme();
-    
-    const isDark = theme === 'dark';
+const UpcomingExamCard = ({ upcomingExams , theme , isAiProctored , isElectronEnv}) => {
     
     return (
-    
-        <div className={`
-            group relative overflow-hidden max-w-md mx-auto
-            hover:scale-[1.02] hover:-translate-y-1 
-            duration-300 transition-all ease-out
-            flex flex-col gap-5 
-            shadow-lg hover:shadow-2xl w-[100%]
-            ${isDark 
-                ? 'bg-gray-800 border border-gray-700 hover:border-indigo-500/40 shadow-black/20 hover:shadow-indigo-500/20' 
-                : 'bg-white border border-gray-200 hover:border-indigo-300 shadow-gray-200/50 hover:shadow-indigo-200/30'
-            }
-            p-6 rounded-2xl
-            before:absolute before:inset-0 before:bg-gradient-to-br 
-            ${isDark 
-                ? 'before:from-indigo-400/5 before:to-purple-400/5' 
-                : 'before:from-indigo-50/80 before:to-blue-50/80'
-            }
-            before:opacity-0 group-hover:before:opacity-100 before:transition-opacity before:duration-300
-        `}>
-            {/* Header Section with Upcoming Badge */}
-            <div className='relative z-10 flex justify-between items-start'>
-                <div className='flex gap-4 items-center flex-1 min-w-0'>
-                    <div className={`
-                        p-3 rounded-xl transition-all duration-300 shrink-0
-                        ${isDark 
-                            ? 'bg-indigo-400/10 group-hover:bg-indigo-400/20' 
-                            : 'bg-indigo-100 group-hover:bg-indigo-200'
-                        }
-                    `}>
-                        <BookOpen className={`
-                            w-6 h-6 transition-colors duration-300
-                            ${isDark ? 'text-indigo-400' : 'text-indigo-600'}
-                        `} />
-                    </div>
-                    <h3 className={`
-                        text-lg font-bold transition-colors duration-300 truncate
-                        ${isDark ? 'text-white' : 'text-gray-900'}
-                        group-hover:${isDark ? 'text-indigo-300' : 'text-indigo-700'}
-                    `}>
-                        {data?.name}
-                    </h3>
-                </div>
-                
-                {/* Upcoming Badge */}
-                <div className={`
-                    relative flex items-center gap-2 px-3 py-1.5 rounded-full font-semibold text-xs
-                    transition-all duration-300 ml-3 shrink-0
-                    ${isDark 
-                        ? 'bg-blue-900/30 text-blue-400 border border-blue-500/30' 
-                        : 'bg-blue-100 text-blue-700 border border-blue-200'
-                    }
-                    group-hover:scale-105
-                `}>
-                    <CalendarDays className={`
-                        w-4 h-4
-                        ${isDark ? 'text-blue-400' : 'text-blue-600'}
-                    `} />
-                    <span>Upcoming</span>
-                </div>
+        <section className="mb-20">
+            <div className="mb-12">
+                <HeadingUtil 
+                    heading="Upcoming Exams" 
+                    subHeading="Scheduled exams that will be available soon"
+                />
             </div>
             
-            {/* Description */}
-            <div className={`
-                text-sm leading-relaxed transition-colors duration-300 relative z-10
-                ${isDark ? 'text-gray-300' : 'text-gray-600'}
-            `}>
-                <span className={`font-medium ${isDark ? 'text-gray-200' : 'text-gray-700'}`}>
-                    Description: 
-                </span>
-                <span className='ml-1 line-clamp-2'>{data?.description}</span>
-            </div>
-            
-            {/* Stats Section */}
-            <div className='space-y-3 relative z-10'>
-                {/* Marks and Duration Row */}
-                <div className='grid grid-cols-2 gap-3'>
-                    <div className={`
-                        flex items-center gap-2 p-3 rounded-xl transition-all duration-300
-                        ${isDark 
-                            ? 'bg-gray-900/50 hover:bg-gray-800/50' 
-                            : 'bg-gray-50 hover:bg-gray-100'
-                        }
-                    `}>
-                        <Goal className={`
-                            w-4 h-4 transition-colors duration-300
-                            ${isDark ? 'text-indigo-400' : 'text-indigo-600'}
-                        `} />
-                        <div className='flex flex-col min-w-0'>
-                            <span className={`
-                                text-xs font-medium transition-colors duration-300
-                                ${isDark ? 'text-gray-400' : 'text-gray-500'}
-                            `}>
-                                Total Marks
-                            </span>
-                            <span className={`
-                                font-bold transition-colors duration-300 truncate
-                                ${isDark ? 'text-white' : 'text-gray-900'}
-                            `}>
-                                {data?.total_marks}
-                            </span>
-                        </div>
-                    </div>
-                    
-                    <div className={`
-                        flex items-center gap-2 p-3 rounded-xl transition-all duration-300
-                        ${isDark 
-                            ? 'bg-gray-900/50 hover:bg-gray-800/50' 
-                            : 'bg-gray-50 hover:bg-gray-100'
-                        }
-                    `}>
-                        <Clock className={`
-                            w-4 h-4 transition-colors duration-300
-                            ${isDark ? 'text-indigo-400' : 'text-indigo-600'}
-                        `} />
-                        <div className='flex flex-col min-w-0'>
-                            <span className={`
-                                text-xs font-medium transition-colors duration-300
-                                ${isDark ? 'text-gray-400' : 'text-gray-500'}
-                            `}>
-                                Duration
-                            </span>
-                            <span className={`
-                                font-bold transition-colors duration-300 truncate
-                                ${isDark ? 'text-white' : 'text-gray-900'}
-                            `}>
-                                {data?.duration} mins
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                
-                {/* Date Section */}
-                <div className={`
-                    flex items-center gap-3 p-3 rounded-xl transition-all duration-300
-                    ${isDark 
-                        ? 'bg-indigo-400/10 border border-indigo-400/20' 
-                        : 'bg-indigo-50 border border-indigo-100'
-                    }
-                `}>
-                    <CalendarDays className={`
-                        w-4 h-4 transition-colors duration-300
-                        ${isDark ? 'text-indigo-400' : 'text-indigo-600'}
-                    `} />
-                    <div className='flex flex-col min-w-0'>
-                        <span className={`
-                            text-xs font-medium transition-colors duration-300
-                            ${isDark ? 'text-indigo-300' : 'text-indigo-700'}
-                        `}>
-                            Exam Date
-                        </span>
-                        <span className={`
-                            font-bold transition-colors duration-300 truncate
-                            ${isDark ? 'text-indigo-200' : 'text-indigo-800'}
-                        `}>
-                            {dateFormatter(data?.date)}
-                        </span>
-                    </div>
-                </div>
-            </div>
-            
-            {/* Action Buttons Section */}
-            <div className='flex flex-col gap-3 mt-4 relative z-10'>
-                {/* Info Buttons */}
-                <div className='flex gap-2'>
-                    <button className={`
-                        relative overflow-hidden group/btn
-                        px-3 py-2 rounded-lg font-medium text-xs flex-1
-                        transition-all duration-300 transform
-                        hover:scale-[1.02] active:scale-[0.98]
-                        ${isDark 
-                            ? 'bg-gray-800 text-indigo-300 border border-indigo-400/30 hover:bg-gray-700 hover:border-indigo-400/50' 
-                            : 'bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300'
-                        }
-                        before:absolute before:inset-0 before:bg-gradient-to-r 
-                        ${isDark 
-                            ? 'before:from-indigo-400/0 before:to-indigo-400/10' 
-                            : 'before:from-indigo-100/0 before:to-indigo-200/50'
-                        }
-                        before:translate-x-full group-hover/btn:before:translate-x-0 before:transition-transform before:duration-300
-                    `}>
-                        <span className='relative z-10'>View Syllabus</span>
-                    </button>
-                    
-                    <button className={`
-                        relative overflow-hidden group/btn
-                        px-3 py-2 rounded-lg font-medium text-xs flex-1
-                        transition-all duration-300 transform
-                        hover:scale-[1.02] active:scale-[0.98]
-                        ${isDark 
-                            ? 'bg-indigo-400 text-gray-900 hover:bg-indigo-300 hover:shadow-lg hover:shadow-indigo-400/25' 
-                            : 'bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-600/25'
-                        }
-                        before:absolute before:inset-0 before:bg-gradient-to-r 
-                        ${isDark 
-                            ? 'before:from-indigo-300/0 before:to-indigo-200/30' 
-                            : 'before:from-indigo-500/0 before:to-indigo-400/30'
-                        }
-                        before:translate-x-full group-hover/btn:before:translate-x-0 before:transition-transform before:duration-300
-                    `}>
-                        <span className='relative z-10'>View Guidelines</span>
-                    </button>
-                </div>
-            </div>
-        </div>
+            <div className="space-y-8">
+                {upcomingExams && upcomingExams.length > 0 ? (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                        {upcomingExams.map((exam, idx) => (
+                            <div
+                                key={idx}
+                                className={`
+                                    relative overflow-hidden rounded-xl border transition-all duration-300
+                                    hover:shadow-lg hover:-translate-y-1 group cursor-default
+                                    ${theme === 'light' 
+                                        ? 'bg-white border-gray-200 hover:border-indigo-600 hover:shadow-indigo-600/10' 
+                                        : 'bg-gray-950 border-gray-800 hover:border-indigo-400 hover:shadow-indigo-400/10'
+                                    }
+                                `}
+                                style={{
+                                    animationDelay: `${idx * 100}ms`,
+                                }}
+                            >
+                                {/* Top Border Accent */}
+                                <div className={`h-1 w-full ${
+                                    theme === 'light' ? 'bg-orange-500' : 'bg-orange-400'
+                                }`}></div>
+                                
+                                {/* Upcoming Badge */}
+                                <div className="absolute top-4 right-4 z-10">
+                                    <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${
+                                        theme === 'light' 
+                                            ? 'bg-orange-500 text-white' 
+                                            : 'bg-orange-400 text-gray-950'
+                                    }`}>
+                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Upcoming
+                                    </div>
+                                </div>
 
-        
+                                <div className="p-6">
+                                    <div className="mb-4">
+                                        <ExamBadge exam={exam} theme={theme} isAiProctored={isAiProctored} isElectronEnv={isElectronEnv}/>
+                                    </div>
+                                    
+                                    <div className="mb-6">
+                                        <h3 className={`text-xl font-semibold mb-2 line-clamp-2 ${
+                                            theme === 'light' ? 'text-gray-900' : 'text-white'
+                                        }`}>
+                                            {exam.name || 'Untitled Exam'}
+                                        </h3>
+                                    </div>
+
+                                    {/* Exam Details */}
+                                    <div className="space-y-3 mb-6">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2">
+                                                <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                                                    theme === 'light' ? 'bg-indigo-50' : 'bg-indigo-950'
+                                                }`}>
+                                                    <svg className={`w-3 h-3 ${
+                                                        theme === 'light' ? 'text-indigo-600' : 'text-indigo-400'
+                                                    }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                </div>
+                                                <span className={`text-sm font-medium ${
+                                                    theme === 'light' ? 'text-gray-600' : 'text-gray-300'
+                                                }`}>
+                                                    Duration
+                                                </span>
+                                            </div>
+                                            <span className={`text-sm font-semibold ${
+                                                theme === 'light' ? 'text-gray-900' : 'text-white'
+                                            }`}>
+                                                {exam.duration || 'N/A'} min
+                                            </span>
+                                        </div>
+                                        
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2">
+                                                <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                                                    theme === 'light' ? 'bg-indigo-50' : 'bg-indigo-950'
+                                                }`}>
+                                                    <svg className={`w-3 h-3 ${
+                                                        theme === 'light' ? 'text-indigo-600' : 'text-indigo-400'
+                                                    }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                </div>
+                                                <span className={`text-sm font-medium ${
+                                                    theme === 'light' ? 'text-gray-600' : 'text-gray-300'
+                                                }`}>
+                                                    Total Marks
+                                                </span>
+                                            </div>
+                                            <span className={`text-sm font-semibold ${
+                                                theme === 'light' ? 'text-gray-900' : 'text-white'
+                                            }`}>
+                                                {exam.total_marks || 'N/A'}
+                                            </span>
+                                        </div>
+
+                                        {/* Countdown */}
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2">
+                                                <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                                                    theme === 'light' ? 'bg-orange-50' : 'bg-orange-950'
+                                                }`}>
+                                                    <svg className={`w-3 h-3 ${
+                                                        theme === 'light' ? 'text-orange-600' : 'text-orange-400'
+                                                    }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                </div>
+                                                <span className={`text-sm font-medium ${
+                                                    theme === 'light' ? 'text-gray-600' : 'text-gray-300'
+                                                }`}>
+                                                    Starts In
+                                                </span>
+                                            </div>
+                                            <div className="text-right">
+                                                <ExamCountdown exam={exam} theme={theme} />
+                                            </div>
+                                        </div>
+
+                                        {(exam.date && exam.exam_time) && (
+                                        <div className={`text-xs p-2 rounded-lg ${
+                                            theme === 'light' ? 'bg-gray-50 text-gray-600' : 'bg-gray-900 text-gray-400'
+                                        }`}>
+                                            <div className="flex items-center gap-2">
+                                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2z" />
+                                            </svg>
+                                            {toISTDisplayString(getExamTargetISO(exam))} IST
+                                            </div>
+                                        </div>
+                                        )}
+
+                                        {/* Divider */}
+                                        <div className={`border-t ${
+                                            theme === 'light' ? 'border-gray-100' : 'border-gray-800'
+                                        }`}></div>
+                                    </div>
+
+                                    <button
+                                        disabled={true}
+                                        className={`
+                                            w-full py-3 px-4 rounded-lg font-semibold text-sm transition-all duration-200
+                                            cursor-not-allowed opacity-50 ${
+                                                theme === 'light' 
+                                                    ? 'bg-gray-100 text-gray-400 border border-gray-200' 
+                                                    : 'bg-gray-800 text-gray-500 border border-gray-700'
+                                            }
+                                        `}
+                                    >
+                                        Not Available Yet
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className={`
+                        text-center py-16 px-8 rounded-xl border-2 border-dashed
+                        ${theme === 'light' 
+                            ? 'border-gray-200 bg-gray-50' 
+                            : 'border-gray-700 bg-gray-900'
+                        }
+                    `}>
+                        <div className="mb-4">
+                            <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center ${
+                                theme === 'light' ? 'bg-orange-50' : 'bg-orange-950'
+                            }`}>
+                                <svg className={`w-8 h-8 ${
+                                    theme === 'light' ? 'text-orange-600' : 'text-orange-400'
+                                }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <h3 className={`text-lg font-semibold mb-2 ${
+                            theme === 'light' ? 'text-gray-900' : 'text-white'
+                        }`}>
+                            No Upcoming Exams
+                        </h3>
+                        <p className={`text-sm ${
+                            theme === 'light' ? 'text-gray-600' : 'text-gray-400'
+                        }`}>
+                            There are no scheduled exams at the moment. Check with your instructor for updates.
+                        </p>
+                    </div>
+                )}
+            </div>
+        </section>
     )
 }
 

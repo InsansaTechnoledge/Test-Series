@@ -5,7 +5,8 @@
     "type": "module",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "dev": "nodemon server/server.js"
+        "dev": "nodemon server/server.js",
+        "dev:cron": "node utils/workers/examGoLiveCron.js"
     },
     "keywords": [],
     "author": "",
@@ -14,6 +15,7 @@
     "dependencies": {
         "@supabase/supabase-js": "^2.49.4",
         "bcrypt": "^5.1.1",
+        "bullmq": "^5.58.0",
         "cloudinary": "^1.30.0",
         "connect-mongo": "^5.1.0",
         "cookie-parser": "^1.4.7",
@@ -23,6 +25,7 @@
         "express-session": "^1.18.1",
         "gaxios": "^6.7.1",
         "googleapis": "^149.0.0",
+        "ioredis": "^5.7.0",
         "mongoose": "^8.14.2",
         "multer": "^1.4.5-lts.2",
         "multer-storage-cloudinary": "^4.0.0",
@@ -32,6 +35,7 @@
         "openai": "^5.12.2",
         "passport": "^0.7.0",
         "passport-local": "^1.0.0",
+        "pg": "^8.16.3",
         "validator": "^13.15.0",
         "xlsx": "^0.18.5"
     }

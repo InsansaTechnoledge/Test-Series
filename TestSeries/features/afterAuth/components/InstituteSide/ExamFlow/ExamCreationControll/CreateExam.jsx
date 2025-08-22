@@ -211,7 +211,7 @@ const CreateExam = () => {
                 } mt-2`}
               >
                 Date: {examDetails.date} | Duration: {examDetails.duration} mins
-                | Total Marks: {examDetails.total_marks}
+                | Total Marks: {examDetails.total_marks} | Exam Scheduled for: {examDetails?.exam_time || 'Not of Scheduled type'}
               </p>
 
               {Array.isArray(examDetails?.subjects) &&

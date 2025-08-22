@@ -8,6 +8,7 @@ const NewExamMetaDataForm = ({handleSubmit , theme , form, setForm , handleChang
     const {user} = useUser();
     
     const [selectedExamType, setSelectedExamType] = useState('semi-subjective');
+    const [autoSchedule, setAutoSchedule] = useState(true); // New state for auto-schedule toggle
     
     const examTypes = [
         { 
@@ -52,9 +53,23 @@ const NewExamMetaDataForm = ({handleSubmit , theme , form, setForm , handleChang
         }
     };
 
+    // Handle auto-schedule toggle
+    const handleAutoScheduleToggle = () => {
+        const newAutoSchedule = !autoSchedule;
+        setAutoSchedule(newAutoSchedule);
+        
+        // If auto-schedule is disabled, set exam_time to null
+        if (!newAutoSchedule) {
+            setForm(prev => ({
+                ...prev,
+                exam_time: null
+            }));
+        }
+    };
+
     // Initialize separate time from existing datetime value
     useEffect(() => {
-        if (form.date && !form.exam_time) {
+        if (form.date && !form.exam_time && autoSchedule) {
             // If date field contains a full datetime, extract the time part
             if (form.date.includes('T')) {
                 const timeStr = form.date.split('T')[1]?.slice(0, 5);
@@ -66,7 +81,14 @@ const NewExamMetaDataForm = ({handleSubmit , theme , form, setForm , handleChang
                 }
             }
         }
-    }, [form.date]);
+    }, [form.date, autoSchedule]);
+
+    // Initialize autoSchedule based on existing exam_time value
+    useEffect(() => {
+        if (form.exam_time !== undefined) {
+            setAutoSchedule(form.exam_time !== null);
+        }
+    }, []);
 
     // Sync selectedExamType with form.exam_type and ensure is_subjective is correct
     useEffect(() => {
@@ -238,26 +260,75 @@ const NewExamMetaDataForm = ({handleSubmit , theme , form, setForm , handleChang
               />
             </div>
 
-            {/* Time */}
+            {/* Auto Schedule Toggle */}
             <div className="group">
               <label className={`font-semibold mb-4 flex items-center space-x-3 text-base ${
                   theme === 'light' ? 'text-gray-700' : 'text-gray-200'
               }`}>
-                <span>Select exam time</span>
+                <span>Exam Scheduling</span>
               </label>
-              <input
-                  type="time"
-                  name="exam_time"
-                  className={`p-5 rounded-2xl transition-all duration-300 text-lg w-full shadow-lg border-2 focus:ring-2 ${
-                  theme === 'light'
-                      ? 'bg-white text-gray-900 border-gray-200 focus:ring-indigo-200 focus:border-indigo-400'
-                      : 'bg-gray-800 text-indigo-100 border-gray-600 focus:ring-indigo-500 focus:border-indigo-300'
-                  }`}
-                  value={form.exam_time || ''}
-                  onChange={handleDateTimeChange}
-                  required
-              />
+              <div className={`p-4 rounded-2xl border-2 ${
+                theme === 'light'
+                  ? 'bg-white border-gray-200'
+                  : 'bg-gray-800 border-gray-600'
+              }`}>
+                <label className="flex items-center cursor-pointer">
+                  <div className="relative">
+                    <input
+                      type="checkbox"
+                      className="sr-only"
+                      checked={autoSchedule}
+                      onChange={handleAutoScheduleToggle}
+                    />
+                    <div className={`w-12 h-6 rounded-full transition-colors duration-300 ${
+                      autoSchedule 
+                        ? 'bg-indigo-600' 
+                        : theme === 'light' ? 'bg-gray-300' : 'bg-gray-600'
+                    }`}>
+                      <div className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform duration-300 ${
+                        autoSchedule ? 'translate-x-6' : 'translate-x-0'
+                      }`}></div>
+                    </div>
+                  </div>
+                  <span className={`ml-3 text-sm font-medium ${
+                    theme === 'light' ? 'text-gray-700' : 'text-gray-200'
+                  }`}>
+                    Auto-schedule exam to go live
+                  </span>
+                </label>
+                <p className={`mt-2 text-xs ${
+                  theme === 'light' ? 'text-gray-500' : 'text-gray-400'
+                }`}>
+                  {autoSchedule 
+                    ? 'Exam will automatically go live at the specified time'
+                    : 'Exam will remain in draft mode and must be manually started'
+                  }
+                </p>
+              </div>
             </div>
+
+            {/* Time - Only show when auto-schedule is enabled */}
+            {autoSchedule && (
+              <div className="group lg:col-start-1">
+                <label className={`font-semibold mb-4 flex items-center space-x-3 text-base ${
+                    theme === 'light' ? 'text-gray-700' : 'text-gray-200'
+                }`}>
+                  <span>Select exam time <span className={`${theme === 'light' ? 'text-gray-500' : ''} text-sm`}>(exam will automatically go live at selected time)</span></span>
+                </label>
+                <input
+                    type="time"
+                    name="exam_time"
+                    className={`p-5 rounded-2xl transition-all duration-300 text-lg w-full shadow-lg border-2 focus:ring-2 ${
+                    theme === 'light'
+                        ? 'bg-white text-gray-900 border-gray-200 focus:ring-indigo-200 focus:border-indigo-400'
+                        : 'bg-gray-800 text-indigo-100 border-gray-600 focus:ring-indigo-500 focus:border-indigo-300'
+                    }`}
+                    value={form.exam_time || ''}
+                    onChange={handleDateTimeChange}
+                    required={autoSchedule}
+                />
+              </div>
+            )}
 
             {/* Total Marks */}
             <div className="group">

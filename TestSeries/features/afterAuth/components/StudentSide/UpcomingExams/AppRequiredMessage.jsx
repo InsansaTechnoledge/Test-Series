@@ -22,23 +22,22 @@ const AppRequiredMessage = ({ isElectronEnv }) => {
         top: '20px',
         right: '20px',
         backgroundColor: isDark ? '#030712' : '#ffffff', // gray-950 dark, white light
-        color: isDark ? '#a1a1aa' : '#374151', // zinc-400 dark, gray-700 light
-        padding: '16px',
-        borderRadius: '12px',
+        color: isDark ? '#9ca3af' : '#374151', // gray-400 dark, gray-700 light
+        padding: '20px',
+        borderRadius: '8px',
         fontSize: '14px',
         fontWeight: '500',
         zIndex: 1000,
         boxShadow: isDark 
-          ? '0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2)' 
-          : '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-        border: isDark ? '1px solid #27272a' : '1px solid #e5e7eb', // zinc-800 dark, gray-200 light
-        minWidth: '300px',
+          ? '0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3)' 
+          : '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+        border: isDark ? '1px solid #374151' : '1px solid #d1d5db', // gray-700 dark, gray-300 light
+        minWidth: '320px',
         maxWidth: '400px',
         display: 'flex',
         alignItems: 'flex-start',
-        gap: '12px',
-        animation: 'slideIn 0.3s ease-out',
-        transition: 'all 0.2s ease-in-out',
+        gap: '16px',
+        animation: 'slideIn 0.2s ease-out',
       }}
     >
       <style jsx>{`
@@ -57,15 +56,14 @@ const AppRequiredMessage = ({ isElectronEnv }) => {
       {/* Warning Icon */}
       <div
         style={{
-          backgroundColor: isDark ? '#422006' : '#fef3c7', // amber-900/20 dark, amber-100 light
-          color: isDark ? '#fbbf24' : '#d97706', // amber-400 dark, amber-600 light
+          backgroundColor: isDark ? '#4338ca' : '#4f46e5', // indigo-600 both themes
+          color: isDark ? '#030712' : '#ffffff', // gray-950 dark, white light
           padding: '8px',
-          borderRadius: '8px',
+          borderRadius: '6px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           flexShrink: 0,
-          marginTop: '2px',
         }}
       >
         <AlertTriangle size={16} />
@@ -76,8 +74,9 @@ const AppRequiredMessage = ({ isElectronEnv }) => {
         <div
           style={{
             fontWeight: '600',
-            marginBottom: '4px',
-            color: isDark ? '#e4e4e7' : '#111827', // zinc-200 dark, gray-900 light
+            marginBottom: '6px',
+            color: isDark ? '#f3f4f6' : '#111827', // gray-100 dark, gray-900 light
+            fontSize: '15px',
           }}
         >
           Desktop App Required
@@ -85,8 +84,8 @@ const AppRequiredMessage = ({ isElectronEnv }) => {
         <div
           style={{
             fontSize: '13px',
-            lineHeight: '1.4',
-            color: isDark ? '#a1a1aa' : '#6b7280', // zinc-400 dark, gray-500 light
+            lineHeight: '1.5',
+            color: isDark ? '#9ca3af' : '#6b7280', // gray-400 dark, gray-500 light
           }}
         >
           AI-proctored exams require the desktop application to function properly.
@@ -99,26 +98,24 @@ const AppRequiredMessage = ({ isElectronEnv }) => {
         style={{
           backgroundColor: 'transparent',
           border: 'none',
-          color: isDark ? '#71717a' : '#9ca3af', // zinc-500 dark, gray-400 light
+          color: isDark ? '#6b7280' : '#9ca3af', // gray-500 dark, gray-400 light
           cursor: 'pointer',
-          padding: '4px',
+          padding: '6px',
           borderRadius: '4px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           flexShrink: 0,
-          transition: 'all 0.15s ease',
+          transition: 'color 0.15s ease',
         }}
         onMouseEnter={(e) => {
-          e.target.style.backgroundColor = isDark ? '#18181b' : '#f3f4f6'; // zinc-900 dark, gray-100 light
-          e.target.style.color = isDark ? '#e4e4e7' : '#374151'; // zinc-200 dark, gray-700 light
+          e.target.style.color = isDark ? '#f3f4f6' : '#374151'; // gray-100 dark, gray-700 light
         }}
         onMouseLeave={(e) => {
-          e.target.style.backgroundColor = 'transparent';
-          e.target.style.color = isDark ? '#71717a' : '#9ca3af';
+          e.target.style.color = isDark ? '#6b7280' : '#9ca3af';
         }}
       >
-        <X size={16} />
+        <X size={18} />
       </button>
     </div>
   );

@@ -1,223 +1,189 @@
-import { BookOpen, CalendarDays, Clock, Goal, Radio } from 'lucide-react'
-import { useNavigate } from 'react-router-dom';
-import { useTheme } from '../../../../../hooks/useTheme';
+import HeadingUtil from '../../../utility/HeadingUtil';
+import ExamBadge from './ExamBadge';
 
-const LiveExamCard = ({ data, onStartTest }) => {
-    const navigate = useNavigate();
-    const { theme } = useTheme();
-    
-    const isDark = theme === 'dark';
-
-    const getButtonProps = () => {
-        if (data.reapplicable) {
-            if (data.hasAttempted) {
-                return { label: 'Start Test Again', onClick: () => onStartTest(data.id) };
-            }
-            return { label: 'Start Test', onClick: () => onStartTest(data.id) };
-        } else {
-            if (data.hasAttempted) {
-                return { label: 'View Result', onClick: () => navigate('/student/completed-exams') };
-            }
-            return { label: 'Start Test', onClick: () => onStartTest(data.id) };
-        }
-    };
-
-    const { label, onClick } = getButtonProps();
+const LiveExamCard = ({ liveExams, proctorStatus , currentExamId , theme , handleStartTest , canStartExam , getStartButtonConfig , isAiProctored , isElectronEnv}) => {
 
     return (
-                <div className={`
-                    group relative overflow-hidden max-w-md mx-auto
-                    hover:scale-[1.02] hover:-translate-y-1 
-                    duration-300 transition-all ease-out
-                    flex flex-col gap-5 
-                    shadow-lg hover:shadow-2xl w-[100%]
+        <section className="mb-20">
+        <div className="mb-12">
+          <HeadingUtil 
+            heading="Live Exams" 
+            subHeading="Active exams available for immediate participation"
+          />
+        </div>
+        
+        <div className="space-y-8">
+          {liveExams && liveExams.length > 0 ? (
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+              {liveExams.map((exam, idx) => (
+                <div
+                  key={idx}
+                  className={`
+                    relative overflow-hidden rounded-xl border transition-all duration-300
+                    hover:shadow-lg hover:-translate-y-1 group cursor-pointer
                     ${theme === 'light' 
-                        ? 'bg-white border border-gray-200 hover:border-indigo-300 shadow-gray-200/50 hover:shadow-indigo-200/30' 
-                        : 'bg-gray-800 border border-gray-700 hover:border-indigo-500/40 shadow-black/20 hover:shadow-indigo-500/20'
+                      ? 'bg-white border-gray-200 hover:border-indigo-600 hover:shadow-indigo-600/10' 
+                      : 'bg-gray-950 border-gray-800 hover:border-indigo-400 hover:shadow-indigo-400/10'
                     }
-                    p-6 rounded-2xl
-                    before:absolute before:inset-0 before:bg-gradient-to-br 
-                    ${theme === 'light' 
-                        ? 'before:from-indigo-50/80 before:to-blue-50/80' 
-                        : 'before:from-indigo-400/5 before:to-purple-400/5'
-                    }
-                    before:opacity-0 group-hover:before:opacity-100 before:transition-opacity before:duration-300
-                `}>
-                    {/* Header Section with Live Badge */}
-                    <div className='relative z-10 flex justify-between items-start'>
-                        <div className='flex gap-4 items-center flex-1 min-w-0'>
-                            <div className={`
-                                p-3 rounded-xl transition-all duration-300 shrink-0
-                                ${theme === 'light' 
-                                    ? 'bg-indigo-100 group-hover:bg-indigo-200' 
-                                    : 'bg-indigo-400/10 group-hover:bg-indigo-400/20'
-                                }
-                            `}>
-                                <BookOpen className={`
-                                    w-6 h-6 transition-colors duration-300
-                                    ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-400'}
-                                `} />
-                            </div>
-                            <h3 className={`
-                                text-lg font-bold transition-colors duration-300 truncate
-                                ${theme === 'light' ? 'text-gray-900' : 'text-white'}
-                                group-hover:${theme === 'light' ? 'text-indigo-700' : 'text-indigo-300'}
-                            `}>
-                                {data.name}
-                            </h3>
+                    ${(proctorStatus === 'starting' && currentExamId !== exam.id) ? 'opacity-50' : 'opacity-100'}
+                  `}
+                  style={{
+                    animationDelay: `${idx * 100}ms`,
+                  }}
+                >
+                  {/* Top Border Accent */}
+                  <div className={`h-1 w-full ${
+                    theme === 'light' ? 'bg-indigo-600' : 'bg-indigo-400'
+                  }`}></div>
+                  
+                  {/* Live Badge */}
+                  {
+                    exam.hasAttempted !== true && (
+                      <div className="absolute top-4 right-4 z-10">
+                        <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${
+                          theme === 'light' 
+                            ? 'bg-indigo-600 text-white' 
+                            : 'bg-indigo-400 text-gray-950'
+                        }`}>
+                          <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${
+                            theme === 'light' ? 'bg-white' : 'bg-gray-950'
+                          }`}></span>
+                          Live
                         </div>
-                        
-                        {/* Live Badge with Animation */}
-                        <div className={`
-                            relative flex items-center gap-2 px-3 py-1.5 rounded-full font-semibold text-xs
-                            transition-all duration-300 ml-3 shrink-0
-                            ${theme === 'light' 
-                                ? 'bg-red-100 text-red-700 border border-red-200' 
-                                : 'bg-red-900/30 text-red-400 border border-red-500/30'
-                            }
-                            group-hover:scale-105
-                        `}>
-                            <Radio className={`
-                                w-4 h-4 animate-pulse
-                                ${theme === 'light' ? 'text-red-600' : 'text-red-400'}
-                            `} />
-                            <span>Live</span>
-                            {/* Pulsing dot animation */}
-                            <div className={`
-                                absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full animate-ping
-                                ${theme === 'light' ? 'bg-red-500' : 'bg-red-400'}
-                            `} />
-                            <div className={`
-                                absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full
-                                ${theme === 'light' ? 'bg-red-500' : 'bg-red-400'}
-                            `} />
-                        </div>
+                      </div>
+                    )
+                  }
+
+                  <div className="p-6">
+                    <div className="mb-4">
+                      <ExamBadge exam={exam} theme={theme} isAiProctored={isAiProctored} isElectronEnv={isElectronEnv} />
                     </div>
                     
-                    {/* Description */}
-                    <div className={`
-                        text-sm leading-relaxed transition-colors duration-300 relative z-10
-                        ${theme === 'light' ? 'text-gray-600' : 'text-gray-300'}
-                    `}>
-                        <span className={`font-medium ${theme === 'light' ? 'text-gray-700' : 'text-gray-200'}`}>
-                            Description: 
+                    <div className="mb-6">
+                      <h3 className={`text-xl font-semibold mb-2 line-clamp-2 ${
+                        theme === 'light' ? 'text-gray-900' : 'text-white'
+                      }`}>
+                        {exam.name || 'Untitled Exam'}
+                      </h3>
+                    </div>
+
+                    {/* Exam Details */}
+                    <div className="space-y-3 mb-6">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                            theme === 'light' ? 'bg-indigo-50' : 'bg-indigo-950'
+                          }`}>
+                            <svg className={`w-3 h-3 ${
+                              theme === 'light' ? 'text-indigo-600' : 'text-indigo-400'
+                            }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </div>
+                          <span className={`text-sm font-medium ${
+                            theme === 'light' ? 'text-gray-600' : 'text-gray-300'
+                          }`}>
+                            Duration
+                          </span>
+                        </div>
+                        <span className={`text-sm font-semibold ${
+                          theme === 'light' ? 'text-gray-900' : 'text-white'
+                        }`}>
+                          {exam.duration || 'N/A'} min
                         </span>
-                        <span className='ml-1 line-clamp-2'>{data.description}</span>
-                    </div>
-                    
-                    {/* Stats Section */}
-                    <div className='space-y-3 relative z-10'>
-                        {/* Marks and Duration Row */}
-                        <div className='grid grid-cols-2 gap-3'>
-                            <div className={`
-                                flex items-center gap-2 p-3 rounded-xl transition-all duration-300
-                                ${theme === 'light' 
-                                    ? 'bg-gray-50 hover:bg-gray-100' 
-                                    : 'bg-gray-900/50 hover:bg-gray-800/50'
-                                }
-                            `}>
-                                <Goal className={`
-                                    w-4 h-4 transition-colors duration-300
-                                    ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-400'}
-                                `} />
-                                <div className='flex flex-col min-w-0'>
-                                    <span className={`
-                                        text-xs font-medium transition-colors duration-300
-                                        ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}
-                                    `}>
-                                        Total Marks
-                                    </span>
-                                    <span className={`
-                                        font-bold transition-colors duration-300 truncate
-                                        ${theme === 'light' ? 'text-gray-900' : 'text-white'}
-                                    `}>
-                                        {data.total_marks}
-                                    </span>
-                                </div>
-                            </div>
-                            
-                            <div className={`
-                                flex items-center gap-2 p-3 rounded-xl transition-all duration-300
-                                ${theme === 'light' 
-                                    ? 'bg-gray-50 hover:bg-gray-100' 
-                                    : 'bg-gray-900/50 hover:bg-gray-800/50'
-                                }
-                            `}>
-                                <Clock className={`
-                                    w-4 h-4 transition-colors duration-300
-                                    ${theme === 'light' ? 'text-indigo-600' : 'text-indigo-400'}
-                                `} />
-                                <div className='flex flex-col min-w-0'>
-                                    <span className={`
-                                        text-xs font-medium transition-colors duration-300
-                                        ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}
-                                    `}>
-                                        Duration
-                                    </span>
-                                    <span className={`
-                                        font-bold transition-colors duration-300 truncate
-                                        ${theme === 'light' ? 'text-gray-900' : 'text-white'}
-                                    `}>
-                                        {data.duration} mins
-                                    </span>
-                                </div>
-                            </div>
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                            theme === 'light' ? 'bg-indigo-50' : 'bg-indigo-950'
+                          }`}>
+                            <svg className={`w-3 h-3 ${
+                              theme === 'light' ? 'text-indigo-600' : 'text-indigo-400'
+                            }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </div>
+                          <span className={`text-sm font-medium ${
+                            theme === 'light' ? 'text-gray-600' : 'text-gray-300'
+                          }`}>
+                            Total Marks
+                          </span>
                         </div>
+                        <span className={`text-sm font-semibold ${
+                          theme === 'light' ? 'text-gray-900' : 'text-white'
+                        }`}>
+                          {exam.total_marks || 'N/A'}
+                        </span>
+                      </div>
+
+                      {/* Divider */}
+                      <div className={`border-t ${
+                        theme === 'light' ? 'border-gray-100' : 'border-gray-800'
+                      }`}></div>
                     </div>
-                    
-                    {/* Action Buttons Section */}
-                    <div className='flex flex-col gap-3 mt-4 relative z-10'>
-                        {/* Info Buttons */}
-                        <div className='flex gap-2'>
-                            <button className={`
-                                relative overflow-hidden group/btn
-                                px-3 py-2 rounded-lg font-medium text-xs flex-1
-                                transition-all duration-300 transform
-                                hover:scale-[1.02] active:scale-[0.98]
-                                ${theme === 'light' 
-                                    ? 'bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300' 
-                                    : 'bg-gray-800 text-indigo-300 border border-indigo-400/30 hover:bg-gray-700 hover:border-indigo-400/50'
-                                }
-                                before:absolute before:inset-0 before:bg-gradient-to-r 
-                                ${theme === 'light' 
-                                    ? 'before:from-indigo-100/0 before:to-indigo-200/50' 
-                                    : 'before:from-indigo-400/0 before:to-indigo-400/10'
-                                }
-                                before:translate-x-full group-hover/btn:before:translate-x-0 before:transition-transform before:duration-300
-                            `}>
-                                <span className='relative z-10'>Syllabus</span>
-                            </button>
-                            
-                            <button className={`
-                                relative overflow-hidden group/btn
-                                px-3 py-2 rounded-lg font-medium text-xs flex-1
-                                transition-all duration-300 transform
-                                hover:scale-[1.02] active:scale-[0.98]
-                                ${theme === 'light' 
-                                    ? 'bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300' 
-                                    : 'bg-gray-800 text-indigo-300 border border-indigo-400/30 hover:bg-gray-700 hover:border-indigo-400/50'
-                                }
-                                before:absolute before:inset-0 before:bg-gradient-to-r 
-                                ${theme === 'light' 
-                                    ? 'before:from-indigo-100/0 before:to-indigo-200/50' 
-                                    : 'before:from-indigo-400/0 before:to-indigo-400/10'
-                                }
-                                before:translate-x-full group-hover/btn:before:translate-x-0 before:transition-transform before:duration-300
-                            `}>
-                                <span className='relative z-10'>Guidelines</span>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    {/* Live Indicator Border Animation */}
-                    <div className={`
-                        absolute inset-0 rounded-2xl pointer-events-none
-                        ${theme === 'light' ? 'bg-gradient-to-r from-red-500/10 via-transparent to-red-500/10' : 'bg-gradient-to-r from-red-400/20 via-transparent to-red-400/20'}
-                        opacity-0 group-hover:opacity-100 transition-opacity duration-500
-                        animate-pulse
-                    `} />
+
+                    <button
+                      onClick={() => handleStartTest(exam.id || exam._id, exam.ai_proctored)}
+                      disabled={!canStartExam(exam) || (exam.hasAttempted === true && exam.reapplicable === false)}
+                      className={`
+                        w-full py-3 px-4 rounded-lg font-semibold text-sm transition-all duration-200
+                        focus:outline-none focus:ring-2 focus:ring-offset-2
+                        ${!canStartExam(exam) || (exam.hasAttempted === true && exam.reapplicable === false)
+                          ? `cursor-not-allowed opacity-50 ${
+                              theme === 'light' 
+                                ? 'bg-gray-100 text-gray-400 border border-gray-200' 
+                                : 'bg-gray-800 text-gray-500 border border-gray-700'
+                            }`
+                          : `${
+                              theme === 'light' 
+                                ? 'bg-indigo-600 hover:bg-indigo-700 text-white focus:ring-indigo-500' 
+                                : 'bg-indigo-400 hover:bg-indigo-300 text-gray-950 focus:ring-indigo-400'
+                            }`
+                        }
+                      `}
+                    >
+                      {getStartButtonConfig(exam).text}
+                    </button>
+                  </div>
                 </div>
-            );
+              ))}
+            </div>
+          ) : (
+            <div className={`
+              text-center py-16 px-8 rounded-xl border-2 border-dashed
+              ${theme === 'light' 
+                ? 'border-gray-200 bg-gray-50' 
+                : 'border-gray-700 bg-gray-900'
+              }
+            `}>
+              <div className="mb-4">
+                <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center ${
+                  theme === 'light' ? 'bg-indigo-50' : 'bg-indigo-950'
+                }`}>
+                  <svg className={`w-8 h-8 ${
+                    theme === 'light' ? 'text-indigo-600' : 'text-indigo-400'
+                  }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                </div>
+              </div>
+              <h3 className={`text-lg font-semibold mb-2 ${
+                theme === 'light' ? 'text-gray-900' : 'text-white'
+              }`}>
+                No Live Exams Available
+              </h3>
+              <p className={`text-sm ${
+                theme === 'light' ? 'text-gray-600' : 'text-gray-400'
+              }`}>
+                There are currently no active exams. Check back later or view upcoming exams below.
+              </p>
+            </div>
+          )}
+        </div>
+      </section>
+
+    )
         };
    
 

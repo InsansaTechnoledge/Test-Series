@@ -233,17 +233,7 @@ const CreateContest = () => {
 
         {/* Form */}
         <div className="min-h-screen p-6">
-          <div className="max-w-4xl mx-auto">
-            {/* Header */}
-            <div className="text-center mb-10">
-              <h1 className={`text-4xl font-bold bg-gradient-to-r ${theme === 'light'
-                ? 'from-indigo-600 to-purple-600'
-                : 'from-indigo-400 to-purple-400'
-                } bg-clip-text text-transparent mb-4`}>
-                Create New Contest
-              </h1>
-            </div>
-
+          <div className="mx-auto">
             {/* Main Form Card */}
             <div className={`rounded-3xl shadow-xl border p-10 relative overflow-hidden ${theme === 'light'
               ? 'bg-white/70 backdrop-blur-sm border-indigo-100'
@@ -573,14 +563,14 @@ const CreateContest = () => {
                           ? 'bg-gray-300 cursor-not-allowed text-red-600'
                           : 'bg-gray-700 cursor-not-allowed text-red-400')
                         : (theme === 'light'
-                          ? 'bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 text-white hover:from-indigo-700 hover:via-purple-700 hover:to-indigo-800 hover:shadow-2xl active:scale-95 focus:ring-indigo-200'
-                          : 'bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 text-white hover:from-indigo-600 hover:via-purple-600 hover:to-indigo-700 hover:shadow-2xl active:scale-95 focus:ring-indigo-400')}
+                          ? 'bg-indigo-600 text-gray-100'
+                          : 'bg-indigo-400')}
                 `}
                   >
                     {canAccessPage !== false && (
                       <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${theme === 'light'
-                        ? 'bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600'
-                        : 'bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400'
+                        ? 'bg-indigo-600 '
+                        : 'bg-indigo-400'
                         }`}></div>
                     )}
                     <span className="relative flex items-center gap-3">
