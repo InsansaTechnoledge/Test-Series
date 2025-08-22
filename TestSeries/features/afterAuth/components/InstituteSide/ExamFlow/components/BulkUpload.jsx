@@ -1,14 +1,24 @@
-import React, { useState } from 'react';
-import * as XLSX from 'xlsx';
-import { v4 as uuidv4 } from 'uuid';
-import { generateSampleExcel } from './SampleExcel';
-import { Upload, FileSpreadsheet, Download, CheckCircle, AlertCircle, Info } from 'lucide-react';
-import { useTheme } from '../../../../../../hooks/useTheme';
-import { validateBloom } from '../../../../../../utils/services/bloomClient';
-const BulkUpload = ({ setQuestions, organizationId }) => {
+import React, { useState } from "react";
+import * as XLSX from "xlsx";
+import { v4 as uuidv4 } from "uuid";
+import { generateSampleExcel } from "./SampleExcel";
+import { ObjectiveSampleExcel } from "./ObjectiveSampleExcel";
+import { SubjectiveSampleExcel } from "./SubjectiveSampleExcel";
+import { BothObjectiveAndSubjectiveSampleExcel } from "./BothObjectiveAndSubjectiveSampleExcel";
+import {
+  Upload,
+  FileSpreadsheet,
+  Download,
+  CheckCircle,
+  AlertCircle,
+  Info,
+} from "lucide-react";
+import { useTheme } from "../../../../../../hooks/useTheme";
+import { validateBloom } from "../../../../../../utils/services/bloomClient";
+const BulkUpload = ({ setQuestions, organizationId, examType }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState(null);
-  const { theme } = useTheme()
+  const { theme } = useTheme();
 
   // const handleFile = async (e) => {
   //   const file = e.target.files[0];
@@ -24,9 +34,9 @@ const BulkUpload = ({ setQuestions, organizationId }) => {
   //     const rows = XLSX.utils.sheet_to_json(sheet);
 
   //     if (rows.length === 0) {
-  //       setUploadResult({ 
-  //         success: false, 
-  //         message: "No data found in the spreadsheet." 
+  //       setUploadResult({
+  //         success: false,
+  //         message: "No data found in the spreadsheet."
   //       });
   //       setIsUploading(false);
   //       return;
@@ -58,21 +68,37 @@ const BulkUpload = ({ setQuestions, organizationId }) => {
   //     });
 
   //     setQuestions((prev) => [...prev, ...parsed]);
-  //     setUploadResult({ 
-  //       success: true, 
-  //       message: `Successfully imported ${parsed.length} questions.` 
+  //     setUploadResult({
+  //       success: true,
+  //       message: `Successfully imported ${parsed.length} questions.`
   //     });
   //     e.target.value = null; // Reset file input
   //   } catch (error) {
   //     console.error("Error processing Excel file:", error);
-  //     setUploadResult({ 
-  //       success: false, 
-  //       message: "Error processing Excel file. Please ensure it has the correct format." 
+  //     setUploadResult({
+  //       success: false,
+  //       message: "Error processing Excel file. Please ensure it has the correct format."
   //     });
   //   } finally {
   //     setIsUploading(false);
   //   }
   // };
+
+  const handleDownloadSample = () => {
+    switch (examType?.toLowerCase()) {
+      case "objective":
+        ObjectiveSampleExcel();
+        break;
+      case "subjective":
+        SubjectiveSampleExcel();
+        break;
+      case "semi_subjective":
+        BothObjectiveAndSubjectiveSampleExcel();
+        break;
+      default:
+        generateSampleExcel();
+    }
+  };
 
   const handleFile = async (e) => {
     const file = e.target.files[0];
@@ -90,7 +116,7 @@ const BulkUpload = ({ setQuestions, organizationId }) => {
       if (rows.length === 0) {
         setUploadResult({
           success: false,
-          message: "No data found in the spreadsheet."
+          message: "No data found in the spreadsheet.",
         });
         setIsUploading(false);
         return;
@@ -98,7 +124,7 @@ const BulkUpload = ({ setQuestions, organizationId }) => {
 
       const parseJsonField = (field) => {
         if (!field) return [];
-        if (typeof field === 'string') {
+        if (typeof field === "string") {
           try {
             return JSON.parse(field);
           } catch (e) {
@@ -108,111 +134,119 @@ const BulkUpload = ({ setQuestions, organizationId }) => {
         return field;
       };
 
-      const parsed = await Promise.all(rows.map(async (row) => {
-        const base = {
-          id: uuidv4(),
-          organization_id: organizationId, // ✅ add this!
-          type: row.type?.toLowerCase(),
-          question_type: row.type?.toLowerCase(),
-          question_text: row.question_text || '',
-          explanation: row.explanation || '',
-          difficulty: row.difficulty?.toLowerCase() || 'easy',
-          positive_marks: Number(row.positive_marks) || 1,
-          negative_marks: Number(row.negative_marks) || 0,
-          subject: row.subject || '',
-          chapter: row.chapter || '',
-          bloom_level: row.bloom_level?.toLowerCase() || '',
-        };
-        // not ideal for actual decimal data
+      const parsed = await Promise.all(
+        rows.map(async (row) => {
+          const base = {
+            id: uuidv4(),
+            organization_id: organizationId, // ✅ add this!
+            type: row.type?.toLowerCase(),
+            question_type: row.type?.toLowerCase(),
+            question_text: row.question_text || "",
+            explanation: row.explanation || "",
+            difficulty: row.difficulty?.toLowerCase() || "easy",
+            positive_marks: Number(row.positive_marks) || 1,
+            negative_marks: Number(row.negative_marks) || 0,
+            subject: row.subject || "",
+            chapter: row.chapter || "",
+            bloom_level: row.bloom_level?.toLowerCase() || "",
+          };
+          // not ideal for actual decimal data
 
-        if (base.bloom_level && base.question_text) {
-          try {
-            const { isValid, matchedLevel } = await validateBloom(base.question_text, base.bloom_level);
-            base.bloom_match = isValid;
-            base.detected_level = matchedLevel;
-          } catch (err) {
-            console.warn("Gemini validation failed", err);
-            base.bloom_match = null;
-            base.detected_level = "error";
-          }
-        } else {
-          base.bloom_match = null;
-          base.detected_level = "missing";
-        }
-        const parseJsonField = (field) => {
-          if (!field) return [];
-          if (typeof field === 'string') {
+          if (base.bloom_level && base.question_text) {
             try {
-              return JSON.parse(field);
-            } catch {
-              return field;
+              const { isValid, matchedLevel } = await validateBloom(
+                base.question_text,
+                base.bloom_level
+              );
+              base.bloom_match = isValid;
+              base.detected_level = matchedLevel;
+            } catch (err) {
+              console.warn("Gemini validation failed", err);
+              base.bloom_match = null;
+              base.detected_level = "error";
             }
+          } else {
+            base.bloom_match = null;
+            base.detected_level = "missing";
           }
-          return field;
-        };
-        // Type-specific logic
-        if (base.type === 'mcq' || base.type === 'msq') {
-          base.options = parseJsonField(row.options);
-        }
+          const parseJsonField = (field) => {
+            if (!field) return [];
+            if (typeof field === "string") {
+              try {
+                return JSON.parse(field);
+              } catch {
+                return field;
+              }
+            }
+            return field;
+          };
+          // Type-specific logic
+          if (base.type === "mcq" || base.type === "msq") {
+            base.options = parseJsonField(row.options);
+          }
 
-        if (base.type === 'mcq') {
-          base.correct_option = Number(row.correct_option) || 0;
-        }
+          if (base.type === "mcq") {
+            base.correct_option = Number(row.correct_option) || 0;
+          }
 
-        if (base.type === 'msq') {
-          base.correct_options = parseJsonField(row.correct_options);
-        }
+          if (base.type === "msq") {
+            base.correct_options = parseJsonField(row.correct_options);
+          }
 
-        if (base.type === 'fill' || base.type === 'numerical') {
-          base.correct_answer = row.correct_answer || '';
-        }
+          if (base.type === "fill" || base.type === "numerical") {
+            base.correct_answer = row.correct_answer || "";
+          }
 
-        if (base.type === 'tf') {
-          base.is_true = row.is_true === true || row.is_true === 'true';
-        }
+          if (base.type === "tf") {
+            base.is_true = row.is_true === true || row.is_true === "true";
+          }
 
-        if (base.type === 'code') {
-          base.test_cases = parseJsonField(row.test_cases);
-        }
+          if (base.type === "code") {
+            base.test_cases = parseJsonField(row.test_cases);
+          }
+          if (base.type === "descriptive") {
+            base.min_words = 0;
+            base.max_words = base.wordLimit;
+          }
+          // if (base.type === 'match') {
+          //   base.left_items = parseJsonField(row.left_items);
+          //   base.right_items = parseJsonField(row.right_items);
+          //   base.correct_pairs = typeof row.correct_pairs === 'string'
+          //     ? JSON.parse(row.correct_pairs)
+          //     : row.correct_pairs;
+          // }
 
-        // if (base.type === 'match') {
-        //   base.left_items = parseJsonField(row.left_items);
-        //   base.right_items = parseJsonField(row.right_items);
-        //   base.correct_pairs = typeof row.correct_pairs === 'string'
-        //     ? JSON.parse(row.correct_pairs)
-        //     : row.correct_pairs;
-        // }
+          if (base.type === "match") {
+            const leftItems = parseJsonField(row.left_items);
+            const rightItems = parseJsonField(row.right_items);
+            const correctPairs =
+              typeof row.correct_pairs === "string"
+                ? JSON.parse(row.correct_pairs)
+                : row.correct_pairs;
 
-        if (base.type === 'match') {
-          const leftItems = parseJsonField(row.left_items);
-          const rightItems = parseJsonField(row.right_items);
-          const correctPairs = typeof row.correct_pairs === 'string'
-            ? JSON.parse(row.correct_pairs)
-            : row.correct_pairs;
+            base.left_items = leftItems;
+            base.right_items = rightItems;
+            base.correct_pairs = correctPairs || {};
+          }
 
-          base.left_items = leftItems;
-          base.right_items = rightItems;
-          base.correct_pairs = correctPairs || {};
-        }
+          if (base.type === "comprehension") {
+            base.passage = row.passage || "";
+            base.sub_question_ids = parseJsonField(row.sub_question_ids);
+          }
 
-
-
-
-        if (base.type === 'comprehension') {
-          base.passage = row.passage || '';
-          base.sub_question_ids = parseJsonField(row.sub_question_ids);
-        }
-
-        return base;
-      }));
+          return base;
+        })
+      );
 
       setQuestions((prev) => [...prev, ...parsed]);
-      const mismatches = parsed.filter(q => q.bloom_match === false).map((q, idx) => ({
-        index: idx + 1,
-        question: q.question_text,
-        expected: q.bloom_level,
-        detected: q.detected_level,
-      }));
+      const mismatches = parsed
+        .filter((q) => q.bloom_match === false)
+        .map((q, idx) => ({
+          index: idx + 1,
+          question: q.question_text,
+          expected: q.bloom_level,
+          detected: q.detected_level,
+        }));
       setUploadResult({
         success: true,
         message: `✅ Imported ${parsed.length} questions. ❌ ${mismatches.length} did not match Bloom level.`,
@@ -228,7 +262,8 @@ const BulkUpload = ({ setQuestions, organizationId }) => {
       console.error("Error processing Excel file:", error);
       setUploadResult({
         success: false,
-        message: "Error processing Excel file. Please ensure it has the correct format."
+        message:
+          "Error processing Excel file. Please ensure it has the correct format.",
       });
     } finally {
       setIsUploading(false);
@@ -236,11 +271,12 @@ const BulkUpload = ({ setQuestions, organizationId }) => {
   };
 
   return (
-
     <div
-
-
-      className={` shadow-md rounded-2xl p-6 space-y-6   ${theme == 'light' ? "bg-white/70 border border-gray-200" : "bg-gray-700 border border-gray-200"} `}
+      className={` shadow-md rounded-2xl p-6 space-y-6   ${
+        theme == "light"
+          ? "bg-white/70 border border-gray-200"
+          : "bg-gray-700 border border-gray-200"
+      } `}
     >
       {/* Header with Icon */}
       <div className="flex items-start space-x-4">
@@ -248,8 +284,18 @@ const BulkUpload = ({ setQuestions, organizationId }) => {
           <Upload className="w-6 h-6 text-white" />
         </div>
         <div>
-          <h3 className={`font-semibold text-xl  ${theme == 'light' ? "text-gray-900" : "text-gray-300"} `}>Upload Excel File</h3>
-          <p className={`font-semibold  ${theme == 'light' ? "text-gray-700" : "text-gray-300"} `}>
+          <h3
+            className={`font-semibold text-xl  ${
+              theme == "light" ? "text-gray-900" : "text-gray-300"
+            } `}
+          >
+            Upload Excel File
+          </h3>
+          <p
+            className={`font-semibold  ${
+              theme == "light" ? "text-gray-700" : "text-gray-300"
+            } `}
+          >
             Upload multiple questions at once using an Excel spreadsheet.
           </p>
         </div>
@@ -264,7 +310,9 @@ const BulkUpload = ({ setQuestions, organizationId }) => {
           disabled={isUploading}
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
         />
-        <p className="text-gray-500 text-sm">Click to select a file or drag it here</p>
+        <p className="text-gray-500 text-sm">
+          Click to select a file or drag it here
+        </p>
       </div>
 
       {/* Uploading Indicator */}
@@ -277,10 +325,11 @@ const BulkUpload = ({ setQuestions, organizationId }) => {
       {/* Upload Result */}
       {uploadResult && (
         <div
-          className={`mt-1 p-3 rounded-lg text-sm font-medium ${uploadResult.success
-            ? 'bg-green-50 text-green-700 border border-green-200'
-            : 'bg-red-50 text-red-700 border border-red-200'
-            }`}
+          className={`mt-1 p-3 rounded-lg text-sm font-medium ${
+            uploadResult.success
+              ? "bg-green-50 text-green-700 border border-green-200"
+              : "bg-red-50 text-red-700 border border-red-200"
+          }`}
         >
           {uploadResult.message}
         </div>
@@ -291,8 +340,13 @@ const BulkUpload = ({ setQuestions, organizationId }) => {
           <ul className="list-disc list-inside space-y-1">
             {uploadResult.mismatches.map((item, idx) => (
               <li key={idx}>
-                <span className="font-semibold">Q{item.index}:</span> {item.question}<br />
-                <span className="ml-4">Expected: <strong>{item.expected}</strong> | Detected: <strong>{item.detected}</strong></span>
+                <span className="font-semibold">Q{item.index}:</span>{" "}
+                {item.question}
+                <br />
+                <span className="ml-4">
+                  Expected: <strong>{item.expected}</strong> | Detected:{" "}
+                  <strong>{item.detected}</strong>
+                </span>
               </li>
             ))}
           </ul>
@@ -301,38 +355,57 @@ const BulkUpload = ({ setQuestions, organizationId }) => {
 
       {/* Format Guidelines */}
       <div
-
-
-
-        className={` rounded-lg p-4 text-sm space-y-2   ${theme == 'light' ? "bg-yellow-50 border border-yellow-300  text-gray-700" : "bg-gray-600 border text-gray-100 "} `}
-
+        className={` rounded-lg p-4 text-sm space-y-2   ${
+          theme == "light"
+            ? "bg-yellow-50 border border-yellow-300  text-gray-700"
+            : "bg-gray-600 border text-gray-100 "
+        } `}
       >
-        <p className={`font-semibold  ${theme == 'light' ? "text-orange-600" : "text-orange-500"} `}
-
-
-
-
-
-
-
-
-
-        >Excel File Format Requirements:</p>
+        <p
+          className={`font-semibold  ${
+            theme == "light" ? "text-orange-600" : "text-orange-500"
+          } `}
+        >
+          Excel File Format Requirements:
+        </p>
         <ul className="list-disc list-inside space-y-1">
-          <li>Required columns: <code>type</code>, <code>question_text</code></li>
-          <li>For MCQs: options as JSON array <code>["Option 1", "Option 2", ...]</code></li>
-          <li>Correct MCQ index: <code>correct_option</code> (0-based)</li>
-          <li>Optional: <code>subject</code>, <code>chapter</code>, <code>difficulty</code>, <code>marks</code></li>
-          <li>For Match the Following: use <code>left_items</code>, <code>right_items</code>, and <code>correct_pairs</code> (e.g., {"{\"1\":\"A\",\"2\":\"C\"}"})</li>
-          <li>For Comprehension: add <code>passage</code> as text, and <code>sub_question_ids</code> as JSON array</li>
+          <li>
+            Required columns: <code>type</code>, <code>question_text</code>
+          </li>
+          <li>
+            For MCQs: options as JSON array{" "}
+            <code>["Option 1", "Option 2", ...]</code>
+          </li>
+          <li>
+            Correct MCQ index: <code>correct_option</code> (0-based)
+          </li>
+          <li>
+            Optional: <code>subject</code>, <code>chapter</code>,{" "}
+            <code>difficulty</code>, <code>marks</code>
+          </li>
+          <li>
+            For Match the Following: use <code>left_items</code>,{" "}
+            <code>right_items</code>, and <code>correct_pairs</code> (e.g.,{" "}
+            {'{"1":"A","2":"C"}'})
+          </li>
+          <li>
+            For Comprehension: add <code>passage</code> as text, and{" "}
+            <code>sub_question_ids</code> as JSON array
+          </li>
         </ul>
       </div>
 
       {/* Sample Download */}
       <div className="space-y-2">
-        <p className={`font-semibold  ${theme == 'light' ? "text-gray-700" : "text-gray-300"} `}>Download the Excel file, fill in the questions, and upload it.</p>
+        <p
+          className={`font-semibold  ${
+            theme == "light" ? "text-gray-700" : "text-gray-300"
+          } `}
+        >
+          Download the Excel file, fill in the questions, and upload it.
+        </p>
         <button
-          onClick={generateSampleExcel}
+          onClick={handleDownloadSample}
           className="inline-flex items-center space-x-2 px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-lg shadow-md hover:from-indigo-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-200"
         >
           <Download className="w-4 h-4" />
@@ -340,9 +413,6 @@ const BulkUpload = ({ setQuestions, organizationId }) => {
         </button>
       </div>
     </div>
-
-
-
   );
 };
 
