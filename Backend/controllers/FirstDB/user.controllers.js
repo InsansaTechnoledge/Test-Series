@@ -39,6 +39,7 @@ export const registerUser = async (req, res) => {
 };
 
 export const updateUser = async (req, res) => {
+    
     const { userId, Data } = req.body;
   
     if (!userId) {

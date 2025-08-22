@@ -17,8 +17,8 @@ import {
   X,
   Check,
 } from "lucide-react";
-import { UpdateOrganizationData } from "../../../../../../utils/services/organizationService";
 import { useToast, ToastContainer } from "../../../../../../utils/Toaster";
+import { profileEdit } from "../../../../../../utils/services/authService";
 
 const YourPlanPage = () => {
   const { user } = useUser();
@@ -70,7 +70,7 @@ const YourPlanPage = () => {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const data = await UpdateOrganizationData(user._id, editData);
+      const data = await profileEdit(editData);
       setIsEditing(false);
       showToast("Organization details updated successfully!");
       console.log(data);

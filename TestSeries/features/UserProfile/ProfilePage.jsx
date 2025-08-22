@@ -17,8 +17,10 @@ import { useToast, ToastContainer } from "../../utils/Toaster";
 
 import { useNavigate, useParams } from "react-router-dom";
 import { updateStudentById } from "../../utils/services/studentService";
+import { UpdateUser } from "../../utils/services/userService";
 import { useTheme } from "../../hooks/useTheme";
 import BackButton from "../../features/constants/BackButton";
+import { profileEdit } from "../../utils/services/authService";
 
 const ProfilePage = () => {
   const { user } = useUser();
@@ -49,9 +51,8 @@ const ProfilePage = () => {
     e.preventDefault();
     console.log("Saving profile:", profile);
     try {
-      await updateStudentById(id, profile);
-
-      showToast("student updated successfully");
+      await profileEdit(profile);
+      showToast("Profile updated successfully", "success");
     } catch (e) {
       showToast("there was some error", "error");
     }

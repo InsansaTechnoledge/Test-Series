@@ -28,4 +28,7 @@ export const logout = async () => {
     return response.data;
 }
 
-
+export const profileEdit = async (data) => {
+    const response = await api.post(`/v1/auth/edit-profile`, data);
+    return response.data;
+}

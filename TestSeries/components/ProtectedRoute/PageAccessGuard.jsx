@@ -26,11 +26,13 @@ const PageAccessGuard = ({ children }) => {
       keyFromPageOrAction: null,
       location: location.pathname
     });
+    
     console.log("hasPlanAccess", hasPlanAccess);
 
 
     if (user.role === 'organization') {
       canAccess = hasPlanAccess;
+      if(location.pathname === '/institute/institute-subscription') canAccess = true;
       console.log("canAccess", canAccess);
       return (
         <PageAccessContext.Provider value={canAccess}>
