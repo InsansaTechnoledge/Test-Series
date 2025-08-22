@@ -1,21 +1,3 @@
-// import express from 'express';
-// import { checkAuth, instituteLogin, Logout, organizationLogin, studentLogin, UserLogin } from '../../../controllers/FirstDB/auth.cotrollers.js';
-// import { authenticateUserMiddleware ,authenticateOrganizationMiddleware, authenticateStudentMiddleware, authenticateInstituteMiddleware } from '../../../middleware/passport.middleware.js';
-// import { isLoggedInMiddleware } from '../../../middleware/isLoggedIn.middleware.js';
-// import { validateSessionMiddleware } from '../../../middleware/validateSessionMiddleware.middleware.js';
-// const router = express.Router();
-
-// router.post('/user-login',authenticateUserMiddleware, UserLogin);
-// // router.post('/org-login',authenticateOrganizationMiddleware,organizationLogin);
-// router.post('/institute-login',authenticateInstituteMiddleware,instituteLogin);
-// router.post('/student-login',authenticateStudentMiddleware,studentLogin);
-
-// router.get('/check-auth',isLoggedInMiddleware ,validateSessionMiddleware,checkAuth);
-// router.post('/logout',isLoggedInMiddleware,validateSessionMiddleware,Logout);
-
-// export default router;
-
-// routes/FirstDB/auth.routes.js
 import express from 'express';
 import passport from '../../../utils/PassportAuth/Passport.js';
 import { Organization } from '../../../models/FirstDB/organization.model.js';
@@ -26,6 +8,7 @@ import { APIResponse } from '../../../utils/ResponseAndError/ApiResponse.utils.j
 import { isLoggedInMiddleware } from '../../../middleware/isLoggedIn.middleware.js';
 import { validateSessionMiddleware } from '../../../middleware/validateSessionMiddleware.middleware.js';
 import { sessionStore } from '../../../config/express.config.js';
+import { profileEdit } from '../../../controllers/FirstDB/auth.cotrollers.js';
 
 const router = express.Router();
 
@@ -174,5 +157,7 @@ router.post('/logout', isLoggedInMiddleware, validateSessionMiddleware, async (r
     return new APIError(err?.status || 500, ['Logout failed', err.message || '']).send(res);
   }
 });
+
+router.post('/edit-profile', isLoggedInMiddleware, validateSessionMiddleware, profileEdit);
 
 export default router;
