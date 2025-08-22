@@ -11,7 +11,7 @@ import QuestionsCard from './components/QuestionsCard';
 import { useCachedBatches } from '../../../hooks/useCachedBatches';
 import { useCachedStudents } from '../../../hooks/useCachedStudents';
 import { useExamManagement } from '../../../hooks/UseExam';
-import { useCachedResultExamData } from './components/useResultExamData';
+import { useCachedResultExamData } from '../../../hooks/useResultExamData';
 import { saveDescriptiveResponse } from '../../../utils/services/resultService';
 import { useQueryClient } from '@tanstack/react-query';
 import { publishExamResults } from '../../../utils/services/examService';
@@ -52,7 +52,6 @@ const EvaluateExamPaper = () => {
 
   // Initialize local state when data changes
   useEffect(() => {
-    console.log("🎀🎀🎀🎀🎀🎀🎀🎀🎀🎀🎀🎀🎀🎀🎀🎀🎀🎀🎀🎀🎀🎀🎀🎀")
     if (studentResultMap && Object.keys(studentResultMap).length > 0) {
       setLocalStudentResultMap(prev => {
         const newMap = { ...prev };
@@ -151,7 +150,7 @@ const EvaluateExamPaper = () => {
       const updatedMap = { ...prevMap };
       const studentData = updatedMap[selectedStudent._id];
 
-      if (studentData) {
+      if (studentData) {        
         const responseIndex = studentData.descriptiveResponses?.findIndex(
           r => r.questionId === questionId
         );

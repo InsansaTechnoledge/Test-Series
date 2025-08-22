@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { useUser } from "../../../../contexts/currentUserContext";
-import { getResultDetail } from "../../../../utils/services/resultPage";
+import { useUser } from "../contexts/currentUserContext";
+import { getResultDetail } from "../utils/services/resultPage";
 
 export const useCachedResultExamData = (examId, forAllStudents,resultId) => {
     const { user } = useUser();

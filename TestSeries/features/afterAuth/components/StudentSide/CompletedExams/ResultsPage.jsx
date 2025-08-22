@@ -6,9 +6,9 @@ import { useNavigate } from 'react-router-dom'
 import useStudentExamResults from './useExamResults'
 import { useUser } from '../../../../../contexts/currentUserContext'
 import { useTheme } from '../../../../../hooks/useTheme'
-import StatisticsCards from './components/StatisticCards'
-import FiltersSection from './components/FilterSection'
-import ResultsTable from './components/ResultTable'
+import StatisticsCards from './ResultsComponents/StatisticCards'
+import FiltersSection from './ResultsComponents/FilterSection'
+import ResultsTable from './ResultsComponents/ResultTable'
 
 const ResultsPage = () => {
     const { user } = useUser()
