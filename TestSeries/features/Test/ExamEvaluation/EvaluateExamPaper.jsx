@@ -24,19 +24,19 @@ const EvaluateExamPaper = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [navigationPath, setNavigationPath] = useState(['Batches']);
-  
+
   // New state for result management
   const [localStudentResultMap, setLocalStudentResultMap] = useState({});
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showLockWarning, setShowLockWarning] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState(null);
-  
+
   const { batchMap } = useCachedBatches();
   const { students } = useCachedStudents(user.role === 'user' ? selectedBatch?.id : null);
   const { exams } = useExamManagement();
   const { data } = useCachedResultExamData(selectedExam?.id, true, null);
   const questions = data?.questions;
-const studentResultMap = useMemo (() => {
+  const studentResultMap = useMemo(() => {
     return Object.fromEntries(
       (data?.results || []).map((r) => [r.studentId, r])
     );
@@ -44,11 +44,11 @@ const studentResultMap = useMemo (() => {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-  console.log("Exam Data:", data);
-  console.log("Students:", students);
-  console.log("Questions:", questions);
-}, [data, students, questions]);
-  
+    console.log("Exam Data:", data);
+    console.log("Students:", students);
+    console.log("Questions:", questions);
+  }, [data, students, questions]);
+
 
   // Initialize local state when data changes
   useEffect(() => {
@@ -81,7 +81,7 @@ const studentResultMap = useMemo (() => {
       setShowLockWarning(true);
       return;
     }
-    
+
     setSelectedBatch(batch);
     setCurrentView('exams');
     setNavigationPath(['Batches', batch.name]);
@@ -97,7 +97,7 @@ const studentResultMap = useMemo (() => {
       setShowLockWarning(true);
       return;
     }
-    
+
     setSelectedExam(exam);
     setCurrentView('students');
     setNavigationPath(['Batches', selectedBatch.name, exam.name]);
@@ -113,7 +113,7 @@ const studentResultMap = useMemo (() => {
       setShowLockWarning(true);
       return;
     }
-    
+
     setSelectedStudent(student);
     setCurrentView('questions');
     setNavigationPath(['Batches', selectedBatch.name, selectedExam.name, student.name]);
@@ -135,7 +135,7 @@ const studentResultMap = useMemo (() => {
       setShowLockWarning(true);
       return;
     }
-    
+
     const views = ['batches', 'exams', 'students', 'questions', 'evaluate'];
     setCurrentView(views[index]);
     setNavigationPath(navigationPath.slice(0, index + 1));
@@ -144,23 +144,23 @@ const studentResultMap = useMemo (() => {
   // Enhanced handleSave with local state management
   const handleSave = async (questionId, marks, feedback) => {
     console.log('Saving marks for question:', questionId, marks, feedback);
-    
+
     if (!selectedStudent) return;
-    
+
     setLocalStudentResultMap(prevMap => {
       const updatedMap = { ...prevMap };
       const studentData = updatedMap[selectedStudent._id];
-      
+
       if (studentData) {
         const responseIndex = studentData.descriptiveResponses?.findIndex(
           r => r.questionId === questionId
         );
-        
+
         if (responseIndex !== -1) {
           updatedMap[selectedStudent._id] = {
             ...studentData,
-            descriptiveResponses: studentData.descriptiveResponses.map((response, index) => 
-              index === responseIndex 
+            descriptiveResponses: studentData.descriptiveResponses.map((response, index) =>
+              index === responseIndex
                 ? { ...response, obtainedMarks: parseInt(marks) || 0, feedback: feedback || '' }
                 : response
             ),
@@ -169,12 +169,12 @@ const studentResultMap = useMemo (() => {
           };
         }
       }
-      
+
       return updatedMap;
     });
 
     setHasUnsavedChanges(true);
-    
+
     // Navigate back to questions list
     setCurrentView('questions');
     setNavigationPath(navigationPath.slice(0, -1));
@@ -184,7 +184,7 @@ const studentResultMap = useMemo (() => {
   const handleLockResult = async (studentId) => {
     try {
       const studentData = localStudentResultMap[studentId];
-      
+
       if (!studentData) {
         alert('Student data not found');
         return;
@@ -210,10 +210,10 @@ const studentResultMap = useMemo (() => {
 
       // Save to backend
       const response = await saveDescriptiveResponse(dataToSave);
-      
+
       if (response.status === 200) {
         console.log("Result locked successfully");
-        
+
         // Update local state
         setLocalStudentResultMap(prevMap => ({
           ...prevMap,
@@ -233,7 +233,7 @@ const studentResultMap = useMemo (() => {
 
         // Invalidate query to refresh data
         queryClient.invalidateQueries({ queryKey: ['resultExamData', selectedExam.id] });
-        
+
         alert('Student result locked successfully!');
       }
     } catch (error) {
@@ -249,7 +249,7 @@ const studentResultMap = useMemo (() => {
       setLocalStudentResultMap(prevMap => {
         const updatedMap = { ...prevMap };
         const studentData = updatedMap[selectedStudent._id];
-        
+
         if (studentData && studentData.hasUnsavedChanges) {
           // Reset to original state
           const originalData = studentResultMap[selectedStudent._id];
@@ -259,14 +259,14 @@ const studentResultMap = useMemo (() => {
             isLocked: originalData?.evaluated || false
           };
         }
-        
+
         return updatedMap;
       });
     }
-    
+
     setHasUnsavedChanges(false);
     setShowLockWarning(false);
-    
+
     // Execute pending navigation
     if (pendingNavigation) {
       pendingNavigation();
@@ -278,7 +278,7 @@ const studentResultMap = useMemo (() => {
     if (selectedStudent) {
       await handleLockResult(selectedStudent._id);
       setShowLockWarning(false);
-      
+
       // Execute pending navigation
       if (pendingNavigation) {
         pendingNavigation();
@@ -291,20 +291,20 @@ const studentResultMap = useMemo (() => {
   const getStudentStatus = (studentId) => {
     const localData = localStudentResultMap[studentId];
     if (!localData) return 'not-started';
-    
+
     if (localData.isLocked) return 'locked';
     if (localData.hasUnsavedChanges) return 'unsaved-changes';
-    
+
     return 'in-progress';
   };
 
   // Get unsaved changes count
   const getUnsavedChangesCount = () => {
     if (!selectedStudent || !hasUnsavedChanges) return 0;
-    
+
     const studentData = localStudentResultMap[selectedStudent._id];
     if (!studentData) return 0;
-    
+
     return studentData.descriptiveResponses?.filter(
       response => response.obtainedMarks !== null && response.obtainedMarks !== undefined
     ).length || 0;
@@ -312,22 +312,20 @@ const studentResultMap = useMemo (() => {
 
 
   const handlePublishResult = async () => {
-      try{
-        const response = await publishExamResults(selectedExam.id);
-        if (response.status === 200) {
-          alert('Exam results published successfully!');
-        }
-        // Invalidate queries to refresh data
-        queryClient.invalidateQueries({ queryKey: ['exams', user._id] });
-        setCurrentView('exams');
-        setNavigationPath(navigationPath.slice(0, -1));
-
-      }catch(error){
-        console.error('Error publishing exam results:', error);
-        alert('Error publishing exam results. Please try again.');
+    try {
+      const response = await publishExamResults(selectedExam.id);
+      if (response.status === 200) {
+        alert('Exam results published successfully!');
       }
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['exams', user._id] });
+      setCurrentView('exams');
+      setNavigationPath(navigationPath.slice(0, -1));
 
-
+    } catch (error) {
+      console.error('Error publishing exam results:', error);
+      alert('Error publishing exam results. Please try again.');
+    }
 
   }
 
@@ -344,8 +342,8 @@ const studentResultMap = useMemo (() => {
           <NavigationBreadcrumb path={navigationPath} onNavigate={handleNavigate} />
         )}
 
-   
-        
+
+
 
         {/* Warning Modal */}
         {showLockWarning && (
@@ -355,12 +353,12 @@ const studentResultMap = useMemo (() => {
                 <AlertTriangle className="w-6 h-6 text-yellow-500 mr-3" />
                 <h3 className="text-lg font-semibold">Unsaved Changes</h3>
               </div>
-              
+
               <p className="text-gray-600 mb-6">
-                You have unsaved changes for {selectedStudent?.name}. If you navigate away without locking the result, 
+                You have unsaved changes for {selectedStudent?.name}. If you navigate away without locking the result,
                 all changes will be lost.
               </p>
-              
+
               <div className="flex space-x-3">
                 <button
                   onClick={() => {
@@ -412,7 +410,6 @@ const studentResultMap = useMemo (() => {
 
         {currentView === 'exams' && selectedBatch && (
           <div>
-            {console.log("Selected exams 🥳🥳🥳🥳🥳🥳🥳",exams)}
             <h2 className="text-xl font-semibold text-gray-900 mb-6">Select Exam</h2>
             <div className="space-y-4">
               {exams?.map(exam => (
@@ -435,10 +432,10 @@ const studentResultMap = useMemo (() => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
               {students?.map(student => (
-                <StudentCard 
-                  key={student._id} 
-                  student={student} 
-                  onSelect={handleStudentSelect} 
+                <StudentCard
+                  key={student._id}
+                  student={student}
+                  onSelect={handleStudentSelect}
                   result={localStudentResultMap[student._id] || studentResultMap[student._id]}
                   status={getStudentStatus(student._id)}
                 />

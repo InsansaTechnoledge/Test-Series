@@ -278,34 +278,38 @@ const Navbar = ({setShowLogoutModal}) => {
           {/* Left side - Logo */}
           <button 
             onClick={() => helperFunctionToNavigateHome(user?.role)}
-            className="flex items-center cursor-pointer">
-            
-            {
-              user?.role === 'organization' ? (
-                <img 
-                src={ theme === 'light' ? logo : logoDark} 
-                alt="Evalvo" 
-                className="h-8 w-auto"
+            className="flex items-center cursor-pointer"
+          >
+            {user?.role === 'organization' ? (
+              // App logo: keep height fixed, let width auto, never crop
+              <img
+                src={theme === 'light' ? logo : logoDark}
+                alt="Evalvo"
+                className="h-8 w-auto max-h-8 object-contain"
               />
-              ) : (
-                <div className="flex items-center gap-4 px-4 py-2 rounded-xl ">
+            ) : (
+              <div className="flex items-center gap-4 px-4 py-2 rounded-xl">
+                {/* Logo container keeps a square and prevents cropping */}
+                <div className="h-12 w-12 rounded-full bg-white ring-1 ring-black/20 overflow-hidden flex items-center justify-center">
                   <img
-                    className="h-12 w-12 rounded-full object-cover border-2 shadow-sm"
                     src={orgLogo}
                     alt="Organization Logo"
+                    className="h-full w-full p-1 object-contain"    
+                    loading="lazy"
                   />
-                  <span
-                    className={`text-xl font-bold tracking-wide ${
-                      theme === 'light' ? 'text-gray-800' : 'text-white'
-                    }`}
-                  >
-                    {organizationName}
-                  </span>
                 </div>
-              )
-            }
-           
+
+                <span
+                  className={`text-xl font-bold tracking-wide ${
+                    theme === 'light' ? 'text-gray-800' : 'text-white'
+                  }`}
+                >
+                  {organizationName}
+                </span>
+              </div>
+            )}
           </button>
+
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4">

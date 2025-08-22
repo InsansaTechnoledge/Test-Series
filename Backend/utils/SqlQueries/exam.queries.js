@@ -103,7 +103,7 @@ export const fetchExamNameById = async (examId) => {
 export const fetchExamNames = async (batch_id) => {
   const { data, error } = await supabase
     .from("batch_exam")
-    .select("name, id")
+    .select("name, id, exam_type, status")
     .eq("batch_id", batch_id);
 
   if (error) throw error;
