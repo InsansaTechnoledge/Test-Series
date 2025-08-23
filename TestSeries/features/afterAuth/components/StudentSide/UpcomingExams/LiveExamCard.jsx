@@ -4,7 +4,7 @@ import ExamBadge from './ExamBadge';
 const LiveExamCard = ({ liveExams, proctorStatus , currentExamId , theme , handleStartTest , canStartExam , getStartButtonConfig , isAiProctored , isElectronEnv}) => {
 
     return (
-        <section className="mb-20">
+        <section className="mb-20 border-gray-200 border-2 py-4 px-4 rounded-4xl">
         <div className="mb-12">
           <HeadingUtil 
             heading="Live Exams" 

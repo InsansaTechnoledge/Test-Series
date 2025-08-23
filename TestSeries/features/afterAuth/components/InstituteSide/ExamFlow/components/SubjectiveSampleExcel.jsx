@@ -18,7 +18,8 @@ export const SubjectiveSampleExcel = () => {
     {
       type: "descriptive",
       question_text: "Explain the theory of relativity.",
-      word_limits: 200,
+      min_words: 0,
+      max_words: 200,    
       bloom_level: "understand",
     },
   ];

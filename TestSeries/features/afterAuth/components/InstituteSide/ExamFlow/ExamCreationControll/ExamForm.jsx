@@ -100,12 +100,12 @@ const ExamForm = ({
   return (
     <div className="min-h-screen p-6">
       <div className="mx-auto">
-        {/* <PendingExamHeader
+        <PendingExamHeader
           theme={theme}
           pendingExams={pendingExams}
           setShowDeleteModal={setShowDeleteModal}
           showDeleteModal={showDeleteModal}
-        /> */}
+        />
 
         {/* Exam Creation Form */}
         <NewExamMetaDataForm

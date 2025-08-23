@@ -6,7 +6,7 @@ import ExamBadge from './ExamBadge';
 const UpcomingExamCard = ({ upcomingExams , theme , isAiProctored , isElectronEnv}) => {
     
     return (
-        <section className="mb-20">
+        <section className="mb-20 border-gray-200 border-2 py-4 px-4 rounded-4xl">
             <div className="mb-12">
                 <HeadingUtil 
                     heading="Upcoming Exams" 

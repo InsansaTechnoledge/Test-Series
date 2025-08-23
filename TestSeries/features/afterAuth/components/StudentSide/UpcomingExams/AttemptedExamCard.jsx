@@ -4,7 +4,7 @@ import HeadingUtil from '../../../utility/HeadingUtil'
 
 const AttemptedExamCard = ({attemptedExams , currentExamId , proctorStatus , isAiProctored , isElectronEnv , theme , handleNavigateToResult , canStartExam , getStartButtonConfig}) => {
   return (
-    <section className="mb-20 mt-12">
+    <section className="mb-20 mt-12 border-gray-200 border-2 py-4 px-4 rounded-4xl">
       <div className="mb-12">
         <HeadingUtil 
           heading="Attempted Exams" 

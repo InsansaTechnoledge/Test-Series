@@ -13,10 +13,18 @@ const PendingExamComponent = ({form , theme , pendingLoading , pendingExams , ba
   const allowedSet = useMemo(() => new Set(AllowedBatched), [AllowedBatched]);
   // console.log("batch array"  , allowedSet);
 
-  const PendingExamToShow = useMemo(
-    () => pendingExams.filter(exam => typeof exam?.batch_id === "string" && allowedSet.has(exam.batch_id)),
-    [pendingExams, allowedSet]
-  );
+  const PendingExamToShow = useMemo(() => {
+    // If role is not 'user', just return all pending exams
+    if (user?.role !== 'user') {
+      return pendingExams;
+    }
+  
+    // Otherwise, filter by allowedSet
+    return pendingExams.filter(
+      exam => typeof exam?.batch_id === "string" && allowedSet.has(exam.batch_id)
+    );
+  }, [user?.role, pendingExams, allowedSet]);
+  
   // console.log("pending" , PendingExamToShow);
 
 
