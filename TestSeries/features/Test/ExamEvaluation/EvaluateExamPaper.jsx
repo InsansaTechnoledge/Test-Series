@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { useUser } from "../../../contexts/currentUserContext";
 import { ChevronRight, ChevronLeft, Users, FileText, CheckCircle, Clock, Award, Eye, Lock, Save, AlertTriangle } from 'lucide-react';
@@ -46,6 +45,32 @@ const EvaluateExamPaper = () => {
   }, [data?.results]);
   const queryClient = useQueryClient();
 
+  // Helper function to calculate total marks for descriptive questions
+  const calculateDescriptiveMarks = (descriptiveResponses) => {
+    if (!descriptiveResponses || descriptiveResponses.length === 0) {
+      return 0;
+    }
+    
+    return descriptiveResponses.reduce((total, response) => {
+      const marks = parseInt(response.obtainedMarks) || 0;
+      return total + marks;
+    }, 0);
+  };
+
+  // Helper function to calculate total result marks
+  const calculateTotalResultMarks = (studentData) => {
+    if (!studentData) return 0;
+
+    // Get marks from MCQ/objective questions (if any)
+    const objectiveMarks = studentData.marks || 0;
+    
+    // Get marks from descriptive questions
+    const descriptiveMarks = calculateDescriptiveMarks(studentData.descriptiveResponses);
+    
+    // Return total marks
+    return objectiveMarks + descriptiveMarks;
+  };
+
   // Initialize local state when data changes
   useEffect(() => {
     if (studentResultMap && Object.keys(studentResultMap).length > 0) {
@@ -53,11 +78,14 @@ const EvaluateExamPaper = () => {
         const newMap = { ...prev };
         Object.keys(studentResultMap).forEach(studentId => {
           if (!newMap[studentId]) {
+            const originalData = studentResultMap[studentId];
             newMap[studentId] = {
-              ...studentResultMap[studentId],
+              ...originalData,
               hasUnsavedChanges: false,
-              isLocked: studentResultMap[studentId].evaluated || false,
-              lastModified: null
+              isLocked: originalData.evaluated || false,
+              lastModified: null,
+              // Ensure total marks are calculated correctly
+              totalMarks: calculateTotalResultMarks(originalData)
             };
           }
         });
@@ -136,7 +164,7 @@ const EvaluateExamPaper = () => {
     setNavigationPath(navigationPath.slice(0, index + 1));
   };
 
-  // Enhanced handleSave with local state management
+  // Enhanced handleSave with local state management and total marks calculation
   const handleSave = async (questionId, marks, feedback) => {
     console.log('Saving marks for question:', questionId, marks, feedback);
 
@@ -152,16 +180,27 @@ const EvaluateExamPaper = () => {
         );
 
         if (responseIndex !== -1) {
+          // Update descriptive response
+          const updatedDescriptiveResponses = studentData.descriptiveResponses.map((response, index) =>
+            index === responseIndex
+              ? { ...response, obtainedMarks: parseInt(marks) || 0, feedback: feedback || '' }
+              : response
+          );
+
+          // Calculate new total marks
+          const objectiveMarks = studentData.marks || 0;
+          const descriptiveMarks = calculateDescriptiveMarks(updatedDescriptiveResponses);
+          const newTotalMarks = objectiveMarks + descriptiveMarks;
+
           updatedMap[selectedStudent._id] = {
             ...studentData,
-            descriptiveResponses: studentData.descriptiveResponses.map((response, index) =>
-              index === responseIndex
-                ? { ...response, obtainedMarks: parseInt(marks) || 0, feedback: feedback || '' }
-                : response
-            ),
+            descriptiveResponses: updatedDescriptiveResponses,
+            totalMarks: newTotalMarks,
             hasUnsavedChanges: true,
             lastModified: new Date().toISOString()
           };
+
+          console.log('Updated total marks:', newTotalMarks, 'Objective:', objectiveMarks, 'Descriptive:', descriptiveMarks);
         }
       }
 
@@ -175,7 +214,7 @@ const EvaluateExamPaper = () => {
     setNavigationPath(navigationPath.slice(0, -1));
   };
 
-  // Lock student result
+  // Lock student result with updated total marks
   const handleLockResult = async (studentId) => {
     try {
       const studentData = localStudentResultMap[studentId];
@@ -197,23 +236,35 @@ const EvaluateExamPaper = () => {
         return;
       }
 
-      // Prepare data for saving
+      // Calculate final total marks
+      const objectiveMarks = studentData.marks || 0;
+      const descriptiveMarks = calculateDescriptiveMarks(studentData.descriptiveResponses);
+      const finalTotalMarks = objectiveMarks + descriptiveMarks;
+
+      // Prepare data for saving with updated total marks
       const dataToSave = {
         ...studentData,
-        evaluated: true
+        marks: finalTotalMarks, // Update the main marks field with total
+        totalMarks: finalTotalMarks,
+        evaluated: true,
+        lockedAt: new Date().toISOString()
       };
+
+      console.log('Saving final result with total marks:', finalTotalMarks);
 
       // Save to backend
       const response = await saveDescriptiveResponse(dataToSave);
 
       if (response.status === 200) {
-        console.log("Result locked successfully");
+        console.log("Result locked successfully with total marks:", finalTotalMarks);
 
         // Update local state
         setLocalStudentResultMap(prevMap => ({
           ...prevMap,
           [studentId]: {
             ...prevMap[studentId],
+            marks: finalTotalMarks, // Update marks field
+            totalMarks: finalTotalMarks,
             isLocked: true,
             hasUnsavedChanges: false,
             evaluated: true,
@@ -229,7 +280,7 @@ const EvaluateExamPaper = () => {
         // Invalidate query to refresh data
         queryClient.invalidateQueries({ queryKey: ['resultExamData', selectedExam.id] });
 
-        alert('Student result locked successfully!');
+        alert(`Student result locked successfully! Total marks: ${finalTotalMarks}`);
       }
     } catch (error) {
       console.error('Error locking student result:', error);
@@ -251,7 +302,8 @@ const EvaluateExamPaper = () => {
           updatedMap[selectedStudent._id] = {
             ...originalData,
             hasUnsavedChanges: false,
-            isLocked: originalData?.evaluated || false
+            isLocked: originalData?.evaluated || false,
+            totalMarks: calculateTotalResultMarks(originalData)
           };
         }
 
