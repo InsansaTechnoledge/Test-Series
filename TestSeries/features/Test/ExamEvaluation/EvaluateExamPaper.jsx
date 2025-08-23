@@ -11,10 +11,11 @@ import QuestionsCard from './components/QuestionsCard';
 import { useCachedBatches } from '../../../hooks/useCachedBatches';
 import { useCachedStudents } from '../../../hooks/useCachedStudents';
 import { useExamManagement } from '../../../hooks/UseExam';
-import { useCachedResultExamData } from './components/useResultExamData';
+import { useCachedResultExamData } from '../../../hooks/useResultExamData';
 import { saveDescriptiveResponse } from '../../../utils/services/resultService';
 import { useQueryClient } from '@tanstack/react-query';
 import { publishExamResults } from '../../../utils/services/examService';
+import { useTheme } from '../../../hooks/useTheme';
 
 const EvaluateExamPaper = () => {
   const { user } = useUser();
@@ -24,6 +25,7 @@ const EvaluateExamPaper = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [navigationPath, setNavigationPath] = useState(['Batches']);
+  const { theme } = useTheme();
 
   // New state for result management
   const [localStudentResultMap, setLocalStudentResultMap] = useState({});
@@ -43,26 +45,47 @@ const EvaluateExamPaper = () => {
   }, [data?.results]);
   const queryClient = useQueryClient();
 
-  useEffect(() => {
-    console.log("Exam Data:", data);
-    console.log("Students:", students);
-    console.log("Questions:", questions);
-  }, [data, students, questions]);
+  // Helper function to calculate total marks for descriptive questions
+  const calculateDescriptiveMarks = (descriptiveResponses) => {
+    if (!descriptiveResponses || descriptiveResponses.length === 0) {
+      return 0;
+    }
+    
+    return descriptiveResponses.reduce((total, response) => {
+      const marks = parseInt(response.obtainedMarks) || 0;
+      return total + marks;
+    }, 0);
+  };
 
+  // Helper function to calculate total result marks
+  const calculateTotalResultMarks = (studentData) => {
+    if (!studentData) return 0;
+
+    // Get marks from MCQ/objective questions (if any)
+    const objectiveMarks = studentData.marks || 0;
+    
+    // Get marks from descriptive questions
+    const descriptiveMarks = calculateDescriptiveMarks(studentData.descriptiveResponses);
+    
+    // Return total marks
+    return objectiveMarks + descriptiveMarks;
+  };
 
   // Initialize local state when data changes
   useEffect(() => {
-    console.log("🎀🎀🎀🎀🎀🎀🎀🎀🎀🎀🎀🎀🎀🎀🎀🎀🎀🎀🎀🎀🎀🎀🎀🎀")
     if (studentResultMap && Object.keys(studentResultMap).length > 0) {
       setLocalStudentResultMap(prev => {
         const newMap = { ...prev };
         Object.keys(studentResultMap).forEach(studentId => {
           if (!newMap[studentId]) {
+            const originalData = studentResultMap[studentId];
             newMap[studentId] = {
-              ...studentResultMap[studentId],
+              ...originalData,
               hasUnsavedChanges: false,
-              isLocked: studentResultMap[studentId].evaluated || false,
-              lastModified: null
+              isLocked: originalData.evaluated || false,
+              lastModified: null,
+              // Ensure total marks are calculated correctly
+              totalMarks: calculateTotalResultMarks(originalData)
             };
           }
         });
@@ -141,7 +164,7 @@ const EvaluateExamPaper = () => {
     setNavigationPath(navigationPath.slice(0, index + 1));
   };
 
-  // Enhanced handleSave with local state management
+  // Enhanced handleSave with local state management and total marks calculation
   const handleSave = async (questionId, marks, feedback) => {
     console.log('Saving marks for question:', questionId, marks, feedback);
 
@@ -151,22 +174,33 @@ const EvaluateExamPaper = () => {
       const updatedMap = { ...prevMap };
       const studentData = updatedMap[selectedStudent._id];
 
-      if (studentData) {
+      if (studentData) {        
         const responseIndex = studentData.descriptiveResponses?.findIndex(
           r => r.questionId === questionId
         );
 
         if (responseIndex !== -1) {
+          // Update descriptive response
+          const updatedDescriptiveResponses = studentData.descriptiveResponses.map((response, index) =>
+            index === responseIndex
+              ? { ...response, obtainedMarks: parseInt(marks) || 0, feedback: feedback || '' }
+              : response
+          );
+
+          // Calculate new total marks
+          const objectiveMarks = studentData.marks || 0;
+          const descriptiveMarks = calculateDescriptiveMarks(updatedDescriptiveResponses);
+          const newTotalMarks = objectiveMarks + descriptiveMarks;
+
           updatedMap[selectedStudent._id] = {
             ...studentData,
-            descriptiveResponses: studentData.descriptiveResponses.map((response, index) =>
-              index === responseIndex
-                ? { ...response, obtainedMarks: parseInt(marks) || 0, feedback: feedback || '' }
-                : response
-            ),
+            descriptiveResponses: updatedDescriptiveResponses,
+            totalMarks: newTotalMarks,
             hasUnsavedChanges: true,
             lastModified: new Date().toISOString()
           };
+
+          console.log('Updated total marks:', newTotalMarks, 'Objective:', objectiveMarks, 'Descriptive:', descriptiveMarks);
         }
       }
 
@@ -180,7 +214,7 @@ const EvaluateExamPaper = () => {
     setNavigationPath(navigationPath.slice(0, -1));
   };
 
-  // Lock student result
+  // Lock student result with updated total marks
   const handleLockResult = async (studentId) => {
     try {
       const studentData = localStudentResultMap[studentId];
@@ -202,23 +236,35 @@ const EvaluateExamPaper = () => {
         return;
       }
 
-      // Prepare data for saving
+      // Calculate final total marks
+      const objectiveMarks = studentData.marks || 0;
+      const descriptiveMarks = calculateDescriptiveMarks(studentData.descriptiveResponses);
+      const finalTotalMarks = objectiveMarks + descriptiveMarks;
+
+      // Prepare data for saving with updated total marks
       const dataToSave = {
         ...studentData,
-        evaluated: true
+        marks: finalTotalMarks, // Update the main marks field with total
+        totalMarks: finalTotalMarks,
+        evaluated: true,
+        lockedAt: new Date().toISOString()
       };
+
+      console.log('Saving final result with total marks:', finalTotalMarks);
 
       // Save to backend
       const response = await saveDescriptiveResponse(dataToSave);
 
       if (response.status === 200) {
-        console.log("Result locked successfully");
+        console.log("Result locked successfully with total marks:", finalTotalMarks);
 
         // Update local state
         setLocalStudentResultMap(prevMap => ({
           ...prevMap,
           [studentId]: {
             ...prevMap[studentId],
+            marks: finalTotalMarks, // Update marks field
+            totalMarks: finalTotalMarks,
             isLocked: true,
             hasUnsavedChanges: false,
             evaluated: true,
@@ -234,7 +280,7 @@ const EvaluateExamPaper = () => {
         // Invalidate query to refresh data
         queryClient.invalidateQueries({ queryKey: ['resultExamData', selectedExam.id] });
 
-        alert('Student result locked successfully!');
+        alert(`Student result locked successfully! Total marks: ${finalTotalMarks}`);
       }
     } catch (error) {
       console.error('Error locking student result:', error);
@@ -256,7 +302,8 @@ const EvaluateExamPaper = () => {
           updatedMap[selectedStudent._id] = {
             ...originalData,
             hasUnsavedChanges: false,
-            isLocked: originalData?.evaluated || false
+            isLocked: originalData?.evaluated || false,
+            totalMarks: calculateTotalResultMarks(originalData)
           };
         }
 
@@ -310,7 +357,6 @@ const EvaluateExamPaper = () => {
     ).length || 0;
   };
 
-
   const handlePublishResult = async () => {
     try {
       const response = await publishExamResults(selectedExam.id);
@@ -326,35 +372,34 @@ const EvaluateExamPaper = () => {
       console.error('Error publishing exam results:', error);
       alert('Error publishing exam results. Please try again.');
     }
-
   }
 
-
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'} p-6 transition-colors duration-200`}>
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Exam Paper Evaluation</h1>
-          <p className="text-gray-600 mt-2">Evaluate student submissions and publish results</p>
+          <h1 className={`text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+            Exam Paper Evaluation
+          </h1>
+          <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} mt-2`}>
+            Evaluate student submissions and publish results
+          </p>
         </div>
 
         {currentView !== 'batches' && (
-          <NavigationBreadcrumb path={navigationPath} onNavigate={handleNavigate} />
+          <NavigationBreadcrumb path={navigationPath} onNavigate={handleNavigate} theme={theme} />
         )}
-
-
-
 
         {/* Warning Modal */}
         {showLockWarning && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 max-w-md mx-4">
+            <div className={`${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'} rounded-lg p-6 max-w-md mx-4 shadow-2xl`}>
               <div className="flex items-center mb-4">
                 <AlertTriangle className="w-6 h-6 text-yellow-500 mr-3" />
                 <h3 className="text-lg font-semibold">Unsaved Changes</h3>
               </div>
 
-              <p className="text-gray-600 mb-6">
+              <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} mb-6`}>
                 You have unsaved changes for {selectedStudent?.name}. If you navigate away without locking the result,
                 all changes will be lost.
               </p>
@@ -365,19 +410,23 @@ const EvaluateExamPaper = () => {
                     setShowLockWarning(false);
                     setPendingNavigation(null);
                   }}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                  className={`flex-1 px-4 py-2 border rounded-lg transition-colors ${
+                    theme === 'dark' 
+                      ? 'border-gray-600 hover:bg-gray-700 text-gray-300' 
+                      : 'border-gray-300 hover:bg-gray-50 text-gray-700'
+                  }`}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleLockAndContinue}
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   Lock & Continue
                 </button>
                 <button
                   onClick={handleConfirmNavigationWithoutLock}
-                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                 >
                   Discard Changes
                 </button>
@@ -388,7 +437,9 @@ const EvaluateExamPaper = () => {
 
         {currentView === 'batches' && (
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Select Batch</h2>
+            <h2 className={`text-xl font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'} mb-6`}>
+              Select Batch
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {Object.values(batchMap).map(batch => (
                 user.role === 'user' ?
@@ -396,12 +447,14 @@ const EvaluateExamPaper = () => {
                     key={batch.id}
                     batch={batch}
                     onSelect={handleBatchSelect}
+                    theme={theme}
                   />)
                   :
                   (<BatchCard
                     key={batch.id}
                     batch={batch}
                     onSelect={handleBatchSelect}
+                    theme={theme}
                   />)
               ))}
             </div>
@@ -410,11 +463,13 @@ const EvaluateExamPaper = () => {
 
         {currentView === 'exams' && selectedBatch && (
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Select Exam</h2>
+            <h2 className={`text-xl font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'} mb-6`}>
+              Select Exam
+            </h2>
             <div className="space-y-4">
               {exams?.map(exam => (
                 exam.batch_id === selectedBatch.id && (exam.exam_type === 'subjective' || exam.exam_type === 'semi_subjective') && (
-                  <ExamCard key={exam.id} exam={exam} onSelect={handleExamSelect} />
+                  <ExamCard key={exam.id} exam={exam} onSelect={handleExamSelect} theme={theme} />
                 )
               ))}
             </div>
@@ -424,8 +479,10 @@ const EvaluateExamPaper = () => {
         {currentView === 'students' && selectedExam && (
           <div>
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-gray-900">Student List</h2>
-              <button className="flex items-center text-blue-600 hover:text-blue-700">
+              <h2 className={`text-xl font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                Student List
+              </h2>
+              <button className={`flex items-center ${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'} transition-colors`}>
                 <Eye className="w-4 h-4 mr-1" />
                 View Overview
               </button>
@@ -438,6 +495,7 @@ const EvaluateExamPaper = () => {
                   onSelect={handleStudentSelect}
                   result={localStudentResultMap[student._id] || studentResultMap[student._id]}
                   status={getStudentStatus(student._id)}
+                  theme={theme}
                 />
               ))}
             </div>
@@ -446,6 +504,7 @@ const EvaluateExamPaper = () => {
               studentsData={data?.results || []}
               handlePublishResult={handlePublishResult}
               status={selectedExam?.status}
+              theme={theme}
             />
           </div>
         )}
@@ -460,6 +519,7 @@ const EvaluateExamPaper = () => {
             handleLockResult={handleLockResult}
             handleQuestionSelect={handleQuestionSelect}
             localStudentResultMap={localStudentResultMap}
+            theme={theme}
           />
         )}
 
@@ -471,6 +531,7 @@ const EvaluateExamPaper = () => {
               // This can be used for additional logic if needed
             }}
             onSave={handleSave}
+            theme={theme}
           />
         )}
       </div>

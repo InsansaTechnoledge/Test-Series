@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { useUser } from "../../../../contexts/currentUserContext";
-import { getResultDetail } from "../../../../utils/services/resultPage";
+import { useUser } from "../contexts/currentUserContext";
+import { getResultDetail } from "../utils/services/resultPage";
 
 export const useCachedResultExamData = (examId, forAllStudents,resultId) => {
     const { user } = useUser();
@@ -8,7 +8,6 @@ export const useCachedResultExamData = (examId, forAllStudents,resultId) => {
     const fetchExamData = async () => {
         try {
             const response = await getResultDetail(examId,forAllStudents,resultId);
-            console.log(response);
             if (response.status !== 200) {
                 throw new Error("Network response was not ok");
             }
