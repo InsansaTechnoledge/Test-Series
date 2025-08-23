@@ -3,8 +3,8 @@ import { QuestionHeader } from './QuestionsHeader';
 import { QuestionContent } from './QuestionContent';
 import { getQuestionResult } from './resultCalculator';
 
-export const QuestionCard = ({ question, index, userAnswers, isExpanded, onToggleExpand, theme }) => {
-  const result = getQuestionResult(question, userAnswers, theme);
+export const QuestionCard = ({ question, index, userAnswers, isExpanded, onToggleExpand, theme ,descriptiveResponses}) => {
+  const result = getQuestionResult(question, userAnswers, theme, descriptiveResponses);
 
   return (
     <div className={`${theme === "dark" ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"} rounded-2xl border shadow-sm hover:shadow-md transition-all duration-200`}>
@@ -26,6 +26,7 @@ export const QuestionCard = ({ question, index, userAnswers, isExpanded, onToggl
             userAnswers={userAnswers}
             result={result}
             theme={theme}
+            descriptiveResponses={descriptiveResponses}
           />
         </div>
       )}

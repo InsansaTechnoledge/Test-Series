@@ -1,11 +1,11 @@
-export const getQuestionResult = (question, userAnswers, theme) => {
+export const getQuestionResult = (question, userAnswers, theme, descriptiveResponses) => {
   if (question.type === "comprehension" && Array.isArray(question.sub_questions)) {
     let allAnswered = true;
     let allCorrect = true;
     let hasCorrect = false;
 
     question.sub_questions.forEach((subQ) => {
-      const subResult = getQuestionResult(subQ, userAnswers, theme);
+      const subResult = getQuestionResult(subQ, userAnswers, theme, descriptiveResponses);
       if (subResult.status === "unanswered") {
         allAnswered = false;
       } else if (subResult.status === "incorrect") {
@@ -64,6 +64,7 @@ export const getQuestionResult = (question, userAnswers, theme) => {
       class: theme === "dark" ? "bg-blue-900 text-blue-300" : "bg-blue-100 text-blue-800",
       label: "Descriptive Answer",
       icon: "📝",
+      marks: descriptiveResponses[question.id]?.obtainedMarks || 0,
     };
   }
 
@@ -123,7 +124,7 @@ export const getFilteredQuestions = (questions, userAnswers, searchTerm, filterT
     }
 
     const matchesType = filterType === "all" || q.type === filterType;
-    const result = getQuestionResult(q, userAnswers, theme);
+    const result = getQuestionResult(q, userAnswers, theme, q.descriptiveResponses || []);
     const matchesResult = filterResult === "all" ||
                          (filterResult === "correct" && result.status === "correct") ||
                          (filterResult === "incorrect" && (result.status === "incorrect" || result.status === "partial")) ||

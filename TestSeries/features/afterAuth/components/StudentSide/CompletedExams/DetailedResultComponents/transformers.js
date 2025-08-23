@@ -21,7 +21,7 @@ export const transformQuestions = (questions) => {
       passage: q.passage,
       sub_question_ids: q.sub_question_ids,
       // Added support for descriptive questions
-      descriptive_answer: q.descriptive_answer,
+      reference_answer: q.reference_answer,
       word_limit: q.word_limit,
       sample_answer: q.sample_answer,
     };

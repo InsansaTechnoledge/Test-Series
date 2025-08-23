@@ -36,6 +36,11 @@ const QuestionBadges = ({ question, result, theme }) => (
         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${theme === "dark" ? "bg-gray-800 text-gray-300 border-gray-600" : "bg-gray-100 text-gray-700 border-gray-200"} border`}>
             +{question.positive_marks} / -{question.negative_marks}
         </span>
+        {question.type === "descriptive" && (
+            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${theme === "dark" ? "bg-blue-900 text-blue-300 border-blue-700" : "bg-blue-100 text-blue-800 border-blue-200"} border`}>
+                Evaluated Marks:{result.marks}
+            </span>
+        )}
     </div>
 );
 
@@ -57,18 +62,7 @@ const QuestionMeta = ({ question, index, theme }) => (
     </div>
 );
 
-const QuestionPreview = ({ question, viewMode, isExpanded, theme }) => {
-    if (viewMode === "compact") {
-        return (
-            <div className={`${theme === "dark" ? "text-gray-400" : "text-gray-600"} text-sm`}>
-                {question.type === "comprehension"
-                    ? "Comprehension passage with multiple questions"
-                    : question.type === "descriptive"
-                        ? "Descriptive answer question"
-                        : question.question_text?.substring(0, 100) + (question.question_text?.length > 100 ? "..." : "")}
-            </div>
-        );
-    }
+const QuestionPreview = ({ question, isExpanded, theme }) => {
 
     return (
         <div className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"} mb-4`}>
@@ -93,21 +87,6 @@ const QuestionPreview = ({ question, viewMode, isExpanded, theme }) => {
                 </div>
             )}
 
-            {question.type === "descriptive" && (
-                <div className={`p-3 rounded-lg ${theme === "dark" ? "bg-blue-900 bg-opacity-20 border border-blue-800" : "bg-blue-50 border border-blue-200"} mt-2`}>
-                    <div className="flex items-center">
-                        <span className="mr-2">📝</span>
-                        <span className={`text-sm font-medium ${theme === "dark" ? "text-blue-300" : "text-blue-800"}`}>
-                            Descriptive Question
-                        </span>
-                        {question.word_limit && (
-                            <span className={`ml-2 text-xs ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}>
-                                (Word limit: {question.word_limit})
-                            </span>
-                        )}
-                    </div>
-                </div>
-            )}
         </div>
     );
 };

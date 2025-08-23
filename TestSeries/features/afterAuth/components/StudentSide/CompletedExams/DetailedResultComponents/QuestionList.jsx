@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { QuestionCard } from './QuestionCard';
 
-export const QuestionsList = ({ questions, userAnswers, theme }) => {
+export const QuestionsList = ({ questions, userAnswers, theme ,descriptiveResponses}) => {
   const [expandedQuestion, setExpandedQuestion] = useState(null);
 
   const toggleExpand = (id) => {
@@ -35,6 +35,7 @@ export const QuestionsList = ({ questions, userAnswers, theme }) => {
           isExpanded={expandedQuestion === question.id}
           onToggleExpand={() => toggleExpand(question.id)}
           theme={theme}
+          descriptiveResponses={descriptiveResponses}
         />
       ))}
     </div>

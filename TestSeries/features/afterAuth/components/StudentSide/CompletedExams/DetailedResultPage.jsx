@@ -37,8 +37,6 @@ const DetailedResultPage = () => {
     setFilterType,
     filterResult,
     setFilterResult,
-    viewMode,
-    setViewMode,
   } = useQuestionFilters();
 
   // Loading state
@@ -87,23 +85,24 @@ const DetailedResultPage = () => {
   const totalMarks = calculateTotalMarks(questions);
   const scoredMarks = resultData.marks || 0;
   const percentage = totalMarks > 0 ? ((scoredMarks / totalMarks) * 100).toFixed(2) : "N/A";
+  const filteredDescriptiveResponses = Object.fromEntries(resultData.descriptiveResponses.map((r)=>[r.questionId,r]) || {});
 
   // Calculate question status counts
   const correctCount = questions.filter(
-    (q) => getQuestionResult(q, userAnswers, theme).status === "correct"
+    (q) => getQuestionResult(q, userAnswers, theme ,filteredDescriptiveResponses).status === "correct"
   ).length;
   
   const incorrectCount = questions.filter((q) => {
-    const status = getQuestionResult(q, userAnswers, theme).status;
+    const status = getQuestionResult(q, userAnswers, theme ,filteredDescriptiveResponses).status;
     return status === "incorrect" || status === "partial";
   }).length;
   
   const unansweredCount = questions.filter(
-    (q) => getQuestionResult(q, userAnswers, theme).status === "unanswered"
+    (q) => getQuestionResult(q, userAnswers, theme ,filteredDescriptiveResponses).status === "unanswered"
   ).length;
   
   const descriptiveCount = questions.filter(
-    (q) => getQuestionResult(q, userAnswers, theme).status === "descriptive"
+    (q) => getQuestionResult(q, userAnswers, theme ,filteredDescriptiveResponses).status === "descriptive"
   ).length;
 
   return (
@@ -144,8 +143,6 @@ const DetailedResultPage = () => {
           setFilterType={setFilterType}
           filterResult={filterResult}
           setFilterResult={setFilterResult}
-          viewMode={viewMode}
-          setViewMode={setViewMode}
           theme={theme}
         />
 
@@ -154,6 +151,7 @@ const DetailedResultPage = () => {
           questions={filteredQuestions}
           userAnswers={userAnswers}
           theme={theme}
+          descriptiveResponses={filteredDescriptiveResponses}
         />
       </div>
     </div>

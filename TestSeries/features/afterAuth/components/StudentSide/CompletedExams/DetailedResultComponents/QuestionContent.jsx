@@ -5,7 +5,7 @@ import { MatchContent } from './MatchContent';
 import { ComprehensionContent } from './ComprehensionContent';
 import { AnswerSummary } from './AnswerSummary';
 
-export const QuestionContent = ({ question, userAnswers, result, theme }) => (
+export const QuestionContent = ({ question, userAnswers, result, theme ,descriptiveResponses}) => (
   <div>
     {/* Passage for comprehension */}
     {question.type === "comprehension" && question.passage && (
@@ -19,17 +19,7 @@ export const QuestionContent = ({ question, userAnswers, result, theme }) => (
       </div>
     )}
 
-    {/* Main question text */}
-    {question.question_text && (
-      <div className="mb-6">
-        <h4 className={`text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"} mb-2`}>
-          Question:
-        </h4>
-        <div className={`prose prose-sm max-w-none ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
-          {question.question_text}
-        </div>
-      </div>
-    )}
+
 
     {/* Question type specific content */}
     {question.type === "descriptive" && (
@@ -37,6 +27,7 @@ export const QuestionContent = ({ question, userAnswers, result, theme }) => (
         question={question} 
         userAnswer={userAnswers[question.id]} 
         theme={theme} 
+        descriptiveResponses={descriptiveResponses}
       />
     )}
     
@@ -45,6 +36,7 @@ export const QuestionContent = ({ question, userAnswers, result, theme }) => (
         question={question} 
         userAnswers={userAnswers} 
         theme={theme} 
+        descriptiveResponses={descriptiveResponses}
       />
     )}
     

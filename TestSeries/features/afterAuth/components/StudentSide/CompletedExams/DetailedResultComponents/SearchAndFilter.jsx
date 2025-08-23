@@ -7,8 +7,6 @@ export const SearchAndFilters = ({
   setFilterType, 
   filterResult, 
   setFilterResult, 
-  viewMode, 
-  setViewMode, 
   theme 
 }) => (
   <div className={`${theme === "dark" ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"} rounded-2xl border p-6 mb-8 shadow-sm`}>
@@ -66,16 +64,6 @@ export const SearchAndFilters = ({
           theme={theme}
         />
         
-        <FilterSelect
-          label="View:"
-          value={viewMode}
-          onChange={setViewMode}
-          options={[
-            { value: "detailed", label: "Detailed" },
-            { value: "compact", label: "Compact" }
-          ]}
-          theme={theme}
-        />
       </div>
     </div>
   </div>

@@ -4,7 +4,6 @@ export const useQuestionFilters = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [filterResult, setFilterResult] = useState("all");
-  const [viewMode, setViewMode] = useState("detailed");
 
   return {
     searchTerm,
@@ -13,8 +12,6 @@ export const useQuestionFilters = () => {
     setFilterType,
     filterResult,
     setFilterResult,
-    viewMode,
-    setViewMode,
   };
 };
 

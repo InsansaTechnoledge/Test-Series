@@ -3,10 +3,10 @@ import { getQuestionResult } from './resultCalculator';
 import { getQuestionTypeLabel } from './questionsUtils';
 import { QuestionContent } from './QuestionContent';
 
-export const ComprehensionContent = ({ question, userAnswers, theme }) => (
+export const ComprehensionContent = ({ question, userAnswers, theme ,descriptiveResponses}) => (
   <div className="space-y-4">
     {question.sub_questions.map((subQuestion, subIndex) => {
-      const subResult = getQuestionResult(subQuestion, userAnswers, theme);
+      const subResult = getQuestionResult(subQuestion, userAnswers, theme, descriptiveResponses);
       const userAnswer = userAnswers[subQuestion.id];
 
       return (
@@ -51,6 +51,7 @@ export const ComprehensionContent = ({ question, userAnswers, theme }) => (
               userAnswers={userAnswers}
               result={subResult}
               theme={theme}
+              descriptiveResponses={resultData.descriptiveResponses}
             />
           </div>
         </div>

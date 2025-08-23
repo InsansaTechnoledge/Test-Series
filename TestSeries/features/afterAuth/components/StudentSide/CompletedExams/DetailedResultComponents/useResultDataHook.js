@@ -1,31 +1,18 @@
 import { useState, useEffect } from 'react';
-import { getResultDetail } from '../../../../../../utils/services/resultPage';
+
+import { useCachedResultExamData } from '../../../../../../hooks/useResultExamData';
 
 export const useResultData = (examId, resultId) => {
   const [resultData, setResultData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { data, isLoading, isError } = useCachedResultExamData(examId, false, resultId);
 
   useEffect(() => {
-    const fetchResultData = async () => {
-      try {
-        setLoading(true);
-        const data = await getResultDetail(examId, false, resultId);
-        console.log("Fetched Result Data:", data);
-        setResultData(data.data);
-      } catch (err) {
-        setError(err.message || "Failed to fetch result data");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (examId) {
-      fetchResultData();
+    if (!isLoading && !isError) {
+      setResultData(data);
     }
-  }, [examId, resultId]);
+  }, [data, isLoading, isError]);
 
-  return { resultData, loading, error };
+  return { resultData, loading: isLoading, error: isError };
 };
 
 export default useResultData;
