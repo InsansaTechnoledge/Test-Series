@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { useUser } from "../../../contexts/currentUserContext";
 import { ChevronRight, ChevronLeft, Users, FileText, CheckCircle, Clock, Award, Eye, Lock, Save, AlertTriangle } from 'lucide-react';
@@ -15,6 +16,7 @@ import { useCachedResultExamData } from '../../../hooks/useResultExamData';
 import { saveDescriptiveResponse } from '../../../utils/services/resultService';
 import { useQueryClient } from '@tanstack/react-query';
 import { publishExamResults } from '../../../utils/services/examService';
+import { useTheme } from '../../../hooks/useTheme';
 
 const EvaluateExamPaper = () => {
   const { user } = useUser();
@@ -24,6 +26,7 @@ const EvaluateExamPaper = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [navigationPath, setNavigationPath] = useState(['Batches']);
+  const { theme } = useTheme();
 
   // New state for result management
   const [localStudentResultMap, setLocalStudentResultMap] = useState({});
@@ -42,13 +45,6 @@ const EvaluateExamPaper = () => {
     );
   }, [data?.results]);
   const queryClient = useQueryClient();
-
-  useEffect(() => {
-    console.log("Exam Data:", data);
-    console.log("Students:", students);
-    console.log("Questions:", questions);
-  }, [data, students, questions]);
-
 
   // Initialize local state when data changes
   useEffect(() => {
@@ -309,7 +305,6 @@ const EvaluateExamPaper = () => {
     ).length || 0;
   };
 
-
   const handlePublishResult = async () => {
     try {
       const response = await publishExamResults(selectedExam.id);
@@ -325,35 +320,34 @@ const EvaluateExamPaper = () => {
       console.error('Error publishing exam results:', error);
       alert('Error publishing exam results. Please try again.');
     }
-
   }
 
-
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'} p-6 transition-colors duration-200`}>
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Exam Paper Evaluation</h1>
-          <p className="text-gray-600 mt-2">Evaluate student submissions and publish results</p>
+          <h1 className={`text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+            Exam Paper Evaluation
+          </h1>
+          <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} mt-2`}>
+            Evaluate student submissions and publish results
+          </p>
         </div>
 
         {currentView !== 'batches' && (
-          <NavigationBreadcrumb path={navigationPath} onNavigate={handleNavigate} />
+          <NavigationBreadcrumb path={navigationPath} onNavigate={handleNavigate} theme={theme} />
         )}
-
-
-
 
         {/* Warning Modal */}
         {showLockWarning && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 max-w-md mx-4">
+            <div className={`${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'} rounded-lg p-6 max-w-md mx-4 shadow-2xl`}>
               <div className="flex items-center mb-4">
                 <AlertTriangle className="w-6 h-6 text-yellow-500 mr-3" />
                 <h3 className="text-lg font-semibold">Unsaved Changes</h3>
               </div>
 
-              <p className="text-gray-600 mb-6">
+              <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} mb-6`}>
                 You have unsaved changes for {selectedStudent?.name}. If you navigate away without locking the result,
                 all changes will be lost.
               </p>
@@ -364,19 +358,23 @@ const EvaluateExamPaper = () => {
                     setShowLockWarning(false);
                     setPendingNavigation(null);
                   }}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                  className={`flex-1 px-4 py-2 border rounded-lg transition-colors ${
+                    theme === 'dark' 
+                      ? 'border-gray-600 hover:bg-gray-700 text-gray-300' 
+                      : 'border-gray-300 hover:bg-gray-50 text-gray-700'
+                  }`}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleLockAndContinue}
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   Lock & Continue
                 </button>
                 <button
                   onClick={handleConfirmNavigationWithoutLock}
-                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                 >
                   Discard Changes
                 </button>
@@ -387,7 +385,9 @@ const EvaluateExamPaper = () => {
 
         {currentView === 'batches' && (
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Select Batch</h2>
+            <h2 className={`text-xl font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'} mb-6`}>
+              Select Batch
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {Object.values(batchMap).map(batch => (
                 user.role === 'user' ?
@@ -395,12 +395,14 @@ const EvaluateExamPaper = () => {
                     key={batch.id}
                     batch={batch}
                     onSelect={handleBatchSelect}
+                    theme={theme}
                   />)
                   :
                   (<BatchCard
                     key={batch.id}
                     batch={batch}
                     onSelect={handleBatchSelect}
+                    theme={theme}
                   />)
               ))}
             </div>
@@ -409,11 +411,13 @@ const EvaluateExamPaper = () => {
 
         {currentView === 'exams' && selectedBatch && (
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Select Exam</h2>
+            <h2 className={`text-xl font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'} mb-6`}>
+              Select Exam
+            </h2>
             <div className="space-y-4">
               {exams?.map(exam => (
                 exam.batch_id === selectedBatch.id && (exam.exam_type === 'subjective' || exam.exam_type === 'semi_subjective') && (
-                  <ExamCard key={exam.id} exam={exam} onSelect={handleExamSelect} />
+                  <ExamCard key={exam.id} exam={exam} onSelect={handleExamSelect} theme={theme} />
                 )
               ))}
             </div>
@@ -423,8 +427,10 @@ const EvaluateExamPaper = () => {
         {currentView === 'students' && selectedExam && (
           <div>
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-gray-900">Student List</h2>
-              <button className="flex items-center text-blue-600 hover:text-blue-700">
+              <h2 className={`text-xl font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                Student List
+              </h2>
+              <button className={`flex items-center ${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'} transition-colors`}>
                 <Eye className="w-4 h-4 mr-1" />
                 View Overview
               </button>
@@ -437,6 +443,7 @@ const EvaluateExamPaper = () => {
                   onSelect={handleStudentSelect}
                   result={localStudentResultMap[student._id] || studentResultMap[student._id]}
                   status={getStudentStatus(student._id)}
+                  theme={theme}
                 />
               ))}
             </div>
@@ -445,6 +452,7 @@ const EvaluateExamPaper = () => {
               studentsData={data?.results || []}
               handlePublishResult={handlePublishResult}
               status={selectedExam?.status}
+              theme={theme}
             />
           </div>
         )}
@@ -459,6 +467,7 @@ const EvaluateExamPaper = () => {
             handleLockResult={handleLockResult}
             handleQuestionSelect={handleQuestionSelect}
             localStudentResultMap={localStudentResultMap}
+            theme={theme}
           />
         )}
 
@@ -470,6 +479,7 @@ const EvaluateExamPaper = () => {
               // This can be used for additional logic if needed
             }}
             onSave={handleSave}
+            theme={theme}
           />
         )}
       </div>

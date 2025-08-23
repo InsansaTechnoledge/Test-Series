@@ -4,7 +4,6 @@ import { transformResultCorrectAnswer } from './transformers';
 export const AnswerSummary = ({ question, userAnswer, theme }) => {
    
   const renderAnswer = (answer, question = null) => {
- console.log("Rendering Answer Summary for question:🥳🥳🥳🥳🥳🥳🥳🥳", question.id,answer);
     if (answer === null || answer === undefined || answer === "") {
       return <span className="italic">Not answered</span>;
     }
