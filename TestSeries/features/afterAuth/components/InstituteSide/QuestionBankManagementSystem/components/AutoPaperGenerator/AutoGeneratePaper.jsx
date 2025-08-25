@@ -1,279 +1,266 @@
 import React, { useState } from 'react';
-import { 
-  Brain, 
-  Sparkles, 
-  FileText, 
-  Download, 
-  RefreshCw, 
-  Eye,
-  Wand2,
-  BookOpen,
-  Clock,
-  Award,
-  Lightbulb,
-  Send,
-  Zap
-} from 'lucide-react';
+import { Sparkles, RefreshCw, FileText, Download, AlertTriangle } from 'lucide-react';
 import axios from 'axios';
 
-const AIPromptExamGenerator = ({ questions }) => {
+const AIPromptExamGenerator = () => {
   const [prompt, setPrompt] = useState('');
   const [generatedPaper, setGeneratedPaper] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [showPreview, setShowPreview] = useState(false);
+  const [error, setError] = useState('');
+
+  const API_URL = 'http://3.236.209.208:8000/generate_exam';
 
   const handlePromptGeneration = async () => {
-    if (!prompt.trim() || !questions?.data?.length) return;
+    if (!prompt.trim()) return;
     
     setIsGenerating(true);
-    
-    try {
-      // Simulate processing delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const response = await axios.post('http://3.236.209.208:8000/generate_exam', {
-        'prompt' : 'generate me exam for 40 marks',
-        'organization_id' : '686e4d384529d5bc5f8a93e1'
-      })
+    setError('');
+    setGeneratedPaper(null);
 
-      console.log('as', response);
-      
-      
-      // For now, we'll just set a placeholder
+    try {
+      const response = await axios.post(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt,
+          organization_id: '686e4d384529d5bc5f8a93e1'
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
       const paper = {
-        title: "AI Generated Exam Paper",
-        totalQuestions: 0,
-        totalMarks: 0,
-        sections: [],
-        generatedAt: new Date().toISOString()
+        title: data?.title || 'AI Generated Exam Paper',
+        totalQuestions: data?.totalQuestions ?? 0,
+        totalMarks: data?.totalMarks ?? 0,
+        sections: Array.isArray(data?.sections) ? data.sections : [],
+        generatedAt: new Date().toISOString(),
+        raw: data
       };
-      
+
       setGeneratedPaper(paper);
-      setShowPreview(false);
-    } catch (error) {
-      console.error('Error generating paper:', error);
+    } catch (e) {
+      console.error('Error generating paper:', e);
+      setError('Failed to generate the exam. Please check your connection and try again.');
     } finally {
       setIsGenerating(false);
     }
   };
 
-  const downloadPDF = () => {
+  const downloadPaper = () => {
     if (!generatedPaper) return;
-    // pdfGenerator.generateAndDownload(generatedPaper);
-    console.log('Downloading PDF...');
+    
+    const lines = [];
+    lines.push(`${generatedPaper.title}`);
+    lines.push(`Generated: ${new Date(generatedPaper.generatedAt).toLocaleString()}`);
+    lines.push(`Questions: ${generatedPaper.totalQuestions} | Marks: ${generatedPaper.totalMarks}`);
+    lines.push('');
+    lines.push('='.repeat(50));
+    lines.push('');
+
+    generatedPaper.sections.forEach((section, i) => {
+      lines.push(`SECTION ${i + 1}: ${section?.title || 'Untitled'}`);
+      lines.push('-'.repeat(30));
+      
+      if (Array.isArray(section?.questions)) {
+        section.questions.forEach((q, qi) => {
+          lines.push(`${qi + 1}. ${q?.text || 'Question'} ${q?.marks ? `[${q.marks} marks]` : ''}`);
+          
+          if (Array.isArray(q?.options) && q.options.length) {
+            q.options.forEach((opt, oi) => {
+              lines.push(`   ${String.fromCharCode(97 + oi)}) ${opt}`);
+            });
+          }
+          lines.push('');
+        });
+      }
+      lines.push('');
+    });
+
+    const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${generatedPaper.title.replace(/\s+/g, '_')}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && e.ctrlKey) {
+      handlePromptGeneration();
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
-      {/* Header */}
-      <div className="bg-white/70 backdrop-blur-sm border-b border-gray-200/50 sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-6 py-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl text-white">
-              <Brain className="w-6 h-6" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                AI Exam Generator
-              </h1>
-              <p className="text-sm text-gray-600">Create perfect exam papers with natural language</p>
-            </div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Prompt Bar */}
+      <div className="bg-white border-b shadow-sm">
+        <div className="max-w-4xl mx-auto p-6">
+          <div className="relative">
+            <textarea
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              onKeyDown={handleKeyPress}
+              placeholder="Describe your exam requirements... (e.g., 'Create a 50-mark Data Structures exam with 60% MCQs and 40% short answers, covering arrays, linked lists, and trees. Mix of easy (40%), medium (40%), and hard (20%) questions for 90 minutes.')"
+              className="w-full h-24 px-4 py-3 pr-20 text-gray-900 placeholder-gray-500 border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent"
+              disabled={isGenerating}
+            />
+            <button
+              onClick={handlePromptGeneration}
+              disabled={isGenerating || !prompt.trim()}
+              className="absolute right-3 top-3 h-10 px-6 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+            >
+              {isGenerating ? (
+                <>
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4" />
+                  Generate
+                </>
+              )}
+            </button>
+          </div>
+          <div className="flex justify-between items-center mt-2 text-sm text-gray-500">
+            <span>{prompt.length}/2000 characters</span>
+            <span>Ctrl + Enter to generate</span>
           </div>
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-6 py-8">
-        {/* Stats Bar */}
-        <div className="mb-8 grid grid-cols-3 gap-4">
-          <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 border border-gray-200/50">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <BookOpen className="w-5 h-5 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Available Questions</p>
-                <p className="text-xl font-bold text-gray-900">{questions?.data?.length || 0}</p>
-              </div>
+      {/* Results */}
+      <div className="max-w-4xl mx-auto p-6">
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="font-medium text-red-900">Generation Failed</p>
+              <p className="text-red-700 text-sm">{error}</p>
             </div>
           </div>
-          
-          <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 border border-gray-200/50">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <Award className="w-5 h-5 text-green-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Papers Generated</p>
-                <p className="text-xl font-bold text-gray-900">{generatedPaper ? 1 : 0}</p>
-              </div>
-            </div>
+        )}
+
+        {isGenerating && (
+          <div className="bg-white rounded-xl border p-8 text-center">
+            <RefreshCw className="w-8 h-8 text-indigo-600 animate-spin mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Generating Your Exam</h3>
+            <p className="text-gray-600">Please wait while we create your personalized exam paper...</p>
           </div>
+        )}
 
-          <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 border border-gray-200/50">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Zap className="w-5 h-5 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">AI Powered</p>
-                <p className="text-xl font-bold text-gray-900">Ready</p>
-              </div>
+        {!generatedPaper && !isGenerating && !error && (
+          <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
+            <div className="w-16 h-16 mx-auto mb-4 bg-indigo-50 rounded-full flex items-center justify-center">
+              <FileText className="w-8 h-8 text-indigo-600" />
             </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Ready to Generate</h3>
+            <p className="text-gray-600">Enter your exam requirements above and click generate to create your paper.</p>
           </div>
-        </div>
+        )}
 
-        <div className="grid lg:grid-cols-5 gap-8">
-          {/* Prompt Input Section */}
-          <div className="lg:col-span-3 space-y-6">
-            <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 border border-gray-200/50 shadow-lg">
-              <div className="mb-6">
-                <div className="flex items-center gap-3 mb-3">
-                  <Wand2 className="w-6 h-6 text-indigo-600" />
-                  <h2 className="text-xl font-bold text-gray-900">Describe Your Exam</h2>
-                </div>
-                <p className="text-gray-600">Tell the AI what kind of exam paper you need in natural language</p>
-              </div>
-
-              <div className="relative mb-6">
-                <textarea
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="Example: Create a 100-mark physics exam on mechanics with 30% easy, 50% medium, and 20% hard questions covering kinematics, dynamics, and energy..."
-                  className="w-full h-32 p-4 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none text-gray-900 placeholder-gray-500 bg-white/50 backdrop-blur-sm"
-                  disabled={isGenerating}
-                />
-                <div className="absolute bottom-3 right-3 text-xs text-gray-400">
-                  {prompt.length}/1000
-                </div>
-              </div>
-
-              <button
-                onClick={handlePromptGeneration}
-                disabled={isGenerating || !prompt.trim() || !questions?.data?.length}
-                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 px-6 rounded-2xl hover:from-indigo-700 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-3 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-              >
-                {isGenerating ? (
-                  <>
-                    <RefreshCw className="w-5 h-5 animate-spin" />
-                    AI is creating your exam...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-5 h-5" />
-                    Generate Exam Paper
-                    <Send className="w-4 h-4" />
-                  </>
-                )}
-              </button>
-
-              {!questions?.data?.length && (
-                <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-2xl">
-                  <div className="flex items-center gap-2 text-amber-800">
-                    <Lightbulb className="w-5 h-5" />
-                    <span className="font-medium">No questions available</span>
-                  </div>
-                  <p className="text-sm text-amber-700 mt-1">
-                    Please upload or load question bank data to generate exam papers.
+        {generatedPaper && (
+          <div className="bg-white rounded-xl border shadow-sm">
+            {/* Header */}
+            <div className="px-6 py-4 border-b bg-indigo-50 rounded-t-xl">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900">{generatedPaper.title}</h2>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Generated on {new Date(generatedPaper.generatedAt).toLocaleDateString()} at{' '}
+                    {new Date(generatedPaper.generatedAt).toLocaleTimeString()}
                   </p>
+                </div>
+                <button
+                  onClick={downloadPaper}
+                  className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                >
+                  <Download className="w-4 h-4" />
+                  Download
+                </button>
+              </div>
+            </div>
+
+            {/* Stats */}
+            <div className="px-6 py-4 border-b bg-gray-50">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-indigo-600">{generatedPaper.totalQuestions}</div>
+                  <div className="text-sm text-gray-600">Total Questions</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-indigo-600">{generatedPaper.totalMarks}</div>
+                  <div className="text-sm text-gray-600">Total Marks</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="p-6">
+              {Array.isArray(generatedPaper.sections) && generatedPaper.sections.length > 0 ? (
+                <div className="space-y-8">
+                  {generatedPaper.sections.map((section, sIndex) => (
+                    <div key={sIndex}>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b">
+                        Section {sIndex + 1}: {section?.title || 'Untitled Section'}
+                      </h3>
+                      
+                      {Array.isArray(section?.questions) && section.questions.length > 0 ? (
+                        <div className="space-y-4">
+                          {section.questions.map((question, qIndex) => (
+                            <div key={qIndex} className="p-4 bg-gray-50 rounded-lg">
+                              <div className="flex justify-between items-start mb-2">
+                                <p className="font-medium text-gray-900 flex-1">
+                                  <span className="text-indigo-600 font-semibold">{qIndex + 1}.</span>{' '}
+                                  {question?.text || 'Question text'}
+                                </p>
+                                {question?.marks && (
+                                  <span className="ml-4 px-2 py-1 bg-indigo-100 text-indigo-800 text-xs font-medium rounded">
+                                    {question.marks} marks
+                                  </span>
+                                )}
+                              </div>
+                              
+                              {Array.isArray(question?.options) && question.options.length > 0 && (
+                                <div className="mt-3 space-y-1">
+                                  {question.options.map((option, oIndex) => (
+                                    <div key={oIndex} className="text-gray-700 text-sm">
+                                      <span className="font-medium text-indigo-600">
+                                        {String.fromCharCode(97 + oIndex)})
+                                      </span>{' '}
+                                      {option}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-gray-500 italic">No questions available in this section.</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-500">No sections generated. Try a different prompt.</p>
                 </div>
               )}
             </div>
-
-            {/* AI Tips */}
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-3xl p-6 border border-blue-200/50">
-              <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                <Lightbulb className="w-5 h-5 text-blue-600" />
-                Pro Tips for Better Results
-              </h3>
-              <ul className="space-y-2 text-sm text-gray-700">
-                <li className="flex items-start gap-2">
-                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                  <span>Specify total marks, difficulty distribution, and time duration</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                  <span>Mention specific topics or chapters to include</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                  <span>Include question types (MCQ, short answer, essay)</span>
-                </li>
-              </ul>
-            </div>
           </div>
-
-          {/* Generated Paper Section */}
-          <div className="lg:col-span-2 space-y-6">
-            {generatedPaper ? (
-              <>
-                <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 border border-gray-200/50 shadow-lg">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                      <FileText className="w-5 h-5 text-green-600" />
-                      Generated Paper
-                    </h3>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => setShowPreview(!showPreview)}
-                        className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={downloadPDF}
-                        className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-                      >
-                        <Download className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3 text-sm">
-                    <div className="p-3 bg-green-50 rounded-2xl">
-                      <p className="text-green-800 font-medium">✨ Paper generated successfully!</p>
-                      <p className="text-green-700 text-xs mt-1">Ready for review and download</p>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="p-3 bg-gray-50 rounded-xl">
-                        <p className="text-gray-600 text-xs">Total Questions</p>
-                        <p className="font-bold text-gray-900">{generatedPaper.totalQuestions || 0}</p>
-                      </div>
-                      <div className="p-3 bg-gray-50 rounded-xl">
-                        <p className="text-gray-600 text-xs">Total Marks</p>
-                        <p className="font-bold text-gray-900">{generatedPaper.totalMarks || 0}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {showPreview && (
-                  <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 border border-gray-200/50 shadow-lg">
-                    <h4 className="font-semibold text-gray-900 mb-4">Preview</h4>
-                    <div className="text-sm text-gray-600 space-y-2">
-                      <p>Paper preview would be displayed here...</p>
-                      {/* Paper preview content would go here */}
-                    </div>
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="bg-white/50 backdrop-blur-sm rounded-3xl p-8 border border-gray-200/50 text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <FileText className="w-8 h-8 text-indigo-600" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">No Paper Generated Yet</h3>
-                <p className="text-gray-600 text-sm mb-4">
-                  Describe your exam requirements and let AI create the perfect paper for you
-                </p>
-                <div className="inline-flex items-center gap-2 text-xs text-indigo-600 bg-indigo-50 px-3 py-2 rounded-full">
-                  <Brain className="w-4 h-4" />
-                  AI Ready
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
