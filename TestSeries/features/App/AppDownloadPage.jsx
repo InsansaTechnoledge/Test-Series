@@ -72,12 +72,14 @@ export default function EvalvoDownloadPage() {
                     </button>
 
                     <button
-                      className="flex-1 bg-white hover:bg-gray-50 text-gray-900 px-6 py-4 rounded-lg font-medium transition-all duration-200 border border-gray-300 hover:border-gray-400 flex items-center justify-center space-x-3"
+                      disabled
+                      className="flex-1 cursor-not-allowed bg-white hover:bg-gray-50 text-gray-900 px-6 py-4 rounded-lg font-medium transition-all duration-200 border border-gray-300 hover:border-gray-400 flex items-center justify-center space-x-3"
                       onClick={() => handleDownload(
                         'https://github.com/InsansaTechnoledge/Test-Series/releases/download/evalvoTech/Evalvo.Proctor-1.0.0.dmg',
                         'Evalvo.Proctor-1.0.0.dmg'
                       )}
                     >
+
                       <Apple className="w-5 h-5" />
                       <span>Download for macOS</span>
                       <Download className="w-4 h-4 opacity-70" />

@@ -494,7 +494,7 @@ const handleSubmitClick = useCallback(async () => {
       <ToasterComponent />
 
       {/* Security Header */}
-      <WarningHeaderForExams examViolations={examViolations} theme={theme} warningCount={warningCount} />
+      {/* <WarningHeaderForExams examViolations={examViolations} theme={theme} warningCount={warningCount} /> */}
 
       {/* Professional Exam Header */}
       <div className={`border-b-2 ${theme === 'light' ? 'bg-white border-blue-200' : 'bg-gray-800 border-blue-600'} shadow-sm`}>
