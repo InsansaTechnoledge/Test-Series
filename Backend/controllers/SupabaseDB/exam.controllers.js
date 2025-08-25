@@ -33,8 +33,6 @@ export const addExam = async (req, res) => {
   }
 };
 
-
-
 export const updateExamById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -97,7 +95,6 @@ export const fetchExamBasedOnCondition = async (req, res) => {
   }
 };
 
-
 export const deleteExamById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -115,7 +112,6 @@ export const deleteExamByBatchId = async (batchId) => {
   const exams = await deleteExam(null, batchId);
   return exams;
 }
-
 
 export const goLiveExamById = async (req, res) => {
   try {

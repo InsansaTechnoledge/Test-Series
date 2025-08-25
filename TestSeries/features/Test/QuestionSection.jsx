@@ -11,6 +11,7 @@ import NumericalQuestion from "./QuestionTypes/NumericQuestion";
 import FillInTheBlankQuestion from "./QuestionTypes/FillInTheBlankQuestion";
 import SubmitModal from "./utils/SubmitResultComponent";
 import DescriptiveQuestion from "./QuestionTypes/DescriptiveQuestion";
+import ComprehensionQuestion from "./QuestionTypes/ComprehensionQuestion";
 
 const QuestionSection = ({
   setSelectedQuestion,
@@ -393,6 +394,8 @@ const QuestionSection = ({
               );
             case "code":
               return <CodeQuestion selectedQuestion={selectedQuestion} option={option} setOption={setOption} />;
+            case "comprehension":
+              return <ComprehensionQuestion selectedQuestion={selectedQuestion} option={option} setOption={setOption} />;
             default:
               return null;
           }

@@ -35,6 +35,8 @@ export const VITE_PLAN_FEATURE_MAP= `{
   "/institute/video": ["videoMaterial_feature"],  
   "/institute/video/upload": ["videoMaterial_feature"],
   "/institute/certificate-assignment": ["certification_feature"],
+  "/institute/evaluate-exams": ["exam_feature"],
+  "/institute/result-section": ["exam_feature"],
 
   "/student/upcoming-exams": ["exam_feature"],
   "/student/completed-exams": ["exam_feature"],
@@ -78,6 +80,8 @@ export const VITE_ROLE_FEATURE_MAP= `{
   "/institute/create-exam/:examId": ["exam:edit_exam"],
   "/institute/exam-list": ["exam:view_exam", "exam:publish_exam", "exam:edit_exam", "exam:delete_exam","exam:create_exam"],
   "/institute/exam-anomaly": ["proctor:monitor_proctored_exam"],
+  "/institute/evaluate-exams": ["exam:evaluate_exam","exam:view_exam","exam:edit_exam","exam:delete_exam","exam:create_exam"],
+  "/institute/result-section": ["exam:view_result","exam:view_exam","exam:edit_exam","exam:delete_exam","exam:create_exam"],
 
   "/institute/create-user": ["user:create_user"],
   "/institute/user-list": ["user:view_user", "user:edit_user", "user:delete_user","user:create_user"],
