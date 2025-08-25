@@ -69,6 +69,7 @@ import CertificateAssignment from '../../features/afterAuth/components/Institute
 import LogComponent from '../../features/afterAuth/components/InstituteSide/LogsComponent/LogComponent';
 import EvaluateExamPaper from '../../features/Test/ExamEvaluation/EvaluateExamPaper';
 import ContactUsComponent from '../../features/afterAuth/components/ErrorContact/ContactUsComponent';
+import ResultListPage from '../../features/afterAuth/components/InstituteSide/Results/ResultListPage';
 // import LogComponent from '../../features/afterAuth/components/InstituteSide/Logs/LogComponent';
 LogComponent
 
@@ -339,10 +340,11 @@ const PageLinks = () => {
                 <Route path='syllabus/:syllabusId' element={<SyllabusViewPage />} />
                 <Route path='certificate-assignment' element={<CertificateAssignment/>}/>
                 <Route path='check-logs' element={<LogComponent/>}/>
-                        <Route path='evaluate-exams' element={<EvaluateExamPaper />} />
+                <Route path='evaluate-exams' element={<EvaluateExamPaper />} />
+                <Route path='result-section' element={<ResultListPage/>}/>
                 {user?.role === "organization" && (
-          <Route path='institute-subscription' element={<YourPlanPage />} />
-        )}
+                  <Route path='institute-subscription' element={<YourPlanPage />} />
+                )}
                 <Route path='*' element={<FallBackPageForOrg />} />
                 
               </Route>

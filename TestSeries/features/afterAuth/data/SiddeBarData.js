@@ -117,6 +117,12 @@ export const controlData = [
     icon: Book,
     activeIcon: AnomalyIcon
   },
+  {
+    name: "View Results",
+    path: "result-section",
+    icon: Book,
+    activeIcon: AnomalyIcon
+  },
     {
     name: "Upload videos",
     path: "video",
@@ -177,7 +183,8 @@ export const categoryData = [
       'Create Exams',
       'Exam List Page',
       'Exam Anomaly Center',
-      'Exam Evaluation Center'
+      'Exam Evaluation Center',
+      'View Results'
     ]
   },
   {

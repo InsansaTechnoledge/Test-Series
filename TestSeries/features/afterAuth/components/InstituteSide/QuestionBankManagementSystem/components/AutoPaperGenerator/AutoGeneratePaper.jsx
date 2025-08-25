@@ -1,339 +1,282 @@
-import React, { useState, useMemo } from 'react';
-import { FileText, Settings, Download, RefreshCw, Eye, Filter, BarChart3, PieChart, Brain, MessageSquare, Lightbulb } from 'lucide-react';
-import { analysisUtils } from './utils/analysisUtils';
-import { pdfGenerator } from './utils/pdfGenerator';
-import { promptParser } from './utils/promptParser';
-import {examGenerationAlgorithm} from './Algorithms/examGenerationAlgorithm'
-import GenerationModeSelector from './components/GenerationModeSelector';
-import PromptBasedGeneration from './components/PromptBasedGeneration';
-import BloomBasedConfiguration from './components/BloomBasedConfiguration';
-import PaperConfiguration from './components/PaperConfiguration';
-import FilterSection from './components/FilterSection';
-import SubjectDistribution from './components/SubjectDistribution';
-import PaperSummary from './components/PaperSummary';
-import PaperPreview from './components/PaperPreview';
+import React, { useState } from 'react';
+import { 
+  Brain, 
+  Sparkles, 
+  FileText, 
+  Download, 
+  RefreshCw, 
+  Eye,
+  Wand2,
+  BookOpen,
+  Clock,
+  Award,
+  Lightbulb,
+  Send,
+  Zap
+} from 'lucide-react';
+import axios from 'axios';
 
+const AIPromptExamGenerator = ({ questions }) => {
+  const [prompt, setPrompt] = useState('');
+  const [generatedPaper, setGeneratedPaper] = useState(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
-
-const AutoGeneratePaper = ({ questions }) => {
-    const [generationMode, setGenerationMode] = useState('traditional');
-    const [formData, setFormData] = useState({
-      paperTitle: '',
-      totalMarks: 100,
-      timeLimit: 60,
-      subjects: {},
-      difficultyDistribution: {
-        easy: 30,
-        medium: 50,
-        hard: 20
-      },
-      marksPerQuestion: {
-        easy: 2,
-        medium: 4,
-        hard: 6
-      },
-      bloomDistribution: {
-        remember: 10,
-        understand: 20,
-        apply: 25,
-        analyze: 20,
-        evaluate: 15,
-        create: 10
-      },
-      filters: {
-        difficulty: 'all',
-        subjectFilter: 'all',
-        bloomFilter: 'all',
-        chapterFilter: 'all'
-      }
-    });
+  const handlePromptGeneration = async () => {
+    if (!prompt.trim() || !questions?.data?.length) return;
     
-    const [generatedPaper, setGeneratedPaper] = useState(null);
-    const [isGenerating, setIsGenerating] = useState(false);
-    const [showPreview, setShowPreview] = useState(false);
-  
-    const analysisData = useMemo(() => {
-      return analysisUtils.analyzeQuestions(questions?.data || []);
-    }, [questions]);
-  
-    const handleInputChange = (field, value) => {
-      setFormData(prev => ({ ...prev, [field]: value }));
-    };
-  
-    const handleNestedChange = (section, field, value) => {
-      setFormData(prev => ({
-        ...prev,
-        [section]: { ...prev[section], [field]: value }
-      }));
-    };
-  
-    const handleSubjectChange = (subject, marks) => {
-      setFormData(prev => ({
-        ...prev,
-        subjects: { ...prev.subjects, [subject]: parseInt(marks) || 0 }
-      }));
-    };
-  
-    const getFilteredQuestions = () => {
-      if (!questions?.data) return [];
+    setIsGenerating(true);
+    
+    try {
+      // Simulate processing delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
-      return questions.data.filter(q => {
-        const filters = formData.filters || {};
-        const difficultyMatch = !filters.difficulty || filters.difficulty === 'all' || 
-          q.difficulty?.toLowerCase() === filters.difficulty;
-        const subjectMatch = !filters.subjectFilter || filters.subjectFilter === 'all' || 
-          q.subject === filters.subjectFilter;
-        const bloomMatch = !filters.bloomFilter || filters.bloomFilter === 'all' || 
-          q.bloom_level?.toLowerCase() === filters.bloomFilter;
-        const chapterMatch = !filters.chapterFilter || filters.chapterFilter === 'all' || 
-          q.chapter === filters.chapterFilter;
-        
-        return difficultyMatch && subjectMatch && bloomMatch && chapterMatch;
-      });
-    };
-  
-    const distributeMarksEqually = () => {
-      const filteredQuestions = getFilteredQuestions();
-      const subjectCounts = {};
+      const response = await axios.post('http://3.236.209.208:8000/generate_exam', {
+        'prompt' : 'generate me exam for 40 marks',
+        'organization_id' : '686e4d384529d5bc5f8a93e1'
+      })
+
+      console.log('as', response);
       
-      filteredQuestions.forEach(q => {
-        const subject = q.subject?.trim();
-        if (subject) {
-          subjectCounts[subject] = (subjectCounts[subject] || 0) + 1;
-        }
-      });
       
-      const availableSubjects = Object.keys(subjectCounts);
-      if (availableSubjects.length === 0) return;
+      // For now, we'll just set a placeholder
+      const paper = {
+        title: "AI Generated Exam Paper",
+        totalQuestions: 0,
+        totalMarks: 0,
+        sections: [],
+        generatedAt: new Date().toISOString()
+      };
       
-      const marksPerSubject = Math.floor(formData.totalMarks / availableSubjects.length);
-      const remainder = formData.totalMarks % availableSubjects.length;
-      
-      const distribution = {};
-      availableSubjects.forEach((subject, index) => {
-        let allocated = marksPerSubject;
-        if (index < remainder) allocated += 1;
-        distribution[subject] = allocated;
-      });
-      
-      setFormData(prev => ({ ...prev, subjects: distribution }));
-    };
-  
-    const handlePromptGeneration = (prompt) => {
-      const filteredQuestions = getFilteredQuestions();
-      if (!filteredQuestions.length) return;
-      
-      // Parse the prompt to get configuration
-      const promptConfig = promptParser.parsePrompt(prompt, filteredQuestions);
-      
-      // Update form data with parsed configuration
-      setFormData(prev => ({
-        ...prev,
-        ...promptConfig
-      }));
-      
-      // Generate paper with the parsed configuration
-      generatePaper(promptConfig, 'prompt');
-    };
-  
-    const generatePaper = async (customConfig = null, mode = generationMode) => {
-      const filteredQuestions = getFilteredQuestions();
-      if (!filteredQuestions.length) return;
-      
-      setIsGenerating(true);
-      
-      try {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        const config = customConfig || formData;
-        const paper = examGenerationAlgorithm.generateExam({
-          questions: filteredQuestions,
-          config,
-          mode
-        });
-        
-        setGeneratedPaper(paper);
-        setShowPreview(false);
-      } catch (error) {
-        console.error('Error generating paper:', error);
-      } finally {
-        setIsGenerating(false);
-      }
-    };
-  
-    const downloadPDF = () => {
-      if (!generatedPaper) return;
-      pdfGenerator.generateAndDownload(generatedPaper);
-    };
-  
-    const filteredQuestions = getFilteredQuestions();
-    const filteredSubjectCounts = {};
-    filteredQuestions.forEach(q => {
-      const subject = q.subject?.trim();
-      if (subject) {
-        filteredSubjectCounts[subject] = (filteredSubjectCounts[subject] || 0) + 1;
-      }
-    });
-  
-    const totalSelectedMarks = Object.values(formData.subjects).reduce((sum, marks) => sum + (marks || 0), 0);
-  
-    const renderConfigurationPanel = () => {
-      switch (generationMode) {
-        case 'bloom':
-          return (
-            <BloomBasedConfiguration 
-              formData={formData}
-              handleInputChange={handleInputChange}
-              handleNestedChange={handleNestedChange}
-              analysisData={analysisData}
-            />
-          );
-        case 'prompt':
-          return (
-            <PromptBasedGeneration 
-              onGenerate={handlePromptGeneration}
-              analysisData={analysisData}
-            />
-          );
-        default:
-          return (
-            <PaperConfiguration 
-              formData={formData}
-              handleInputChange={handleInputChange}
-              handleNestedChange={handleNestedChange}
-              filteredQuestions={filteredQuestions}
-            />
-          );
-      }
-    };
-  
-    return (
-      <div className={`mt-8 px-4 mx-6 rounded-2xl border  py-6 shadow-sm`}>
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2 flex items-center gap-2">
-            Auto Generate Exam Paper
-          </h1>
-          <p className="text-gray-600">Create customized exam papers with advanced filtering and distribution options</p>
-          <div className="mt-2 text-sm text-blue-600 font-medium">
-            Total Questions: {questions?.data?.length || 0} | After Filters: {filteredQuestions.length} | Subjects: {Object.keys(analysisData.subjects).length}
+      setGeneratedPaper(paper);
+      setShowPreview(false);
+    } catch (error) {
+      console.error('Error generating paper:', error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const downloadPDF = () => {
+    if (!generatedPaper) return;
+    // pdfGenerator.generateAndDownload(generatedPaper);
+    console.log('Downloading PDF...');
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+      {/* Header */}
+      <div className="bg-white/70 backdrop-blur-sm border-b border-gray-200/50 sticky top-0 z-10">
+        <div className="max-w-4xl mx-auto px-6 py-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl text-white">
+              <Brain className="w-6 h-6" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                AI Exam Generator
+              </h1>
+              <p className="text-sm text-gray-600">Create perfect exam papers with natural language</p>
+            </div>
           </div>
         </div>
-  
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Configuration Form */}
-          <div className="lg:col-span-1 space-y-4">
-            <GenerationModeSelector 
-              mode={generationMode}
-              setMode={setGenerationMode}
-            />
-  
-            {renderConfigurationPanel()}
-  
-            {generationMode !== 'prompt' && (
-              <>
-                <FilterSection 
-                  formData={formData}
-                  handleInputChange={handleInputChange}
-                  analysisData={analysisData}
-                />
-  
-                <SubjectDistribution 
-                  formData={formData}
-                  handleSubjectChange={handleSubjectChange}
-                  distributeMarksEqually={distributeMarksEqually}
-                  filteredSubjectCounts={filteredSubjectCounts}
-                  totalSelectedMarks={totalSelectedMarks}
-                />
-  
-                <button
-                  onClick={() => generatePaper()}
-                  disabled={isGenerating || (generationMode !== 'bloom' && totalSelectedMarks === 0) || Object.keys(filteredSubjectCounts).length === 0}
-                  className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
-                >
-                  {isGenerating ? (
-                    <>
-                      <RefreshCw className="w-4 h-4 animate-spin" />
-                      Generating Paper...
-                    </>
-                  ) : (
-                    <>
-                      <FileText className="w-4 h-4" />
-                      Generate Paper
-                    </>
-                  )}
-                </button>
-              </>
-            )}
-  
-            {/* Quick Stats */}
-            <div className="bg-blue-50 p-3 rounded-lg">
-              <h4 className="text-sm font-semibold text-gray-800 mb-2">Quick Stats</h4>
-              <div className="text-xs text-gray-700 space-y-1">
-                <div>Available Questions: {filteredQuestions.length}</div>
-                <div>Selected Subjects: {Object.keys(formData.subjects).filter(s => formData.subjects[s] > 0).length}</div>
-                <div>Total Marks Allocated: {totalSelectedMarks}</div>
-                <div>Generation Mode: <span className="capitalize font-medium">{generationMode}</span></div>
-                {totalSelectedMarks > 0 && generationMode !== 'bloom' && (
-                  <div>Est. Questions: ~{Math.ceil(totalSelectedMarks / ((formData.marksPerQuestion.easy + formData.marksPerQuestion.medium + formData.marksPerQuestion.hard) / 3))}</div>
-                )}
+      </div>
+
+      <div className="max-w-4xl mx-auto px-6 py-8">
+        {/* Stats Bar */}
+        <div className="mb-8 grid grid-cols-3 gap-4">
+          <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 border border-gray-200/50">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <BookOpen className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Available Questions</p>
+                <p className="text-xl font-bold text-gray-900">{questions?.data?.length || 0}</p>
               </div>
             </div>
           </div>
-  
-          {/* Generated Paper Preview/Summary */}
-          <div className="lg:col-span-2 space-y-4">
+          
+          <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 border border-gray-200/50">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <Award className="w-5 h-5 text-green-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Papers Generated</p>
+                <p className="text-xl font-bold text-gray-900">{generatedPaper ? 1 : 0}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 border border-gray-200/50">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <Zap className="w-5 h-5 text-purple-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">AI Powered</p>
+                <p className="text-xl font-bold text-gray-900">Ready</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid lg:grid-cols-5 gap-8">
+          {/* Prompt Input Section */}
+          <div className="lg:col-span-3 space-y-6">
+            <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 border border-gray-200/50 shadow-lg">
+              <div className="mb-6">
+                <div className="flex items-center gap-3 mb-3">
+                  <Wand2 className="w-6 h-6 text-indigo-600" />
+                  <h2 className="text-xl font-bold text-gray-900">Describe Your Exam</h2>
+                </div>
+                <p className="text-gray-600">Tell the AI what kind of exam paper you need in natural language</p>
+              </div>
+
+              <div className="relative mb-6">
+                <textarea
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  placeholder="Example: Create a 100-mark physics exam on mechanics with 30% easy, 50% medium, and 20% hard questions covering kinematics, dynamics, and energy..."
+                  className="w-full h-32 p-4 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none text-gray-900 placeholder-gray-500 bg-white/50 backdrop-blur-sm"
+                  disabled={isGenerating}
+                />
+                <div className="absolute bottom-3 right-3 text-xs text-gray-400">
+                  {prompt.length}/1000
+                </div>
+              </div>
+
+              <button
+                onClick={handlePromptGeneration}
+                disabled={isGenerating || !prompt.trim() || !questions?.data?.length}
+                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 px-6 rounded-2xl hover:from-indigo-700 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-3 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              >
+                {isGenerating ? (
+                  <>
+                    <RefreshCw className="w-5 h-5 animate-spin" />
+                    AI is creating your exam...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-5 h-5" />
+                    Generate Exam Paper
+                    <Send className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+
+              {!questions?.data?.length && (
+                <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-2xl">
+                  <div className="flex items-center gap-2 text-amber-800">
+                    <Lightbulb className="w-5 h-5" />
+                    <span className="font-medium">No questions available</span>
+                  </div>
+                  <p className="text-sm text-amber-700 mt-1">
+                    Please upload or load question bank data to generate exam papers.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* AI Tips */}
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-3xl p-6 border border-blue-200/50">
+              <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <Lightbulb className="w-5 h-5 text-blue-600" />
+                Pro Tips for Better Results
+              </h3>
+              <ul className="space-y-2 text-sm text-gray-700">
+                <li className="flex items-start gap-2">
+                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                  <span>Specify total marks, difficulty distribution, and time duration</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                  <span>Mention specific topics or chapters to include</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                  <span>Include question types (MCQ, short answer, essay)</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Generated Paper Section */}
+          <div className="lg:col-span-2 space-y-6">
             {generatedPaper ? (
               <>
-                <PaperSummary 
-                  generatedPaper={generatedPaper}
-                  showPreview={showPreview}
-                  setShowPreview={setShowPreview}
-                  downloadPDF={downloadPDF}
-                />
-  
+                <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 border border-gray-200/50 shadow-lg">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                      <FileText className="w-5 h-5 text-green-600" />
+                      Generated Paper
+                    </h3>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setShowPreview(!showPreview)}
+                        className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={downloadPDF}
+                        className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                      >
+                        <Download className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 text-sm">
+                    <div className="p-3 bg-green-50 rounded-2xl">
+                      <p className="text-green-800 font-medium">✨ Paper generated successfully!</p>
+                      <p className="text-green-700 text-xs mt-1">Ready for review and download</p>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="p-3 bg-gray-50 rounded-xl">
+                        <p className="text-gray-600 text-xs">Total Questions</p>
+                        <p className="font-bold text-gray-900">{generatedPaper.totalQuestions || 0}</p>
+                      </div>
+                      <div className="p-3 bg-gray-50 rounded-xl">
+                        <p className="text-gray-600 text-xs">Total Marks</p>
+                        <p className="font-bold text-gray-900">{generatedPaper.totalMarks || 0}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 {showPreview && (
-                  <PaperPreview generatedPaper={generatedPaper} />
+                  <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 border border-gray-200/50 shadow-lg">
+                    <h4 className="font-semibold text-gray-900 mb-4">Preview</h4>
+                    <div className="text-sm text-gray-600 space-y-2">
+                      <p>Paper preview would be displayed here...</p>
+                      {/* Paper preview content would go here */}
+                    </div>
+                  </div>
                 )}
               </>
             ) : (
-              <div className="bg-gray-50 p-12 rounded-lg text-center">
-                <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-600 mb-2">No Paper Generated</h3>
-                <p className="text-gray-500 mb-4">Configure your paper settings and filters, then click "Generate Paper"</p>
-                
-                {Object.keys(filteredSubjectCounts).length === 0 && (
-                  <div className="bg-yellow-50 border border-yellow-200 rounded p-3 text-sm text-yellow-800">
-                    <strong>No questions available with current filters.</strong><br />
-                    Try adjusting your difficulty or subject filters to see available questions.
-                  </div>
-                )}
-                
-                {Object.keys(filteredSubjectCounts).length > 0 && totalSelectedMarks === 0 && generationMode !== 'bloom' && generationMode !== 'prompt' && (
-                  <div className="bg-blue-50 border border-blue-200 rounded p-3 text-sm text-blue-800">
-                    <strong>Configure subject marks distribution.</strong><br />
-                    Use "Auto Distribute" or manually set marks for each subject.
-                  </div>
-                )}
-  
-                {generationMode === 'prompt' && (
-                  <div className="bg-green-50 border border-green-200 rounded p-3 text-sm text-green-800">
-                    <strong>Use AI Prompt Generation.</strong><br />
-                    Describe your exam requirements in natural language to generate a paper automatically.
-                  </div>
-                )}
-  
-                {generationMode === 'bloom' && (
-                  <div className="bg-purple-50 border border-purple-200 rounded p-3 text-sm text-purple-800">
-                    <strong>Configure Bloom's Taxonomy Distribution.</strong><br />
-                    Set the percentage distribution for different cognitive levels and generate your paper.
-                  </div>
-                )}
+              <div className="bg-white/50 backdrop-blur-sm rounded-3xl p-8 border border-gray-200/50 text-center">
+                <div className="w-16 h-16 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <FileText className="w-8 h-8 text-indigo-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">No Paper Generated Yet</h3>
+                <p className="text-gray-600 text-sm mb-4">
+                  Describe your exam requirements and let AI create the perfect paper for you
+                </p>
+                <div className="inline-flex items-center gap-2 text-xs text-indigo-600 bg-indigo-50 px-3 py-2 rounded-full">
+                  <Brain className="w-4 h-4" />
+                  AI Ready
+                </div>
               </div>
             )}
           </div>
         </div>
       </div>
-    );
-  };
+    </div>
+  );
+};
 
-export default AutoGeneratePaper
+export default AIPromptExamGenerator;

@@ -17,6 +17,8 @@ export const VITE_PLAN_FEATURE_MAP= `{
   "/institute/student-edit": ["student_feature"],
   "/institute/create-role-group": ["role_feature"],
   "/institute/create-exam": ["exam_feature"],
+  "/institute/result-section": ["exam_feature"],
+  "/institute/evaluate-exams" : ["exam_feature"],
   "/institute/create-exam/:examId": ["exam_feature"],
   "/institute/exam-list": ["exam_feature"],
   "/institute/create-user": ["user_feature"], 
